@@ -80,8 +80,10 @@ export class SchedulePage {
     this.getProductById(173); 
   }
 
-  scannedValue: string = '';
+
+
   componentsEnabled: boolean = true;
+  scannedValue: string = '';
   async startScan() {
     try {
       const devices = await BrowserMultiFormatReader.listVideoInputDevices();

@@ -218,7 +218,7 @@ import { ApplyComponent } from '../modal/apply/apply.component';
 
 
 
-  product:any
+   product:any
   getProductById(id: number) {
     this.productService.getProductById(id).subscribe(data => {
       this.product = data[0];
@@ -299,7 +299,7 @@ import { ApplyComponent } from '../modal/apply/apply.component';
     }
   }
 
-  updateProductQty(productId:number,datos:any){
+ updateProductQty(productId:number,datos:any){
     this.productService.updateProductQty(productId, datos).subscribe({
       next: (res) => {
         console.log('Cantidad actualizada:', res);
@@ -319,12 +319,13 @@ import { ApplyComponent } from '../modal/apply/apply.component';
 
 
 
-async openModal(detalles: any[], idQuotation: number, red: any) {
+  async openModal(detalles: any[], idQuotation: number, red: any) {
+    
     const modal = await this.modalController.create({
       component: ApplyComponent,
       componentProps: {
         items: [red],
-        detalles: this.detalles // Puedes pasar los elementos que desees aquí
+        detalles: [this.categories,this.ums] // Puedes pasar los elementos que desees aquí
       },
       cssClass: 'half-screen-modal' // Agregamos la clase CSS personalizada
     });
