@@ -1,0 +1,333 @@
+<ion-header>
+  <ion-toolbar translucent>
+    <ion-title>Calificar Cliente</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">X</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="modal-content ion-padding" [style.background]="'rgba(255,255,255,0.9)'">
+  <ion-row>
+    <ion-col size="12">
+      <div class="rating-info">
+        <span><b>1 es la peor calificación &nbsp;&nbsp;&nbsp;</b></span>
+        <span>
+          <ion-icon style="font-size: 12px; color: rgb(197, 161, 2);" slot="icon-only" name="star-half-outline"></ion-icon>
+          <ion-icon style="font-size: 12px; color: rgb(197, 161, 2);" slot="icon-only" name="star-half-outline"></ion-icon>
+          <ion-icon style="font-size: 12px; color: rgb(197, 161, 2);" slot="icon-only" name="star-half-outline"></ion-icon>
+          <ion-icon style="font-size: 12px; color: rgb(197, 161, 2);" slot="icon-only" name="star-half-outline"></ion-icon>
+          <ion-icon style="font-size: 12px; color: rgb(197, 161, 2);" slot="icon-only" name="star-half-outline"></ion-icon>&nbsp;
+        </span>
+        <span><b> &nbsp;&nbsp;&nbsp;5 es la mejor calificación </b></span>
+      </div>
+
+      <div class="rank-container bordeado">
+        <ion-row>
+          <ion-col size="4" class="centro-inicio">
+            <span style="font-size: x-small;">Facilidad para encontrar el sitio:</span>
+          </ion-col>
+          <ion-col size="7" class="stars-container">
+            <ion-icon
+              *ngFor="let star of stars; let i = index"
+              [name]="i < currentRating100 ? 'star' : 'star-outline'"
+              (click)="rateUser100(i + 1)"
+              class="star-icon"
+            ></ion-icon>
+          </ion-col>
+        </ion-row>
+      </div>
+
+      <!-- Habilidad y experiencia -->
+      <div class="rank-container bordeado">
+        <ion-row>
+          <ion-col size="4" class="centro-inicio">
+            <span style="font-size: x-small;">El cliente describió exactamente lo que necesitaba:</span>
+          </ion-col>
+          <ion-col size="7" class="stars-container">
+            <ion-icon
+              *ngFor="let star of stars; let i = index"
+              [name]="i < currentRating200 ? 'star' : 'star-outline'"
+              (click)="rateUser200(i + 1)"
+              class="star-icon"
+            ></ion-icon>
+          </ion-col>
+        </ion-row>
+      </div>
+
+      <!-- Velocidad -->
+      <div class="rank-container bordeado">
+        <ion-row>
+          <ion-col size="4" class="centro-inicio">
+            <span style="font-size: x-small;">El cliente fue puntual en el pago:</span>
+          </ion-col>
+          <ion-col size="7" class="stars-container">
+            <ion-icon
+              *ngFor="let star of stars; let i = index"
+              [name]="i < currentRating300 ? 'star' : 'star-outline'"
+              (click)="rateUser300(i + 1)"
+              class="star-icon"
+            ></ion-icon>
+          </ion-col>
+        </ion-row>
+      </div>
+
+      <!-- Comentario -->
+      <div class="comment-container" style="margin-top: -10px;">
+        <ion-item lines="none" style="background: rgba(240,240,240,0.5); border-radius:8px;">
+          <ion-label position="stacked">
+            <span style="color:#b6b6b6;">Comentarios:</span>
+            <span style="color:#d5d5d5;">(opcional)</span>
+          </ion-label>
+          <ion-textarea
+            [(ngModel)]="userComment"
+            placeholder="Escribe tus comentarios aquí..."
+            rows="5"
+          ></ion-textarea>
+        </ion-item>
+      </div>
+    </ion-col>
+  </ion-row>
+
+  <!-- Botón Enviar -->
+  <ion-row style="margin-top: 20px;">
+    <ion-col size="12">
+      <ion-button expand="block" color="primary" (click)="enviar()">
+        Enviar
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</ion-content>
+
+
+
+
+
+
+
+<!-- <ion-row>
+  <ion-col size="12">
+    <div class="rank-container bordeado">
+      <ion-row>
+        <ion-col size="4" class="centro-inicio">
+          <span>Puntalidad: </span>
+        </ion-col>
+        <ion-col size="7" class="stars-container">
+          <ion-icon
+            *ngFor="let star of stars; let i = index"
+            [name]="i < currentRating100 ? 'star' : 'star-outline'"
+            (click)="rateUser100(i + 1)"
+            class="star-icon"
+          >
+          </ion-icon>
+        </ion-col>
+      </ion-row>
+    </div>
+    <div class="rank-container bordeado">
+      <ion-row>
+        <ion-col size="4" class="centro-inicio">
+          <span>Habilidad y experiencia: </span>
+        </ion-col>
+        <ion-col size="7" class="stars-container">
+          <ion-icon
+            *ngFor="let star of stars; let i = index"
+            [name]="i < currentRating200 ? 'star' : 'star-outline'"
+            (click)="rateUser200(i + 1)"
+            class="star-icon"
+          >
+          </ion-icon>
+        </ion-col>
+      </ion-row>
+    </div>
+    <div class="rank-container bordeado">
+      <ion-row>
+        <ion-col size="4" class="centro-inicio">
+          <span>Velocidad: </span>
+        </ion-col>
+        <ion-col size="7" class="stars-container">
+          <ion-icon
+            *ngFor="let star of stars; let i = index"
+            [name]="i < currentRating300 ? 'star' : 'star-outline'"
+            (click)="rateUser300(i + 1)"
+            class="star-icon"
+          >
+          </ion-icon>
+        </ion-col>
+      </ion-row>
+    </div>
+    <div class="comment-container" style="margin-top: -20px;">
+      <ion-item lines="none">
+        <ion-label position="stacked"><span style="color:#b6b6b6;">Comentarios: </span> <span style="color:#d5d5d5;">(opcional)</span></ion-label>
+        <ion-textarea
+          [(ngModel)]="userComment"
+          placeholder="Escribe tus comentarios aquí..."
+          rows="6"
+        ></ion-textarea>
+      </ion-item>
+    </div>                  
+  </ion-col>
+</ion-row>
+<ion-row>
+  <ion-col size="6" class="footer-button-container">
+  </ion-col>
+  <ion-col size="6" class="footer-button-container">
+    <ion-button fill="outline" color="info" expand="block" >
+      Enviar
+    </ion-button>
+  </ion-col>
+</ion-row> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <ion-header>
+  <ion-toolbar>
+    <ion-title>Aplicar</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()"><ion-icon slot="icon-only" name="close"></ion-icon></ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item class="sliding-item-red">
+  </ion-item>
+  <ion-item class="sliding-item-red">
+    <ion-row>
+      <span style="font-size: small;"><b>Servicio de {{ chamba.str_field_19 }}: </b>{{ chamba.violet_quotation_note }}</span>
+    </ion-row>
+  </ion-item>
+  <ion-item class="sliding-item-red">
+    <ion-row>
+      <ion-col size="7">
+        <span class="opportunity-labeled">Dirección: {{ chamba.str_field_4 }}</span>
+        <br>
+        <span class="opportunity-labeled">Documentación: {{ chamba.str_field_10 }}</span>
+        <br>
+        <span class="opportunity-labeled">Deducciones: {{ chamba.str_field_11 }}</span>
+        <br>
+        <span class="opportunity-labeled">Medios de pago: </span>
+        <ng-container *ngFor="let medioId of chamba.mediosIds">
+          <ng-container *ngFor="let medio of medios">
+            <ng-container *ngIf="medioId == medio.id">
+              <span class="opportunity-labeled">{{ medio.name }}&nbsp;</span>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+        <span style="font-size:small;"> &nbsp;| &nbsp;Precio: ${{chamba.amount_total}}</span>
+      </ion-col>
+      <ion-col size="5" style="font-size: small;font-style: italic;">
+        <ul>
+          <li><span>Servicios contratados por este cliente: {{chamba.int_field_8}}</span></li>
+          <li><span>Miembro desde: {{chamba.str_field_9}}</span></li>
+        </ul>
+        <span></span>
+      </ion-col>
+    </ion-row>
+  </ion-item>
+  <ion-item class="centered-item">
+    <div class="centered-container">
+      <img *ngIf="chamba.str_field_15; else defaultImage" 
+          [src]="chamba.str_field_15" 
+          class="centered-image"
+          loading="lazy"
+          alt="Imagen de chamba">
+      <ng-template #defaultImage>
+        <img src="../../../assets/img/appicon.png" 
+            class="centered-image"
+            loading="lazy"
+            alt="Imagen por defecto">
+      </ng-template>
+    </div>
+  </ion-item>
+  <br>
+  <ion-item>
+    <table width="100%">
+      <tr>
+        <td>
+          <span style="font-size: x-small;">Num. de Contacto: &nbsp;&nbsp; <span><b>{{mobile}}</b></span></span>
+          <p style="font-size: xx-small;">puede modificarlo desde menu <b>"Mi cuenta > Cambiar mi numero de celular"</b></p>
+        </td>
+      </tr>
+    </table>
+  </ion-item>
+  <br>
+  <ion-item>
+    <table width="100%">
+      <tr>
+        <td>
+          <ion-label>Precio</ion-label>
+        </td>
+        <td>
+          <ion-select (ionChange)="valueSelected($event)" placeholder="Selecciona un precio" interface="popover">
+            <ion-select-option *ngFor="let price of valores" [value]="price">
+              {{ price.name }}
+            </ion-select-option>
+          </ion-select>
+        </td>
+        <td>
+          {{ selectedPrice?.spell }} {{ selectedPrice?.currency }}
+        </td>
+      </tr>
+    </table>
+  </ion-item>
+  <br>
+  <ion-item class="custom-item">
+    <ion-label position="floating" class="custom-label">Que incluye: </ion-label>
+    <br>
+    <span style="font-size:small;">El servicio incluye <b>mano de obra </b><span style="font-size: x-small;"><i>y herramienta (depende de su profesión)</i></span></span><br>
+  </ion-item>
+
+  <ion-item class="custom-item">
+    <ion-label position="floating" class="custom-label">No incluye:</ion-label>
+    <br>
+    <span style="font-size:small;">No incluye insumos, materiales ni repuestos.
+      <br>Usted puede asesorar al cliente sobre dónde adquirirlos y recomendar las opciones más convenientes para su solución (incluso ofrecerlos directamente), pero la compra de estos elementos es decisión del cliente y queda a criterio del cliente.
+      <br>El costo de insumos, materiales o repuestos no está incluido en el precio del servicio.</span><br>
+  </ion-item>
+  <br>
+  <ion-item class="custom-item-2">
+    <table width="100%">
+      <tr>
+        <td>
+          <span class="note">La puntualidad es muy importante por favor elija una hora que sí pueda cumplir</span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <ion-item>
+            <ion-label class="hour-label">Hora</ion-label>
+            <ion-select [(ngModel)]="selectedHour" placeholder="Selecciona una hora" name="hora" interface="popover">
+              <ion-select-option *ngFor="let hour of remainingHours" [value]="hour">
+                {{ hour }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </td>
+      </tr>
+    </table>
+  </ion-item>
+  <br><br>
+  <span style="font-size: xx-small;"><i>Una buena calificación le hará destacar por encima de los demás. Los perfiles mejor calificados obtienen las mayores ganancias.</i></span>
+  <br><br>
+  <ion-button *ngIf="!bcvsbl" expand="full" color="primary" (click)="botonConfirmacion(true)">
+    Enviar mi propuesta
+    <ion-icon slot="end" name="paper-plane"></ion-icon>
+  </ion-button>
+  <ion-button *ngIf="bcvsbl" expand="full" color="danger" (click)="onLock()">
+    Confirmar
+    <ion-icon slot="end" name="paper-plane"></ion-icon>
+  </ion-button>
+  <span *ngIf="!publishVisibility"><ion-spinner name="crescent"></ion-spinner></span>
+  <br><br><br><br><br>
+</ion-content> -->

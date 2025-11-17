@@ -1,0 +1,161 @@
+<ion-header>
+  <ion-toolbar>
+    <!-- <ion-title>Dirección</ion-title> -->
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div>
+    <ion-item>
+      <table width="100%">
+        <tr>
+          <td width="20%" style="font-size: small;"><span>Pais:</span></td>
+          <td width="45%" style="text-align: center;"><span *ngIf="address && address.str_field_2"><b>{{address.str_field_2}}</b></span></td>
+          <td width="35%"></td>
+        </tr>
+      </table>
+    </ion-item>
+    <ion-item>
+      <table width="100%">
+        <tr>
+          <td width="20%" style="font-size: small;"><span>Departamento:</span></td>
+          <td width="45%" style="text-align: center;"><span><b>{{ address.str_field_3 }}</b></span></td>
+          <td width="35%">
+            <ion-select 
+              [(ngModel)]="address.str_field_3" 
+              multiple="false" 
+              name="state" 
+              placeholder="Seleccionar"
+              interface="alert"
+              (ionChange)="setState($event)">
+              <ion-select-option *ngFor="let prv of states" [value]="prv.id">
+                {{ prv.name }}
+              </ion-select-option>
+            </ion-select>
+          </td>          
+        </tr>
+      </table>
+    </ion-item>
+
+    <ion-item *ngIf="showCities">
+      <table width="100%">
+        <tr>
+          <td width="20%" style="font-size: small;"><span>Ciudad:</span></td>
+          <td width="45%" style="text-align: center;"><span><b>{{ address.str_field_4 }}</b></span></td>
+          <td width="35%">
+            <ion-select 
+              [(ngModel)]="address.str_field_4" 
+              multiple="false" 
+              name="city" 
+              placeholder="Cambiar" 
+              interface="alert"
+              (ionChange)="setCity($event)">
+              <ion-select-option *ngFor="let city of cities2" [value]="city">
+                {{ city }}
+              </ion-select-option>
+            </ion-select>
+          </td>
+        </tr>
+      </table>
+    </ion-item>
+    <ion-item>
+      <table width="100%">
+        <tr>
+          <td width="33%" style="font-size: small;"><span>Barrio:</span></td>
+          <td width="67%" style="text-align: center;">
+            <ion-item>
+              <ion-input style="background-color: #7e7e7e;" [(ngModel)]="address.str_field_6" type="text"></ion-input>
+            </ion-item>
+          </td>
+        </tr>
+      </table>
+    </ion-item>
+    <ion-item>
+      <table width="100%">
+        <tr>
+          <td width="33%" style="font-size: small;"><span>Sector (opcional):</span></td>
+          <td width="67%" style="text-align: center;">
+            <ion-item>
+              <ion-input style="background-color: #7e7e7e;" [(ngModel)]="address.str_field_7" type="text"></ion-input>
+            </ion-item>
+          </td>
+        </tr>
+      </table>
+    </ion-item>
+    <ion-item>
+      <table width="100%">
+        <tr>
+          <td width="33%" style="font-size: small;"><span>Dirección:</span></td>
+          <td width="67%" style="text-align: center;">
+            <ion-item>
+              <ion-input style="background-color: #7e7e7e;" [(ngModel)]="address.str_field_5" type="text"></ion-input>
+            </ion-item>
+          </td>
+        </tr>
+      </table>
+    </ion-item>
+    <ion-item>
+      <table width="100%">
+        <tr>
+          <td width="33%" style="font-size: small;"><span>Punto de referencia <span style="font-size: x-small;">(ej: frente al restaurante Los pollos)</span> </span></td>
+          <td width="67%" style="text-align: center;">
+            <ion-item>
+              <ion-input style="background-color: #7e7e7e;" [(ngModel)]="address.str_field_8" type="text"></ion-input>
+            </ion-item>
+          </td>
+        </tr>
+      </table>
+    </ion-item>
+    <ion-item>
+      <table width="100%">
+        <tr>
+          <td width="33%" style="font-size: small;">
+            <span>Alias / Nombre:</span> <span style="font-size:xx-small;">Ingrese un NOMBRE para esta dirección. Ejemplo: <i>Oficina de Barcelona...</i></span>
+          </td>
+          <td width="67%" style="text-align: center;">
+              <ion-item>
+                <ion-input aria-placeholder="Oficina de Barcelona..." style="background-color: #7e7e7e;" [(ngModel)]="address.str_field_1" type="text"></ion-input>
+              </ion-item>
+          </td>
+        </tr>
+      </table>
+    </ion-item>
+    <br>
+
+    <ion-item *ngIf="address && !address.id || address.id==0">
+      <table width="100%">
+        <tr style="width: 100%;">
+          <td>
+            <ion-button class="btn btn-primary" (click)="createAddress()" expand="block">
+              Crear dirección
+            </ion-button>  
+          </td>
+        </tr>
+      </table>  
+    </ion-item>
+
+    <ion-item *ngIf="address && address.id && address.id>0">
+      <table width="100%">
+        <tr style="width: 100%;">
+          <td>
+            <ion-button class="btn btn-primary" (click)="updateAddress()" expand="block">
+              Actualizar dirección
+            </ion-button>  
+          </td>
+        </tr>
+      </table>  
+    </ion-item> 
+
+    <!-- <ion-item >
+      <ion-button class="btn btn-primary" (click)="createAddress()" expand="block">
+        Guardar
+      </ion-button>  
+    </ion-item> -->
+  </div>
+
+
+
+</ion-content> 

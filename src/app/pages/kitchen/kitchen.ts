@@ -19,7 +19,7 @@ import { Product } from '../../interfaces/product';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-
+import { ApplyComponent } from '../modal/apply/apply.component';
 
   @Component({
     selector: 'page-kitchen',
@@ -46,7 +46,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
   activeSession: Session | null = null;
   sessionId: number | null = null;
   searchSubject = new Subject<string>();
-
+  detalles:any[]=[];
 
   constructor(
     private barcodeService: BarcodeService,
@@ -67,6 +67,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
     private productService:ProductService,
     private categoryService:CategoryService,
     private umService:UmService,
+    private modalController: ModalController
   ) {}
 
 
@@ -310,10 +311,40 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
   }
 
 
-  openModal(p:Product){
-  console.log("producto pasado",p)
-
+  openMdl(p:Product){
+    console.log("producto pasado",p)
+    this.openModal([],p.id, p);
   }
+
+
+
+
+async openModal(detalles: any[], idQuotation: number, red: any) {
+    const modal = await this.modalController.create({
+      component: ApplyComponent,
+      componentProps: {
+        items: [red],
+        detalles: this.detalles // Puedes pasar los elementos que desees aquí
+      },
+      cssClass: 'half-screen-modal' // Agregamos la clase CSS personalizada
+    });
+
+    modal.onDidDismiss().then((result) => {
+      console.log('Datos de cierre:', result);
+
+      if (result.data?.closedBy === 'customCloseModal') {
+        console.log('Cerrado con mi método personalizado 🚀');
+      } else {
+        console.log('Cerrado con los controles del sistema ✋');
+      }
+    });
+
+    return await modal.present();
+  }
+
+
+
+
 
   exitApp() {
     console.log('🛑 Saliendo de la app');

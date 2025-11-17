@@ -1,0 +1,198 @@
+.service-time-container {
+  display: flex;
+  align-items: center; /* Aligns items vertically center */
+}
+
+.service-time-container span p {
+  font-size:10px;
+  margin: 0; /* Remove default margin of <p> */
+}
+
+.service-time-container p {
+  font-size:10px;
+  margin: 0; /* Remove default margin of <p> */
+}
+
+.opportunity-labeled{
+  font-size:13px;
+  line-height: 0px;
+}
+
+.opportunity-labeled p{
+  font-size:13px;
+  line-height: 0px;
+}
+
+.sliding-item-red {
+  --ion-background-color: #fcf5f5 !important; /* Forces the background color change */
+}
+
+.ios .sliding-item-red {
+  --ion-background-color: #fcf5f5 !important; /* Background color for iOS */
+}
+
+
+
+
+
+
+
+.centered-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.centered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* Opcional: asegura que el contenedor ocupe todo el espacio disponible */
+}
+
+.centered-image {
+  display: block;
+  margin: 0 auto;
+  max-width: 60%; /* Ajusta si es necesario para evitar que se desborde */
+  height: auto; /* Mantiene la proporción */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Estilo para el ion-item */
+.custom-item {
+  --background: transparent;  /* Fondo transparente para mantener el diseño limpio */
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 0px; /* Eliminar padding innecesario */
+  --padding-bottom: 0px; /* Eliminar padding innecesario */
+  --border-radius: 8px; /* Bordes redondeados */
+  --box-shadow: none; /* Eliminar sombra del item */
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* Asegura que el item ocupe todo el ancho disponible */
+}
+
+/* Estilo del ion-label */
+.custom-label {
+  color: var(--ion-color-primary, #4a90e2); /* Color principal del label */
+  font-weight: 500;  /* Peso moderado para el texto */
+  font-size: 14px;   /* Tamaño más pequeño y legible */
+}
+
+/* Estilo del ion-textarea */
+.custom-textarea {
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  --border-radius: 8px;  /* Bordes redondeados */
+  --box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);  /* Sombra sutil */
+  --min-height: 50px;  /* Altura mínima */
+  font-size: 16px;  /* Tamaño de texto cómodo */
+  line-height: 20px;  /* Espaciado de líneas cómodo */
+  height: auto;  /* Se ajusta automáticamente según el contenido */
+  resize: none;  /* Deshabilitar la opción de cambiar el tamaño manualmente */
+}
+
+/* Placeholder del ion-textarea */
+.custom-textarea::part(textarea) {
+  color: #bbb; /* Color gris para el texto del placeholder */
+}
+
+/* Asegurando que el label flotante no se solape */
+ion-label[position="floating"] {
+  font-size: 14px;  /* Aseguramos que el label flotante no sea demasiado grande */
+  transition: all 0.3s ease; /* Suavizamos la transición al flotar */
+}
+
+/* Cuando el textarea tiene contenido, el label se mueve hacia arriba */
+.custom-item ion-textarea:focus + ion-label,
+.custom-item ion-textarea:not(:placeholder-shown) + ion-label {
+  font-size: 12px; /* Reducir el tamaño cuando se mueve el label */
+  top: -5px; /* Mover el label hacia arriba */
+  color: var(--ion-color-primary, #4a90e2); /* Color del label cuando está flotando */
+}
+
+/* Responsividad: Asegurarse de que se vea bien en pantallas pequeñas */
+@media (max-width: 767px) {
+  .custom-item {
+    --padding-start: 10px;
+    --padding-end: 10px;
+  }
+  .custom-label {
+    font-size: 12px; /* Más pequeño en pantallas pequeñas */
+  }
+  .custom-textarea {
+    font-size: 14px; /* Más pequeño en pantallas pequeñas */
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.custom-item-2 {
+  display: flex;
+  flex-direction: column; /* Coloca los elementos en una columna */
+}
+
+.note {
+  font-size: x-small;
+  font-style: italic;
+  margin-bottom: 8px; /* Espaciado entre el texto y los elementos de abajo */
+  color: #888; /* Color gris para el texto de la nota */
+}
+
+.hour-label {
+  color: var(--ion-color-primary2, #d7d7d8); /* Color personalizado para el label */
+  font-size: 14px; /* Tamaño de la fuente del label */
+  margin-bottom: 4px; /* Espaciado entre el label y el select */
+}
+
+ion-select {
+  width: 100%; /* Asegura que el ion-select ocupe todo el ancho disponible */
+}
