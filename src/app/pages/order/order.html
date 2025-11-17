@@ -1,0 +1,70 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-searchbar  [(ngModel)]="queryText" (ionInput)="updateOrder()" (ionCancel)="showSearchbar = false" placeholder="Search"></ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+
+
+<ion-content>
+  <div class="actions">
+    <button class="danger-button" (click)="clearOrder()">🗑️ Eliminar mi pedido y volver a empezar</button>
+  </div>
+
+  <div *ngFor="let group of getGroupedOrder()" class="category-block">
+    <h3 class="category-title">{{ group.name }}</h3>
+    <ul class="product-list">
+      <li *ngFor="let product of group.products" class="product-item">
+        <span class="product-name">{{ product.name }}</span>
+        <span class="product-info">Cant: {{ product.cant }}</span>
+        <span class="product-price">${{ product.price }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="bottom-button">
+    <ion-button expand="block" shape="round" (click)="enviarOrder()">
+      <ion-icon name="cart-outline" slot="start"></ion-icon>
+      Enviar Pedido
+    </ion-button>
+  </div>
+</ion-content>
+
+
+
+
+<!-- <ion-content>
+
+  <div class="actions">
+    <button (click)="clearOrder()">🗑️ Vaciar carrito</button>
+  </div>
+
+  <div *ngFor="let group of getGroupedOrder()">
+    <h3>{{ group.name }}</h3>
+    <ul>
+      <li *ngFor="let product of group.products">
+        {{ product.name }} - Cant: {{ product.cant }} - ${{ product.price }}
+      </li>
+    </ul>
+  </div>
+
+  <div class="bottom-button">
+    <ion-button expand="block" shape="round" (click)="enviarOrder()">
+      <ion-icon name="cart-outline" slot="start"></ion-icon>
+      Enviar Pedido
+    </ion-button>
+  </div>
+
+</ion-content> -->

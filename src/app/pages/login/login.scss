@@ -1,0 +1,20 @@
+ion-content {
+  --background: #f8f9fa; /* Fondo suave */
+}
+
+.bottom-button {
+  position: fixed;
+  bottom: 20px;
+  left: 10px;
+  right: 10px;
+  text-align: center;
+}
+
+ion-button {
+  --background: linear-gradient(45deg, #3880ff, #4c8dff);
+  --border-radius: 12px;
+  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  font-size: 18px;
+  font-weight: bold;
+  height: 56px;
+}

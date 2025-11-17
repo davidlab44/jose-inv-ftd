@@ -1,0 +1,47 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button color='primary' (click)="startApp()" [hidden]="!showSkip">Skip</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen="true">
+  <div class="slide-container">
+    <section class="slide">
+      <img src="assets/img/ica-slidebox-img-1.png" class="slide-image" />
+      <h2 class="slide-title">
+        Bienvenido a
+        <b>Impulso Violeta</b>
+      </h2>
+      <p>
+        La Aplicación <b>violet app</b> es una forma facil y segura de conectar con el mejor talento local de cartagena, cientos de mujeres calificadas con experiencia disponibles para prestar sus servicios en las areas de gastronomia, belleza, peluqueria, manicure, pedicure, peinados, cocina, mesa, bar y hosteleria.
+      </p>
+    </section>
+
+    <section class="slide">
+      <img src="assets/img/ica-slidebox-img-2.png" class="slide-image" />
+      <h2 class="slide-title">Que es Violet App?</h2>
+      <p>
+        <b>Violet App</b> Publica las oportunidades o servicios con detalle de lo que necesitas y recibe postulaciones de mujeres cartageneras calificadas y certificadas para ejecutar ese trabajo en el menor tiempo posible
+      </p>
+    </section>
+
+    <section class="slide">
+      <img src="assets/img/ica-slidebox-img-3.png" class="slide-image" />
+      <h2 class="slide-title">Seguridad y respaldo</h2>
+      <p>
+        <b>Violet App</b> todas las mujeres registradas en la aplicación cuentan con el aval, el respaldo y la capacitación y/o apoyo a su formación de la  <a href="https://www.cartagena.gov.co/">alcaldia mayor de Cartagena</a> y <a href="https://acdesarrollo.org/">ACDesarrollo</a> <br> Publica una oportunidad ahora y ayuda a las mujeres de Cartagena a salir adelante con sus emprendimientos; una vez finalizado el servicio puedes calificar tu experiencia esto ayudara a toda la comunidad a elegir siempre al mejor talento
+      </p>
+    </section>
+
+    <section class="slide">
+      <img src="assets/img/ica-slidebox-img-4.png" class="slide-image" />
+      <h2 class="slide-title">Listo para empezar?</h2>
+      <ion-button fill="clear" (click)="startApp()">
+        Continuar
+        <ion-icon slot="end" name="arrow-forward"></ion-icon>
+      </ion-button>
+    </section>
+  </div>
+</ion-content>

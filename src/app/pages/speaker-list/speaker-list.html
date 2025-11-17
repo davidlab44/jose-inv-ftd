@@ -1,0 +1,108 @@
+<ion-content><p></p></ion-content> 
+
+<!-- <ion-header translucent="true">
+    <ion-toolbar>
+      <ion-buttons *ngIf="!showSearchbar" slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-segment *ngIf="ios" [(ngModel)]="segment" (ionChange)="updateSchedule()">
+        <ion-segment-button value="all">
+          Mezclas
+        </ion-segment-button>
+        <ion-segment-button value="favorites">
+          Mezclas
+        </ion-segment-button>
+      </ion-segment>
+      <ion-searchbar *ngIf="showSearchbar" showCancelButton="always" [(ngModel)]="queryText" (ionInput)="updateSchedule()" (ionCancel)="showSearchbar = false" placeholder="Search"></ion-searchbar>
+      <ion-buttons slot="end">
+        <ion-button *ngIf="!ios && !showSearchbar" (click)="showSearchbar = true">
+          <ion-icon slot="icon-only" name="search"></ion-icon>
+        </ion-button>
+        <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+          <span *ngIf="ios">Filter</span>
+          <span *ngIf="!ios">
+            <ion-icon slot="icon-only" name="options"></ion-icon>
+          </span>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+    <ion-toolbar *ngIf="ios">
+      <ion-segment [(ngModel)]="segment" (ionChange)="updateSchedule()">
+        <ion-segment-button>
+          Medicamentos base
+        </ion-segment-button>
+      </ion-segment>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content fullscreen="true">
+    <ion-item>
+      <ion-header collapse="condense">
+        <ion-toolbar>
+          <ion-title size="large">gpharma</ion-title>
+        </ion-toolbar>
+        <ion-toolbar>
+          <ion-searchbar [(ngModel)]="queryText" (ionInput)="updateSchedule()" placeholder="Search"></ion-searchbar>
+        </ion-toolbar>
+      </ion-header>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12">
+              <ion-list>
+                <ion-item-group>
+                  <ion-item-sliding *ngFor="let draft of drafts">
+                    <div *ngIf="draft.lines.length>0" style="border:solid 1px #d5d5d5;">
+                      <ion-row style="width:100%;background-color: rgb(230, 230, 230);">
+                        <ion-col size="3">
+                          <span>Mesa {{draft.table_id[0]}}</span>
+                        </ion-col>
+                        <ion-col size="8">
+                          <span></span>
+                        </ion-col>
+                        <ion-col size="1">
+                        </ion-col>
+                      </ion-row>
+                      <ion-row style="width:100%;padding-left: 20px;padding-right: 20px;">
+                        <ion-col size="6">
+                          <div *ngFor="let serverSaleOrderLine of modifiedServerSaleOrderLineList">
+                            <div *ngIf="serverSaleOrderLine.order_id[0]==draft.id">
+                              <div *ngIf="!serverSaleOrderLine.isBar">
+                                <div *ngIf="serverSaleOrderLine.notice=='sent'" style="color: #949292;">
+                                    <span>{{serverSaleOrderLine.order_id[0]}}</span> &nbsp;&nbsp;
+                                    <span>{{serverSaleOrderLine.product_id[1]}}</span>
+                                </div>
+                                <div *ngIf="!serverSaleOrderLine.notice">
+                                    <span>{{serverSaleOrderLine.order_id[0]}}</span> &nbsp;&nbsp;
+                                    <span>{{serverSaleOrderLine.product_id[1]}}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </ion-col>
+                        <ion-col size="6">
+                          <div *ngFor="let serverSaleOrderLine of modifiedServerSaleOrderLineList">
+                            <div *ngIf="serverSaleOrderLine.order_id[0]==draft.id">
+                              <div *ngIf="serverSaleOrderLine.isBar">
+                                <div *ngIf="serverSaleOrderLine.notice=='sent'" style="color: #949292;">
+                                    <span>{{serverSaleOrderLine.order_id[0]}}</span> &nbsp;&nbsp;
+                                    <span>{{serverSaleOrderLine.product_id[1]}}</span>
+                                </div>
+                                <div *ngIf="!serverSaleOrderLine.notice">
+                                    <span>{{serverSaleOrderLine.order_id[0]}}</span> &nbsp;&nbsp;
+                                    <span>{{serverSaleOrderLine.product_id[1]}}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </ion-col>
+                      </ion-row>
+                    </div>
+                    <br>
+                  </ion-item-sliding>
+                </ion-item-group>
+              </ion-list>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+    </ion-item>
+  </ion-content> -->

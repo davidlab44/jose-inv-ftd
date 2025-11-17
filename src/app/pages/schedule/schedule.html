@@ -1,0 +1,87 @@
+<ion-content>
+
+  <ion-card class="main-card" [class.disabled]="product && !componentsEnabled">
+
+    <ion-card-content>
+
+      <!-- SCAN AREA -->
+      <div class="scan-container">
+        <video #video autoplay playsinline class="video-preview"></video>
+
+        <div class="scan-row">
+          <ion-button color="danger" class="scan-btn" (click)="stopScan()">
+            <ion-icon name="stop-circle-outline"></ion-icon>
+          </ion-button>
+          <ion-item class="scan-input">
+            <ion-input readonly [value]="scannedValue"></ion-input>
+          </ion-item>
+          <ion-button class="scan-btn" (click)="startScan()">
+            <ion-icon name="camera-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+      </div>
+
+      <!-- PRODUCT INFO -->
+      <ng-container *ngIf="product">
+        <div class="product-section">
+
+          <ion-card-header>
+            <ion-card-subtitle class="category">
+              {{ getCategoryNameById(product.datos.categ[0]) | uppercase }}
+            </ion-card-subtitle>
+
+            <ion-card-title class="product-name">
+              {{ product.datos.name | uppercase }}
+            </ion-card-title>
+
+            <ion-card-subtitle class="product-qty">
+              Cantidad actual:
+              <strong>{{ product.datos.qty }}</strong>
+              {{ getUmNameById(product.datos.um[0]) }}
+            </ion-card-subtitle>
+          </ion-card-header>
+
+        </div>
+
+        <!-- QTY INPUT -->
+        <div class="quantity-container">
+          <ion-item class="quantity-item">
+            <ion-input
+              type="number"
+              [(ngModel)]="extraQty"
+              [readonly]="!componentsEnabled"
+              inputmode="numeric"
+              class="quantity-input">
+            </ion-input>
+          </ion-item>
+
+          <div class="quantity-buttons">
+            <ion-button color="medium" expand="block" (click)="clearQty()" [disabled]="!componentsEnabled">Clear</ion-button>
+            <ion-button color="primary" expand="block" (click)="addQty(1)" [disabled]="!componentsEnabled">+1</ion-button>
+            <ion-button color="success" expand="block" (click)="addQty(10)" [disabled]="!componentsEnabled">+10</ion-button>
+          </div>
+
+          <div class="action-buttons-row ion-padding">
+            <ion-button color="medium" shape="round" (click)="exitApp()">
+              <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
+            </ion-button>
+            <ion-button color="primary" shape="round" (click)="confirmAction()">
+              <ion-icon slot="icon-only" name="checkmark-circle-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </ng-container>
+
+    </ion-card-content>
+  </ion-card>
+
+  <ng-container *ngIf="!product">
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando producto...</p>
+    </div>
+  </ng-container>
+
+</ion-content>
+
