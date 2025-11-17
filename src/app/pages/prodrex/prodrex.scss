@@ -1,0 +1,25 @@
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #barcode, #barcode * {
+    visibility: visible;
+  }
+}
+
+
+
+.subheader-toolbar {
+  --min-height: 32px;   /* más delgado que un toolbar normal */
+}
+
+.subheader-title {
+  text-align: center;
+  font-size: 12px;      /* más pequeño */
+  font-weight: 500;     /* opcional, un poco más marcado */
+  width: 100%;          /* asegura centrado perfecto */
+  margin: 0;
+  padding: 0;
+}
+
+

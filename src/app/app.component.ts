@@ -35,13 +35,13 @@ export class AppComponent implements OnInit {
        icon: 'map'
      },
      {
-       title: 'Entradas',
+       title: 'Entrada',
        url: '/app/tabs/kitchen',
        icon: 'people'
      },
      {
-       title: 'About',
-       url: '/app/tabs/about',
+       title: 'Ingresos de mercancia',
+       url: '/app/tabs/readren',
        icon: 'information-circle'
      }
    ];

@@ -84,7 +84,8 @@ const routes: Routes = [
             loadChildren: () => import('../kitchen/kitchen.module').then(m => m.KitchenModule)
           }
         ]
-      },     {
+      },
+      {
         path: 'readprdct',
         children: [
           {
@@ -94,6 +95,24 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'readren',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../readren/readren.module').then(m => m.ReadrenModule)
+          }
+        ]
+      },
+      {
+        path: 'prodrex',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../prodrex/prodrex.module').then(m => m.ProdrexModule)
+          }
+        ]
+      },
+    {
         path: '',
         redirectTo: '/app/tabs/schedule',
         pathMatch: 'full'

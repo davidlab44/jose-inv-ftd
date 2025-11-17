@@ -235,6 +235,10 @@ export class SchedulePage {
     });
   }
 
+  openReport(){
+    this.router.navigate(['/app/tabs/prodrex']);
+  }
+
   exitApp() {
     console.log('🛑 Saliendo de la app');
     window.location.href = 'https://www.google.com';
