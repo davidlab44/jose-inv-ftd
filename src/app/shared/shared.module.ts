@@ -4,15 +4,16 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms'; // ✅ agrega esto
 
 import { BarcodeGeneratorComponent } from '../pages/barcode-generator/barcode-generator.component';
+import { SignatureComponent } from '../components/signature/signature.component';
 
 @NgModule({
-  declarations: [BarcodeGeneratorComponent],
+  declarations: [BarcodeGeneratorComponent,SignatureComponent],
   imports: [
     CommonModule,
     IonicModule,
     FormsModule // ✅ necesario para [(ngModel)]
   ],
-  exports: [BarcodeGeneratorComponent]
+  exports: [BarcodeGeneratorComponent,SignatureComponent]
 })
 export class SharedModule {}
 

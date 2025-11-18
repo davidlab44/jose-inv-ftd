@@ -48,6 +48,7 @@
     "jsbarcode": "^3.12.1",
     "jspdf": "^3.0.3",
     "rxjs": "^7.8.0",
+    "signature_pad": "^5.1.2",
     "svg2pdf.js": "^2.6.0",
     "sw-toolbox": "3.6.0",
     "tslib": "^2.0.0",
