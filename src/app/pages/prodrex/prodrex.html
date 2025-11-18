@@ -19,16 +19,14 @@
 
   <ion-toolbar color="light" class="subheader-toolbar">
     <ion-title class="subheader-title">
-      Movimientos | Salida de mercancia
+      Movimientos | Salida de mercancia <br><br>
+      <span style= "font-size:xx-small;padding-bottom:5px ;">
+        <i>{{todayDate}}</i>
+      </span>
     </ion-title>
   </ion-toolbar>
 
-
 </ion-header>
-
-
-
-
 
 <ion-content>
   <ion-list>
@@ -37,17 +35,12 @@
         <table style="width: 100%; border-collapse: collapse;">
           <!-- Primera fila: Categoría, Nombre, Cantidad + UM, Botón -->
           <tr>
-            <!-- Categoría -->
             <td style="font-size: small; width: 10%;">
               {{ getCategoryNameById(p?.datos?.categ?.[0]) | capitalize }}
             </td>
-
-            <!-- Nombre del producto (letra más pequeña) -->
             <td style="font-size: 13px; width: 60%;">
               <h3 style="margin: 0; font-size: inherit;">{{ p?.datos?.name | uppercase }}</h3>
             </td>
-
-            <!-- Cantidad + UM (compacta, número arriba, unidad abajo) -->
             <td style="width: 15%; text-align: right; vertical-align: top;">
               <div style="display: flex; flex-direction: column; align-items: flex-end;">
                 <strong>{{ p?.datos?.qty }}</strong>
@@ -62,66 +55,11 @@
               </ion-button>
             </td>
           </tr>
-
-
-
-          <tr>
-            <td colspan="4" style="font-size: x-small; color: gray; padding-top: 2px;">
-              {{ formatFechaLatam(p.creado_en) }}
-            </td>
-          </tr>
-
-          <!-- Segunda fila: Fecha creado -->
-<!--          <tr>-->
-            <!--<td colspan="4" style="font-size: x-small; color: gray; padding-top: 2px;">-->
-              <!--{{ p.creado_en }}-->
-            <!--</td>-->
-          <!--</tr>-->
         </table>
       </ion-item>
     </ng-container>
   </ion-list>
 </ion-content>
-
-
-
-
-<!--<ion-content>-->
-  <!--<ion-list>-->
-    <!--<ion-item *ngFor="let p of productList" button (click)="addToOrder(p)" style="display:flex; align-items:center;">-->
-
-      <!--[> Categoría <]-->
-      <!--<ion-label style="font-size: small; flex: 1;">-->
-      <!--[>  <span>{{ getCategoryNameById(p?.datos?.categ?.[0])?.toUpperCase() }}&nbsp;</span><]-->
-        <!--<span>{{ getCategoryNameById(p?.datos?.categ?.[0]) | capitalize }}&nbsp;</span>-->
-      <!--</ion-label>-->
-
-      <!--[> Nombre del producto (más espacio) <]-->
-      <!--<ion-label style="font-size: small; flex: 3;">-->
-        <!--<h3>{{ p?.datos?.name | uppercase }}</h3>-->
-      <!--</ion-label>-->
-
-      <!--[> Cantidad + UM (menos espacio) <]-->
-      <!--<ion-label style="font-size: small; flex: 0.5; text-align:right;">-->
-        <!--<strong>{{ p?.datos?.qty }}</strong>-->
-        <!--<span style="font-size: xx-small;"> {{ getUmNameById(p?.datos?.um?.[0]) }}</span>-->
-      <!--</ion-label>-->
-
-      <!--[> Botón <]-->
-      <!--<ion-button color="primary" slot="end" (click)="printSelectedBarcodes(p); $event.stopPropagation()">-->
-        <!--<ion-icon name="barcode-outline"></ion-icon>-->
-      <!--</ion-button>-->
-
-    <!--</ion-item>-->
-    <!--<ion-item>-->
-      <!--<p>{{p.creado_en}} </p>-->
-    <!--</ion-item>-->
-  <!--</ion-list>-->
-<!--</ion-content>-->
-
-
-
-
 
 
 

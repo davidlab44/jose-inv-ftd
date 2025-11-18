@@ -19,7 +19,7 @@ import { Product } from '../../interfaces/product';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-
+import { DateService } from '../../services/local/date.service';
 
 
 @Component({
@@ -45,7 +45,7 @@ export class ProdrexPage {
   activeSession: Session | null = null;
   sessionId: number | null = null;
   searchSubject = new Subject<string>();
-
+  todayDate:any
 
   constructor(
     private barcodeService: BarcodeService,
@@ -66,6 +66,7 @@ export class ProdrexPage {
     private productService:ProductService,
     private categoryService:CategoryService,
     private umService:UmService,
+    private dateService: DateService,
   ) {}
 
 
@@ -96,6 +97,8 @@ export class ProdrexPage {
       },
       error: err => console.error("Error en búsqueda:", err)
     });
+    const ahora = new Date();
+    this.todayDate=this.formatFechaLatam(ahora);
   }
 
 
@@ -242,7 +245,7 @@ export class ProdrexPage {
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
-
+  
 
 }
 
