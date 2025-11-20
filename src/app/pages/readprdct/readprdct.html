@@ -25,19 +25,18 @@
 
       <!-- Categoría -->
       <ion-label style="font-size: small; flex: 1;">
-      <!--  <span>{{ getCategoryNameById(p?.datos?.categ?.[0])?.toUpperCase() }}&nbsp;</span>-->
-        <span>{{ getCategoryNameById(p?.datos?.categ?.[0]) | capitalize }}&nbsp;</span>
+        <span>{{ getCategoryNameById(p?.data?.categ?.[0]) | capitalize }}&nbsp;</span>
       </ion-label>
 
       <!-- Nombre del producto (más espacio) -->
       <ion-label style="font-size: small; flex: 3;">
-        <h3>{{ p?.datos?.name | uppercase }}</h3>
+        <h3>{{ p?.data?.name | uppercase }}</h3>
       </ion-label>
 
       <!-- Cantidad + UM (menos espacio) -->
       <ion-label style="font-size: small; flex: 0.5; text-align:right;">
-        <strong>{{ p?.datos?.qty }}</strong>
-        <span style="font-size: xx-small;"> {{ getUmNameById(p?.datos?.um?.[0]) }}</span>
+        <strong>{{ p?.data?.qty }}</strong>
+        <span style="font-size: xx-small;"> {{ getUmNameById(p?.data?.um?.[0]) }}</span>
       </ion-label>
 
       <!-- Botón -->

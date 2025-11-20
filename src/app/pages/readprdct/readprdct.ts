@@ -19,7 +19,7 @@ import { Product } from '../../interfaces/product';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-
+import { RexService } from '../../services/rex.service';
 
 
 @Component({
@@ -66,8 +66,8 @@ export class ReadprdctPage {
     private productService:ProductService,
     private categoryService:CategoryService,
     private umService:UmService,
+    private rexService: RexService
   ) {}
-
 
 
   printSelectedBarcodes(p: Product) {
@@ -154,8 +154,6 @@ export class ReadprdctPage {
       }); 
     }     
       
-
-
     getCategoryNameById(id: number | null | undefined): string {
       if (id === null || id === undefined) {
         return 'Sin categoría';
@@ -167,7 +165,7 @@ export class ReadprdctPage {
 
       const cat = this.categories.find(c => Number(c.id) === Number(id));
 
-      const nombre = cat?.datos?.nombre;
+      const nombre = cat?.data?.nombre;
 
       return typeof nombre === 'string' && nombre.trim() !== ''
         ? nombre
@@ -198,7 +196,7 @@ export class ReadprdctPage {
     }
 
     // Extraer el nombre si existe y es válido
-    const nombre = um?.datos?.name;
+    const nombre = um?.data?.name;
     if (typeof nombre === 'string' && nombre.trim() !== '') {
       return nombre;
     }
@@ -212,10 +210,39 @@ export class ReadprdctPage {
   }
 
 
+  enviar() {
+    const items = [
+      {
+        ext_id: 101,
+        data: {
+          nombre: 'Producto de prueba',
+          precio: 249.90,
+          categoria: 'Electrónica',
+          stock: 12
+        }
+      },
+      {
+        ext_id: 102,
+        data: {
+          nombre: 'Audífonos Bluetooth',
+          precio: 89.50,
+          categoria: 'Accesorios',
+          stock: 50
+        }
+      }
+    ];
 
+    this.rexService.addProdrexItems(items).subscribe({
+      next: (resp) => console.log('Respuesta OK:', resp),
+      error: (err) => console.error('Error al enviar:', err)
+    });
+  }
 
 
 }
+
+
+
 
 
 

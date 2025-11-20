@@ -21,7 +21,6 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { DateService } from '../../services/local/date.service';
 
-
 @Component({
   selector: 'page-prodrex',
   templateUrl: 'prodrex.html',
@@ -84,19 +83,6 @@ export class ProdrexPage {
     console.log("ngOnInit")
     await this.loadCategories();
     await this.loadUms();
-    this.getAllProducts();
-    this.searchSubject.pipe(
-      debounceTime(1000),          // espera 1 segundo
-      distinctUntilChanged(),      // solo si el texto cambia
-      switchMap(text => this.productService.searchProducts(text))
-    )
-    .subscribe({
-      next: results => {
-        console.log("Resultados de búsqueda:", results);
-        this.productList = results;    // si quieres mostrar los productos encontrados
-      },
-      error: err => console.error("Error en búsqueda:", err)
-    });
     const ahora = new Date();
     this.todayDate=this.formatFechaLatam(ahora);
   }
@@ -179,41 +165,30 @@ export class ProdrexPage {
 
 
   getUmNameById(id: number | string | null | undefined): string {
-    // Validar ID recibido
     if (id === null || id === undefined) {
       return 'Sin UM';
     }
-
     const idNum = Number(id);
     if (isNaN(idNum)) {
       return 'Sin UM';
     }
-
-    // Validar que this.ums exista y tenga elementos
     if (!Array.isArray(this.ums) || this.ums.length === 0) {
       return 'Sin UM';
     }
-
-    // Buscar la UM por ID
     const um = this.ums.find(u => Number(u.id) === idNum);
     if (!um) {
       return 'Sin UM';
     }
-
-    // Extraer el nombre si existe y es válido
     const nombre = um?.datos?.name;
     if (typeof nombre === 'string' && nombre.trim() !== '') {
       return nombre;
     }
-
     return 'Sin UM';
   }
-
 
   onSearch(text: string) {
     this.searchSubject.next(text);
   }
-
 
   /**
    * Formatea una fecha en estilo amigable con hora en 12h y segundos
@@ -225,15 +200,12 @@ export class ProdrexPage {
 
     const date = new Date(dateInput);
 
-    // Día, mes (nombre) y año
     const opciones: Intl.DateTimeFormatOptions = {
       day: '2-digit',
       month: 'long',
       year: 'numeric'
     };
     const fechaTexto = new Intl.DateTimeFormat('es-ES', opciones).format(date);
-
-    // Hora en 12h con AM/PM
     let horas = date.getHours();
     const minutos = String(date.getMinutes()).padStart(2, '0');
     const segundos = String(date.getSeconds()).padStart(2, '0');
@@ -245,7 +217,6 @@ export class ProdrexPage {
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
-  
 
 }
 

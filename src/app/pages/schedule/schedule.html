@@ -1,23 +1,48 @@
-<ion-content>
-
-
-
 <ion-header translucent="true">
+
   <ion-toolbar>
-    <ion-buttons *ngIf="!showSearchbar" slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <!--<ion-searchbar-->
-      <!--placeholder="Buscar">-->
-    <!--</ion-searchbar>-->
-    <ion-buttons slot="end">
-      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
-        <span *ngIf="ios">Filter</span>
-        <span *ngIf="!ios">
-          <ion-icon slot="icon-only" name="options"></ion-icon>
-        </span>
-      </ion-button>
-    </ion-buttons>
+    <ion-grid>
+      <ion-row class="ion-align-items-center">
+
+        <!-- Columna izquierda -->
+        <ion-col size="8">
+          <ion-buttons *ngIf="!showSearchbar" slot="start">
+            <ion-menu-button></ion-menu-button>
+          </ion-buttons>
+
+        </ion-col>
+
+        <!-- Columna derecha: total de items -->
+        <ion-col size="4" class="ion-text-right">
+          <ng-container *ngIf="exitList?.length > 0; else noItems">
+            <strong>{{ itemList.length }} items</strong>
+          </ng-container>
+          <ng-template #noItems>
+            <span>No hay items</span>
+          </ng-template>
+
+          <ion-buttons slot="end">
+            <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+              <span *ngIf="ios">Filter</span>
+              <span *ngIf="!ios">
+                <ion-icon slot="icon-only" name="options"></ion-icon>
+              </span>
+            </ion-button>
+          </ion-buttons>
+
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+
+  <ion-toolbar color="light" class="subheader-toolbar">
+    <ion-title class="subheader-title">
+      Movimientos | Salida de mercancia <br><br>
+      <span style="font-size: xx-small; padding-bottom: 5px;">
+        <i>{{ todayDate }}</i>
+      </span>
+    </ion-title>
   </ion-toolbar>
 
 </ion-header>
@@ -25,7 +50,7 @@
 
 
 
-
+<ion-content>
   <ion-card class="main-card" [class.disabled]="product && !componentsEnabled">
 
     <ion-card-content>
@@ -45,26 +70,24 @@
             <ion-icon name="camera-outline"></ion-icon>
           </ion-button>
         </div>
-
       </div>
 
-      <!-- PRODUCT INFO -->
        <ng-container *ngIf="product">
         <div class="product-section">
 
           <ion-card-header>
             <ion-card-subtitle class="category">
-              {{ getCategoryNameById(product.datos.categ[0]) | uppercase }}
+              {{ getCategoryNameById(product.data.categ[0]) | uppercase }}
             </ion-card-subtitle>
 
             <ion-card-title class="product-name">
-              {{ product.datos.name | uppercase }}
+              {{ product.data.name | uppercase }}
             </ion-card-title>
 
             <ion-card-subtitle class="product-qty">
               Cantidad actual:
-              <strong>{{ product.datos.qty }}</strong>
-              {{ getUmNameById(product.datos.um[0]) }}
+              <strong>{{ product.data.qty }}</strong>
+              {{ getUmNameById(product.data.um[0]) }}
             </ion-card-subtitle>
           </ion-card-header>
 
@@ -81,13 +104,11 @@
               class="quantity-input">
             </ion-input>
           </ion-item>
-
           <div class="quantity-buttons">
             <ion-button color="medium" expand="block" (click)="clearQty()" [disabled]="!componentsEnabled">Clear</ion-button>
-            <ion-button color="primary" expand="block" (click)="addQty(1)" [disabled]="!componentsEnabled">+1</ion-button>
-            <ion-button color="success" expand="block" (click)="addQty(10)" [disabled]="!componentsEnabled">+10</ion-button>
+            <ion-button color="primary" expand="block" (click)="addQty(1)" [disabled]="!componentsEnabled">1</ion-button>
+            <ion-button color="success" expand="block" (click)="addQty(10)" [disabled]="!componentsEnabled">10</ion-button>
           </div>
-
           <div class="action-buttons-row ion-padding">
             <ion-button color="medium" shape="round" (click)="exitApp()">
               <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
@@ -98,7 +119,6 @@
           </div>
         </div>
       </ng-container>
-
    </ion-card-content>
   </ion-card>
 
@@ -109,13 +129,14 @@
     </div>
   </ng-container>
 
-  <!-- FAB para informe / planilla -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button color="primary" (click)="openReport()">
       <ion-icon name="document-text-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
-
 </ion-content>
+
+
+
 

@@ -167,7 +167,7 @@ export class ReadrenPage {
 
       const cat = this.categories.find(c => Number(c.id) === Number(id));
 
-      const nombre = cat?.datos?.nombre;
+      const nombre = cat?.data?.nombre;
 
       return typeof nombre === 'string' && nombre.trim() !== ''
         ? nombre
@@ -198,7 +198,7 @@ export class ReadrenPage {
     }
 
     // Extraer el nombre si existe y es válido
-    const nombre = um?.datos?.name;
+    const nombre = um?.data?.name;
     if (typeof nombre === 'string' && nombre.trim() !== '') {
       return nombre;
     }

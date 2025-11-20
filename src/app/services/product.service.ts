@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
 
-  private apiUrl = environment.apiHost; 
 
+  private apiUrl = environment.apiHost; 
   constructor(private http: HttpClient) {}
 
    getAll(): Observable<any[]> {
@@ -22,8 +22,7 @@ export class ProductService {
 
   searchProducts(hash: string): Observable<any[]> {
     return this.http.get<any[]>(
-      `${this.apiUrl}/product?datos->>name=ilike.*${hash}*&limit=20`
-      // `${this.apiUrl}/product?datos->>name=ilike.*${hash}*`
+      `${this.apiUrl}/product?data->>name=ilike.*${hash}*&limit=20`
     );
   }
 

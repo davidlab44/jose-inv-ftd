@@ -27,7 +27,6 @@ import { ApplyComponent } from '../modal/apply/apply.component';
     styleUrls: ['./kitchen.scss'],
   })
   
-  //voy a trabajar REN remisiones de Entradas de mercancias
   export class KitchenPage  {
 
   ios: boolean;
@@ -70,14 +69,11 @@ import { ApplyComponent } from '../modal/apply/apply.component';
     private modalController: ModalController
   ) {}
 
-
-
   printSelectedBarcodes(p: Product) {
     const paddedId = p.id.toString().padStart(6, '0');
     const selectedBarcodes = [paddedId];
     this.barcodeService.downloadPDF(selectedBarcodes);
   }
-
 
   hash:string='';
   table:any
@@ -126,99 +122,12 @@ import { ApplyComponent } from '../modal/apply/apply.component';
     );
   }
 
-  /*categories: any[] = [];    */
-    /*loadCategories() { */
-      /*this.categoryService.getAllCategories().subscribe({ */
-        /*next: (res) => {       */
-          /*this.categories = res;          */
-          /*this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage */
-        /*}, */
-        /*error: (err) => {      */
-          /*console.error('❌ Error al cargar categorías:', err); */
-          /*this.categories = this.categoryService.getCategoriesFromLocal(); */
-        /*} */
-      /*}); */
-    /*}   */
-        
-    /*ums: any[] = []; */
-        
-/*    loadUms() {                */
-      /*this.umService.getAllUms().subscribe({ */
-        /*next: (res) => {       */
-          /*console.log('✅ Ums:', res);    */
-          /*this.ums = res; */
-          /*this.umService.saveUmsToLocal(res); */
-        /*}, */
-        /*error: (err) => {      */
-          /*console.error('❌ Error al cargar categorías:', err); */
-          /*this.ums = this.umService.getUmsFromLocal(); */
-        /*} */
-      /*}); */
-    /*}     */
-      
-
-
-    /*getCategoryNameById(id: number | null | undefined): string {*/
-      /*if (id === null || id === undefined) {*/
-        /*return 'Sin categoría';*/
-      /*}*/
-
-      /*if (!Array.isArray(this.categories) || this.categories.length === 0) {*/
-        /*return 'Sin categoría';*/
-      /*}*/
-
-      /*const cat = this.categories.find(c => Number(c.id) === Number(id));*/
-
-      /*const nombre = cat?.datos?.nombre;*/
-
-      /*return typeof nombre === 'string' && nombre.trim() !== ''*/
-        /*? nombre*/
-        /*: 'Sin categoría';*/
-    /*}*/
-
-
-  /*getUmNameById(id: number | string | null | undefined): string {*/
-    /*// Validar ID recibido*/
-    /*if (id === null || id === undefined) {*/
-      /*return 'Sin UM';*/
-    /*}*/
-
-    /*const idNum = Number(id);*/
-    /*if (isNaN(idNum)) {*/
-      /*return 'Sin UM';*/
-    /*}*/
-
-    /*// Validar que this.ums exista y tenga elementos*/
-    /*if (!Array.isArray(this.ums) || this.ums.length === 0) {*/
-      /*return 'Sin UM';*/
-    /*}*/
-
-    /*// Buscar la UM por ID*/
-    /*const um = this.ums.find(u => Number(u.id) === idNum);*/
-    /*if (!um) {*/
-      /*return 'Sin UM';*/
-    /*}*/
-
-    /*// Extraer el nombre si existe y es válido*/
-    /*const nombre = um?.datos?.name;*/
-    /*if (typeof nombre === 'string' && nombre.trim() !== '') {*/
-      /*return nombre;*/
-    /*}*/
-
-    /*return 'Sin UM';*/
-  /*}*/
-
 
   onSearch(text: string) {
     this.searchSubject.next(text);
   }
 
-
-
-
-
-
-   product:any
+  product:any
   getProductById(id: number) {
     this.productService.getProductById(id).subscribe(data => {
       this.product = data[0];
@@ -240,7 +149,6 @@ import { ApplyComponent } from '../modal/apply/apply.component';
   }
 
   ums: any[] = [];
-
   loadUms() {
     this.umService.getAllUms().subscribe({
       next: (res) => {
@@ -257,13 +165,13 @@ import { ApplyComponent } from '../modal/apply/apply.component';
 
   getCategoryNameById(id: number): string {
     const cat = this.categories.find(c => c.id === id);
-    return cat ? cat.datos?.nombre || 'Sin categoría' : 'Sin categoría';
+    return cat ? cat.data?.nombre || 'Sin categoría' : 'Sin categoría';
   }
 
   getUmNameById(id: number | string): string {
     const idNum = Number(id);
     const um = this.ums.find(u => Number(u.id) === idNum);
-    return um?.datos?.name ? um.datos.name : 'Sin UM';
+    return um?.data?.name ? um.data.name : 'Sin UM';
   }
 
   extraQty = 0;
@@ -272,13 +180,12 @@ import { ApplyComponent } from '../modal/apply/apply.component';
   }
 
   addQty(value: number) {
-    const allowedCant = Number(this.product?.datos?.qty) - value;
+    const allowedCant = Number(this.product?.data?.qty) - value;
     console.log("allowed", allowedCant);
 
-    // ✅ Validar correctamente si el valor no es un número
     if (Number.isNaN(allowedCant)) {
       this.utilService.presentToast("allowedCant is NaN", "danger", 500);
-      return; // salimos de la función
+      return;
     }
 
     if (allowedCant >= 0) {
@@ -289,18 +196,18 @@ import { ApplyComponent } from '../modal/apply/apply.component';
   }
 
   confirmAction() {
-    const newQty = this.product.datos.qty - this.extraQty;
+    const newQty = this.product.data.qty - this.extraQty;
     console.log("newQty",newQty)
     if (newQty >= 0) {
-      this.product.datos.qty = newQty;
+      this.product.data.qty = newQty;
       this.updateProductQty(this.product.id, this.product);
     } else {
       this.utilService.presentToast("No tiene suficiente stockk", "default", 1000);
     }
   }
 
- updateProductQty(productId:number,datos:any){
-    this.productService.updateProductQty(productId, datos).subscribe({
+  updateProductQty(productId:number,data:any){
+    this.productService.updateProductQty(productId, data).subscribe({
       next: (res) => {
         console.log('Cantidad actualizada:', res);
       },
@@ -317,8 +224,6 @@ import { ApplyComponent } from '../modal/apply/apply.component';
   }
 
 
-
-
   async openModal(detalles: any[], idQuotation: number, red: any) {
     
     const modal = await this.modalController.create({
@@ -331,7 +236,7 @@ import { ApplyComponent } from '../modal/apply/apply.component';
     });
 
     modal.onDidDismiss().then((result) => {
-      console.log('Datos de cierre:', result);
+      console.log('data de cierre:', result);
 
       if (result.data?.closedBy === 'customCloseModal') {
         console.log('Cerrado con mi método personalizado 🚀');
@@ -342,10 +247,6 @@ import { ApplyComponent } from '../modal/apply/apply.component';
 
     return await modal.present();
   }
-
-
-
-
 
   exitApp() {
     console.log('🛑 Saliendo de la app');
