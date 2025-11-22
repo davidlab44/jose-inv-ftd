@@ -59,23 +59,32 @@ export class AppComponent implements OnInit {
     private userData: UserData,
     private swUpdate: SwUpdate,
     private toastCtrl: ToastController,
-    private opportunityService:OpportunityService
+    private opportunityService:OpportunityService,
+    private updates: SwUpdate
   ) {
-    // this.router.events.subscribe((event) => {
-    //   if (event instanceof NavigationEnd) {
-    //     // Check if the current route is '/login'
-    //     if (event.url === '/login' || event.url === '/signup' ||  event.url === '/app/tabs/about' || event.url === '') {
-    //       this.showMenu = true; // Hide the menu
-    //       // if(event.url === '/app/tabs/about'){
-    //       //   window.open('app/tabs/about', '_blank');
-    //       // }
-    //     } else {
-    //       this.showMenu = true; // Show the menu on other routes
-    //     }
-    //   }
-    // });
-    // this.initializeApp();
+    this.checkForUpdates();
   }
+
+async checkForUpdates() {
+  if (!this.swUpdate.isEnabled) return;
+
+  // Verificar si hay actualización
+  const updateFound = await this.swUpdate.checkForUpdate();
+
+  if (updateFound) {
+    if (confirm('Nueva versión disponible. ¿Actualizar?')) {
+      await this.swUpdate.activateUpdate();
+      document.location.reload();
+    }
+  }
+}
+
+  
+
+
+
+
+
 
   async ngOnInit() {
     //console.log('hittttttttttttttttman')

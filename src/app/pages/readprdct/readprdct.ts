@@ -232,10 +232,10 @@ export class ReadprdctPage {
       }
     ];
 
-    this.rexService.addProdrexItems(items).subscribe({
-      next: (resp) => console.log('Respuesta OK:', resp),
-      error: (err) => console.error('Error al enviar:', err)
-    });
+    /*this.rexService.addProdrexItems(items).subscribe({*/
+      /*next: (resp) => console.log('Respuesta OK:', resp),*/
+      /*error: (err) => console.error('Error al enviar:', err)*/
+    /*});*/
   }
 
 

@@ -30,21 +30,22 @@
 
 <ion-content>
   <ion-list>
-    <ng-container *ngFor="let p of productList">
+    
+    <ng-container *ngFor="let p of prodrexList">
       <ion-item button (click)="addToOrder(p)" lines="none" style="padding-top: 6px; padding-bottom: 6px;">
         <table style="width: 100%; border-collapse: collapse;">
           <!-- Primera fila: Categoría, Nombre, Cantidad + UM, Botón -->
           <tr>
-            <td style="font-size: small; width: 10%;">
-              {{ getCategoryNameById(p?.data?.categ?.[0]) | capitalize }}
-            </td>
+           <!-- <td style="font-size: small; width: 10%;">-->
+              <!--{{ getCategoryNameById(p?.data?.categ?.[0]) | capitalize }}-->
+            <!--</td>-->
             <td style="font-size: 13px; width: 60%;">
-              <h3 style="margin: 0; font-size: inherit;">{{ p?.data?.name | uppercase }}</h3>
+              <h3 style="margin: 0; font-size: inherit;">documento numero : {{ p?.data?.id_product  }}</h3>
             </td>
             <td style="width: 15%; text-align: right; vertical-align: top;">
               <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                <strong>{{ p?.data?.qty }}</strong>
-                <span style="font-size: xx-small;">{{ getUmNameById(p?.data?.um?.[0]) }}</span>
+                <!--<strong>{{ p?.data?.qty }}</strong>-->
+                <span style="font-size: xx-small;">name: {{ getProductNameById(p?.data?.id_product) }}</span>
               </div>
             </td>
 
@@ -60,7 +61,11 @@
     </ng-container>
   </ion-list>
 
+
   <app-signature></app-signature>
+  
+       <h3>prodrex LIST</h3>
+       <pre>{{prodrexList | json}}</pre>
 </ion-content>
 
 

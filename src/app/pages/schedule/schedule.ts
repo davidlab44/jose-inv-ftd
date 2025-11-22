@@ -17,13 +17,14 @@ import { CategoryService } from '../../services/category.service';
 import { UmService } from '../../services/um.service';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { RexService } from '../../services/rex.service';
+import { ProdrexService } from '../../services/prodrex.service';
 
 @Component({
   selector: 'page-schedule',
   templateUrl: 'schedule.html',
   styleUrls: ['./schedule.scss'],
 })
-export class SchedulePage {
+export class SchedulePage{
   @ViewChild('video', { static: false }) videoElement!: ElementRef<HTMLVideoElement>;
 
   private codeReader = new BrowserMultiFormatReader();
@@ -55,6 +56,7 @@ export class SchedulePage {
     private productService: ProductService,
     private categoryService: CategoryService,
     private umService: UmService,     
+    private prodrexService: ProdrexService,
     private rexService: RexService
   ) {
   
@@ -69,7 +71,7 @@ export class SchedulePage {
 
   ngOnInit() {
     const myUrl = window.location.href;
-    console.log('URL actual:', myUrl);
+    //console.log('URL actual:', myUrl);
       /*    const urlsPermitidas = [*/
       /*'http://10.100.100.4:8505',*/
       /*'http://10.100.100.4:8505/',*/
@@ -79,16 +81,29 @@ export class SchedulePage {
     /*if (urlsPermitidas.some(url => myUrl.includes(url))) {*/
       /*this.router.navigate(['/app/tabs/scnbrcd']);*/
     /*}*/
-    
     const ahora = new Date();
     this.todayDate=this.formatFechaLatam(ahora);
   }
 
+  productListOriginal:any[]=[];
+  ionViewWillEnter() {
+    this.productService.refreshFromServer().subscribe(data => {
+      this.productListOriginal = data;
+    });
+  }
+
+  rexDocument:any;
   async ionViewDidEnter() {
     await this.loadCategories();
     await this.loadUms();
     this.getProductById(87); 
     await this.loadProdrex();
+    this.rexService.getAll().subscribe({
+      next: (response) => {
+        this.rexDocument=response;
+        console.log("response rex table",response)
+      }
+    })
   }
 
   componentsEnabled: boolean = true;
@@ -155,7 +170,7 @@ export class SchedulePage {
   getProductById(id: number) {
     this.productService.getProductById(id).subscribe(data => {
       this.product = data[0];
-      console.log("getProductById", this.product);
+      //console.log("getProductById", this.product);
     });
   }
 
@@ -178,11 +193,12 @@ export class SchedulePage {
     this.rexService.getProdrexList(1).subscribe({
       next: (res) => {
         this.prodrexList = res;
-        this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage
+        //this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage
+        console.log("res",res)
       },
       error: (err) => {
         console.error('❌ Error al cargar categorías:', err);
-        this.categories = this.categoryService.getCategoriesFromLocal();
+        //this.categories = this.categoryService.getCategoriesFromLocal();
       }
     });
   }
@@ -221,11 +237,9 @@ export class SchedulePage {
   addQty(value: number) {
     const allowedCant = Number(this.product?.data?.qty) - value;
     console.log("allowed", allowedCant);
-
-    // ✅ Validar correctamente si el valor no es un número
     if (Number.isNaN(allowedCant)) {
       this.utilService.presentToast("allowedCant is NaN", "danger", 500);
-      return; // salimos de la función
+      return;
     }
 
     if (allowedCant >= 0) {
@@ -236,10 +250,12 @@ export class SchedulePage {
   }
 
   confirmAction() {
-    const newQty = this.product.data.qty - this.extraQty;
-    console.log("this.product.data",this.product)
-
-    console.log("newQty",newQty)
+    console.log('product',this.product)
+    this.prodrexService.addProdrexItem(this.product.id,this.rexDocument[0].id).subscribe({
+      next: (res) =>{
+        console.log("res",res)
+      }
+    })
     /*if (newQty >= 0) {*/
       /*this.product.data.qty = newQty;*/
       /*this.updateProductQty(this.product.id, this.product);*/
@@ -268,8 +284,6 @@ export class SchedulePage {
     window.location.href = 'https://www.google.com';
   }
 
-
-
   /**
    * Formatea una fecha en estilo amigable con hora en 12h y segundos
    * Ejemplo: "12 agosto de 2025 11:39:20 AM"
@@ -277,9 +291,7 @@ export class SchedulePage {
    */
   formatFechaLatam(dateInput: string | Date | number): string {
     if (!dateInput) return '';
-
     const date = new Date(dateInput);
-
     const opciones: Intl.DateTimeFormatOptions = {
       day: '2-digit',
       month: 'long',
@@ -293,10 +305,8 @@ export class SchedulePage {
     horas = horas % 12;
     if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
     const horasTexto = String(horas).padStart(2, '0');
-
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
-
 
 
 }

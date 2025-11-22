@@ -20,6 +20,8 @@ import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { DateService } from '../../services/local/date.service';
+import { RexService } from '../../services/rex.service';
+import { ProdrexService } from '../../services/prodrex.service';
 
 @Component({
   selector: 'page-prodrex',
@@ -66,16 +68,15 @@ export class ProdrexPage {
     private categoryService:CategoryService,
     private umService:UmService,
     private dateService: DateService,
+    private rexService: RexService,
+    private prodrexService: ProdrexService
   ) {}
-
-
 
   printSelectedBarcodes(p: Product) {
     const paddedId = p.id.toString().padStart(6, '0');
     const selectedBarcodes = [paddedId];
     this.barcodeService.downloadPDF(selectedBarcodes);
   }
-
 
   hash:string='';
   table:any
@@ -87,11 +88,26 @@ export class ProdrexPage {
     this.todayDate=this.formatFechaLatam(ahora);
   }
 
-
   updateSchedule(){
+     
   }
 
-  ionViewDidEnter() {}
+  productListCaos:any[]=[];
+  ionViewWillEnter() {
+    this.productService.getCachedOrServer().subscribe(data => {
+      this.productListCaos = data;
+    });
+  }
+
+  prodrexList:any[]=[];
+  ionViewDidEnter() {
+    this.prodrexService.getAll().subscribe({
+      next: response=>{
+        this.prodrexList=response;
+        console.log("getProdRexList",response)
+      }
+    })
+  }
 
   posCategId:number=0
   productList:Product[]=[];
@@ -143,8 +159,6 @@ export class ProdrexPage {
       }); 
     }     
       
-
-
     getCategoryNameById(id: number | null | undefined): string {
       if (id === null || id === undefined) {
         return 'Sin categoría';
@@ -185,6 +199,54 @@ export class ProdrexPage {
     }
     return 'Sin UM';
   }
+
+
+  getProductNameById(id: number | string | null | undefined): string {
+    console.log("id product pasado", id);
+
+    if (id === null || id === undefined) return 'Sin Nombre';
+
+    const idNum = Number(id);
+    if (isNaN(idNum)) return 'Sin Nombre';
+
+    if (!Array.isArray(this.productListCaos) || this.productListCaos.length === 0) {
+      return 'Sin Nombre';
+    }
+
+    const product = this.productListCaos.find(p => Number(p.id) === idNum);
+    if (!product) return 'Sin Nombre';
+
+    const name = product?.data?.name;
+    if (typeof name === 'string' && name.trim() !== '') {
+      return name;
+    }
+
+    return 'Sin Nombre';
+  }
+
+  /*getProductNameById(id: number | string | null | undefined): string {*/
+    /*console.log("id product pasado",id)*/
+    /*console.log("productListCaos",this.productListCaos)*/
+    /*if (id === null || id === undefined) {*/
+      /*return 'Sin Nombre';*/
+    /*}*/
+    /*const idNum = Number(id);*/
+    /*if (isNaN(idNum)) {*/
+      /*return 'Sin Nombre';*/
+    /*}*/
+    /*if (!Array.isArray(this.productListCaos) || this.productListCaos.length === 0) {*/
+      /*return 'Sin Nombre';*/
+    /*}*/
+    /*const prdct = this.productListCaos.find(prd => Number(prd.id) === idNum);*/
+    /*if (!prdct) {*/
+      /*return 'Sin Nombre';*/
+    /*}*/
+    /*const nombre = prdct?.datos?.name;*/
+    /*if (typeof nombre === 'string' && nombre.trim() !== '') {*/
+      /*return nombre;*/
+    /*}*/
+    /*return 'Sin Nombre';*/
+  /*}*/
 
   onSearch(text: string) {
     this.searchSubject.next(text);

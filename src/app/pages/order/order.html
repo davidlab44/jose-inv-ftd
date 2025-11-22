@@ -15,12 +15,9 @@
   </ion-toolbar>
 </ion-header>
 
-
-
-
 <ion-content>
   <div class="actions">
-    <button class="danger-button" (click)="clearOrder()">🗑️ Eliminar mi pedido y volver a empezar</button>
+    <button class="danger-button" (click)="clearOrder()">Eliminar mi pedido y volver a empezar</button>
   </div>
 
   <div *ngFor="let group of getGroupedOrder()" class="category-block">
@@ -44,27 +41,3 @@
 
 
 
-
-<!-- <ion-content>
-
-  <div class="actions">
-    <button (click)="clearOrder()">🗑️ Vaciar carrito</button>
-  </div>
-
-  <div *ngFor="let group of getGroupedOrder()">
-    <h3>{{ group.name }}</h3>
-    <ul>
-      <li *ngFor="let product of group.products">
-        {{ product.name }} - Cant: {{ product.cant }} - ${{ product.price }}
-      </li>
-    </ul>
-  </div>
-
-  <div class="bottom-button">
-    <ion-button expand="block" shape="round" (click)="enviarOrder()">
-      <ion-icon name="cart-outline" slot="start"></ion-icon>
-      Enviar Pedido
-    </ion-button>
-  </div>
-
-</ion-content> -->
