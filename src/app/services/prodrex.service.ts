@@ -5,7 +5,6 @@ import { environment } from '../../environments/environment';
 import { tap } from 'rxjs/operators';
 import { BehaviorSubject, of } from 'rxjs';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -22,15 +21,17 @@ export class ProdrexService {
   getAll(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/prodrex`);
   }
- 
-  addProdrexItem(productId: number,rexDocumentId:number): Observable<any> {
+
+
+  addProdrexItem(productId: number,qty:number,rexDocumentId:number): Observable<any> {
     console.log("id pasado", productId);
     console.log("rexDocument10 id pasado", rexDocumentId);
     const url = `${this.apiUrl}/prodrex?select=*`;
     const item = {
       data: {
         id_product: productId,
-        id_rex: rexDocumentId
+        id_rex: rexDocumentId,
+        qty:qty
       }
     };
     return this.http.post(url, item, {
@@ -40,6 +41,7 @@ export class ProdrexService {
       }
     });
   }
+
 
   addProdrexItems(items: any[]): Observable<any> {
     console.log("request",items)
@@ -51,5 +53,11 @@ export class ProdrexService {
     });
   }
 
+  removeFromProdrex(id: number): Observable<any> {
+    const url = `${this.apiUrl}/prodrex?id=eq.${id}`;
+    return this.http.delete(url, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 
 }

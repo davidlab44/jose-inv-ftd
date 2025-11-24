@@ -7,8 +7,6 @@
   }
 }
 
-
-
 .subheader-toolbar {
   --min-height: 32px;   /* más delgado que un toolbar normal */
 }
@@ -21,5 +19,30 @@
   margin: 0;
   padding: 0;
 }
+
+.user-table {
+  margin: 10px;
+
+  .header {
+    font-weight: bold;
+    background: #f1f1f1;
+    padding: 8px 0;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .user-row {
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .check-col {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+
 
 

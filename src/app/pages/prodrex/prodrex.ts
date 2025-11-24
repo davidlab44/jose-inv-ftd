@@ -22,6 +22,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { DateService } from '../../services/local/date.service';
 import { RexService } from '../../services/rex.service';
 import { ProdrexService } from '../../services/prodrex.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'page-prodrex',
@@ -31,6 +32,7 @@ import { ProdrexService } from '../../services/prodrex.service';
 export class ProdrexPage {
 
   ios: boolean;
+  hasOwner:boolean=false;
   segment = 'all';
   showSearchbar: boolean;
   opportunities = [];
@@ -69,7 +71,8 @@ export class ProdrexPage {
     private umService:UmService,
     private dateService: DateService,
     private rexService: RexService,
-    private prodrexService: ProdrexService
+    private prodrexService: ProdrexService,
+    private userService: UserService
   ) {}
 
   printSelectedBarcodes(p: Product) {
@@ -80,13 +83,33 @@ export class ProdrexPage {
 
   hash:string='';
   table:any
+  rexDocument:any;
   async ngOnInit() {
     console.log("ngOnInit")
     await this.loadCategories();
     await this.loadUms();
     const ahora = new Date();
     this.todayDate=this.formatFechaLatam(ahora);
+    this.loadUsers();
+    this.rexService.getAll().subscribe({
+      next: (response) => {
+        this.rexDocument=response;
+        console.log("response rex table",response)
+      }
+    })
+
   }
+
+  userList:any[]=[];
+  loadUsers(){
+    this.userService.getAll().subscribe({
+      next: (response)=>{
+        console.log("users",response)
+        this.userList=response;
+      }
+    })
+  }
+
 
   updateSchedule(){
      
@@ -220,48 +243,16 @@ export class ProdrexPage {
     if (typeof name === 'string' && name.trim() !== '') {
       return name;
     }
-
     return 'Sin Nombre';
   }
-
-  /*getProductNameById(id: number | string | null | undefined): string {*/
-    /*console.log("id product pasado",id)*/
-    /*console.log("productListCaos",this.productListCaos)*/
-    /*if (id === null || id === undefined) {*/
-      /*return 'Sin Nombre';*/
-    /*}*/
-    /*const idNum = Number(id);*/
-    /*if (isNaN(idNum)) {*/
-      /*return 'Sin Nombre';*/
-    /*}*/
-    /*if (!Array.isArray(this.productListCaos) || this.productListCaos.length === 0) {*/
-      /*return 'Sin Nombre';*/
-    /*}*/
-    /*const prdct = this.productListCaos.find(prd => Number(prd.id) === idNum);*/
-    /*if (!prdct) {*/
-      /*return 'Sin Nombre';*/
-    /*}*/
-    /*const nombre = prdct?.datos?.name;*/
-    /*if (typeof nombre === 'string' && nombre.trim() !== '') {*/
-      /*return nombre;*/
-    /*}*/
-    /*return 'Sin Nombre';*/
-  /*}*/
-
+  
   onSearch(text: string) {
     this.searchSubject.next(text);
   }
 
-  /**
-   * Formatea una fecha en estilo amigable con hora en 12h y segundos
-   * Ejemplo: "12 agosto de 2025 11:39:20 AM"
-   * @param dateInput puede ser string, Date o timestamp
-   */
   formatFechaLatam(dateInput: string | Date | number): string {
     if (!dateInput) return '';
-
     const date = new Date(dateInput);
-
     const opciones: Intl.DateTimeFormatOptions = {
       day: '2-digit',
       month: 'long',
@@ -275,8 +266,27 @@ export class ProdrexPage {
     horas = horas % 12;
     if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
     const horasTexto = String(horas).padStart(2, '0');
-
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
+  }
+
+  selectUsers(){
+    console.log("userList",this.userList)    
+    this.ownerId=0;
+    this.hasOwner=false;
+  }
+
+  ownerId=0
+  selectUser(u){
+    console.log("component u pasado",u)
+    this.rexService.addUserOwner(this.rexDocument[0],u.id).subscribe({
+      next: (res) =>{
+        console.log("res para usar",res)
+        if(res[0].data.id_user > 0){
+          this.ownerId=res[0].data.id_user;
+          this.hasOwner=true;
+        } 
+      }
+    })
   }
 
 

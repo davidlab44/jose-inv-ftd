@@ -22,6 +22,21 @@ export class RexService {
     );
   }
 
+  addUserOwner(rex:any,id_user:number): Observable<any> {
+    console.log("rex pasadox", rex);
+    console.log("id_product pasadox", id_user);
+    const url = `${this.apiUrl}/rex?select=*`;
+    rex.data.id_user = id_user;
+    console.log("rex que se enviara",rex);
+    return this.http.patch(url, rex, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      }
+    });
+  }
+
+
 /*  addProdrexItem(id: number,rexId:number): Observable<any> {*/
     /*console.log("id pasado", id);*/
     /*console.log("rexDocument3 id pasado", rexId);*/

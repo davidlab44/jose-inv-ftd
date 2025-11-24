@@ -235,14 +235,14 @@ export class SchedulePage{
   }
 
   addQty(value: number) {
-    const allowedCant = Number(this.product?.data?.qty) - value;
-    console.log("allowed", allowedCant);
-    if (Number.isNaN(allowedCant)) {
+    const requestedQty = Number(this.product?.data?.qty) - value;
+    console.log("requestedQty", value);
+    console.log("available QTY", this.product.data.qty);
+    if (Number.isNaN(requestedQty)) {
       this.utilService.presentToast("allowedCant is NaN", "danger", 500);
       return;
     }
-
-    if (allowedCant >= 0) {
+    if (requestedQty >= 0) {
       this.extraQty += value;
     } else {
       this.utilService.presentToast("No tiene suficiente stock", "danger", 1000);
@@ -250,18 +250,11 @@ export class SchedulePage{
   }
 
   confirmAction() {
-    console.log('product',this.product)
-    this.prodrexService.addProdrexItem(this.product.id,this.rexDocument[0].id).subscribe({
+   this.prodrexService.addProdrexItem(this.product.id,this.extraQty,this.rexDocument[0].id).subscribe({
       next: (res) =>{
         console.log("res",res)
       }
     })
-    /*if (newQty >= 0) {*/
-      /*this.product.data.qty = newQty;*/
-      /*this.updateProductQty(this.product.id, this.product);*/
-    /*} else {*/
-      /*this.utilService.presentToast("No tiene suficiente stockk", "default", 1000);*/
-    /*}*/
   }
 
   updateProductQty(productId:number,data:any){
@@ -284,11 +277,6 @@ export class SchedulePage{
     window.location.href = 'https://www.google.com';
   }
 
-  /**
-   * Formatea una fecha en estilo amigable con hora en 12h y segundos
-   * Ejemplo: "12 agosto de 2025 11:39:20 AM"
-   * @param dateInput puede ser string, Date o timestamp
-   */
   formatFechaLatam(dateInput: string | Date | number): string {
     if (!dateInput) return '';
     const date = new Date(dateInput);
