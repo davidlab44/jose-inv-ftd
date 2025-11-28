@@ -112,7 +112,25 @@ const routes: Routes = [
           }
         ]
       },
-    {
+      {
+        path: 'replenishment',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/replenishment/replenishment.module').then(m => m.ReplenishmentModule)
+          }
+        ]
+      },
+      {
+        path: 'glpprices',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/price/price.module').then(m => m.PriceModule)
+          }
+        ]
+      },
+      {
         path: '',
         redirectTo: '/app/tabs/schedule',
         pathMatch: 'full'

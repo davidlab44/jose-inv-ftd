@@ -83,6 +83,11 @@ export class SchedulePage{
     /*}*/
     const ahora = new Date();
     this.todayDate=this.formatFechaLatam(ahora);
+    const host = window.location.hostname;
+    if (host.startsWith("abs.")) {
+      this.router.navigate(['/app/tabs/replenishment']);
+    }
+
   }
 
   productListOriginal:any[]=[];

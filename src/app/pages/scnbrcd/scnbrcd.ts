@@ -174,9 +174,10 @@ export class ScnbrcdPage {
 
  printSelectedBarcodes() {
     // Datos hardcoded de prueba
-    const selectedBarcodes = ['110', '111', '112', '113'];
-
-    this.barcodeService.downloadPDF(selectedBarcodes);
+    //const selectedBarcodes = ['110', '111', '112', '113'];
+    const selectedBarcodes = Array.from({ length: 100 }, (_, i) => String(i + 1));
+    //this.barcodeService.downloadPDF(selectedBarcodes);
+    this.barcodeService.generateBarcodesPDF(selectedBarcodes);
   }
 
 

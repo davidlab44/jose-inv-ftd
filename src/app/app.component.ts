@@ -23,7 +23,7 @@ export class AppComponent implements OnInit {
 
 //appPages=[];
   
-   appPages = [
+  appPages = [
      {
        title: 'Inicio',
        url: '/app/tabs/schedule',
@@ -44,6 +44,23 @@ export class AppComponent implements OnInit {
        url: '/app/tabs/readren',
        icon: 'document-text'
      }
+   ];
+  appPages4 = [
+     {
+       title: 'Inicio',
+       url: '/app/tabs/replenishment',
+       icon: 'home'
+     },
+     {
+       title: 'Inventario',
+       url: '/app/tabs/readren',
+       icon: 'cube'
+     },
+     {
+       title: 'Fijar precio',
+       url: '/app/tabs/glpprices',
+       icon: 'cash'
+     },
    ];
   
   loggedIn = false;
@@ -115,9 +132,17 @@ async checkForUpdates() {
 
     this.showMenu=true;
     //this.getPosCategories();
+
+    const host = window.location.hostname;
+
+    if (host.startsWith("abs.")) {
+      this.appPages = this.appPages4;
+      this.router.navigate(['/app/tabs/replenishment']);
+    }
+
+
+
   }
-
-
 
 
 
