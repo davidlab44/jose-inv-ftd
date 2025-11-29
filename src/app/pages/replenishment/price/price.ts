@@ -33,21 +33,20 @@ import { GlppricesService } from '../../../services/replenishment/glpprices.serv
 export class PricePage {
 
   ios: boolean;
-  hasOwner:boolean=false;
-  segment = 'all';
+  importado: boolean=false;
+  hasOwner: boolean = false;
+  //segment = 'all';
   showSearchbar: boolean;
-  opportunities = [];
-  storedObject: any;
-  posOrders: any[] = [];
-  posOrderLineList: any[] = [];
-  pendingCommands: any[] = [];
-  deliveredList: any[] = [];
-  filteredProductList: any[] = [];
-  maxQtyDeliveredItems: any[] = [];
+  //posOrders: any[] = [];
+  //posOrderLineList: any[] = [];
+  //pendingCommands: any[] = [];
+  //deliveredList: any[] = [];
+  //filteredProductList: any[] = [];
+  //maxQtyDeliveredItems: any[] = [];
   queryText:any
-  mesas: any[] = [];
-  activeSession: Session | null = null;
-  sessionId: number | null = null;
+  //mesas: any[] = [];
+  //activeSession: Session | null = null;
+  //sessionId: number | null = null;
   searchSubject = new Subject<string>();
   todayDate:any
 
@@ -88,20 +87,27 @@ export class PricePage {
 
   rexDocument:any;
   glppricesList:any[]=[];
-  async ngOnInit() {
-    //await this.loadCategories();
-    //await this.loadUms();
-    const ahora = new Date();
-    this.todayDate=this.formatFechaLatam(ahora);
-    //this.loadUsers();
-    this.glpricesService.getAll().subscribe({
-      next: (response) => {
-        console.log("glp prices table",response);
-        this.glppricesList=response;
-        this.getMaxIdItem(this.glppricesList);
-      }
-    })
-  }
+  
+async ngOnInit() {
+  const ahora = new Date();
+  this.todayDate = this.formatFechaLatam(ahora);
+  this.glpricesService.getAll().subscribe({
+    next: (response) => {
+      console.log("glp prices table", response);
+      this.glppricesList = response.slice().reverse();
+      this.getMaxIdItem(this.glppricesList);
+      this.getMaxImportedItem(this.glppricesList);
+      console.log("Nacional:", this.lastGlpprice);
+      console.log("Importado:", this.lastImportedPrice);
+    }
+  });
+}
+
+
+
+
+
+
   numero: number;
 
   valor:number=0
@@ -116,7 +122,13 @@ export class PricePage {
      
   }
 
-  addGlpprice(price:number,idReplenishmentProduct:number){
+  addGlpprice(price:number){
+    let idReplenishmentProduct:number=1;
+    if(!this.importado){
+      idReplenishmentProduct=1;
+    }else{
+      idReplenishmentProduct=2;
+    }
     this.glpricesService.addGlpprice(price,idReplenishmentProduct).subscribe({
       next: (response)=>{
         console.log("response",response)
@@ -124,36 +136,63 @@ export class PricePage {
     })
   }
 
-  lastGlpprice:any="";
-  getMaxIdItem(items: any[]){
+  get currentPrice() {
+  return this.importado ? this.lastImportedPrice : this.lastGlpprice;
+}
+
+
+
+lastGlpprice: any = null;
+getMaxIdItem(items: any[]) {
+  const filtered = items.filter(i => i.data?.id_replenishment_product === 1);
+
+  if (filtered.length === 0) {
+    this.lastGlpprice = null;
+    return null;
+  }
+
+  this.lastGlpprice = filtered.reduce((max, item) =>
+    item.id > max.id ? item : max
+  );
+}
+
+
+
+/*  getMaxIdItem(items: any[]){*/
+    /*if (!items || items.length === 0) {*/
+      /*return null; // No hay elementos*/
+    /*}*/
+    /*this.lastGlpprice= items.reduce((max, item) =>*/
+      /*item.id > max.id ? item : max*/
+    /*);*/
+    /*console.log('lastGlpprice.data',this.lastGlpprice.data)*/
+  /*}*/
+
+  lastImportedPrice: any = "";
+  getMaxImportedItem(items: any[]) {
     if (!items || items.length === 0) {
-      return null; // No hay elementos
+      return null;
     }
-    this.lastGlpprice= items.reduce((max, item) =>
+    const filtered = items.filter(i => i.data?.id_replenishment_product === 2);
+    if (filtered.length === 0) {
+      this.lastImportedPrice = null;
+      return null; // No imported items found
+    }
+    this.lastImportedPrice = filtered.reduce((max, item) =>
       item.id > max.id ? item : max
     );
-    console.log('lastGlpprice.data',this.lastGlpprice.data)
-
+    console.log("lastImportedPrice.data", this.lastImportedPrice.data);
   }
+
 
   getFormatedDate(){
     return
   }
-  productListCaos:any[]=[];
+  
   ionViewWillEnter() {
-    this.productService.getCachedOrServer().subscribe(data => {
-      this.productListCaos = data;
-    });
   }
 
-  prodrexList:any[]=[];
   ionViewDidEnter() {
-    this.prodrexService.getAll().subscribe({
-      next: response=>{
-        this.prodrexList=response;
-        //console.log("getProdRexList",response)
-      }
-    })
   }
   
   searchProducts(hash: string, productList: any[]): any[] {
@@ -163,27 +202,6 @@ export class PricePage {
     );
   }
 
-  getProductNameById(id: number | string | null | undefined): string {
-
-    if (id === null || id === undefined) return 'Sin Nombre';
-
-    const idNum = Number(id);
-    if (isNaN(idNum)) return 'Sin Nombre';
-
-    if (!Array.isArray(this.productListCaos) || this.productListCaos.length === 0) {
-      return 'Sin Nombre';
-    }
-
-    const product = this.productListCaos.find(p => Number(p.id) === idNum);
-    if (!product) return 'Sin Nombre';
-
-    const name = product?.data?.name;
-    if (typeof name === 'string' && name.trim() !== '') {
-      return name;
-    }
-    return 'Sin Nombre';
-  }
-  
   onSearch(text: string) {
     this.searchSubject.next(text);
   }

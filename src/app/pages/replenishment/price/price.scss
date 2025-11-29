@@ -1,4 +1,4 @@
-@media print {
+media print {
   body * {
     visibility: hidden;
   }
@@ -51,4 +51,64 @@
 }
 
 
+/* FONDO GENERAL SEGÚN OPCIÓN */
+
+.bg-nacional {
+  --background: #ceedca;
+}
+
+.bg-importado {
+  --background: #fce6e6;
+}
+
+/* FILA DEL PRECIO ACTUAL – Nacional */
+.row-nacional {
+  background-color: #99da91 !important;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+/* Importado */
+.row-importado {
+  background-color: #ef7d7d !important;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+
+/* FILA DEL PRECIO ACTUAL */
+.tbl-row {
+  background-color: #d5d5d5;
+  padding: 8px;
+}
+
+/* ITEMS DEL HISTORICO */
+.titulo-historico,
+.item-historico {
+  background-color: transparent !important;
+  color: #555;
+  font-weight: 400;
+  font-size: small;
+}
+
+
+
+
+/* Quitar fondo a ion-list */
+ion-list {
+  --background: transparent !important;
+}
+
+/* Quitar fondo a ion-item */
+ion-item {
+  --background: transparent !important;
+  background: transparent !important;
+}
+
+/* Mantener los títulos del histórico sin fondo */
+.titulo-historico,
+.item-historico {
+  --background: transparent !important;
+  background: transparent !important;
+}
 
