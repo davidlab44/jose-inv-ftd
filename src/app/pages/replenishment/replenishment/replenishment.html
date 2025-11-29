@@ -36,58 +36,102 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-   <ion-grid class="user-table" *ngIf="!hasOwner">
-    <ion-row class="header">
-      <ion-col size="9">Nombre</ion-col>
-      <ion-col size="3" class="check-col">Select</ion-col>
-    </ion-row>
-    <ion-row *ngFor="let u of userList" class="user-row">
-      <ion-col size="9">
-        {{ u.data.name }}
-      </ion-col>
-      <ion-col size="3" class="check-col">
-        <ion-checkbox
-          (ionChange)="selectUser(u)"
-          mode="ios">
-        </ion-checkbox>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-
-<div *ngIf="hasOwner" style="width:100%;border-bottom: solid 1px #d5d5d5;padding: 10px;">
-  <ion-row *ngFor="let u of userList" style="width:100%; justify-content:center; display:flex;">
-    <span *ngIf="u.id == ownerId" style="text-align:center; width:100%;">
-      <b>{{ u.data.name }}</b>
-    </span>
-  </ion-row>
-</div>
-
-  <ion-list>
-    <ng-container *ngFor="let p of prodrexList">
-      <ion-item button (click)="addToOrder(p)" lines="none" style="padding-top: 6px; padding-bottom: 6px;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="font-size: 13px; width: 70%;">
-                <span style="font-size: small;">{{ getProductNameById(p?.data?.id_product) }}</span>
-            </td>
-            <td style="width: 15%; text-align: center;">
-                <span style="font-size: small;">{{ p?.data?.qty }}</span>
-            </td>
-            <td style="width: 15%; text-align: center;">
-              <ion-button color="secondary" (click)="removeFromProdrex(p.id)" style="height: 28px; min-width: 28px;">
-                <ion-icon name="trash-outline"></ion-icon>
-              </ion-button>
-            </td>
-          </tr>
-        </table>
-      </ion-item>
-    </ng-container>
-  </ion-list>
-
-  <app-signature></app-signature>
-
+<ion-content class="ion-padding">
+  <div class="table-container">
+    <table class="wide-table">
+      <thead>
+        <tr>
+          <th class="sticky-col">col1</th>   <!-- name -->
+          <th>Fecha V</th>                     <!-- role -->
+          <th>Cont vacío</th>                     <!-- ext_id -->
+          <th>Rem vacío</th>                     <!-- ext_id -->
+          <th>Fe ing M</th>                     <!-- ext_id -->
+          <th>Rem M LL</th>                     <!-- ext_id -->
+          <th>SUR</th>                     <!-- ext_id -->
+          <th>NORT</th>                     <!-- ext_id -->
+          <th>Fecha</th>                     <!-- ext_id -->
+          <th>Ticket</th>                     <!-- ext_id -->
+          <th>PSI</th>                     <!-- ext_id -->
+          <th>OPC</th>                     <!-- ext_id -->
+          <th>IMPO</th>                     <!-- ext_id -->
+          <th>P. Total</th>                     <!-- ext_id -->
+          <th>ROTOGATE</th>                     <!-- ext_id -->
+          <th>P. Vacío B</th>                     <!-- ext_id -->
+          <th>peso Lleno B</th>                     <!-- ext_id -->
+          <th>P Neto</th>                     <!-- ext_id -->
+          <th>DIF</th>                     <!-- ext_id -->
+          <th>PRECIO P</th>                     <!-- ext_id -->
+          <th>Fecha f</th>                     <!-- ext_id -->
+          <th>Factura</th>                     <!-- ext_id -->
+          <th>Valor Fact</th>                     <!-- ext_id -->
+          <th>Sello1</th>                     <!-- ext_id -->
+          <th>Sello2</th>                     <!-- ext_id -->
+          <th>Sello3</th>                     <!-- ext_id -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of userList">
+          <td class="sticky-col">{{ u.data.name }}</td>
+          <td>{{ u.data.role }}</td>
+          <td>{{ u.ext_id }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </ion-content>
+
+
+
+  <!--   <ion-grid class="user-table" *ngIf="!hasOwner">-->
+    <!--<ion-row class="header">-->
+      <!--<ion-col size="9">Nombre</ion-col>-->
+      <!--<ion-col size="3" class="check-col">Select</ion-col>-->
+    <!--</ion-row>-->
+    <!--<ion-row *ngFor="let u of userList" class="user-row">-->
+      <!--<ion-col size="9">-->
+        <!--{{ u.data.name }}-->
+      <!--</ion-col>-->
+      <!--<ion-col size="3" class="check-col">-->
+        <!--<ion-checkbox-->
+          <!--(ionChange)="selectUser(u)"-->
+          <!--mode="ios">-->
+        <!--</ion-checkbox>-->
+      <!--</ion-col>-->
+    <!--</ion-row>-->
+  <!--</ion-grid>-->
+
+<!--<div *ngIf="hasOwner" style="width:100%;border-bottom: solid 1px #d5d5d5;padding: 10px;">-->
+  <!--<ion-row *ngFor="let u of userList" style="width:100%; justify-content:center; display:flex;">-->
+    <!--<span *ngIf="u.id == ownerId" style="text-align:center; width:100%;">-->
+      <!--<b>{{ u.data.name }}</b>-->
+    <!--</span>-->
+  <!--</ion-row>-->
+<!--</div>-->
+
+  <!--<ion-list>-->
+    <!--<ng-container *ngFor="let p of prodrexList">-->
+      <!--<ion-item button (click)="addToOrder(p)" lines="none" style="padding-top: 6px; padding-bottom: 6px;">-->
+        <!--<table style="width: 100%; border-collapse: collapse;">-->
+          <!--<tr>-->
+            <!--<td style="font-size: 13px; width: 70%;">-->
+                <!--<span style="font-size: small;">{{ getProductNameById(p?.data?.id_product) }}</span>-->
+            <!--</td>-->
+            <!--<td style="width: 15%; text-align: center;">-->
+                <!--<span style="font-size: small;">{{ p?.data?.qty }}</span>-->
+            <!--</td>-->
+            <!--<td style="width: 15%; text-align: center;">-->
+              <!--<ion-button color="secondary" (click)="removeFromProdrex(p.id)" style="height: 28px; min-width: 28px;">-->
+                <!--<ion-icon name="trash-outline"></ion-icon>-->
+              <!--</ion-button>-->
+            <!--</td>-->
+          <!--</tr>-->
+        <!--</table>-->
+      <!--</ion-item>-->
+    <!--</ng-container>-->
+  <!--</ion-list>-->
+
+  <!--<app-signature></app-signature>-->
+
 
 
 
