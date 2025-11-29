@@ -91,22 +91,22 @@ export class PricePage {
 async ngOnInit() {
   const ahora = new Date();
   this.todayDate = this.formatFechaLatam(ahora);
-  this.glpricesService.getAll().subscribe({
-    next: (response) => {
-      console.log("glp prices table", response);
-      this.glppricesList = response.slice().reverse();
-      this.getMaxIdItem(this.glppricesList);
-      this.getMaxImportedItem(this.glppricesList);
-      console.log("Nacional:", this.lastGlpprice);
-      console.log("Importado:", this.lastImportedPrice);
-    }
-  });
+  this.getAllPrices();
 }
 
 
-
-
-
+  getAllPrices(){
+    this.glpricesService.getAll().subscribe({
+      next: (response) => {
+        console.log("glp prices table", response);
+        this.glppricesList = response.slice().reverse();
+        this.getMaxIdItem(this.glppricesList);
+        this.getMaxImportedItem(this.glppricesList);
+        console.log("Nacional:", this.lastGlpprice);
+        console.log("Importado:", this.lastImportedPrice);
+      }
+    });   
+  }
 
   numero: number;
 
@@ -132,6 +132,7 @@ async ngOnInit() {
     this.glpricesService.addGlpprice(price,idReplenishmentProduct).subscribe({
       next: (response)=>{
         console.log("response",response)
+        this.getAllPrices();
       }
     })
   }

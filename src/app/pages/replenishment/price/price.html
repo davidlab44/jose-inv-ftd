@@ -16,33 +16,10 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
-  <ion-toolbar color="light" class="subheader-toolbar">
-    <ion-row>
-      <ion-col size="6" (click)="importado = false">
-        <ion-title class="subheader-title">
-          <span
-            style="font-size: small; padding: 16px;"
-            [style.font-weight]="!importado ? '700' : '400'">
-            Nacional
-          </span>
-        </ion-title>
-      </ion-col>
-      <ion-col size="6" (click)="importado = true">
-        <ion-title class="subheader-title">
-          <span
-            style="font-size: small; padding: 16px;"
-            [style.font-weight]="importado ? '700' : '400'">
-            Importado
-          </span>
-        </ion-title>
-      </ion-col>
-    </ion-row>
-  </ion-toolbar>
-
   <ion-toolbar>
     <ion-segment>
-      <ion-segment-button value="all"  (click)="importado = false"> All </ion-segment-button>
-      <ion-segment-button value="favorites"  (click)="importado = true"  > Favorites </ion-segment-button>
+      <ion-segment-button value="all"  (click)="importado = false"> NACIONAL </ion-segment-button>
+      <ion-segment-button value="favorites"  (click)="importado = true"  > IMPORTADO </ion-segment-button>
     </ion-segment>
   </ion-toolbar>
 </ion-header>
@@ -63,18 +40,18 @@
     </ion-button>
     <br>
 
-<table style="width: 100%;">
-  <tr [ngClass]="importado ? 'row-importado' : 'row-nacional'">
-    <td style="width: 80%;">
-      <span style="font-size:small;">
-        &nbsp;&nbsp;Precio actual {{ formatFechaLatam(currentPrice?.created_at) }}&nbsp;&nbsp;
-      </span>
-    </td>
-    <td style="padding:8px;width:20%;">
-      <h5>{{ currentPrice?.data?.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}&nbsp;</h5>
-    </td>
-  </tr>
-</table>
+    <table style="width: 100%;">
+      <tr [ngClass]="importado ? 'row-importado' : 'row-nacional'">
+        <td style="width: 80%;">
+          <span style="font-size:small;">
+            &nbsp;&nbsp;Precio actual {{ formatFechaLatam(currentPrice?.created_at) }}&nbsp;&nbsp;
+          </span>
+        </td>
+        <td style="padding:8px;width:20%;">
+          <h5>{{ currentPrice?.data?.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}&nbsp;</h5>
+        </td>
+      </tr>
+    </table>
 
     <!--    <table style="width: 100%;">-->
       <!--<tr [ngClass]="importado ? 'row-importado' : 'row-nacional'">-->
