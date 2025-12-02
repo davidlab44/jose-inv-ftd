@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
 import { ConferenceData } from '../../../providers/conference-data';
@@ -23,13 +23,68 @@ import { DateService } from '../../../services/local/date.service';
 import { RexService } from '../../../services/rex.service';
 import { ProdrexService } from '../../../services/prodrex.service';
 import { UserService } from '../../../services/user.service';
+import { ReplenishmentService } from '../../../services/replenishment/replenishment.service';
 
 @Component({
   selector: 'page-replenishment',
   templateUrl: 'replenishment.html',
   styleUrls: ['./replenishment.scss'],
 })
-export class ReplenishmentPage {
+export class ReplenishmentPage implements OnInit {
+
+  replenishmentList: any[] = [];
+
+columns = [
+    { header: 'Fecha V', field: 'fecha_v' },
+    { header: 'Cont vacío', field: 'cont_vacio' },
+    { header: 'Rem vacío', field: 'rem_vacio' },
+    { header: 'Fe ing M', field: 'fe_ing_m' },
+    { header: 'Rem M ll', field: 'rem_m_ll' },
+    { header: 'Sur', field: 'sur' },
+    { header: 'Nort', field: 'nort' },
+    { header: 'Fecha', field: 'fecha' },
+    { header: 'Ticket', field: 'ticket' },
+    { header: 'PSI', field: 'psi' },
+    { header: 'OPC', field: 'opc' },
+    { header: 'IMPO', field: 'impo' },
+    { header: 'P Total', field: 'p_total' },
+    { header: 'Rotogate', field: 'rotogate' },
+    { header: 'P Vacío B', field: 'p_vacio_b' },
+    { header: 'Peso Lleno B', field: 'peso_lleno_b' },
+    { header: 'P Neto', field: 'p_neto' },
+    { header: 'DIF', field: 'dif' },
+    { header: 'Precio P', field: 'precio_p' },
+    { header: 'Fecha F', field: 'fecha_f' },
+    { header: 'Factura', field: 'factura' },
+    { header: 'Valor Fact', field: 'valor_fact' },
+    { header: 'Sello 1', field: 'sello1' },
+    { header: 'Sello 2', field: 'sello2' },
+    { header: 'Sello 3', field: 'sello3' }
+  ]; 
+
+  patchThisElement(item:any){
+    this.router.navigate(
+      ['/app/tabs/replenishment-patch'],
+      { state: { item } }
+    );
+  }
+
+  slideOpts = {
+    initialSlide: 0,
+    slidesPerView: 1,
+    speed: 300
+  };
+
+  ngOnInit() {
+    this.loadData();
+  }
+
+  loadData() {
+    this.replenishmentService.getAll().subscribe((resp) => {
+      this.replenishmentList = resp;
+      console.log('DATA:', this.replenishmentList);
+    });
+  }
 
   ios: boolean;
   hasOwner:boolean=false;
@@ -72,7 +127,8 @@ export class ReplenishmentPage {
     private dateService: DateService,
     private rexService: RexService,
     private prodrexService: ProdrexService,
-    private userService: UserService
+    private userService: UserService,
+    private replenishmentService: ReplenishmentService
   ) {}
 
   printSelectedBarcodes(p: Product) {
@@ -83,23 +139,6 @@ export class ReplenishmentPage {
 
   hash:string='';
   table:any
-  rexDocument:any;
-  async ngOnInit() {
-    console.log("ngOnInit")
-    await this.loadCategories();
-    await this.loadUms();
-    const ahora = new Date();
-    this.todayDate=this.formatFechaLatam(ahora);
-    this.loadUsers();
-    this.rexService.getAll().subscribe({
-      next: (response) => {
-        this.rexDocument=response;
-        console.log("response rex table",response)
-      }
-    })
-
-  }
-
   userList:any[]=[];
   loadUsers(){
     this.userService.getAll().subscribe({
@@ -110,7 +149,6 @@ export class ReplenishmentPage {
     })
   }
 
-
   updateSchedule(){
      
   }
@@ -120,6 +158,15 @@ export class ReplenishmentPage {
     this.productService.getCachedOrServer().subscribe(data => {
       this.productListCaos = data;
     });
+    this.getAll();
+  }
+
+  getAll(){
+    this.replenishmentService.getAll().subscribe({
+      next: response=>{
+        console.log("response gettall replenishment",response);
+      }
+    })
   }
 
   prodrexList:any[]=[];
@@ -152,100 +199,6 @@ export class ReplenishmentPage {
     );
   }
 
-  categories: any[] = [];    
-    loadCategories() { 
-      this.categoryService.getAllCategories().subscribe({ 
-        next: (res) => {       
-          this.categories = res;          
-          this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.categories = this.categoryService.getCategoriesFromLocal(); 
-        } 
-      }); 
-    }   
-        
-    ums: any[] = []; 
-        
-    loadUms() {                
-      this.umService.getAllUms().subscribe({ 
-        next: (res) => {       
-          console.log('✅ Ums:', res);    
-          this.ums = res; 
-          this.umService.saveUmsToLocal(res); 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.ums = this.umService.getUmsFromLocal(); 
-        } 
-      }); 
-    }     
-      
-    getCategoryNameById(id: number | null | undefined): string {
-      if (id === null || id === undefined) {
-        return 'Sin categoría';
-      }
-
-      if (!Array.isArray(this.categories) || this.categories.length === 0) {
-        return 'Sin categoría';
-      }
-
-      const cat = this.categories.find(c => Number(c.id) === Number(id));
-
-      const nombre = cat?.datos?.nombre;
-
-      return typeof nombre === 'string' && nombre.trim() !== ''
-        ? nombre
-        : 'Sin categoría';
-    }
-
-
-  getUmNameById(id: number | string | null | undefined): string {
-    if (id === null || id === undefined) {
-      return 'Sin UM';
-    }
-    const idNum = Number(id);
-    if (isNaN(idNum)) {
-      return 'Sin UM';
-    }
-    if (!Array.isArray(this.ums) || this.ums.length === 0) {
-      return 'Sin UM';
-    }
-    const um = this.ums.find(u => Number(u.id) === idNum);
-    if (!um) {
-      return 'Sin UM';
-    }
-    const nombre = um?.datos?.name;
-    if (typeof nombre === 'string' && nombre.trim() !== '') {
-      return nombre;
-    }
-    return 'Sin UM';
-  }
-
-
-  getProductNameById(id: number | string | null | undefined): string {
-    console.log("id product pasado", id);
-
-    if (id === null || id === undefined) return 'Sin Nombre';
-
-    const idNum = Number(id);
-    if (isNaN(idNum)) return 'Sin Nombre';
-
-    if (!Array.isArray(this.productListCaos) || this.productListCaos.length === 0) {
-      return 'Sin Nombre';
-    }
-
-    const product = this.productListCaos.find(p => Number(p.id) === idNum);
-    if (!product) return 'Sin Nombre';
-
-    const name = product?.data?.name;
-    if (typeof name === 'string' && name.trim() !== '') {
-      return name;
-    }
-    return 'Sin Nombre';
-  }
-  
   onSearch(text: string) {
     this.searchSubject.next(text);
   }
@@ -269,25 +222,7 @@ export class ReplenishmentPage {
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
-  selectUsers(){
-    console.log("userList",this.userList)    
-    this.ownerId=0;
-    this.hasOwner=false;
-  }
 
-  ownerId=0
-  selectUser(u){
-    console.log("component u pasado",u)
-    this.rexService.addUserOwner(this.rexDocument[0],u.id).subscribe({
-      next: (res) =>{
-        console.log("res para usar",res)
-        if(res[0].data.id_user > 0){
-          this.ownerId=res[0].data.id_user;
-          this.hasOwner=true;
-        } 
-      }
-    })
-  }
 
 
 }

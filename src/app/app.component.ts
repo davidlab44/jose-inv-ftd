@@ -61,6 +61,11 @@ export class AppComponent implements OnInit {
        url: '/app/tabs/glpprices',
        icon: 'cash'
      },
+     {
+       title: 'Registrar',
+       url: '/app/tabs/replenishment-post',
+       icon: 'bus'
+     },
    ];
   
   loggedIn = false;

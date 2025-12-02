@@ -131,6 +131,24 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'replenishment-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/post/post.module').then(m => m.PostModule)
+          }
+        ]
+      },
+      {
+        path: 'replenishment-patch',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/patch/patch.module').then(m => m.PatchModule)
+          }
+        ]
+      },
+      {
         path: '',
         redirectTo: '/app/tabs/schedule',
         pathMatch: 'full'

@@ -78,7 +78,7 @@ export class ProductService {
 
   updateProductQty(id: number, updatedProduct: any): Observable<any> {
     const url = `${this.apiUrl}/product?id=eq.${id}`;
-    const body = { datos: updatedProduct.datos };
+    const body = { data: updatedProduct.data };
     return this.http.patch(url, body, {
       headers: { 'Content-Type': 'application/json' }
     });
