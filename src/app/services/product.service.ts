@@ -80,6 +80,19 @@ export class ProductService {
     return this.http.get<any[]>(url);
   }
 
+  post(data:any): Observable<any> {
+    const url = `${this.apiUrl}/product?select=*`;
+    const item = {
+      data: data
+    };
+    return this.http.post(url, item, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      }
+    });
+  }
+
   updateProductQty(id: number, updatedProduct: any): Observable<any> {
     const url = `${this.apiUrl}/product?id=eq.${id}`;
     const body = { data: updatedProduct.data };
@@ -89,7 +102,5 @@ export class ProductService {
   }
 
   
-
-
 }
 

@@ -18,7 +18,6 @@
   </ion-toolbar>
 </ion-header>
 
-
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let p of productList" button (click)="addToOrder(p)" style="display:flex; align-items:center;">
@@ -36,7 +35,7 @@
       <!-- Cantidad + UM (menos espacio) -->
       <ion-label style="font-size: small; flex: 0.5; text-align:right;">
         <strong>{{ p?.data?.qty }}</strong>
-        <span style="font-size: xx-small;"> {{ getUmNameById(p?.data?.um?.[0]) }}</span>
+        <span style="font-size: xx-small;"> {{ getUmNameById(p?.data?.um) }}</span>
       </ion-label>
 
       <!-- Botón -->

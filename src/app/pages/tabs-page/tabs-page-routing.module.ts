@@ -149,6 +149,15 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'asset-supply-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../asset/supply/post/post.module').then(m => m.AssetSupplyPostModule)
+          }
+        ]
+      },
+      {
         path: '',
         redirectTo: '/app/tabs/schedule',
         pathMatch: 'full'

@@ -175,24 +175,25 @@ export class ReadprdctPage {
 
   getUmNameById(id: number | string | null | undefined): string {
     // Validar ID recibido
+    console.log("id recibido",id)
     if (id === null || id === undefined) {
-      return 'Sin UM';
+      return 'Sin UM1';
     }
 
     const idNum = Number(id);
     if (isNaN(idNum)) {
-      return 'Sin UM';
+      return 'Sin UM2';
     }
 
     // Validar que this.ums exista y tenga elementos
     if (!Array.isArray(this.ums) || this.ums.length === 0) {
-      return 'Sin UM';
+      return 'Sin UM3';
     }
 
     // Buscar la UM por ID
     const um = this.ums.find(u => Number(u.id) === idNum);
     if (!um) {
-      return 'Sin UM';
+      return 'Sin UM4';
     }
 
     // Extraer el nombre si existe y es válido
@@ -201,14 +202,12 @@ export class ReadprdctPage {
       return nombre;
     }
 
-    return 'Sin UM';
+    return 'Sin UM5';
   }
-
 
   onSearch(text: string) {
     this.searchSubject.next(text);
   }
-
 
   enviar() {
     const items = [

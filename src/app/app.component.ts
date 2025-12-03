@@ -43,7 +43,13 @@ export class AppComponent implements OnInit {
        title: 'Ingresos de mercancia',
        url: '/app/tabs/readren',
        icon: 'document-text'
-     }
+     },
+     {
+       title: 'Registrar',
+       url: '/app/tabs/asset-supply-post',
+       icon: 'document-text'
+     },
+
    ];
   appPages4 = [
      {
