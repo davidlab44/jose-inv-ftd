@@ -5,7 +5,6 @@ import { environment } from '../../environments/environment';
 import { tap } from 'rxjs/operators';
 import { BehaviorSubject, of } from 'rxjs';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -73,6 +72,11 @@ export class ProductService {
 
   getProductById(id: number): Observable<any> {
     const url = `${this.apiUrl}/product?id=eq.${id}`;
+    return this.http.get<any[]>(url);
+  }
+
+  getProductByBarcode(barcode: number): Observable<any> {
+    const url = `${this.apiUrl}/product?data->>barcode=eq.${barcode}&limit=1`;
     return this.http.get<any[]>(url);
   }
 

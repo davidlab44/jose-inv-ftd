@@ -138,7 +138,7 @@ export class SchedulePage{
             const code = result.getText()?.trim();
             if (code && code.length > 0) {
               this.scannedValue = code;
-              this.getProductById(Number(this.scannedValue));
+              this.getProductByBarcode(Number(this.scannedValue));
               this.componentsEnabled = true;
               this.stopScan();
             }
@@ -176,6 +176,12 @@ export class SchedulePage{
     this.productService.getProductById(id).subscribe(data => {
       this.product = data[0];
       //console.log("getProductById", this.product);
+    });
+  }
+
+  getProductByBarcode(barcode: number) {
+    this.productService.getProductByBarcode(barcode).subscribe(data => {
+      this.product = data[0];
     });
   }
 
