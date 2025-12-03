@@ -29,13 +29,35 @@ export class ReplenishmentService {
     });
   }
 
+
+
   patch(id: number, updatedElement: any): Observable<any> {
     const url = `${this.apiUrl}/replenishment_replenishment?id=eq.${id}`;
-    const body = { data: updatedElement.data };
+    
+    const body = {
+      data: updatedElement   // updatedElement ES la data, NO el objeto completo
+    };
+
     return this.http.patch(url, body, {
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      }
     });
   }
+
+
+  
+
+  /*patch(id: number, updatedElement: any): Observable<any> {*/
+    /*const url = `${this.apiUrl}/replenishment_replenishment?id=eq.${id}`;*/
+    /*//const body = { data: updatedElement };*/
+    /*const body = updatedElement ;*/
+    /*console.log("body",body)*/
+    /*return this.http.patch(url, body, {*/
+      /*headers: { 'Content-Type': 'application/json' }*/
+    /*});*/
+  /*}*/
 
   removeFromProdrex(id: number): Observable<any> {
     const url = `${this.apiUrl}/replenishment_replenishment?id=eq.${id}`;

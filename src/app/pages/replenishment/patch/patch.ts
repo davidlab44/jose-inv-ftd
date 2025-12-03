@@ -152,17 +152,42 @@ export class PatchPage {
 
     console.log("Formulario inicializado:", this.form.value);
   }
+save() {
+  const payload = this.form.value;
 
+  const id = payload.id;
 
+  // Solo enviar el objeto interno data
+  const justData = { ...payload };
+  delete justData.id;
+  delete justData.ext_id;
+  delete justData.created_at;
+  delete justData.updated_at;
 
+  this.replenishmentService.patch(id, justData).subscribe({
+    next: (r) => console.log("PATCH OK:", r),
+    error: (e) => console.error("PATCH ERROR:", e),
+  });
+}
 
-  save() {
-    if (this.form.valid) {
-      console.log("Guardando:", this.form.value);
-      // Aquí puedes llamar a tu servicio si deseas
-      // this.replenishmentService.update(...)
-    }
-  }
+  /*save() {*/
+    /*if (this.form.valid) {*/
+      /*console.log("Guardando:", this.form.value);*/
+      /*// Aquí puedes llamar a tu servicio si deseas*/
+      /*// this.replenishmentService.update(...)*/
+      /*console.log("this.form.value.id",this.form.value.id)*/
+      /*console.log("this.form.value",this.form.value);*/
+
+      /*this.replenishmentService.patch(this.form.value.id,this.form.value).subscribe({*/
+      /*next: (res) => {*/
+        /*console.log('replenishment patch response', res);*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error('Error al actualizar cantidad:', err);*/
+      /*}*/
+    /*});*/
+    /*}*/
+  /*}*/
 
   getAll(){
     this.replenishmentService.getAll().subscribe((data: any[]) => {
@@ -170,8 +195,7 @@ export class PatchPage {
     });
   }
 
-
-/*  patchReplenishment(){*/
+  /*patchReplenishment(){*/
     /*this.replenishmentService.patch(this.replenishment.id,this.replenishment.data).subscribe({*/
       /*next: (res) => {*/
         /*console.log('replenishment actuacancelLongPress(cancelLongPress(lizada:', res);*/
@@ -181,9 +205,6 @@ export class PatchPage {
       /*}*/
     /*});*/
   /*}*/
-
-
-
 
   slideOpts = {
     initialSlide: 0,
