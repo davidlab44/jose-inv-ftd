@@ -157,6 +157,15 @@ const routes: Routes = [
           }
         ]
       },
+      { 
+        path: 'asset-supply-readprdct',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../asset/supply/readprdct/readprdct.module').then(m => m.AssetSupplyReadprdctModule)
+          }
+        ]
+      },
       {
         path: '',
         redirectTo: '/app/tabs/schedule',

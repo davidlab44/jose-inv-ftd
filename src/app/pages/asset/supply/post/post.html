@@ -20,45 +20,35 @@
 
 
 <ion-content class="ion-padding">
-
   <form [formGroup]="form">
-
     <ion-list>
       <ion-item>
         <ion-label position="floating">Category</ion-label>
         <ion-input type="number" formControlName="category"></ion-input>
       </ion-item>
-
       <ion-item>
         <ion-label position="floating">Name</ion-label>
         <ion-input formControlName="name"></ion-input>
       </ion-item>
-
       <ion-item>
         <ion-label position="floating">Barcode</ion-label>
         <ion-input type="number" formControlName="barcode"></ion-input>
       </ion-item>
-
       <ion-item>
         <ion-label position="floating">Qty</ion-label>
         <ion-input type="number" formControlName="qty"></ion-input>
       </ion-item>
-
       <ion-item>
         <ion-label position="floating">UM</ion-label>
         <ion-input type="number" formControlName="um"></ion-input>
       </ion-item>
-
     </ion-list>
-
     <br>
     <pre>{{lastAsset | json}}</pre>
     <br>
-
     <ion-button expand="block" (click)="guardar()">
       Guardar
     </ion-button>
-
   </form>
 </ion-content>
 

@@ -101,6 +101,21 @@ export class ProductService {
     });
   }
 
+
+  patch(id: number, updatedElement: any): Observable<any> {
+    const url = `${this.apiUrl}/product?id=eq.${id}`;
+    const body = {
+      data: updatedElement
+    };
+    return this.http.patch(url, body, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      }
+    });
+  }
+
+
   
 }
 

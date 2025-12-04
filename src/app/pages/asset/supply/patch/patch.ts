@@ -1,29 +1,29 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
-import { ConferenceData } from '../../../providers/conference-data';
-import { UserData } from '../../../providers/user-data';
-import { OpportunityService } from '../../../services/opportunity.service';
-import { PosOrderService } from '../../../services/pos-order.service';
-import { TableService } from '../../../services/table.service';
-import { environment } from '../../../../environments/environment';
+import { ConferenceData } from '../../../../providers/conference-data';
+import { UserData } from '../../../../providers/user-data';
+import { OpportunityService } from '../../../../services/opportunity.service';
+import { PosOrderService } from '../../../../services/pos-order.service';
+import { TableService } from '../../../../services/table.service';
+import { environment } from '../../../../../environments/environment';
 import { ActivatedRoute } from '@angular/router'
-import { Session } from '../../../interfaces/session';
-import { SessionService } from '../../../services/session.service';
-import { UtilService } from '../../../services/util.service';
-import { ProductService } from '../../../services/product.service';
-import { BarcodeService } from '../../../services/barcode.service';
-import { CategoryService } from '../../../services/category.service';
-import { UmService } from '../../../services/um.service';
-import { Product } from '../../../interfaces/product';
+import { Session } from '../../../../interfaces/session';
+import { SessionService } from '../../../../services/session.service';
+import { UtilService } from '../../../../services/util.service';
+import { ProductService } from '../../../../services/product.service';
+import { BarcodeService } from '../../../../services/barcode.service';
+import { CategoryService } from '../../../../services/category.service';
+import { UmService } from '../../../../services/um.service';
+import { Product } from '../../../../interfaces/product';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { DateService } from '../../../services/local/date.service';
-import { RexService } from '../../../services/rex.service';
-import { ProdrexService } from '../../../services/prodrex.service';
-import { UserService } from '../../../services/user.service';
-import { ReplenishmentService } from '../../../services/replenishment/replenishment.service';
+import { DateService } from '../../../../services/local/date.service';
+import { RexService } from '../../../../services/rex.service';
+import { ProdrexService } from '../../../../services/prodrex.service';
+import { UserService } from '../../../../services/user.service';
+import { ReplenishmentService } from '../../../../services/replenishment/replenishment.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 
@@ -32,7 +32,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   templateUrl: 'patch.html',
   styleUrls: ['./patch.scss'],
 })
-export class PatchPage {
+export class AssetSupplyPatchPage {
 
   ios: boolean;
   hasOwner:boolean=false;
@@ -55,34 +55,7 @@ export class PatchPage {
   form!: FormGroup;
   replenishmentList: any[] = [];
   replenishment:any;
-
-  columns = [
-      { header: 'Fecha V', field: 'fecha_v' },
-      { header: 'Cont vacío', field: 'cont_vacio' },
-      { header: 'Rem vacío', field: 'rem_vacio' },
-      { header: 'Fe ing M', field: 'fe_ing_m' },
-      { header: 'Rem M LL', field: 'rem_m_ll' },
-      { header: 'Sur', field: 'sur' },
-      { header: 'Nort', field: 'nort' },
-      { header: 'Fecha', field: 'fecha' },
-      { header: 'Ticket', field: 'ticket' },
-      { header: 'PSI', field: 'psi' },
-      { header: 'OPC', field: 'opc' },
-      { header: 'IMPO', field: 'impo' },
-      { header: 'P Total', field: 'p_total' },
-      { header: 'Rotogate', field: 'rotogate' },
-      { header: 'P Vacío B', field: 'p_vacio_b' },
-      { header: 'Peso lleno B', field: 'peso_lleno_b' },
-      { header: 'P Neto', field: 'p_neto' },
-      { header: 'Dif', field: 'dif' },
-      { header: 'Precio P', field: 'precio_p' },
-      { header: 'Fecha F', field: 'fecha_f' },
-      { header: 'Factura', field: 'factura' },
-      { header: 'Valor Fact', field: 'valor_fact' },
-      { header: 'Sello1', field: 'sello1' },
-      { header: 'Sello2', field: 'sello2' },
-      { header: 'Sello3', field: 'sello3' },
-  ];
+  assetSupplyProduct:any;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -112,42 +85,18 @@ export class PatchPage {
   ) {
     const item = this.router.getCurrentNavigation()?.extras.state?.item;
     console.log("Item recibido:", item);
-    this.replenishment = this.buildDefaultReplenishment(item);
+    this.assetSupplyProduct = this.buildDefaultReplenishment(item);
   }
-  
+ 
+
+
   ngOnInit() {
     this.form = this.fb.group({
-      id: [this.replenishment.id],
-      ext_id: [this.replenishment.ext_id],
-      created_at: [this.replenishment.created_at],
-      updated_at: [this.replenishment.updated_at],
-
-      // Campos del objeto DATA
-      dif: [this.replenishment.data.dif],
-      opc: [this.replenishment.data.opc],
-      psi: [this.replenishment.data.psi],
-      sur: [this.replenishment.data.sur],
-      impo: [this.replenishment.data.impo],
-      nort: [this.replenishment.data.nort],
-      fecha: [this.replenishment.data.fecha],
-      p_neto: [this.replenishment.data.p_neto],
-      sello1: [this.replenishment.data.sello1],
-      sello2: [this.replenishment.data.sello2],
-      sello3: [this.replenishment.data.sello3],
-      ticket: [this.replenishment.data.ticket],
-      factura: [this.replenishment.data.factura],
-      fecha_f: [this.replenishment.data.fecha_f],
-      fecha_v: [this.replenishment.data.fecha_v],
-      p_total: [this.replenishment.data.p_total],
-      fe_ing_m: [this.replenishment.data.fe_ing_m],
-      precio_p: [this.replenishment.data.precio_p],
-      rem_m_ll: [this.replenishment.data.rem_m_ll],
-      rotogate: [this.replenishment.data.rotogate],
-      p_vacio_b: [this.replenishment.data.p_vacio_b],
-      rem_vacio: [this.replenishment.data.rem_vacio],
-      cont_vacio: [this.replenishment.data.cont_vacio],
-      valor_fact: [this.replenishment.data.valor_fact],
-      peso_lleno_b: [this.replenishment.data.peso_lleno_b]
+      category: [this.assetSupplyProduct.data.category],
+      name: [this.assetSupplyProduct.data.name],
+      barcode: [this.assetSupplyProduct.data.barcode],
+      qty: [this.assetSupplyProduct.data.qty],
+      um: [this.assetSupplyProduct.data.um],
     });
 
     console.log("Formulario inicializado:", this.form.value);
@@ -157,54 +106,24 @@ save() {
 
   const id = payload.id;
 
-  // Solo enviar el objeto interno data
   const justData = { ...payload };
   delete justData.id;
   delete justData.ext_id;
   delete justData.created_at;
   delete justData.updated_at;
 
-  this.replenishmentService.patch(id, justData).subscribe({
+  this.productService.patch(id, justData).subscribe({
     next: (r) => console.log("PATCH OK:", r),
     error: (e) => console.error("PATCH ERROR:", e),
   });
 }
 
-  /*save() {*/
-    /*if (this.form.valid) {*/
-      /*console.log("Guardando:", this.form.value);*/
-      /*// Aquí puedes llamar a tu servicio si deseas*/
-      /*// this.replenishmentService.update(...)*/
-      /*console.log("this.form.value.id",this.form.value.id)*/
-      /*console.log("this.form.value",this.form.value);*/
-
-      /*this.replenishmentService.patch(this.form.value.id,this.form.value).subscribe({*/
-      /*next: (res) => {*/
-        /*console.log('replenishment patch response', res);*/
-      /*},*/
-      /*error: (err) => {*/
-        /*console.error('Error al actualizar cantidad:', err);*/
-      /*}*/
-    /*});*/
-    /*}*/
-  /*}*/
 
   getAll(){
     this.replenishmentService.getAll().subscribe((data: any[]) => {
       this.replenishmentList = data;
     });
   }
-
-  /*patchReplenishment(){*/
-    /*this.replenishmentService.patch(this.replenishment.id,this.replenishment.data).subscribe({*/
-      /*next: (res) => {*/
-        /*console.log('replenishment actuacancelLongPress(cancelLongPress(lizada:', res);*/
-      /*},*/
-      /*error: (err) => {*/
-        /*console.error('Error al actualizar cantidad:', err);*/
-      /*}*/
-    /*});*/
-  /*}*/
 
   slideOpts = {
     initialSlide: 0,

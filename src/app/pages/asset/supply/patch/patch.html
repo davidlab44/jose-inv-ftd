@@ -19,147 +19,39 @@
 </ion-header>
 
 
+
 <ion-content class="ion-padding">
-
   <form [formGroup]="form">
-
     <ion-list>
-
       <ion-item>
-        <ion-label position="floating">Fecha V</ion-label>
-        <ion-input formControlName="fecha_v"></ion-input>
+        <ion-label position="floating">Category</ion-label>
+        <ion-input type="number" formControlName="category"></ion-input>
       </ion-item>
-
       <ion-item>
-        <ion-label position="floating">Cont vacío</ion-label>
-        <ion-input formControlName="cont_vacio"></ion-input>
+        <ion-label position="floating">Name</ion-label>
+        <ion-input formControlName="name"></ion-input>
       </ion-item>
-
       <ion-item>
-        <ion-label position="floating">Rem vacío</ion-label>
-        <ion-input formControlName="rem_vacio"></ion-input>
+        <ion-label position="floating">Barcode</ion-label>
+        <ion-input type="number" formControlName="barcode"></ion-input>
       </ion-item>
-
       <ion-item>
-        <ion-label position="floating">Fe ing M</ion-label>
-        <ion-input formControlName="fe_ing_m"></ion-input>
+        <ion-label position="floating">Qty</ion-label>
+        <ion-input type="number" formControlName="qty"></ion-input>
       </ion-item>
-
       <ion-item>
-        <ion-label position="floating">Rem M LL</ion-label>
-        <ion-input formControlName="rem_m_ll"></ion-input>
+        <ion-label position="floating">UM</ion-label>
+        <ion-input type="number" formControlName="um"></ion-input>
       </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">SUR</ion-label>
-        <ion-input formControlName="sur"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">NORT</ion-label>
-        <ion-input formControlName="nort"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Fecha</ion-label>
-        <ion-input formControlName="fecha"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Ticket</ion-label>
-        <ion-input formControlName="ticket"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">PSI</ion-label>
-        <ion-input type="number" formControlName="psi"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">OPC</ion-label>
-        <ion-input type="number" formControlName="opc"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">IMPO</ion-label>
-        <ion-input type="number" formControlName="impo"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">P. Total</ion-label>
-        <ion-input type="number" formControlName="p_total"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">ROTOGATE</ion-label>
-        <ion-input type="number" formControlName="rotogate"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Peso vacío B</ion-label>
-        <ion-input type="number" formControlName="p_vacio_b"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Peso lleno B</ion-label>
-        <ion-input type="number" formControlName="peso_lleno_b"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">P. Neto</ion-label>
-        <ion-input type="number" formControlName="p_neto"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">DIF</ion-label>
-        <ion-input type="number" formControlName="dif"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Precio P</ion-label>
-        <ion-input type="number" formControlName="precio_p"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Fecha F</ion-label>
-        <ion-input formControlName="fecha_f"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Factura</ion-label>
-        <ion-input formControlName="factura"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Valor Factura</ion-label>
-        <ion-input type="number" formControlName="valor_fact"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Sello 1</ion-label>
-        <ion-input formControlName="sello1"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Sello 2</ion-label>
-        <ion-input formControlName="sello2"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="floating">Sello 3</ion-label>
-        <ion-input formControlName="sello3"></ion-input>
-      </ion-item>
-
     </ion-list>
     <br>
-
-    <ion-button expand="block" (click)="save()">
+    <pre>{{lastAsset | json}}</pre>
+    <br>
+    <ion-button expand="block" (click)="guardar()">
       Guardar
     </ion-button>
-
   </form>
 </ion-content>
-
 
 
 
