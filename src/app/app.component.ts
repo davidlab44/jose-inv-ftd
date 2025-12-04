@@ -45,6 +45,11 @@ export class AppComponent implements OnInit {
        icon: 'document-text'
      },
      {
+       title: 'Listar',
+       url: '/app/tabs/asset-supply-readprdct',
+       icon: 'document-text'
+     },
+     {
        title: 'Registrar',
        url: '/app/tabs/asset-supply-post',
        icon: 'document-text'

@@ -85,14 +85,17 @@ export class AssetSupplyPatchPage {
   ) {
     const item = this.router.getCurrentNavigation()?.extras.state?.item;
     console.log("Item recibido:", item);
-    this.assetSupplyProduct = this.buildDefaultReplenishment(item);
+    this.assetSupplyProduct = this.buildDefaultAssetSpupplyProduct(item);
   }
  
-
-
   ngOnInit() {
+    this.loadCategories();
+    this.loadUms();
+
+
     this.form = this.fb.group({
-      category: [this.assetSupplyProduct.data.category],
+      id: [this.assetSupplyProduct.data.id],
+      category: [this.assetSupplyProduct.data.categ[0]],
       name: [this.assetSupplyProduct.data.name],
       barcode: [this.assetSupplyProduct.data.barcode],
       qty: [this.assetSupplyProduct.data.qty],
@@ -101,29 +104,26 @@ export class AssetSupplyPatchPage {
 
     console.log("Formulario inicializado:", this.form.value);
   }
-save() {
-  const payload = this.form.value;
-
-  const id = payload.id;
-
-  const justData = { ...payload };
-  delete justData.id;
-  delete justData.ext_id;
-  delete justData.created_at;
-  delete justData.updated_at;
-
-  this.productService.patch(id, justData).subscribe({
-    next: (r) => console.log("PATCH OK:", r),
-    error: (e) => console.error("PATCH ERROR:", e),
-  });
-}
 
 
-  getAll(){
-    this.replenishmentService.getAll().subscribe((data: any[]) => {
-      this.replenishmentList = data;
+  
+  patch() {
+    const payload = this.form.value;
+
+    const id = payload.id;
+
+    const justData = { ...payload };
+    delete justData.id;
+    delete justData.ext_id;
+    delete justData.created_at;
+    delete justData.updated_at;
+
+    this.productService.patch(id, justData).subscribe({
+      next: (r) => console.log("PATCH OK:", r),
+      error: (e) => console.error("PATCH ERROR:", e),
     });
   }
+
 
   slideOpts = {
     initialSlide: 0,
@@ -133,13 +133,6 @@ save() {
 
   updateSchedule(){
      
-  }
-
-  productListCaos:any[]=[];
-  ionViewWillEnter() {
-    this.productService.getCachedOrServer().subscribe(data => {
-      this.productListCaos = data;
-    });
   }
 
   prodrexList:any[]=[];
@@ -182,43 +175,20 @@ save() {
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
-
-
-private buildDefaultReplenishment(item: any) {
+  private buildDefaultAssetSpupplyProduct(item: any) {
     const template = {
       id: null,
       ext_id: null,
       created_at: null,
       updated_at: null,
       data: {
-        dif: 0,
-        opc: 0,
-        psi: 0,
-        sur: "",
-        impo: 0,
-        nort: "",
-        fecha: "",
-        p_neto: 0,
-        sello1: "",
-        sello2: "",
-        sello3: "",
-        ticket: "",
-        factura: "",
-        fecha_f: "",
-        fecha_v: "",
-        p_total: 0,
-        fe_ing_m: "",
-        precio_p: 0,
-        rem_m_ll: "",
-        rotogate: 0,
-        p_vacio_b: 0,
-        rem_vacio: "",
-        cont_vacio: "",
-        valor_fact: 0,
-        peso_lleno_b: 0
+       categ:[],
+        name: "",
+        barcode: 0,
+        qty: 0,
+        um: 0,
       }
     };
-
     return {
       ...template,
       ...item,
@@ -228,6 +198,38 @@ private buildDefaultReplenishment(item: any) {
       }
     };
   }
+
+
+   categories: any[] = [];    
+   loadCategories() { 
+      this.categoryService.getAllCategories().subscribe({ 
+        next: (res) => {       
+          this.categories = res;          
+          this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
+        }, 
+        error: (err) => {      
+          console.error('❌ Error al cargar categorías:', err); 
+          this.categories = this.categoryService.getCategoriesFromLocal(); 
+        } 
+      }); 
+    }   
+        
+    ums: any[] = []; 
+        
+    loadUms() {                
+      this.umService.getAllUms().subscribe({ 
+        next: (res) => {       
+          console.log('✅ Ums:', res);    
+          this.ums = res; 
+          this.umService.saveUmsToLocal(res); 
+        }, 
+        error: (err) => {      
+          console.error('❌ Error al cargar categorías:', err); 
+          this.ums = this.umService.getUmsFromLocal(); 
+        } 
+      }); 
+    }     
+
 
 
 

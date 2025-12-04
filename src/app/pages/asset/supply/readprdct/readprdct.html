@@ -20,7 +20,7 @@
 
 <ion-content>
   <ion-list>
-    <ion-item *ngFor="let p of productList" button (click)="addToOrder(p)" style="display:flex; align-items:center;">
+    <ion-item *ngFor="let p of productList" style="display:flex; align-items:center;">
       <ion-label style="font-size: small; flex: 1;">
         <span>{{ getCategoryNameById(p?.data?.categ?.[0]) | capitalize }}&nbsp;</span>
       </ion-label>
@@ -31,8 +31,11 @@
         <strong>{{ p?.data?.qty }}</strong>
         <span style="font-size: xx-small;"> {{ getUmNameById(p?.data?.um) }}</span>
       </ion-label>
-      <ion-button color="primary" slot="end" (click)="printSelectedBarcodes(p); $event.stopPropagation()">
-        <ion-icon name="barcode-outline"></ion-icon>
+      <ion-button color="primary" slot="end" (click)="patch(p)">
+        <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
+     <ion-button color="primary" slot="end" (click)="printSelectedBarcodes(p); $event.stopPropagation()">
+        <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>

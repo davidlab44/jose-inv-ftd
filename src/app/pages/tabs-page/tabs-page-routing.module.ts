@@ -157,6 +157,15 @@ const routes: Routes = [
           }
         ]
       },
+     {
+        path: 'asset-supply-patch',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../asset/supply/patch/patch.module').then(m => m.AssetSupplyPatchModule)
+          }
+        ]
+      },
       { 
         path: 'asset-supply-readprdct',
         children: [

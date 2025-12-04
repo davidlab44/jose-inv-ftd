@@ -237,6 +237,15 @@ export class AssetSupplyReadprdctPage {
     /*});*/
   }
 
+  patch(item:any){
+    console.log("item to patch",item);
+    this.router.navigate(
+      ['/app/tabs/asset-supply-patch'],
+      { state: { item } }
+    );
+  }
+
+
 
 }
 

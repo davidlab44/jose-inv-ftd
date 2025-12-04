@@ -18,8 +18,6 @@
   </ion-toolbar>
 </ion-header>
 
-
-
 <ion-content class="ion-padding">
   <form [formGroup]="form">
     <ion-list>
@@ -27,31 +25,76 @@
         <ion-label position="floating">Category</ion-label>
         <ion-input type="number" formControlName="category"></ion-input>
       </ion-item>
+
       <ion-item>
         <ion-label position="floating">Name</ion-label>
         <ion-input formControlName="name"></ion-input>
       </ion-item>
+
       <ion-item>
         <ion-label position="floating">Barcode</ion-label>
         <ion-input type="number" formControlName="barcode"></ion-input>
       </ion-item>
+
       <ion-item>
         <ion-label position="floating">Qty</ion-label>
         <ion-input type="number" formControlName="qty"></ion-input>
       </ion-item>
+
       <ion-item>
         <ion-label position="floating">UM</ion-label>
         <ion-input type="number" formControlName="um"></ion-input>
       </ion-item>
     </ion-list>
+
     <br>
-    <pre>{{lastAsset | json}}</pre>
-    <br>
-    <ion-button expand="block" (click)="guardar()">
+
+    <ion-button expand="block" (click)="patch()">
       Guardar
     </ion-button>
   </form>
+
+  <br>
+
+  <pre>{{ categories | json }}</pre>
+  <pre>{{ ums | json }}</pre>
 </ion-content>
+
+
+<!--<ion-content class="ion-padding">-->
+  <!--<form [formGroup]="form">-->
+    <!--<ion-list>-->
+      <!--<ion-item>-->
+        <!--<ion-label position="floating">Category</ion-label>-->
+        <!--<ion-input type="number" formControlName="category"></ion-input>-->
+      <!--</ion-item>-->
+      <!--<ion-item>-->
+        <!--<ion-label position="floating">Name</ion-label>-->
+        <!--<ion-input formControlName="name"></ion-input>-->
+      <!--</ion-item>-->
+      <!--<ion-item>-->
+        <!--<ion-label position="floating">Barcode</ion-label>-->
+        <!--<ion-input type="number" formControlName="barcode"></ion-input>-->
+      <!--</ion-item>-->
+      <!--<ion-item>-->
+        <!--<ion-label position="floating">Qty</ion-label>-->
+        <!--<ion-input type="number" formControlName="qty"></ion-input>-->
+      <!--</ion-item>-->
+      <!--<ion-item>-->
+        <!--<ion-label position="floating">UM</ion-label>-->
+        <!--<ion-input type="number" formControlName="um"></ion-input>-->
+      <!--</ion-item>-->
+    <!--</ion-list>-->
+    <!--<br>-->
+    <!--<ion-button expand="block" (click)="patch()">-->
+      <!--Guardar-->
+    <!--</ion-button>-->
+  <!--</form>-->
+  <!--<br>-->
+  <!--<pre>{{categories?}}</pre> -->
+  <!--<br>-->
+  <!--<pre>{{ums?}}</pre> -->
+<!--</ion-content>-->
 
 
 
