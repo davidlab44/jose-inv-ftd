@@ -85,7 +85,6 @@ export class ProdrexPage {
   table:any
   rexDocument:any;
   async ngOnInit() {
-    console.log("ngOnInit")
     await this.loadCategories();
     await this.loadUms();
     const ahora = new Date();

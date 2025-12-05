@@ -96,6 +96,9 @@ export class AppComponent implements OnInit {
     private updates: SwUpdate
   ) {
     this.checkForUpdates();
+
+
+  console.log("constructor")
   }
 
 async checkForUpdates() {
@@ -120,7 +123,7 @@ async checkForUpdates() {
 
 
   async ngOnInit() {
-    //console.log('hittttttttttttttttman')
+    //console.log('hitman')
     //await this.storage.create();
 
     //this.checkLoginStatus();
@@ -156,10 +159,15 @@ async checkForUpdates() {
       this.router.navigate(['/app/tabs/replenishment']);
     }
 
-
-
+    
+  console.log("ionviewdidenter1")
   }
 
+
+
+ionViewDidEnter() {
+  console.log("ionviewdidenter")
+}
 
 
   // getPosCategories() {

@@ -80,7 +80,6 @@ export class ReadrenPage {
   hash:string='';
   table:any
   async ngOnInit() {
-    console.log("ngOnInit")
     await this.loadCategories();
     await this.loadUms();
     this.getAllProducts();

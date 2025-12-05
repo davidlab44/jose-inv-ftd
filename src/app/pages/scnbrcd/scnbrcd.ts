@@ -200,7 +200,7 @@ export class ScnbrcdPage {
         this.getProductByCat(2);
       }
     });
-    console.log("ngOnInit")
+   // console.log("ngOnInit")
   }
 
 

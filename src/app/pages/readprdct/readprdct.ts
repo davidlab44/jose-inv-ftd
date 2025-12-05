@@ -21,7 +21,6 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { RexService } from '../../services/rex.service';
 
-
 @Component({
   selector: 'page-readprdct',
   templateUrl: 'readprdct.html',
@@ -46,7 +45,6 @@ export class ReadprdctPage {
   sessionId: number | null = null;
   searchSubject = new Subject<string>();
 
-
   constructor(
     private barcodeService: BarcodeService,
     public alertCtrl: AlertController,
@@ -69,18 +67,15 @@ export class ReadprdctPage {
     private rexService: RexService
   ) {}
 
-
   printSelectedBarcodes(p: Product) {
     const paddedId = p.id.toString().padStart(6, '0');
     const selectedBarcodes = [paddedId];
     this.barcodeService.downloadPDF(selectedBarcodes);
   }
 
-
   hash:string='';
   table:any
   async ngOnInit() {
-    console.log("ngOnInit")
     await this.loadCategories();
     await this.loadUms();
     this.getAllProducts();
@@ -97,7 +92,6 @@ export class ReadprdctPage {
       error: err => console.error("Error en búsqueda:", err)
     });
   }
-
 
   updateSchedule(){
   }

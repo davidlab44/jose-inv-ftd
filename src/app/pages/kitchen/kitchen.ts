@@ -78,7 +78,6 @@ import { ApplyComponent } from '../modal/apply/apply.component';
   hash:string='';
   table:any
   async ngOnInit() {
-    console.log("ngOnInit")
     await this.loadCategories();
     await this.loadUms();
     this.getAllProducts();
