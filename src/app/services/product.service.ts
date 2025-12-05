@@ -101,8 +101,9 @@ export class ProductService {
     });
   }
 
-
   patch(id: number, updatedElement: any): Observable<any> {
+    console.log("id",id)
+    console.log("updatedElement",updatedElement)
     const url = `${this.apiUrl}/product?id=eq.${id}`;
     const body = {
       data: updatedElement
@@ -115,6 +116,12 @@ export class ProductService {
     });
   }
 
+  delete(id: number): Observable<any> {
+    const url = `${this.apiUrl}/product?id=eq.${id}`;
+    return this.http.delete(url, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 
   
 }

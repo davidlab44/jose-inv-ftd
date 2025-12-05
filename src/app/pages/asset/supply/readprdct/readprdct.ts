@@ -1,5 +1,6 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { tap } from 'rxjs/operators';
 import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
 import { ConferenceData } from '../../../../providers/conference-data';
 import { UserData } from '../../../../providers/user-data';
@@ -20,7 +21,6 @@ import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { RexService } from '../../../../services/rex.service';
-
 
 @Component({
   selector: 'page-readprdct',
@@ -77,6 +77,12 @@ export class AssetSupplyReadprdctPage {
   }
 
 
+
+filteredCategories: any[] = [];
+filteredProductsByCategory: any[] = [];
+
+
+
   hash:string='';
   table:any
   async ngOnInit() {
@@ -84,18 +90,57 @@ export class AssetSupplyReadprdctPage {
     await this.loadCategories();
     await this.loadUms();
     this.getAllProducts();
+   
+
     this.searchSubject.pipe(
-      debounceTime(1000),          // espera 1 segundo
-      distinctUntilChanged(),      // solo si el texto cambia
+      debounceTime(500),
+      distinctUntilChanged(),
+
+      tap(text => {
+        // 1. BUSCAR CATEGORÍAS POR NOMBRE
+        this.filteredCategories = this.categories.filter(cat =>
+          cat?.data?.name?.toLowerCase().includes(text.toLowerCase())
+        );
+
+        console.log("Coincidencias de categorías:", this.filteredCategories);
+
+        // 2. EXTRAER LOS ID DE ESAS CATEGORÍAS
+        const ids = this.filteredCategories.map(c => Number(c.id));
+
+        console.log("IDs de categorías filtradas:", ids);
+
+        // 3. FILTRAR PRODUCTOS QUE TENGAN ESOS IDS EN data.categ[0]
+        this.filteredProductsByCategory = this.productList.filter(prod =>
+          ids.includes(Number(prod?.data?.categ?.[0]))
+        );
+
+        console.log("Productos filtrados por categoría:", this.filteredProductsByCategory);
+      }),
+
+      // 4. SEGUIR HACIENDO BÚSQUEDA REMOTA
       switchMap(text => this.productService.searchProducts(text))
+
     )
     .subscribe({
       next: results => {
-        console.log("Resultados de búsqueda:", results);
-        this.productList = results;    // si quieres mostrar los productos encontrados
+        this.productList = results; // actualización de backend
       },
       error: err => console.error("Error en búsqueda:", err)
     });
+
+
+    /*    this.searchSubject.pipe(*/
+      /*debounceTime(1000),          // espera 1 segundo*/
+      /*distinctUntilChanged(),      // solo si el texto cambia*/
+      /*switchMap(text => this.productService.searchProducts(text))*/
+    /*)*/
+    /*.subscribe({*/
+      /*next: results => {*/
+        /*console.log("Resultados de búsqueda:", results);*/
+        /*this.productList = results;    // si quieres mostrar los productos encontrados*/
+      /*},*/
+      /*error: err => console.error("Error en búsqueda:", err)*/
+    /*});*/
   }
 
 
@@ -105,7 +150,7 @@ export class AssetSupplyReadprdctPage {
   ionViewDidEnter() {}
 
   posCategId:number=0
-  productList:Product[]=[];
+  productList:any[]=[];
   getAllProducts() {
     this.productService.getAllProducts().subscribe({
       next: response => {
@@ -244,6 +289,18 @@ export class AssetSupplyReadprdctPage {
       { state: { item } }
     );
   }
+
+
+  delete(p){
+    this.productService.delete(p.id).subscribe({
+      next: (response)=>{
+        console.log("delete response",response);
+
+      } 
+    })
+  }
+
+
 
 
 

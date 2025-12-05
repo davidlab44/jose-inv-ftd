@@ -91,32 +91,32 @@ export class AssetSupplyPatchPage {
   ngOnInit() {
     this.loadCategories();
     this.loadUms();
-
-
     this.form = this.fb.group({
-      id: [this.assetSupplyProduct.data.id],
+      id: [this.assetSupplyProduct.id],
       category: [this.assetSupplyProduct.data.categ[0]],
       name: [this.assetSupplyProduct.data.name],
       barcode: [this.assetSupplyProduct.data.barcode],
       qty: [this.assetSupplyProduct.data.qty],
       um: [this.assetSupplyProduct.data.um],
     });
-
     console.log("Formulario inicializado:", this.form.value);
   }
 
 
-  
   patch() {
     const payload = this.form.value;
-
     const id = payload.id;
 
+    if (!id) {
+      console.error("No ID found in form");
+      return;
+    }
+
     const justData = { ...payload };
-    delete justData.id;
+    delete justData.id;      
     delete justData.ext_id;
-    delete justData.created_at;
-    delete justData.updated_at;
+    delete justData.created_at;     
+    delete justData.updated_at;     
 
     this.productService.patch(id, justData).subscribe({
       next: (r) => console.log("PATCH OK:", r),
@@ -124,6 +124,22 @@ export class AssetSupplyPatchPage {
     });
   }
 
+
+
+
+  /*patch() {*/
+    /*const payload = this.form.value;*/
+    /*const id = payload.id;*/
+    /*const justData = { ...payload };*/
+    /*delete justData.id;*/
+    /*delete justData.ext_id;*/
+    /*delete justData.created_at;*/
+    /*delete justData.updated_at;*/
+    /*this.productService.patch(id, justData).subscribe({*/
+      /*next: (r) => console.log("PATCH OK:", r),*/
+      /*error: (e) => console.error("PATCH ERROR:", e),*/
+    /*});*/
+  /*}*/
 
   slideOpts = {
     initialSlide: 0,

@@ -18,6 +18,7 @@
   </ion-toolbar>
 </ion-header>
 
+
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let p of productList" style="display:flex; align-items:center;">
@@ -34,7 +35,7 @@
       <ion-button color="primary" slot="end" (click)="patch(p)">
         <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
-     <ion-button color="primary" slot="end" (click)="printSelectedBarcodes(p); $event.stopPropagation()">
+     <ion-button color="primary" slot="end" (click)="delete(p); $event.stopPropagation()">
         <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
     </ion-item>
