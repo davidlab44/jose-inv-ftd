@@ -91,11 +91,24 @@ filteredProductsByCategory: any[] = [];
       debounceTime(500),
       distinctUntilChanged(),
 
+
+
+
       tap(text => {
-         this.filteredCategories = this.categories.filter(cat => {
+
+
+        const query = text.trim().toLowerCase();
+        if (query.length === 0) {
+          this.productList = this.productListFull.slice(0, 20);
+          console.log("Restaurando primeros 20 productos:", this.productList);
+          return; 
+        }
+
+
+        this.filteredCategories = this.categories.filter(cat => {
             const nombre = cat?.data?.nombre?.toLowerCase() || "";
             const coincide = nombre.includes(text.toLowerCase());
-            return coincide; // ← ESTA LÍNEA ES LO QUE FALTABA
+            return coincide;
           });
 
         const ids = this.filteredCategories.map(c => Number(c.id));
