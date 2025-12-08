@@ -85,7 +85,7 @@ filteredProductsByCategory: any[] = [];
     await this.loadCategories();
     await this.loadUms();
     this.getAllProducts();
-   
+    this.getAllProductsFull();
 
     this.searchSubject.pipe(
       debounceTime(500),
@@ -95,32 +95,12 @@ filteredProductsByCategory: any[] = [];
          this.filteredCategories = this.categories.filter(cat => {
             const nombre = cat?.data?.nombre?.toLowerCase() || "";
             const coincide = nombre.includes(text.toLowerCase());
-
-            console.log("cat.name", cat.data, "coincide?", coincide);
-
             return coincide; // ← ESTA LÍNEA ES LO QUE FALTABA
           });
 
-        console.log("Coincidencias de categorías:", this.filteredCategories);
-
-
-        /*        // 1. BUSCAR CATEGORÍAS POR NOMBRE*/
-        /*console.log("hash", text);*/
-        /*console.log("tap categories", this.categories);*/
-        /*this.filteredCategories = this.categories.filter(cat =>{*/
-          /*cat?.data?.nombre?.toLowerCase().includes(text.toLowerCase())*/
-          /*console.log("cat.name",cat.data )     */
-        /*});*/
-
-        /*console.log("Coincidencias de categorías:", this.filteredCategories);*/
-
-        // 2. EXTRAER LOS ID DE ESAS CATEGORÍAS
         const ids = this.filteredCategories.map(c => Number(c.id));
 
-        console.log("IDs de categorías filtradas:", ids);
-
-        // 3. FILTRAR PRODUCTOS QUE TENGAN ESOS IDS EN data.categ[0]
-        this.filteredProductsByCategory = this.productList.filter(prod =>
+        this.filteredProductsByCategory = this.productListFull.filter(prod =>
           ids.includes(Number(prod?.data?.categ?.[0]))
         );
 
@@ -133,24 +113,21 @@ filteredProductsByCategory: any[] = [];
     )
     .subscribe({
       next: results => {
-        this.productList = results; // actualización de backend
+
+        // 1. Unir ambos arreglos
+        const combined = [...results, ...this.filteredProductsByCategory];
+
+        // 2. Eliminar duplicados por id
+        this.productList = combined.filter(
+          (item, index, self) =>
+            index === self.findIndex(p => p.id === item.id)
+        );
+
+        console.log("productList (sin duplicados):", this.productList);
       },
       error: err => console.error("Error en búsqueda:", err)
     });
 
-
-    /*    this.searchSubject.pipe(*/
-      /*debounceTime(1000),          // espera 1 segundo*/
-      /*distinctUntilChanged(),      // solo si el texto cambia*/
-      /*switchMap(text => this.productService.searchProducts(text))*/
-    /*)*/
-    /*.subscribe({*/
-      /*next: results => {*/
-        /*console.log("Resultados de búsqueda:", results);*/
-        /*this.productList = results;    // si quieres mostrar los productos encontrados*/
-      /*},*/
-      /*error: err => console.error("Error en búsqueda:", err)*/
-    /*});*/
   }
 
 
@@ -161,7 +138,7 @@ filteredProductsByCategory: any[] = [];
 
   posCategId:number=0
   productList:any[]=[];
-  getAllProducts() {
+   getAllProducts() {
     this.productService.getAllProducts().subscribe({
       next: response => {
         this.productList=response;
@@ -170,7 +147,19 @@ filteredProductsByCategory: any[] = [];
       error: error => console.error('Error:', error),
       complete: () => {}
     });
-  }
+   }
+
+   productListFull:any[]=[];
+   getAllProductsFull() {
+      this.productService.getAll().subscribe({
+        next: response => {
+          this.productListFull=response;
+          console.log('products full',this.productListFull)
+        },
+        error: error => console.error('Error:', error),
+        complete: () => {}
+      });
+    }
 
   searchProducts(hash: string, productList: any[]): any[] {
     if (!hash || hash.trim() === '') return productList;
