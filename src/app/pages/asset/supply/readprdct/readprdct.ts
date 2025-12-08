@@ -69,19 +69,14 @@ export class AssetSupplyReadprdctPage {
     private rexService: RexService
   ) {}
 
-
   printSelectedBarcodes(p: Product) {
     const paddedId = p.id.toString().padStart(6, '0');
     const selectedBarcodes = [paddedId];
     this.barcodeService.downloadPDF(selectedBarcodes);
   }
 
-
-
 filteredCategories: any[] = [];
 filteredProductsByCategory: any[] = [];
-
-
 
   hash:string='';
   table:any
@@ -97,12 +92,27 @@ filteredProductsByCategory: any[] = [];
       distinctUntilChanged(),
 
       tap(text => {
-        // 1. BUSCAR CATEGORÍAS POR NOMBRE
-        this.filteredCategories = this.categories.filter(cat =>
-          cat?.data?.name?.toLowerCase().includes(text.toLowerCase())
-        );
+         this.filteredCategories = this.categories.filter(cat => {
+            const nombre = cat?.data?.nombre?.toLowerCase() || "";
+            const coincide = nombre.includes(text.toLowerCase());
+
+            console.log("cat.name", cat.data, "coincide?", coincide);
+
+            return coincide; // ← ESTA LÍNEA ES LO QUE FALTABA
+          });
 
         console.log("Coincidencias de categorías:", this.filteredCategories);
+
+
+        /*        // 1. BUSCAR CATEGORÍAS POR NOMBRE*/
+        /*console.log("hash", text);*/
+        /*console.log("tap categories", this.categories);*/
+        /*this.filteredCategories = this.categories.filter(cat =>{*/
+          /*cat?.data?.nombre?.toLowerCase().includes(text.toLowerCase())*/
+          /*console.log("cat.name",cat.data )     */
+        /*});*/
+
+        /*console.log("Coincidencias de categorías:", this.filteredCategories);*/
 
         // 2. EXTRAER LOS ID DE ESAS CATEGORÍAS
         const ids = this.filteredCategories.map(c => Number(c.id));
@@ -220,7 +230,7 @@ filteredProductsByCategory: any[] = [];
 
   getUmNameById(id: number | string | null | undefined): string {
     // Validar ID recibido
-    console.log("id recibido",id)
+    //console.log("id recibido",id)
     if (id === null || id === undefined) {
       return 'Sin UM1';
     }
