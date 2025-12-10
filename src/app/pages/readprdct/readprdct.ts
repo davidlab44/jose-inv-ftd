@@ -101,7 +101,7 @@ export class ReadprdctPage {
   posCategId:number=0
   productList:Product[]=[];
   getAllProducts() {
-    this.productService.getAllProducts().subscribe({
+    this.productService.getAll().subscribe({
       next: response => {
         this.productList=response;
         console.log('products By Cat',this.productList)
