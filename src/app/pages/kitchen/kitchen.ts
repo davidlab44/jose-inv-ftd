@@ -69,11 +69,11 @@ import { ApplyComponent } from '../modal/apply/apply.component';
     private modalController: ModalController
   ) {}
 
-  printSelectedBarcodes(p: Product) {
-    const paddedId = p.id.toString().padStart(6, '0');
-    const selectedBarcodes = [paddedId];
-    this.barcodeService.downloadPDF(selectedBarcodes);
-  }
+/*  printSelectedBarcodes(p: Product) {*/
+    /*const paddedId = p.id.toString().padStart(6, '0');*/
+    /*const selectedBarcodes = [paddedId];*/
+    /*this.barcodeService.downloadPDF(selectedBarcodes);*/
+  /*}*/
 
   hash:string='';
   table:any

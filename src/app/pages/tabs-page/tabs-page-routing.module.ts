@@ -157,12 +157,21 @@ const routes: Routes = [
           }
         ]
       },
-     {
+      {
         path: 'asset-supply-patch',
         children: [
           {
             path: '',
             loadChildren: () => import('../asset/supply/patch/patch.module').then(m => m.AssetSupplyPatchModule)
+          }
+        ]
+      },
+      {
+        path: 'asset-supply-out',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../asset/supply/out/out.module').then(m => m.AssetSupplyOutModule)
           }
         ]
       },
@@ -172,6 +181,24 @@ const routes: Routes = [
           {
             path: '',
             loadChildren: () => import('../asset/supply/readprdct/readprdct.module').then(m => m.AssetSupplyReadprdctModule)
+          }
+        ]
+      },
+       {
+        path: 'replenishment-withdrawn-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/withdrawn/post/post.module').then(m => m.PostModule)
+          }
+        ]
+      },
+      {
+        path: 'replenishment-withdrawn-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/withdrawn/getall/getall.module').then(m => m.GetallModule)
           }
         ]
       },

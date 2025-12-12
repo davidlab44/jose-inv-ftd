@@ -54,6 +54,16 @@ export class AppComponent implements OnInit {
        url: '/app/tabs/asset-supply-post',
        icon: 'document-text'
      },
+     {
+       title: 'Withdrawn get all',
+       url: '/app/tabs/replenishment-withdrawn-getall',
+       icon: 'document-text'
+     },
+     {
+       title: 'Withdrawn post',
+       url: '/app/tabs/replenishment-withdrawn-post',
+       icon: 'document-text'
+     },
 
    ];
   appPages4 = [

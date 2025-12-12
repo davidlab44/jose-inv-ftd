@@ -1,5 +1,6 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { tap } from 'rxjs/operators';
 import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
 import { ConferenceData } from '../../providers/conference-data';
 import { UserData } from '../../providers/user-data';
@@ -19,8 +20,7 @@ import { Product } from '../../interfaces/product';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-
-
+import { RexService } from '../../services/rex.service';
 
 @Component({
   selector: 'page-readren',
@@ -66,37 +66,61 @@ export class ReadrenPage {
     private productService:ProductService,
     private categoryService:CategoryService,
     private umService:UmService,
+    private rexService: RexService
   ) {}
 
 
-
-  printSelectedBarcodes(p: Product) {
-    const paddedId = p.id.toString().padStart(6, '0');
-    const selectedBarcodes = [paddedId];
-    this.barcodeService.downloadPDF(selectedBarcodes);
-  }
-
+filteredCategories: any[] = [];
+filteredProductsByCategory: any[] = [];
 
   hash:string='';
   table:any
   async ngOnInit() {
+    console.log("ngOnInit")
     await this.loadCategories();
     await this.loadUms();
     this.getAllProducts();
+    this.getAllProductsFull();
+
     this.searchSubject.pipe(
-      debounceTime(1000),          // espera 1 segundo
-      distinctUntilChanged(),      // solo si el texto cambia
+      debounceTime(500),
+      distinctUntilChanged(),
+
+      tap(text => {
+        const query = text.trim().toLowerCase();
+        if (query.length === 0) {
+          this.productList = this.productListFull.slice(0, 20);
+          console.log("Restaurando primeros 20 productos:", this.productList);
+          return; 
+        }
+        this.filteredCategories = this.categories.filter(cat => {
+            const nombre = cat?.data?.nombre?.toLowerCase() || "";
+            const coincide = nombre.includes(text.toLowerCase());
+            return coincide;
+          });
+        const ids = this.filteredCategories.map(c => Number(c.id));
+        this.filteredProductsByCategory = this.productListFull.filter(prod =>
+          ids.includes(Number(prod?.data?.categ?.[0]))
+        );
+        console.log("Productos filtrados por categoría:", this.filteredProductsByCategory);
+      }),
+      // 4. SEGUIR HACIENDO BÚSQUEDA REMOTA
       switchMap(text => this.productService.searchProducts(text))
     )
     .subscribe({
       next: results => {
-        console.log("Resultados de búsqueda:", results);
-        this.productList = results;    // si quieres mostrar los productos encontrados
+        // 1. Unir ambos arreglos
+        const combined = [...results, ...this.filteredProductsByCategory];
+        // 2. Eliminar duplicados por id
+        this.productList = combined.filter(
+          (item, index, self) =>
+            index === self.findIndex(p => p.id === item.id)
+        );
+        console.log("productList (sin duplicados):", this.productList);
       },
       error: err => console.error("Error en búsqueda:", err)
     });
   }
-
 
   updateSchedule(){
   }
@@ -104,8 +128,8 @@ export class ReadrenPage {
   ionViewDidEnter() {}
 
   posCategId:number=0
-  productList:Product[]=[];
-  getAllProducts() {
+  productList:any[]=[];
+   getAllProducts() {
     this.productService.getAllProducts().subscribe({
       next: response => {
         this.productList=response;
@@ -114,7 +138,19 @@ export class ReadrenPage {
       error: error => console.error('Error:', error),
       complete: () => {}
     });
-  }
+   }
+
+   productListFull:any[]=[];
+   getAllProductsFull() {
+      this.productService.getAll().subscribe({
+        next: response => {
+          this.productListFull=response;
+          console.log('products full',this.productListFull)
+        },
+        error: error => console.error('Error:', error),
+        complete: () => {}
+      });
+    }
 
   searchProducts(hash: string, productList: any[]): any[] {
     if (!hash || hash.trim() === '') return productList;
@@ -138,7 +174,6 @@ export class ReadrenPage {
     }   
         
     ums: any[] = []; 
-        
     loadUms() {                
       this.umService.getAllUms().subscribe({ 
         next: (res) => {       
@@ -153,8 +188,6 @@ export class ReadrenPage {
       }); 
     }     
       
-
-
     getCategoryNameById(id: number | null | undefined): string {
       if (id === null || id === undefined) {
         return 'Sin categoría';
@@ -176,24 +209,25 @@ export class ReadrenPage {
 
   getUmNameById(id: number | string | null | undefined): string {
     // Validar ID recibido
+    //console.log("id recibido",id)
     if (id === null || id === undefined) {
-      return 'Sin UM';
+      return 'Sin UM1';
     }
 
     const idNum = Number(id);
     if (isNaN(idNum)) {
-      return 'Sin UM';
+      return 'Sin UM2';
     }
 
     // Validar que this.ums exista y tenga elementos
     if (!Array.isArray(this.ums) || this.ums.length === 0) {
-      return 'Sin UM';
+      return 'Sin UM3';
     }
 
     // Buscar la UM por ID
     const um = this.ums.find(u => Number(u.id) === idNum);
     if (!um) {
-      return 'Sin UM';
+      return 'Sin UM4';
     }
 
     // Extraer el nombre si existe y es válido
@@ -202,44 +236,45 @@ export class ReadrenPage {
       return nombre;
     }
 
-    return 'Sin UM';
+    return 'Sin UM5';
   }
-
 
   onSearch(text: string) {
     this.searchSubject.next(text);
   }
 
+  /*enviar() {*/
+    /*const items = [*/
+      /*{*/
+        /*ext_id: 101,*/
+        /*data: {*/
+          /*nombre: 'Producto de prueba',*/
+          /*precio: 249.90,*/
+          /*categoria: 'Electrónica',*/
+          /*stock: 12*/
+        /*}*/
+      /*},*/
+      /*{*/
+        /*ext_id: 102,*/
+        /*data: {*/
+          /*nombre: 'Audífonos Bluetooth',*/
+          /*precio: 89.50,*/
+          /*categoria: 'Accesorios',*/
+          /*stock: 50*/
+        /*}*/
+      /*}*/
+    /*];*/
 
-  /**
-   * Formatea una fecha en estilo amigable con hora en 12h y segundos
-   * Ejemplo: "12 agosto de 2025 11:39:20 AM"
-   * @param dateInput puede ser string, Date o timestamp
-   */
-  formatFechaLatam(dateInput: string | Date | number): string {
-    if (!dateInput) return '';
+  /*}*/
 
-    const date = new Date(dateInput);
+  /*patch(item:any){*/
+    /*console.log("item to patch",item);*/
+    /*this.router.navigate(*/
+      /*['/app/tabs/asset-supply-patch'],*/
+      /*{ state: { item } }*/
+    /*);*/
+  /*}*/
 
-    // Día, mes (nombre) y año
-    const opciones: Intl.DateTimeFormatOptions = {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    };
-    const fechaTexto = new Intl.DateTimeFormat('es-ES', opciones).format(date);
-
-    // Hora en 12h con AM/PM
-    let horas = date.getHours();
-    const minutos = String(date.getMinutes()).padStart(2, '0');
-    const segundos = String(date.getSeconds()).padStart(2, '0');
-    const ampm = horas >= 12 ? 'PM' : 'AM';
-    horas = horas % 12;
-    if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
-    const horasTexto = String(horas).padStart(2, '0');
-
-    return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
-  }
 
 
 

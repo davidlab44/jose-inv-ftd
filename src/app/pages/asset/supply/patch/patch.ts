@@ -93,7 +93,7 @@ export class AssetSupplyPatchPage {
     this.loadUms();
     this.form = this.fb.group({
       id: [this.assetSupplyProduct.id],
-      category: [this.assetSupplyProduct.data.categ[0]],
+      categ: [this.assetSupplyProduct.data.categ[0]],
       name: [this.assetSupplyProduct.data.name],
       barcode: [this.assetSupplyProduct.data.barcode],
       qty: [this.assetSupplyProduct.data.qty],
@@ -102,30 +102,27 @@ export class AssetSupplyPatchPage {
     console.log("Formulario inicializado:", this.form.value);
   }
 
-
   patch() {
     const payload = this.form.value;
     const id = payload.id;
-
     if (!id) {
       console.error("No ID found in form");
       return;
     }
-
     const justData = { ...payload };
     delete justData.id;      
     delete justData.ext_id;
     delete justData.created_at;     
     delete justData.updated_at;     
-
+    justData.categ=[justData.categ];
     this.productService.patch(id, justData).subscribe({
-      next: (r) => console.log("PATCH OK:", r),
+      next: (r) => {
+        console.log("PATCH OK:", r);
+        this.utilService.presentToast("cant: "+r[0].data.qty+" "+r[0].data.name)
+      },
       error: (e) => console.error("PATCH ERROR:", e),
     });
   }
-
-
-
 
   /*patch() {*/
     /*const payload = this.form.value;*/
@@ -231,7 +228,6 @@ export class AssetSupplyPatchPage {
     }   
         
     ums: any[] = []; 
-        
     loadUms() {                
       this.umService.getAllUms().subscribe({ 
         next: (res) => {       
@@ -245,8 +241,6 @@ export class AssetSupplyPatchPage {
         } 
       }); 
     }     
-
-
 
 
 }

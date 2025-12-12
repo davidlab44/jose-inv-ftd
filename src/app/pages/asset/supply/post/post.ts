@@ -109,17 +109,20 @@ export class AssetSupplyPostPage {
     private replenishmentService : ReplenishmentService,
   ) {}
 
-  printSelectedBarcodes(p: Product) {
-    const paddedId = p.id.toString().padStart(6, '0');
-    const selectedBarcodes = [paddedId];
-    this.barcodeService.downloadPDF(selectedBarcodes);
-  }
+  /*printSelectedBarcodes(p: Product) {*/
+    /*const paddedId = p.id.toString().padStart(6, '0');*/
+    /*const selectedBarcodes = [paddedId];*/
+    /*this.barcodeService.downloadPDF(selectedBarcodes);*/
+  /*}*/
 
   hash:string='';
   table:any
   rexDocument:any;
 
   ngOnInit() {
+    this.loadCategories();
+    this.loadUms();
+
     this.form = this.fb.group({
       category: [0],
       name: [''],
@@ -151,6 +154,9 @@ export class AssetSupplyPostPage {
     this.productService.post(data).subscribe({
       next: (response) => {
         console.log("product post response", response);
+        if(response && response.length>0){
+          this.utilService.presentToast(response.toString())
+        }
       }
     });
   }
@@ -211,6 +217,37 @@ export class AssetSupplyPostPage {
     const horasTexto = String(horas).padStart(2, '0');
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
+
+  categories: any[] = [];    
+  loadCategories() { 
+      this.categoryService.getAllCategories().subscribe({ 
+        next: (res) => {       
+          this.categories = res;          
+          this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
+        }, 
+        error: (err) => {      
+          console.error('❌ Error al cargar categorías:', err); 
+          this.categories = this.categoryService.getCategoriesFromLocal(); 
+        } 
+      }); 
+   }   
+       
+   ums: any[] = []; 
+   loadUms() {                
+     this.umService.getAllUms().subscribe({ 
+        next: (res) => {       
+          console.log('✅ Ums:', res);    
+          this.ums = res; 
+          this.umService.saveUmsToLocal(res); 
+        }, 
+        error: (err) => {      
+          console.error('❌ Error al cargar categorías:', err); 
+          this.ums = this.umService.getUmsFromLocal(); 
+        } 
+      }); 
+   }     
+
+
 
 }
 

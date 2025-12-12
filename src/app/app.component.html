@@ -7,7 +7,7 @@
     <ion-menu contentId="main-content">
       <ion-content>
         <ion-list lines="none">
-          <ion-list-header>Carta</ion-list-header>
+          <ion-list-header>Inbemetal</ion-list-header>
           <!-- Menu items -->
           <ion-menu-toggle autoHide="false" *ngFor="let p of appPages">
             <ion-item [routerLink]="[p.url]"
@@ -52,7 +52,7 @@
         </ion-list>
 
         <ion-list *ngIf="!loggedIn" lines="none">
-          <ion-list-header>Orden</ion-list-header>
+          <ion-list-header>Ajustes</ion-list-header>
 
           <ion-menu-toggle autoHide="false">
             <ion-item routerLink="/app/tabs/order" routerLinkActive="active" routerDirection="root" detail="false">

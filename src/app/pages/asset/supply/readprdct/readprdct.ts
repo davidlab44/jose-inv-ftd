@@ -69,11 +69,11 @@ export class AssetSupplyReadprdctPage {
     private rexService: RexService
   ) {}
 
-  printSelectedBarcodes(p: Product) {
-    const paddedId = p.id.toString().padStart(6, '0');
-    const selectedBarcodes = [paddedId];
-    this.barcodeService.downloadPDF(selectedBarcodes);
-  }
+/*  printSelectedBarcodes(p: Product) {*/
+    /*const paddedId = p.id.toString().padStart(6, '0');*/
+    /*const selectedBarcodes = [paddedId];*/
+    /*this.barcodeService.downloadPDF(selectedBarcodes);*/
+  /*}*/
 
 filteredCategories: any[] = [];
 filteredProductsByCategory: any[] = [];

@@ -1,0 +1,211 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-searchbar
+      placeholder="Buscar"
+      (ionInput)="onSearch($event.target.value)">
+    </ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content class="ion-padding">
+
+  <!--<form [formGroup]="form">-->
+      <!--<ion-item>-->
+        <!--<ion-label position="floating">Isotanque</ion-label>-->
+        <!--<ion-input formControlName="akg"></ion-input>-->
+      <!--</ion-item>-->
+  <!--</form>-->
+
+  <form [formGroup]="form">
+
+    <ion-list>
+
+      <h3>Isotanque 1</h3>
+
+      <ion-item>
+        <ion-label position="floating">Proveedor</ion-label>
+        <ion-select
+          formControlName="avendor"
+          interface="popover"
+        >
+          <ion-select-option value="1">plexa</ion-select-option>
+          <ion-select-option value="2">plexaport</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Fecha y Hora de llenado</ion-label>
+        <ion-datetime
+          formControlName="adate"
+          presentation="date-time"
+          display-format="YYYY-MM-DD HH:mm"
+          value-format="YYYY-MM-DDTHH:mm:ss"
+          locale="es-ES"
+          prefer-wheel="false"
+        ></ion-datetime>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Precio</ion-label>
+        <ion-select
+          formControlName="aprice"
+          interface="popover"
+        >
+          <ion-select-option value="1">nacional</ion-select-option>
+          <ion-select-option value="2">importado</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Isotanque</ion-label>
+        <ion-input formControlName="akg"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">PSI</ion-label>
+        <ion-input type="number" formControlName="apsi"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">ROTOGATE</ion-label>
+        <ion-input type="number" formControlName="arotogate"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Sello 1</ion-label>
+        <ion-input formControlName="aseal1"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Sello 2</ion-label>
+        <ion-input formControlName="aseal2"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Sello 3</ion-label>
+        <ion-input formControlName="aseal3"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Ticket</ion-label>
+        <ion-input formControlName="aticket"></ion-input>
+      </ion-item>
+
+      <br><br>
+
+      <h3>Isotanque 2</h3>
+
+      <ion-item>
+        <ion-label position="floating">Proveedor</ion-label>
+        <ion-select
+          formControlName="bvendor"
+          interface="popover"
+        >
+          <ion-select-option value="1">plexa</ion-select-option>
+          <ion-select-option value="2">plexaport</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Fecha y Hora de llenado</ion-label>
+        <ion-datetime
+          formControlName="bdate"
+          presentation="date-time"
+          display-format="YYYY-MM-DD HH:mm"
+          value-format="YYYY-MM-DDTHH:mm:ss"
+          locale="es-ES"
+          prefer-wheel="false"
+        ></ion-datetime>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Precio</ion-label>
+        <ion-select
+          formControlName="bprice"
+          interface="popover"
+        >
+          <ion-select-option value="1">nacional</ion-select-option>
+          <ion-select-option value="2">importado</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Isotanque</ion-label>
+        <ion-input formControlName="bkg"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">PSI</ion-label>
+        <ion-input type="number" formControlName="bpsi"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">ROTOGATE</ion-label>
+        <ion-input type="number" formControlName="brotogate"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Sello 1</ion-label>
+        <ion-input formControlName="bseal1"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Sello 2</ion-label>
+        <ion-input formControlName="bseal2"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Sello 3</ion-label>
+        <ion-input formControlName="bseal3"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Ticket</ion-label>
+        <ion-input formControlName="bticket"></ion-input>
+      </ion-item>
+
+      <br><br>
+
+      <h3>Bascula</h3>
+      <ion-item>
+        <ion-label position="floating">Peso vacío</ion-label>
+        <ion-input type="number" formControlName="empty"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Peso lleno</ion-label>
+        <ion-input type="number" formControlName="full"></ion-input>
+      </ion-item>
+
+    </ion-list>
+
+    <br>
+
+    <ion-button expand="block" (click)="guardar()">
+      Guardar
+    </ion-button>
+
+  </form>
+</ion-content>
+
+
+
+
+
+
+
+
+
+

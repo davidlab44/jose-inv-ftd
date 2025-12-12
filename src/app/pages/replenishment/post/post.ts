@@ -112,11 +112,11 @@ export class PostPage {
     private replenishmentService : ReplenishmentService,
   ) {}
 
-  printSelectedBarcodes(p: Product) {
-    const paddedId = p.id.toString().padStart(6, '0');
-    const selectedBarcodes = [paddedId];
-    this.barcodeService.downloadPDF(selectedBarcodes);
-  }
+  /*printSelectedBarcodes(p: Product) {*/
+    /*const paddedId = p.id.toString().padStart(6, '0');*/
+    /*const selectedBarcodes = [paddedId];*/
+    /*this.barcodeService.printIn50mmPortablePrinterBt(selectedBarcodes);*/
+  /*}*/
 
   hash:string='';
   table:any
