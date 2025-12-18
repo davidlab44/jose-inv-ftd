@@ -287,13 +287,16 @@ filteredProductsByCategory: any[] = [];
         }
       }
     ];
-
-    /*this.rexService.addProdrexItems(items).subscribe({*/
-      /*next: (resp) => console.log('Respuesta OK:', resp),*/
-      /*error: (err) => console.error('Error al enviar:', err)*/
-    /*});*/
   }
 
+  out(item:any){
+    console.log("item to modifyqty",item);
+    this.router.navigate(
+      ['/app/tabs/asset-supply-out'],
+      { state: { item } }
+    );
+  }
+   
   patch(item:any){
     console.log("item to patch",item);
     this.router.navigate(
@@ -301,8 +304,7 @@ filteredProductsByCategory: any[] = [];
       { state: { item } }
     );
   }
-
-
+  
   delete(p){
     this.productService.delete(p.id).subscribe({
       next: (response)=>{
@@ -311,9 +313,6 @@ filteredProductsByCategory: any[] = [];
       } 
     })
   }
-
-
-
 
 
 }

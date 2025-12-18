@@ -26,7 +26,6 @@ import { UserService } from '../../../../services/user.service';
 import { ReplenishmentService } from '../../../../services/replenishment/replenishment.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-
 @Component({
   selector: 'page-out',
   templateUrl: 'out.html',
@@ -56,6 +55,8 @@ export class AssetSupplyOutPage {
   replenishmentList: any[] = [];
   replenishment:any;
   assetSupplyProduct:any;
+  textoIngresado: string = '';
+  textoMostrado: string = '';
 
   constructor(
     private barcodeService: BarcodeService,
@@ -99,7 +100,9 @@ export class AssetSupplyOutPage {
       qty: [this.assetSupplyProduct.data.qty],
       um: [this.assetSupplyProduct.data.um],
     });
-    console.log("Formulario inicializado:", this.form.value);
+    //console.log("Formulario inicializado:", this.form.value);
+    this.textoIngresado = '';
+    this.textoMostrado= '';
   }
 
   patch() {
@@ -123,20 +126,6 @@ export class AssetSupplyOutPage {
       error: (e) => console.error("PATCH ERROR:", e),
     });
   }
-
-  /*patch() {*/
-    /*const payload = this.form.value;*/
-    /*const id = payload.id;*/
-    /*const justData = { ...payload };*/
-    /*delete justData.id;*/
-    /*delete justData.ext_id;*/
-    /*delete justData.created_at;*/
-    /*delete justData.updated_at;*/
-    /*this.productService.patch(id, justData).subscribe({*/
-      /*next: (r) => console.log("PATCH OK:", r),*/
-      /*error: (e) => console.error("PATCH ERROR:", e),*/
-    /*});*/
-  /*}*/
 
   slideOpts = {
     initialSlide: 0,
@@ -212,9 +201,8 @@ export class AssetSupplyOutPage {
     };
   }
 
-
-   categories: any[] = [];    
-   loadCategories() { 
+  categories: any[] = [];    
+  loadCategories() { 
       this.categoryService.getAllCategories().subscribe({ 
         next: (res) => {       
           this.categories = res;          
@@ -227,8 +215,8 @@ export class AssetSupplyOutPage {
       }); 
     }   
         
-    ums: any[] = []; 
-    loadUms() {                
+   ums: any[] = []; 
+   loadUms() {                
       this.umService.getAllUms().subscribe({ 
         next: (res) => {       
           console.log('✅ Ums:', res);    
@@ -240,7 +228,12 @@ export class AssetSupplyOutPage {
           this.ums = this.umService.getUmsFromLocal(); 
         } 
       }); 
-    }     
+   }     
+
+  imprimirTexto() {
+    console.log('Texto ingresado:', this.textoIngresado);
+    this.textoMostrado = this.textoIngresado;
+  }
 
 
 }

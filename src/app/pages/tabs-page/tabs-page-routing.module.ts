@@ -4,7 +4,6 @@ import { TabsPage } from './tabs-page';
 import { SchedulePage } from '../schedule/schedule';
 import { ScnbrcdPage } from '../scnbrcd/scnbrcd';
 
-
 const routes: Routes = [
   {
     path: 'tabs',

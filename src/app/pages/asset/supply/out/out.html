@@ -18,15 +18,32 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<!--<ion-content class="ion-padding">-->
 
 <ion-content class="ion-padding">
   <form [formGroup]="form">    
     
-    <!-- Campo oculto -->
     <input type="hidden" formControlName="id">
 
     <ion-list>
+
+      <!--<h6>{{assetSupplyProduct.data.name}}</h6>-->
+      <!--<p>{{assetSupplyProduct.data.qty}}</p>-->
+
+      <!--<ion-item>-->
+        <!--<ion-label position="floating">Ingrese un texto</ion-label>-->
+        <!--<ion-input [(ngModel)]="textoIngresado"></ion-input>-->
+      <!--</ion-item>-->
+
+      <!--<ion-button expand="block" (click)="imprimirTexto()">-->
+        <!--Imprimir-->
+      <!--</ion-button>-->
+
+
+      <br><br><br>
+      <hr>
+      <br><br><br>
+
       <ion-item>
         <ion-label position="floating">Category</ion-label>
         <ion-input type="number" formControlName="categ"></ion-input>

@@ -42,27 +42,27 @@ export class AppComponent implements OnInit {
      {
        title: 'Ingresos de mercancia',
        url: '/app/tabs/readren',
-       icon: 'document-text'
+       icon: 'chevron-forward-circle'
      },
      {
-       title: 'Listar',
+       title: 'Listar productos ',
        url: '/app/tabs/asset-supply-readprdct',
        icon: 'document-text'
      },
      {
-       title: 'Registrar',
+       title: 'Registrar producto',
        url: '/app/tabs/asset-supply-post',
-       icon: 'document-text'
+       icon: 'add-circle'
      },
      {
-       title: 'Withdrawn get all',
+       title: 'Kilos retirados',
        url: '/app/tabs/replenishment-withdrawn-getall',
-       icon: 'document-text'
+       icon: 'checkbox'
      },
      {
-       title: 'Withdrawn post',
+       title: 'Registrar retiro',
        url: '/app/tabs/replenishment-withdrawn-post',
-       icon: 'document-text'
+       icon: 'add-circle'
      },
 
    ];

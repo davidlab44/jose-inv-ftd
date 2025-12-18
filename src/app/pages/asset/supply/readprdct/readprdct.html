@@ -31,7 +31,10 @@
         <strong>{{ p?.data?.qty }}</strong>
         <span style="font-size: xx-small;"> {{ getUmNameById(p?.data?.um) }}</span>
       </ion-label>
-      <ion-button color="primary" slot="end" (click)="patch(p)">
+      <ion-button color="primary" slot="end" (click)="out(p)">
+        <ion-icon name="remove-outline"></ion-icon>
+      </ion-button>
+     <ion-button color="primary" slot="end" (click)="patch(p)">
         <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
      <ion-button color="primary" slot="end" (click)="delete(p); $event.stopPropagation()">
