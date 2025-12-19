@@ -4,7 +4,7 @@
 export interface Product {
   id: number;
   creado_en: string;               // ISO datetime string
-  datos: {
+  data: {
     um: string;                    // unidad de medida (string porque viene "8")
     qty: number;
     name: string;
@@ -19,7 +19,7 @@ export interface Product {
 export const defaultProduct: Product = {
   id: 0,
   creado_en: new Date().toISOString(),
-  datos: {
+  data: {
     um: "0",
     qty: 1,
     name: "",

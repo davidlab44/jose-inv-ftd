@@ -10,11 +10,243 @@ export class BarcodeService {
 
   constructor() { }
 
-  /**
-   * Genera un PDF preparado para una impresora térmica de rollo 50 mm
-   * y coloca los códigos de barras dentro del ancho imprimible.
-   */
-  printIn50mmPortablePrinterBt(barcodes: string[]) {
+
+
+
+
+
+
+printIn50mmPortablePrinterBt(barcodes: string[], belowText:string) {
+  console.log('Generando PNGs para impresión térmica 50mm FULL WIDTH:', barcodes);
+
+  // 📐 Ancho total del rollo (50 mm)
+  const pageWidthMm = 50;
+  const barcodeHeightMm = 15; // un poco más alto si quieres
+  const marginMm = 1; // margen lateral mínimo para que no se corte
+
+  // 📏 Resolución: 8 px/mm = ~200 DPI
+  const pxPerMm = 8;
+  const canvasWidth = pageWidthMm * pxPerMm; // 🔥 ahora usamos todo el ancho disponible
+  const canvasHeight = barcodeHeightMm * pxPerMm;
+
+  barcodes.forEach((code) => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    JsBarcode(svg, code, {
+      format: 'CODE128',
+      displayValue: true,
+      margin: 0, // sin margen interno, lo controlamos con el canvas
+    });
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.src = url;
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Canvas no soportado');
+        return;
+      }
+
+      // Fondo blanco
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+      // 🔍 Escalar el código para que use todo el ancho
+      const scale = canvasWidth / img.width;
+      const drawWidth = img.width * scale;
+      const drawHeight = img.height * scale;
+      const offsetX = 0;
+      const offsetY = (canvasHeight - drawHeight) / 2;
+
+      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+
+      // 🔽 Descargar la imagen (puedes luego usarla en RAW BT)
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const downloadUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = downloadUrl;
+          a.download = `barcode-${code}.png`;
+          a.click();
+          URL.revokeObjectURL(downloadUrl);
+        } else {
+          console.error('No se pudo generar el PNG.');
+        }
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    };
+
+    img.onerror = (err) => {
+      console.error('Error cargando imagen del código:', code, err);
+      URL.revokeObjectURL(url);
+    };
+  });
+}
+
+
+  /*printIn50mmPortablePrinterBt(barcodes: string[]) {*/
+  /*console.log('Generando PNGs para impresión térmica 50mm FULL WIDTH:', barcodes);*/
+
+  /*// 📐 Ancho total del rollo (50 mm)*/
+  /*const pageWidthMm = 50;*/
+  /*const barcodeHeightMm = 15; // un poco más alto si quieres*/
+  /*const marginMm = 1; // margen lateral mínimo para que no se corte*/
+
+  /*// 📏 Resolución: 8 px/mm = ~200 DPI*/
+  /*const pxPerMm = 8;*/
+  /*const canvasWidth = pageWidthMm * pxPerMm; // 🔥 ahora usamos todo el ancho disponible*/
+  /*const canvasHeight = barcodeHeightMm * pxPerMm;*/
+
+  /*barcodes.forEach((code) => {*/
+    /*const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');*/
+    /*JsBarcode(svg, code, {*/
+      /*format: 'CODE128',*/
+      /*displayValue: true,*/
+      /*margin: 0, // sin margen interno, lo controlamos con el canvas*/
+    /*});*/
+
+    /*const svgData = new XMLSerializer().serializeToString(svg);*/
+    /*const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });*/
+    /*const url = URL.createObjectURL(svgBlob);*/
+    /*const img = new Image();*/
+    /*img.src = url;*/
+
+    /*img.onload = () => {*/
+      /*const canvas = document.createElement('canvas');*/
+      /*canvas.width = canvasWidth;*/
+      /*canvas.height = canvasHeight;*/
+
+      /*const ctx = canvas.getContext('2d');*/
+      /*if (!ctx) {*/
+        /*console.error('Canvas no soportado');*/
+        /*return;*/
+      /*}*/
+
+      /*// Fondo blanco*/
+      /*ctx.fillStyle = '#ffffff';*/
+      /*ctx.fillRect(0, 0, canvasWidth, canvasHeight);*/
+
+      /*// 🔍 Escalar el código para que use todo el ancho*/
+      /*const scale = canvasWidth / img.width;*/
+      /*const drawWidth = img.width * scale;*/
+      /*const drawHeight = img.height * scale;*/
+      /*const offsetX = 0;*/
+      /*const offsetY = (canvasHeight - drawHeight) / 2;*/
+
+      /*ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);*/
+
+      /*// 🔽 Descargar la imagen (puedes luego usarla en RAW BT)*/
+      /*canvas.toBlob((blob) => {*/
+        /*if (blob) {*/
+          /*const downloadUrl = URL.createObjectURL(blob);*/
+          /*const a = document.createElement('a');*/
+          /*a.href = downloadUrl;*/
+          /*a.download = `barcode-${code}.png`;*/
+          /*a.click();*/
+          /*URL.revokeObjectURL(downloadUrl);*/
+        /*} else {*/
+          /*console.error('No se pudo generar el PNG.');*/
+        /*}*/
+        /*URL.revokeObjectURL(url);*/
+      /*}, 'image/png');*/
+    /*};*/
+
+    /*img.onerror = (err) => {*/
+      /*console.error('Error cargando imagen del código:', code, err);*/
+      /*URL.revokeObjectURL(url);*/
+    /*};*/
+  /*});*/
+/*}*/
+
+
+
+
+/*printIn50mmPortablePrinterBt(barcodes: string[]) {*/
+  /*console.log('Generando PNGs para RAW BT - térmica 50mm. Códigos:', barcodes);*/
+
+  /*// Dimensiones del rollo (en mm)*/
+  /*const pageWidthMm = 50;*/
+  /*const barcodeHeightMm = 10;*/
+  /*const marginMm = 4;*/
+
+  /*// Resolución adecuada (~200dpi)*/
+  /*const pxPerMm = 8;*/
+  /*const canvasWidth = (pageWidthMm - marginMm * 2) * pxPerMm;*/
+  /*const canvasHeight = barcodeHeightMm * pxPerMm;*/
+
+  /*barcodes.forEach((code) => {*/
+    /*const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');*/
+    /*JsBarcode(svg, code, {*/
+      /*format: 'CODE128',*/
+      /*displayValue: true,*/
+      /*margin: 0,*/
+    /*});*/
+
+    /*const svgData = new XMLSerializer().serializeToString(svg);*/
+    /*const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });*/
+    /*const url = URL.createObjectURL(svgBlob);*/
+    /*const img = new Image();*/
+    /*img.src = url;*/
+
+    /*img.onload = () => {*/
+      /*const canvas = document.createElement('canvas');*/
+      /*canvas.width = canvasWidth;*/
+      /*canvas.height = canvasHeight;*/
+
+      /*const ctx = canvas.getContext('2d');*/
+      /*if (!ctx) {*/
+        /*console.error('Canvas no soportado');*/
+        /*return;*/
+      /*}*/
+
+      /*// Fondo blanco*/
+      /*ctx.fillStyle = '#ffffff';*/
+      /*ctx.fillRect(0, 0, canvasWidth, canvasHeight);*/
+
+      /*// Escala y centrado*/
+      /*const scale = Math.min(canvasWidth / img.width, canvasHeight / img.height);*/
+      /*const drawWidth = img.width * scale;*/
+      /*const drawHeight = img.height * scale;*/
+      /*const offsetX = (canvasWidth - drawWidth) / 2;*/
+      /*const offsetY = (canvasHeight - drawHeight) / 2;*/
+
+      /*ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);*/
+
+      /*// Convertir a Blob PNG*/
+      /*canvas.toBlob((blob) => {*/
+        /*if (blob) {*/
+          /*// 👉 Descargar imagen como archivo PNG (para enviar manualmente desde RAW BT)*/
+          /*const downloadUrl = URL.createObjectURL(blob);*/
+          /*const a = document.createElement('a');*/
+          /*a.href = downloadUrl;*/
+          /*a.download = `barcode-${code}.png`;*/
+          /*a.click();*/
+          /*URL.revokeObjectURL(downloadUrl);*/
+        /*} else {*/
+          /*console.error('No se pudo generar el blob PNG');*/
+        /*}*/
+        /*URL.revokeObjectURL(url);*/
+      /*}, 'image/png');*/
+    /*};*/
+
+    /*img.onerror = (err) => {*/
+      /*console.error('Error cargando imagen del barcode:', code, err);*/
+      /*URL.revokeObjectURL(url);*/
+    /*};*/
+  /*});*/
+/*}*/
+
+
+
+
+  printIn50mmPortablePrinterBt2(barcodes: string[]) {
     console.log('Imprimiendo en rollo 50mm. Códigos:', barcodes);
 
     // Medidas en mm
