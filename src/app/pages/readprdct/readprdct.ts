@@ -67,11 +67,11 @@ export class ReadprdctPage {
     private rexService: RexService
   ) {}
 
-  /*printSelectedBarcodes(p: Product) {*/
-    /*const paddedId = p.id.toString().padStart(6, '0');*/
-    /*const selectedBarcodes = [paddedId];*/
-    /*this.barcodeService.downloadPDF(selectedBarcodes);*/
-  /*}*/
+  printSelectedBarcodes(p: Product) {
+    const paddedId = p.id.toString().padStart(6, '0');
+    const selectedBarcodes = [paddedId];
+    this.barcodeService.printIn50mmPortablePrinterBt(selectedBarcodes);
+  }
 
   hash:string='';
   table:any
@@ -101,7 +101,7 @@ export class ReadprdctPage {
   posCategId:number=0
   productList:Product[]=[];
   getAllProducts() {
-    this.productService.getAll().subscribe({
+    this.productService.getAllProducts().subscribe({
       next: response => {
         this.productList=response;
         console.log('products By Cat',this.productList)
@@ -169,7 +169,7 @@ export class ReadprdctPage {
 
   getUmNameById(id: number | string | null | undefined): string {
     // Validar ID recibido
-    console.log("id recibido",id)
+    //console.log("id recibido",id)
     if (id === null || id === undefined) {
       return 'Sin UM1';
     }
