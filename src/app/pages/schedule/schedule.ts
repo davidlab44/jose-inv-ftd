@@ -1,4 +1,6 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
+import { IonInput } from '@ionic/angular';
+import { debounceTime, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
 import { ConferenceData } from '../../providers/conference-data';
@@ -87,7 +89,17 @@ export class SchedulePage{
     if (host.startsWith("abs.")) {
       this.router.navigate(['/app/tabs/replenishment']);
     }
-
+    this.inputChanged.pipe(debounceTime(1000)).subscribe((val) => {
+      console.log('🕐 Input después de 1s sin cambios:', val);
+        const manualBarcode=Number(val);
+        if(manualBarcode>0){
+          this.getProductByBarcode(Number(val));
+          this.componentsEnabled = true;
+          this.stopScan();
+        }else{
+          this.utilService.presentToast('barcode ingresado no es un numero');
+        }
+    });
   }
 
   productListOriginal:any[]=[];
@@ -305,6 +317,12 @@ export class SchedulePage{
     if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
     const horasTexto = String(horas).padStart(2, '0');
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
+  }
+
+  private inputChanged: Subject<string> = new Subject();
+
+  onInputChange() {
+    this.inputChanged.next(this.scannedValue);
   }
 
 

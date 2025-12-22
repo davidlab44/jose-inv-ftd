@@ -73,7 +73,6 @@
 
     <ion-card-content>
 
-      <!-- SCAN AREA -->
       <div class="scan-container">
         <video #video autoplay playsinline class="video-preview"></video>
 
@@ -82,12 +81,13 @@
             <ion-icon name="stop-circle-outline"></ion-icon>
           </ion-button>
           <ion-item class="scan-input">
-            <ion-input readonly [value]="scannedValue"></ion-input>
+            <ion-input #scanInput [(ngModel)]="scannedValue" (ionInput)="onInputChange()" type="text"></ion-input>
           </ion-item>
           <ion-button class="scan-btn" (click)="startScan()">
             <ion-icon name="camera-outline"></ion-icon>
           </ion-button>
         </div>
+
       </div>
 
        <ng-container *ngIf="product">

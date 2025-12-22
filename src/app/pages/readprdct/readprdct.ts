@@ -233,6 +233,11 @@ export class ReadprdctPage {
   }
 
 
+
+  manualOutbound(){
+    
+  }
+
 }
 
 
