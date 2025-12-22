@@ -68,9 +68,10 @@ export class ReadprdctPage {
   ) {}
 
   printSelectedBarcodes(p: Product) {
+    console.log("producto recibido",p)
     const paddedId = p.id.toString().padStart(6, '0');
     const selectedBarcodes = [paddedId];
-    this.barcodeService.printIn50mmPortablePrinterBt(selectedBarcodes,p.data.name);
+    this.barcodeService.printIn50mmPortablePrinterBt(selectedBarcodes,p.data.barcode);
   }
 
   hash:string='';
@@ -80,14 +81,14 @@ export class ReadprdctPage {
     await this.loadUms();
     this.getAllProducts();
     this.searchSubject.pipe(
-      debounceTime(1000),          // espera 1 segundo
-      distinctUntilChanged(),      // solo si el texto cambia
+      debounceTime(1000),          
+      distinctUntilChanged(),      
       switchMap(text => this.productService.searchProducts(text))
     )
     .subscribe({
       next: results => {
         console.log("Resultados de búsqueda:", results);
-        this.productList = results;    // si quieres mostrar los productos encontrados
+        this.productList = results;
       },
       error: err => console.error("Error en búsqueda:", err)
     });

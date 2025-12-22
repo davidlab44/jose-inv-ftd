@@ -12,34 +12,29 @@ export class BarcodeService {
 
 
 
+printIn50mmPortablePrinterBt(barcodes: string[], text: string) {
+  const pageWidthMm = 48; // Ancho reducido para margen izquierdo
+  const pageHeightMm = 25;
 
+  const pxPerMm = 16; // Resolución duplicada (más calidad)
+  const canvasWidth = pageWidthMm * pxPerMm;
+  const canvasHeight = pageHeightMm * pxPerMm;
 
-
-
-printIn50mmPortablePrinterBt(barcodes: string[], belowText:string) {
-  console.log('Generando PNGs para impresión térmica 50mm FULL WIDTH:', barcodes);
-
-  // 📐 Ancho total del rollo (50 mm)
-  const pageWidthMm = 50;
-  const barcodeHeightMm = 15; // un poco más alto si quieres
-  const marginMm = 1; // margen lateral mínimo para que no se corte
-
-  // 📏 Resolución: 8 px/mm = ~200 DPI
-  const pxPerMm = 8;
-  const canvasWidth = pageWidthMm * pxPerMm; // 🔥 ahora usamos todo el ancho disponible
-  const canvasHeight = barcodeHeightMm * pxPerMm;
+  const barcodeHeightMm = pageHeightMm * 0.7;
+  const barcodeHeightPx = barcodeHeightMm * pxPerMm;
 
   barcodes.forEach((code) => {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     JsBarcode(svg, code, {
       format: 'CODE128',
-      displayValue: true,
-      margin: 0, // sin margen interno, lo controlamos con el canvas
+      displayValue: false,
+      margin: 0,
     });
 
     const svgData = new XMLSerializer().serializeToString(svg);
     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(svgBlob);
+
     const img = new Image();
     img.src = url;
 
@@ -54,20 +49,32 @@ printIn50mmPortablePrinterBt(barcodes: string[], belowText:string) {
         return;
       }
 
-      // Fondo blanco
+      // 🎨 Fondo blanco
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-      // 🔍 Escalar el código para que use todo el ancho
+      // 🧾 Dibujar código de barras (70% alto)
       const scale = canvasWidth / img.width;
       const drawWidth = img.width * scale;
       const drawHeight = img.height * scale;
+
       const offsetX = 0;
-      const offsetY = (canvasHeight - drawHeight) / 2;
+      const offsetY = 0;
 
-      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+      ctx.drawImage(img, offsetX, offsetY, drawWidth, barcodeHeightPx);
 
-      // 🔽 Descargar la imagen (puedes luego usarla en RAW BT)
+      // ✍️ Texto en parte inferior (30%)
+      ctx.fillStyle = '#000000';
+      ctx.font = `${pxPerMm * 2.5}px sans-serif`; // Tamaño ajustado a mayor resolución
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const textX = canvasWidth / 2;
+      const textY = barcodeHeightPx + ((canvasHeight - barcodeHeightPx) / 2);
+
+      ctx.fillText(text, textX, textY);
+
+      // 💾 Descargar PNG
       canvas.toBlob((blob) => {
         if (blob) {
           const downloadUrl = URL.createObjectURL(blob);
@@ -89,6 +96,328 @@ printIn50mmPortablePrinterBt(barcodes: string[], belowText:string) {
     };
   });
 }
+
+
+
+
+  /*printIn50mmPortablePrinterBt(barcodes: string[], text: string) {*/
+  /*const pageWidthMm = 50;*/
+  /*const pageHeightMm = 25;*/
+
+  /*const pxPerMm = 8;*/
+  /*const canvasWidth = pageWidthMm * pxPerMm;*/
+  /*const canvasHeight = pageHeightMm * pxPerMm;*/
+
+  /*const barcodeHeightMm = pageHeightMm * 0.7;*/
+  /*const barcodeHeightPx = barcodeHeightMm * pxPerMm;*/
+
+  /*barcodes.forEach((code) => {*/
+    /*const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');*/
+    /*JsBarcode(svg, code, {*/
+      /*format: 'CODE128',*/
+      /*displayValue: false,*/
+      /*margin: 0,*/
+    /*});*/
+
+    /*const svgData = new XMLSerializer().serializeToString(svg);*/
+    /*const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });*/
+    /*const url = URL.createObjectURL(svgBlob);*/
+
+    /*const img = new Image();*/
+    /*img.src = url;*/
+
+    /*img.onload = () => {*/
+      /*const canvas = document.createElement('canvas');*/
+      /*canvas.width = canvasWidth;*/
+      /*canvas.height = canvasHeight;*/
+
+      /*const ctx = canvas.getContext('2d');*/
+      /*if (!ctx) {*/
+        /*console.error('Canvas no soportado');*/
+        /*return;*/
+      /*}*/
+
+      /*// 🎨 Fondo blanco*/
+      /*ctx.fillStyle = '#ffffff';*/
+      /*ctx.fillRect(0, 0, canvasWidth, canvasHeight);*/
+
+      /*// 🧾 Dibujar código de barras (70% alto)*/
+      /*const scale = canvasWidth / img.width;*/
+      /*const drawWidth = img.width * scale;*/
+      /*const drawHeight = img.height * scale;*/
+
+      /*const offsetX = 0;*/
+      /*const offsetY = 0;*/
+
+      /*ctx.drawImage(img, offsetX, offsetY, drawWidth, barcodeHeightPx);*/
+
+      /*// ✍️ Texto en parte inferior (30%)*/
+      /*ctx.fillStyle = '#000000';*/
+      /*ctx.font = `${pxPerMm * 2.5}px sans-serif`; // ≈20px*/
+      /*ctx.textAlign = 'center';*/
+      /*ctx.textBaseline = 'middle';*/
+
+      /*const textX = canvasWidth / 2;*/
+      /*const textY = barcodeHeightPx + ((canvasHeight - barcodeHeightPx) / 2);*/
+
+      /*ctx.fillText(text, textX, textY);*/
+
+      /*// 💾 Descargar PNG*/
+      /*canvas.toBlob((blob) => {*/
+        /*if (blob) {*/
+          /*const downloadUrl = URL.createObjectURL(blob);*/
+          /*const a = document.createElement('a');*/
+          /*a.href = downloadUrl;*/
+          /*a.download = `barcode-${code}.png`;*/
+          /*a.click();*/
+          /*URL.revokeObjectURL(downloadUrl);*/
+        /*} else {*/
+          /*console.error('No se pudo generar el PNG.');*/
+        /*}*/
+        /*URL.revokeObjectURL(url);*/
+      /*}, 'image/png');*/
+    /*};*/
+
+    /*img.onerror = (err) => {*/
+      /*console.error('Error cargando imagen del código:', code, err);*/
+      /*URL.revokeObjectURL(url);*/
+    /*};*/
+  /*});*/
+/*}*/
+
+
+
+
+
+//imprime el codigo sobre el texto
+
+
+/*printIn50mmPortablePrinterBt(barcodes: string[], text: string) {*/
+  /*const pageWidthMm = 50;*/
+  /*const barcodeHeightMm = 15;*/
+  /*const textAreaHeightMm = 12;*/
+  /*const pageHeightMm = barcodeHeightMm + textAreaHeightMm;*/
+
+  /*const pxPerMm = 8;*/
+  /*const canvasWidth = pageWidthMm * pxPerMm;*/
+  /*const canvasHeight = pageHeightMm * pxPerMm;*/
+  /*const barcodeHeightPx = barcodeHeightMm * pxPerMm;*/
+
+  /*barcodes.forEach((code) => {*/
+    /*const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');*/
+    /*JsBarcode(svg, code, {*/
+      /*format: 'CODE128',*/
+      /*displayValue: false,*/
+      /*margin: 0,*/
+    /*});*/
+
+    /*const svgData = new XMLSerializer().serializeToString(svg);*/
+    /*const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });*/
+    /*const url = URL.createObjectURL(svgBlob);*/
+
+    /*const img = new Image();*/
+    /*img.src = url;*/
+
+    /*img.onload = () => {*/
+      /*const canvas = document.createElement('canvas');*/
+      /*canvas.width = canvasWidth;*/
+      /*canvas.height = canvasHeight;*/
+
+      /*const ctx = canvas.getContext('2d');*/
+      /*if (!ctx) {*/
+        /*console.error('Canvas no soportado');*/
+        /*return;*/
+      /*}*/
+
+      /*// 🎨 Fondo blanco*/
+      /*ctx.fillStyle = '#ffffff';*/
+      /*ctx.fillRect(0, 0, canvasWidth, canvasHeight);*/
+
+      /*// 🔳 Dibujar código de barras (escalado al ancho)*/
+      /*const scale = canvasWidth / img.width;*/
+      /*const drawWidth = img.width * scale;*/
+      /*const drawHeight = img.height * scale;*/
+
+      /*const offsetX = 0;*/
+      /*const offsetY = 0;*/
+
+      /*ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);*/
+
+      /*// ✍️ Agregar texto debajo del código*/
+      /*ctx.fillStyle = '#000000';*/
+      /*ctx.font = `${pxPerMm * 2.5}px sans-serif`; // ≈20px*/
+      /*ctx.textAlign = 'center';*/
+      /*ctx.textBaseline = 'middle';*/
+
+      /*const textX = canvasWidth / 2;*/
+      /*const textY = barcodeHeightPx + ((canvasHeight - barcodeHeightPx) / 2); // mitad del área inferior*/
+
+      /*ctx.fillText(text, textX, textY);*/
+
+      /*// 💾 Descargar PNG*/
+      /*canvas.toBlob((blob) => {*/
+        /*if (blob) {*/
+          /*const downloadUrl = URL.createObjectURL(blob);*/
+          /*const a = document.createElement('a');*/
+          /*a.href = downloadUrl;*/
+          /*a.download = `barcode-${code}.png`;*/
+          /*a.click();*/
+          /*URL.revokeObjectURL(downloadUrl);*/
+        /*} else {*/
+          /*console.error('No se pudo generar el PNG.');*/
+        /*}*/
+        /*URL.revokeObjectURL(url);*/
+      /*}, 'image/png');*/
+    /*};*/
+
+    /*img.onerror = (err) => {*/
+      /*console.error('Error cargando imagen del código:', code, err);*/
+      /*URL.revokeObjectURL(url);*/
+    /*};*/
+  /*});*/
+/*}*/
+
+
+
+
+
+
+
+
+//esto imprime el texto
+/*printIn50mmPortablePrinterBt(barcodes: string[], text: string) {*/
+  /*// 📐 Tamaño del canvas en milímetros*/
+  /*const pageWidthMm = 50;*/
+  /*const pageHeightMm = 20;*/
+
+  /*// 📏 Conversión a pixeles (200 DPI ≈ 8 px/mm)*/
+  /*const pxPerMm = 8;*/
+  /*const canvasWidth = pageWidthMm * pxPerMm;*/
+  /*const canvasHeight = pageHeightMm * pxPerMm;*/
+
+  /*// 🖼️ Crear canvas*/
+  /*const canvas = document.createElement('canvas');*/
+  /*canvas.width = canvasWidth;*/
+  /*canvas.height = canvasHeight;*/
+
+  /*const ctx = canvas.getContext('2d');*/
+  /*if (!ctx) {*/
+    /*console.error('No se pudo crear el contexto del canvas');*/
+    /*return;*/
+  /*}*/
+
+  /*// 🎨 Fondo blanco*/
+  /*ctx.fillStyle = '#ffffff';*/
+  /*ctx.fillRect(0, 0, canvasWidth, canvasHeight);*/
+
+  /*// ✍️ Texto negro, centrado*/
+  /*ctx.fillStyle = '#000000';*/
+  /*ctx.font = `${pxPerMm * 2.5}px sans-serif`; // ≈20px*/
+  /*ctx.textAlign = 'center';*/
+  /*ctx.textBaseline = 'middle';*/
+
+  /*const textX = canvasWidth / 2;*/
+  /*const textY = canvasHeight / 2;*/
+
+  /*ctx.fillText(text, textX, textY);*/
+
+  /*// 💾 Descargar PNG*/
+  /*canvas.toBlob((blob) => {*/
+    /*if (blob) {*/
+      /*const downloadUrl = URL.createObjectURL(blob);*/
+      /*const a = document.createElement('a');*/
+      /*a.href = downloadUrl;*/
+      /*a.download = 'texto.png';*/
+      /*a.click();*/
+      /*URL.revokeObjectURL(downloadUrl);*/
+    /*} else {*/
+      /*console.error('No se pudo generar el PNG.');*/
+    /*}*/
+  /*}, 'image/png');*/
+/*}*/
+
+
+
+
+
+
+
+
+//perfecto pero sin texto
+
+/*printIn50mmPortablePrinterBt(barcodes: string[], belowText:string) {*/
+  /*console.log('Generando PNGs para impresión térmica 50mm FULL WIDTH:', barcodes);*/
+
+  /*// 📐 Ancho total del rollo (50 mm)*/
+  /*const pageWidthMm = 50;*/
+  /*const barcodeHeightMm = 15; // un poco más alto si quieres*/
+  /*const marginMm = 1; // margen lateral mínimo para que no se corte*/
+
+  /*// 📏 Resolución: 8 px/mm = ~200 DPI*/
+  /*const pxPerMm = 8;*/
+  /*const canvasWidth = pageWidthMm * pxPerMm; // 🔥 ahora usamos todo el ancho disponible*/
+  /*const canvasHeight = barcodeHeightMm * pxPerMm;*/
+
+  /*barcodes.forEach((code) => {*/
+    /*const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');*/
+    /*JsBarcode(svg, code, {*/
+      /*format: 'CODE128',*/
+      /*displayValue: true,*/
+      /*margin: 0, // sin margen interno, lo controlamos con el canvas*/
+    /*});*/
+
+    /*const svgData = new XMLSerializer().serializeToString(svg);*/
+    /*const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });*/
+    /*const url = URL.createObjectURL(svgBlob);*/
+    /*const img = new Image();*/
+    /*img.src = url;*/
+
+    /*img.onload = () => {*/
+      /*const canvas = document.createElement('canvas');*/
+      /*canvas.width = canvasWidth;*/
+      /*canvas.height = canvasHeight;*/
+
+      /*const ctx = canvas.getContext('2d');*/
+      /*if (!ctx) {*/
+        /*console.error('Canvas no soportado');*/
+        /*return;*/
+      /*}*/
+
+      /*// Fondo blanco*/
+      /*ctx.fillStyle = '#ffffff';*/
+      /*ctx.fillRect(0, 0, canvasWidth, canvasHeight);*/
+
+      /*// 🔍 Escalar el código para que use todo el ancho*/
+      /*const scale = canvasWidth / img.width;*/
+      /*const drawWidth = img.width * scale;*/
+      /*const drawHeight = img.height * scale;*/
+      /*const offsetX = 0;*/
+      /*const offsetY = (canvasHeight - drawHeight) / 2;*/
+
+      /*ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);*/
+
+      /*// 🔽 Descargar la imagen (puedes luego usarla en RAW BT)*/
+      /*canvas.toBlob((blob) => {*/
+        /*if (blob) {*/
+          /*const downloadUrl = URL.createObjectURL(blob);*/
+          /*const a = document.createElement('a');*/
+          /*a.href = downloadUrl;*/
+          /*a.download = `barcode-${code}.png`;*/
+          /*a.click();*/
+          /*URL.revokeObjectURL(downloadUrl);*/
+        /*} else {*/
+          /*console.error('No se pudo generar el PNG.');*/
+        /*}*/
+        /*URL.revokeObjectURL(url);*/
+      /*}, 'image/png');*/
+    /*};*/
+
+    /*img.onerror = (err) => {*/
+      /*console.error('Error cargando imagen del código:', code, err);*/
+      /*URL.revokeObjectURL(url);*/
+    /*};*/
+  /*});*/
+/*}*/
 
 
   /*printIn50mmPortablePrinterBt(barcodes: string[]) {*/

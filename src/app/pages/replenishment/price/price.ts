@@ -76,23 +76,23 @@ export class PricePage {
     private glpricesService : GlppricesService
   ) {}
 
-  printSelectedBarcodes(p: Product) {
-    const paddedId = p.id.toString().padStart(6, '0');
-    const selectedBarcodes = [paddedId];
-    this.barcodeService.printIn50mmPortablePrinterBt(selectedBarcodes);
-  }
+  /*printSelectedBarcodes(p: Product) {*/
+    /*const paddedId = p.id.toString().padStart(6, '0');*/
+    /*const selectedBarcodes = [paddedId];*/
+    /*this.barcodeService.printIn50mmPortablePrinterBt(selectedBarcodes);*/
+  /*}*/
 
   hash:string='';
   table:any
 
   rexDocument:any;
   glppricesList:any[]=[];
-  
-async ngOnInit() {
-  const ahora = new Date();
-  this.todayDate = this.formatFechaLatam(ahora);
-  this.getAllPrices();
-}
+    
+  async ngOnInit() {
+    const ahora = new Date();
+    this.todayDate = this.formatFechaLatam(ahora);
+    this.getAllPrices();
+  }
 
 
   getAllPrices(){

@@ -5,10 +5,11 @@ export interface Product {
   id: number;
   creado_en: string;               // ISO datetime string
   data: {
-    um: string;                    // unidad de medida (string porque viene "8")
+    um: string;     
     qty: number;
     name: string;
-    categ: number[];               // array de IDs numéricos
+    barcode: string;
+    categ: number[];
   };
 }
 
@@ -23,6 +24,7 @@ export const defaultProduct: Product = {
     um: "0",
     qty: 1,
     name: "",
+    barcode: "",
     categ: []
   }
 };
