@@ -37,32 +37,6 @@
 </ion-header>
 
 <ion-content>
-   <ion-grid class="user-table" *ngIf="!hasOwner">
-    <ion-row class="header">
-      <ion-col size="9">Nombre</ion-col>
-      <ion-col size="3" class="check-col">Select</ion-col>
-    </ion-row>
-    <ion-row *ngFor="let u of userList" class="user-row">
-      <ion-col size="9">
-        {{ u.data.name }}
-      </ion-col>
-      <ion-col size="3" class="check-col">
-        <ion-checkbox
-          (ionChange)="selectUser(u)"
-          mode="ios">
-        </ion-checkbox>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-
-<div *ngIf="hasOwner" style="width:100%;border-bottom: solid 1px #d5d5d5;padding: 10px;">
-  <ion-row *ngFor="let u of userList" style="width:100%; justify-content:center; display:flex;">
-    <span *ngIf="u.id == ownerId" style="text-align:center; width:100%;">
-      <b>{{ u.data.name }}</b>
-    </span>
-  </ion-row>
-</div>
-
   <ion-list>
     <ng-container *ngFor="let p of prodrexList">
       <ion-item button (click)="addToOrder(p)" lines="none" style="padding-top: 6px; padding-bottom: 6px;">
@@ -84,8 +58,41 @@
       </ion-item>
     </ng-container>
   </ion-list>
+  <br>
+  <ion-grid class="user-table" *ngIf="!hasOwner">
+    <ion-row class="header">
+      <ion-col size="9">Nombre</ion-col>
+      <ion-col size="3" class="check-col">Seleccionar</ion-col>
+    </ion-row>
+    <ion-row *ngFor="let u of userList" class="user-row">
+      <ion-col size="9">
+        {{ u.data.name }}
+      </ion-col>
+      <ion-col size="3" class="check-col">
+        <ion-checkbox
+          (ionChange)="selectUser(u)"
+          mode="ios">
+        </ion-checkbox>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
-  <app-signature></app-signature>
+  <div *ngIf="hasOwner" style="width:100%;border-bottom: solid 1px #d5d5d5;padding: 10px;">
+    <ion-row *ngFor="let u of userList" style="width:100%; justify-content:center; display:flex;">
+      <span *ngIf="u.id == ownerId" style="text-align:center; width:100%;">
+        <b>{{ u.data.name }}</b>
+      </span>
+    </ion-row>
+  </div>
+
+  <div class="button-right" style="padding-right: 12px;" >
+    <ion-button color="primary" (click)="markAsDelivered()">
+      <ion-icon name="checkbox-outline"></ion-icon>&nbsp; 
+    </ion-button>
+  </div>
+
+  
+  <!--<app-signature></app-signature>-->
 
 </ion-content>
 

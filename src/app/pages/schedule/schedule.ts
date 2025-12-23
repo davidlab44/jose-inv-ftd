@@ -61,9 +61,7 @@ export class SchedulePage{
     private prodrexService: ProdrexService,
     private rexService: RexService
   ) {
-  
     (window as any).productService=this.productService
-
   }
 
   updateSchedule(){}
@@ -115,10 +113,17 @@ export class SchedulePage{
     await this.loadUms();
     this.getProductById(87); 
     await this.loadProdrex();
-    this.rexService.getAll().subscribe({
+    this.rexService.getLast().subscribe({
       next: (response) => {
         this.rexDocument=response;
         console.log("response rex table",response)
+        if(response[0].state=='delivered'){
+          this.rexService.addRex().subscribe({
+            next: (response)=>{
+              console.log('rex posted',response);
+            }
+          })
+        }
       }
     })
   }
@@ -259,8 +264,6 @@ export class SchedulePage{
 
   addQty(value: number) {
     const requestedQty = Number(this.product?.data?.qty) - value;
-    console.log("requestedQty", value);
-    console.log("available QTY", this.product.data.qty);
     if (Number.isNaN(requestedQty)) {
       this.utilService.presentToast("allowedCant is NaN", "danger", 500);
       return;
@@ -273,7 +276,8 @@ export class SchedulePage{
   }
 
   confirmAction() {
-   this.prodrexService.addProdrexItem(this.product.id,this.extraQty,this.rexDocument[0].id).subscribe({
+    
+    this.prodrexService.addProdrexItem(this.product.id,this.extraQty,this.rexDocument[0].id).subscribe({
       next: (res) =>{
         console.log("res",res)
       }
@@ -296,7 +300,7 @@ export class SchedulePage{
   }
 
   exitApp() {
-    console.log('🛑 Saliendo de la app');
+    console.log('Saliendo de la app');
     window.location.href = 'https://www.google.com';
   }
 

@@ -75,7 +75,7 @@ export class ProdrexPage {
     private userService: UserService
   ) {}
 
- /* printSelectedBarcodes(p: Product) {*/
+  /* printSelectedBarcodes(p: Product) {*/
     /*const paddedId = p.id.toString().padStart(6, '0');*/
     /*const selectedBarcodes = [paddedId];*/
     /*this.barcodeService.downloadPDF(selectedBarcodes);*/
@@ -94,11 +94,14 @@ export class ProdrexPage {
       next: (response) => {
         this.rexDocument=response;
         console.log("response rex table",response)
+        if(response[0].status=='delivered'){
+          
+        } 
       }
     })
 
   }
-
+  
   userList:any[]=[];
   loadUsers(){
     this.userService.getAll().subscribe({
@@ -164,9 +167,7 @@ export class ProdrexPage {
         } 
       }); 
     }   
-        
     ums: any[] = []; 
-        
     loadUms() {                
       this.umService.getAllUms().subscribe({ 
         next: (res) => {       
@@ -277,7 +278,7 @@ export class ProdrexPage {
   ownerId=0
   selectUser(u){
     console.log("component u pasado",u)
-    this.rexService.addUserOwner(this.rexDocument[0],u.id).subscribe({
+    this.rexService.patchUserOwner(this.rexDocument[0],u.id).subscribe({
       next: (res) =>{
         console.log("res para usar",res)
         if(res[0].data.id_user > 0){
@@ -288,6 +289,40 @@ export class ProdrexPage {
     })
   }
 
+  removeFromProdrex(id:any){
+    this.prodrexService.removeFromProdrex(id).subscribe({
+      next: (response)=>{
+        console.log('prodrex deleted',response);
+        
+        this.prodrexService.getAll().subscribe({                                                                                
+          next: response=>{
+            this.prodrexList=response;      
+            console.log("getProdRexList",response)
+          }
+        })
+
+        this.rexService.getAll().subscribe({
+          next: (response) => {
+            this.rexDocument=response;
+            console.log("response rex table",response)
+          }
+        })
+      }
+    });
+  }
+
+  addToOrder(p){
+    console.log('p',p)
+  }
+
+
+  markAsDelivered(){
+    this.rexService.markAsDelivered(this.rexDocument[0]).subscribe({
+      next: (response)=>{
+        console.log('markAsDelivered response',response)
+      }
+    });
+  }
 
 }
 

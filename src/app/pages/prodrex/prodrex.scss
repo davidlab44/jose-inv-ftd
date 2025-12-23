@@ -7,6 +7,13 @@
   }
 }
 
+.button-right {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  padding: 8px 0;
+}
+
 .subheader-toolbar {
   --min-height: 32px;   /* más delgado que un toolbar normal */
 }
@@ -41,6 +48,7 @@
     justify-content: center;
     align-items: center;
   }
+
 }
 
 

@@ -22,7 +22,6 @@ export class ProdrexService {
     return this.http.get<any[]>(`${this.apiUrl}/prodrex`);
   }
 
-
   addProdrexItem(productId: number,qty:number,rexDocumentId:number): Observable<any> {
     console.log("id pasado", productId);
     console.log("rexDocument10 id pasado", rexDocumentId);
@@ -31,7 +30,7 @@ export class ProdrexService {
       data: {
         id_product: productId,
         id_rex: rexDocumentId,
-        qty:qty
+        qty:qty,
       }
     };
     return this.http.post(url, item, {
@@ -41,7 +40,7 @@ export class ProdrexService {
       }
     });
   }
-
+  
 
   addProdrexItems(items: any[]): Observable<any> {
     console.log("request",items)

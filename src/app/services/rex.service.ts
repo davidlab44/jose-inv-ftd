@@ -12,8 +12,13 @@ export class RexService {
 
   constructor(private http: HttpClient) {}
 
+
   getAll(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/rex`);
+  }
+
+  getLast(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/rex?order=id.desc&limit=1`);
   }
 
   getProdrexList(rexId: number): Observable<any[]> {
@@ -22,48 +27,58 @@ export class RexService {
     );
   }
 
-  addUserOwner(rex:any,id_user:number): Observable<any> {
-    console.log("rex pasadox", rex);
-    console.log("id_product pasadox", id_user);
+
+  addRex(): Observable<any> {
     const url = `${this.apiUrl}/rex?select=*`;
-    rex.data.id_user = id_user;
-    console.log("rex que se enviara",rex);
-    return this.http.patch(url, rex, {
+    const item = {
+      status:'draft',
+      data: {
+        id_user: null,
+      }
+    };
+    return this.http.post(url, item, {
       headers: {
         'Content-Type': 'application/json',
         'Prefer': 'return=representation'
       }
     });
   }
+ 
 
 
-/*  addProdrexItem(id: number,rexId:number): Observable<any> {*/
-    /*console.log("id pasado", id);*/
-    /*console.log("rexDocument3 id pasado", rexId);*/
-    /*const url = `${this.apiUrl}/prodrex?select=*`;*/
-    /*const item = {*/
-      /*data: {*/
-        /*id_product: id,*/
-        /*id_rex: rexId*/
-      /*}*/
-    /*};*/
-    /*return this.http.post(url, item, {*/
-      /*headers: {*/
-        /*'Content-Type': 'application/json',*/
-        /*'Prefer': 'return=representation'*/
-      /*}*/
-    /*});*/
-  /*}*/
 
-  /*addProdrexItems(items: any[]): Observable<any> {*/
-    /*console.log("request",items)*/
-    /*const url = `${this.apiUrl}/prodrex`;*/
-    /*return this.http.post(url, items, {*/
-      /*headers: {*/
-        /*'Content-Type': 'application/json'*/
-      /*}*/
-    /*});*/
-  /*}*/
+  patchUserOwner(rex:any,id_user:number): Observable<any> {
+    //console.log("rex pasadox", rex);
+    //console.log("id_product pasadox", id_user);
+    const url = `${this.apiUrl}/rex?select=*`;
+    rex.data.id_user = id_user;
+    rex.state = 'draft';
+    console.log("rex que se enviara",rex);
+    console.log("url",url);
+    return this.http.patch(url, rex, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      }
+    });  
+  }
+
+  changeUserOwner(){}
+  
+  markAsDelivered(rex:any){
+    //console.log("rex pasadox", rex);
+    const url = `${this.apiUrl}/rex?select=*`;
+    rex.state = 'delivered';
+    console.log("rex que se sendiara",rex);
+    return this.http.patch(url, rex, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      }
+    }); 
+  }
+
+
 
 }
 

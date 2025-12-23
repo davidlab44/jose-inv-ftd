@@ -94,7 +94,6 @@ export class PricePage {
     this.getAllPrices();
   }
 
-
   getAllPrices(){
     this.glpricesService.getAll().subscribe({
       next: (response) => {
@@ -109,7 +108,6 @@ export class PricePage {
   }
 
   numero: number;
-
   valor:number=0
   mostrarValor() {
     console.log('Valor ingresado:', this.valor);
@@ -118,6 +116,7 @@ export class PricePage {
   mostrarNumero() {
     console.log("Número ingresado:", this.numero);
   }
+  
   updateSchedule(){
      
   }
@@ -138,28 +137,24 @@ export class PricePage {
   }
 
   get currentPrice() {
-  return this.importado ? this.lastImportedPrice : this.lastGlpprice;
-}
-
-
-
-lastGlpprice: any = null;
-getMaxIdItem(items: any[]) {
-  const filtered = items.filter(i => i.data?.id_replenishment_product === 1);
-
-  if (filtered.length === 0) {
-    this.lastGlpprice = null;
-    return null;
+    return this.importado ? this.lastImportedPrice : this.lastGlpprice;
   }
 
-  this.lastGlpprice = filtered.reduce((max, item) =>
-    item.id > max.id ? item : max
-  );
-}
+  lastGlpprice: any = null;
+  getMaxIdItem(items: any[]) {
+    const filtered = items.filter(i => i.data?.id_replenishment_product === 1);
 
+    if (filtered.length === 0) {
+      this.lastGlpprice = null;
+      return null;
+    }
 
+    this.lastGlpprice = filtered.reduce((max, item) =>
+      item.id > max.id ? item : max
+    );
+  }
 
-/*  getMaxIdItem(items: any[]){*/
+  /*  getMaxIdItem(items: any[]){*/
     /*if (!items || items.length === 0) {*/
       /*return null; // No hay elementos*/
     /*}*/
@@ -184,7 +179,6 @@ getMaxIdItem(items: any[]) {
     );
     console.log("lastImportedPrice.data", this.lastImportedPrice.data);
   }
-
 
   getFormatedDate(){
     return
@@ -224,26 +218,6 @@ getMaxIdItem(items: any[]) {
     if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
     const horasTexto = String(horas).padStart(2, '0');
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
-  }
-
-  selectUsers(){
-    //console.log("userList",this.userList)    
-    this.ownerId=0;
-    this.hasOwner=false;
-  }
-
-  ownerId=0
-  selectUser(u){
-    //console.log("component u pasado",u)
-    this.rexService.addUserOwner(this.rexDocument[0],u.id).subscribe({
-      next: (res) =>{
-        console.log("res para usar",res)
-        if(res[0].data.id_user > 0){
-          this.ownerId=res[0].data.id_user;
-          this.hasOwner=true;
-        } 
-      }
-    })
   }
 
 
