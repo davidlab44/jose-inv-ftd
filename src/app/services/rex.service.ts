@@ -44,6 +44,17 @@ export class RexService {
     });
   }
  
+  
+  addUserOwner(rex:any,id_user:number): Observable<any> {
+    const url = `${this.apiUrl}/rex?select=*`;
+    rex.data.id_user = id_user;
+    return this.http.patch(url, rex, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      }
+    });
+  }
 
 
 

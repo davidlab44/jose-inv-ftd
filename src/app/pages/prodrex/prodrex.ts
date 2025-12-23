@@ -94,9 +94,7 @@ export class ProdrexPage {
       next: (response) => {
         this.rexDocument=response;
         console.log("response rex table",response)
-        if(response[0].status=='delivered'){
-          
-        } 
+         
       }
     })
 
@@ -278,7 +276,7 @@ export class ProdrexPage {
   ownerId=0
   selectUser(u){
     console.log("component u pasado",u)
-    this.rexService.patchUserOwner(this.rexDocument[0],u.id).subscribe({
+    this.rexService.addUserOwner(this.rexDocument[0],u.id).subscribe({
       next: (res) =>{
         console.log("res para usar",res)
         if(res[0].data.id_user > 0){
