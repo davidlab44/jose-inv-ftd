@@ -47,21 +47,16 @@ export class RexService {
 
 
 
-  patchUserOwner(rex:any,id_user:number): Observable<any> {
-    //console.log("rex pasadox", rex);
-    //console.log("id_product pasadox", id_user);
-    const url = `${this.apiUrl}/rex?select=*`;
-    rex.data.id_user = id_user;
-    rex.state = 'draft';
-    console.log("rex que se enviara",rex);
-    console.log("url",url);
-    return this.http.patch(url, rex, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
-      }
-    });  
-  }
+  /*patchRex(rex:any,qty:number): Observable<any> {*/
+    /*const url = `${this.apiUrl}/product?select=*`;*/
+    /*rex.data.qty = qty;*/
+    /*return this.http.patch(url, rex, {*/
+      /*headers: {*/
+        /*'Content-Type': 'application/json',*/
+        /*'Prefer': 'return=representation'*/
+      /*}*/
+    /*});  */
+  /*}*/
 
   changeUserOwner(){}
   

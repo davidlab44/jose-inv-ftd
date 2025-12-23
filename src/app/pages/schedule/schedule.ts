@@ -121,6 +121,12 @@ export class SchedulePage{
           this.rexService.addRex().subscribe({
             next: (response)=>{
               console.log('rex posted',response);
+              this.rexService.getLast().subscribe({
+                next: (r)=>{
+                  console.log('getLast',r);
+                  this.rexDocument=response;
+                }
+              })
             }
           })
         }
