@@ -20,6 +20,7 @@ import { UmService } from '../../services/um.service';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { RexService } from '../../services/rex.service';
 import { ProdrexService } from '../../services/prodrex.service';
+import { Product, defaultProduct } from '../../interfaces/product';
 
 @Component({
   selector: 'page-schedule',
@@ -116,7 +117,7 @@ export class SchedulePage{
     this.rexService.getLast().subscribe({
       next: (response) => {
         this.rexDocument=response;
-        console.log("response rex table",response)
+        //console.log("response rex table",response)
         if(response[0].state=='delivered'){
           this.rexService.addRex().subscribe({
             next: (response)=>{
@@ -188,23 +189,25 @@ export class SchedulePage{
         video.srcObject.getTracks().forEach(track => track.stop());
         video.srcObject = null;
       }
-      console.log('Escaneo detenido correctamente');
+      //console.log('Escaneo detenido correctamente');
     } catch (e) {
       console.warn('Error al detener la cámara:', e);
     }
   }
 
-  product:any
+  prdct:any
   getProductById(id: number) {
     this.productService.getProductById(id).subscribe(data => {
-      this.product = data[0];
+      this.prdct = data[0];
+      this.extraQty=0;
       //console.log("getProductById", this.product);
     });
   }
 
   getProductByBarcode(barcode: number) {
     this.productService.getProductByBarcode(barcode).subscribe(data => {
-      this.product = data[0];
+      this.prdct = data[0];
+      this.extraQty=0;
     });
   }
 
@@ -228,7 +231,7 @@ export class SchedulePage{
       next: (res) => {
         this.prodrexList = res;
         //this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage
-        console.log("res",res)
+        //console.log("res",res)
       },
       error: (err) => {
         console.error('❌ Error al cargar categorías:', err);
@@ -269,7 +272,10 @@ export class SchedulePage{
   }
 
   addQty(value: number) {
-    const requestedQty = Number(this.product?.data?.qty) - value;
+    //console.log('2product',this.prdct)
+    //console.log('value',value)
+    value = value + this.extraQty;
+    const requestedQty = Number(this.prdct?.data?.qty) - value;
     if (Number.isNaN(requestedQty)) {
       this.utilService.presentToast("allowedCant is NaN", "danger", 500);
       return;
@@ -282,18 +288,33 @@ export class SchedulePage{
   }
 
   confirmAction() {
-    
-    this.prodrexService.addProdrexItem(this.product.id,this.extraQty,this.rexDocument[0].id).subscribe({
-      next: (res) =>{
-        console.log("res",res)
+    //console.log('3product to update qty',this.prdct);
+    this.prdct.data.qty= this.prdct.data.qty-this.extraQty;
+    //console.log('4product to update qty',this.prdct);
+     this.productService.updateProductQty(this.prdct.id,this.prdct).subscribe({
+      next: (r)=>{
+        console.log('patchProduct qty response',r)
+        this.prodrexService.addProdrexItem(this.prdct.id,this.extraQty,this.rexDocument[0].id).subscribe({
+          next: (res) =>{
+            console.log("res",res)
+            this.prodrexService.getAll().subscribe({
+              next: (r)=>{
+                //console.log('prodService refresh response',r)
+                //this.getProductById(87);
+                this.prdct=defaultProduct;
+                this.scannedValue='';
+              }
+            })
+          }
+        })
       }
-    })
+    });
   }
 
   updateProductQty(productId:number,data:any){
     this.productService.updateProductQty(productId, data).subscribe({
       next: (res) => {
-        console.log('Cantidad actualizada:', res);
+        //console.log('Cantidad actualizada:', res);
       },
       error: (err) => {
         console.error('Error al actualizar cantidad:', err);

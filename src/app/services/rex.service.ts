@@ -44,11 +44,28 @@ export class RexService {
     });
   }
  
-  
-  addUserOwner(rex:any,id_user:number): Observable<any> {
-    const url = `${this.apiUrl}/rex?select=*`;
-    rex.data.id_user = id_user;
-    return this.http.patch(url, rex, {
+  /*addUserOwner(rex: any, id_user: number): Observable<any> {*/
+
+  /*// WHERE id = 1 (hardcoded)*/
+  /*const url = `${this.apiUrl}/rex?id=eq.1&select=*`;*/
+
+  /*// Solo enviar los campos que se van a actualizar*/
+  /*const body = {*/
+    /*id_user: id_user*/
+  /*};*/
+
+  /*return this.http.patch(url, body, {*/
+    /*headers: {*/
+      /*'Content-Type': 'application/json',*/
+      /*'Prefer': 'return=representation'*/
+    /*}*/
+  /*});*/
+/*}*/
+
+  addUserOwner(body:any,id_user:number): Observable<any> {
+    const url = `${this.apiUrl}/rex?id=eq.${body.id}&select=*`;
+    body.data.id_user = id_user;
+    return this.http.patch(url, body, {
       headers: {
         'Content-Type': 'application/json',
         'Prefer': 'return=representation'

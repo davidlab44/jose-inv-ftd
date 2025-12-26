@@ -22,7 +22,7 @@ export const defaultProduct: Product = {
   creado_en: new Date().toISOString(),
   data: {
     um: "0",
-    qty: 1,
+    qty: 0,
     name: "",
     barcode: "",
     categ: []

@@ -93,8 +93,7 @@ export class ProdrexPage {
     this.rexService.getAll().subscribe({
       next: (response) => {
         this.rexDocument=response;
-        console.log("response rex table",response)
-         
+        //console.log("response rex table",response)
       }
     })
 
@@ -127,7 +126,7 @@ export class ProdrexPage {
     this.prodrexService.getAll().subscribe({
       next: response=>{
         this.prodrexList=response;
-        console.log("getProdRexList",response)
+        //console.log("getProdRexList",response)
       }
     })
   }
@@ -138,7 +137,7 @@ export class ProdrexPage {
     this.productService.getAllProducts().subscribe({
       next: response => {
         this.productList=response;
-        console.log('products By Cat',this.productList)
+        //console.log('products By Cat',this.productList)
       },
       error: error => console.error('Error:', error),
       complete: () => {}
@@ -223,7 +222,7 @@ export class ProdrexPage {
 
 
   getProductNameById(id: number | string | null | undefined): string {
-    console.log("id product pasado", id);
+    //console.log("id product pasado", id);
 
     if (id === null || id === undefined) return 'Sin Nombre';
 
@@ -287,32 +286,42 @@ export class ProdrexPage {
     })
   }
 
-  removeFromProdrex(id:any){
-    this.prodrexService.removeFromProdrex(id).subscribe({
-      next: (response)=>{
-        console.log('prodrex deleted',response);
-        
-        this.prodrexService.getAll().subscribe({                                                                                
-          next: response=>{
-            this.prodrexList=response;      
-            console.log("getProdRexList",response)
-          }
-        })
-
-        this.rexService.getAll().subscribe({
-          next: (response) => {
-            this.rexDocument=response;
-            console.log("response rex table",response)
+  removeFromProdrex(prdct:any){
+    this.productService.getProductById(prdct.data.id_product).subscribe({
+      next: (r)=>{
+        r[0].data.qty=Number(r[0].data.qty)+Number(prdct.data.qty);
+        console.log('r[0]',r[0].data)
+        this.productService.patch(r[0].id,r[0].data).subscribe({
+          next: (r)=>{
+            console.log('updated',r)
+            this.prodrexService.removeFromProdrex(prdct.id).subscribe({
+              next: (response)=>{
+                console.log('prodrex deleted',response);
+                this.prodrexService.getAll().subscribe({
+                  next: response=>{
+                    this.prodrexList=response;
+                    console.log("getProdRexList",response)
+                  }
+                })
+                this.rexService.getAll().subscribe({
+                  next: (response) => {
+                    this.rexDocument=response;
+                    console.log("response rex table",response)
+                  }
+                })
+              }
+            });
           }
         })
       }
-    });
+    })
+    //actualizar la cantidad (updateqty)
+    //eliminar el producto
   }
 
   addToOrder(p){
     console.log('p',p)
   }
-
 
   markAsDelivered(){
     this.rexService.markAsDelivered(this.rexDocument[0]).subscribe({
@@ -321,6 +330,8 @@ export class ProdrexPage {
       }
     });
   }
+
+
 
 }
 

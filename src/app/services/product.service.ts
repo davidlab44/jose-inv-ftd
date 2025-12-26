@@ -94,20 +94,23 @@ export class ProductService {
   }
 
   updateProductQty(id: number, updatedProduct: any): Observable<any> {
+    //console.log('request updateProductQty',updatedProduct);
     const url = `${this.apiUrl}/product?id=eq.${id}`;
     const body = { data: updatedProduct.data };
+    console.log('request url',url)
+    console.log('request id',id)
+    console.log('request body',body)
     return this.http.patch(url, body, {
       headers: { 'Content-Type': 'application/json' }
     });
   }
 
   patch(id: number, updatedElement: any): Observable<any> {
-    console.log("id",id)
-    console.log("updatedElement",updatedElement)
     const url = `${this.apiUrl}/product?id=eq.${id}`;
     const body = {
       data: updatedElement
     };
+    //console.log("request patch body",body)
     return this.http.patch(url, body, {
       headers: {
         'Content-Type': 'application/json',
