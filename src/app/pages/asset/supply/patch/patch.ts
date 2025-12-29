@@ -102,6 +102,21 @@ export class AssetSupplyPatchPage {
     console.log("Formulario inicializado:", this.form.value);
   }
 
+  ionViewWillEnter(){
+    this.loadCategories();
+    this.loadUms();
+    this.form = this.fb.group({
+      id: [this.assetSupplyProduct.id],
+      categ: [this.assetSupplyProduct.data.categ[0]],
+      name: [this.assetSupplyProduct.data.name],
+      barcode: [this.assetSupplyProduct.data.barcode],
+      qty: [this.assetSupplyProduct.data.qty],
+      um: [this.assetSupplyProduct.data.um],
+    });
+    console.log("Formulario inicializado:", this.form.value);
+
+  }
+
   patch() {
     const payload = this.form.value;
     const id = payload.id;
@@ -119,10 +134,41 @@ export class AssetSupplyPatchPage {
       next: (r) => {
         console.log("PATCH OK:", r);
         this.utilService.presentToast("cant: "+r[0].data.qty+" "+r[0].data.name)
+        this.resetForm();
+       this.utilService.presentToast('resetForm')
+       this.router.navigate(['/app/tabs/asset-supply-readprdct']);
       },
       error: (e) => console.error("PATCH ERROR:", e),
     });
   }
+
+  resetForm(): void {
+    this.form.reset({
+      id: 0,
+      categ: null,
+      name: '',
+      barcode: '',
+      qty: 1,
+      um: null
+    });
+  }
+
+
+  /*ngViewDidEnter(){*/
+    /*this.loadCategories();*/
+    /*this.loadUms();*/
+    /*this.form = this.fb.group({*/
+      /*id: [this.assetSupplyProduct.id],*/
+      /*categ: [this.assetSupplyProduct.data.categ[0]],*/
+      /*name: [this.assetSupplyProduct.data.name],*/
+      /*barcode: [this.assetSupplyProduct.data.barcode],*/
+      /*qty: [this.assetSupplyProduct.data.qty],*/
+      /*um: [this.assetSupplyProduct.data.um],*/
+    /*});*/
+    /*console.log("Formulario inicializado:", this.form.value);*/
+
+  /*}*/
+  
 
   /*patch() {*/
     /*const payload = this.form.value;*/

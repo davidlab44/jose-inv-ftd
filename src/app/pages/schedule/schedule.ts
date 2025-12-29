@@ -274,14 +274,21 @@ export class SchedulePage{
   addQty(value: number) {
     //console.log('2product',this.prdct)
     //console.log('value',value)
-    value = value + this.extraQty;
-    const requestedQty = Number(this.prdct?.data?.qty) - value;
-    if (Number.isNaN(requestedQty)) {
-      this.utilService.presentToast("allowedCant is NaN", "danger", 500);
+    //const availableQty = Number(this.prdct?.data?.qty) - value;
+    const availableQty = Number(this.prdct?.data?.qty);
+    console.log('requestedQty',value+this.extraQty)
+    console.log('availableQty',availableQty)
+    if (Number.isNaN(availableQty)) {
+      this.utilService.presentToast("availableQty is NaN", "danger", 500);
       return;
     }
-    if (requestedQty >= 0) {
-      this.extraQty += value;
+    if((value+this.extraQty)>availableQty){
+      this.utilService.presentToast("not such Qty available", "danger", 500);
+      return;
+    
+    }
+    if (availableQty >= 0) {
+      this.extraQty = this.extraQty+value
     } else {
       this.utilService.presentToast("No tiene suficiente stock", "danger", 1000);
     }

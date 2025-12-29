@@ -21,6 +21,9 @@ import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { RexService } from '../../../../services/rex.service';
+import { IonSearchbar } from '@ionic/angular';
+
+
 
 @Component({
   selector: 'page-readprdct',
@@ -29,6 +32,9 @@ import { RexService } from '../../../../services/rex.service';
 })
 export class AssetSupplyReadprdctPage {
 
+
+
+@ViewChild('searchbar', { static: false }) searchbar!: IonSearchbar;
   ios: boolean;
   segment = 'all';
   showSearchbar: boolean;
@@ -78,9 +84,18 @@ export class AssetSupplyReadprdctPage {
 filteredCategories: any[] = [];
 filteredProductsByCategory: any[] = [];
 
+
+  async ngOnInit(){
+    this.refreshView();
+  }
+
+  async ionViewWillEnter(){
+    this.refreshView();
+  }
+
   hash:string='';
   table:any
-  async ngOnInit() {
+  async refreshView() {
     console.log("ngOnInit")
     await this.loadCategories();
     await this.loadUms();
@@ -91,11 +106,7 @@ filteredProductsByCategory: any[] = [];
       debounceTime(500),
       distinctUntilChanged(),
 
-
-
-
       tap(text => {
-
 
         const query = text.trim().toLowerCase();
         if (query.length === 0) {
@@ -103,7 +114,6 @@ filteredProductsByCategory: any[] = [];
           console.log("Restaurando primeros 20 productos:", this.productList);
           return; 
         }
-
 
         this.filteredCategories = this.categories.filter(cat => {
             const nombre = cat?.data?.nombre?.toLowerCase() || "";
@@ -142,6 +152,8 @@ filteredProductsByCategory: any[] = [];
     });
 
   }
+
+
 
 
   updateSchedule(){
@@ -303,8 +315,15 @@ filteredProductsByCategory: any[] = [];
       ['/app/tabs/asset-supply-patch'],
       { state: { item } }
     );
+    this.clearSearch();
   }
-  
+
+  clearSearch(): void {
+    console.log('searchSubject',this.searchSubject.next )
+    this.searchbar.ionClear;
+    this.searchSubject.next(''); // restaura lista
+  }
+
   delete(p){
     this.productService.delete(p.id).subscribe({
       next: (response)=>{
