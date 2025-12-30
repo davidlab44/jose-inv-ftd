@@ -70,7 +70,13 @@ export class SchedulePage{
   hash:string='';
   table:any
 
+
+
   ngOnInit() {
+    this.refreshView();
+  }
+
+  refreshView() {
     const myUrl = window.location.href;
     //console.log('URL actual:', myUrl);
       /*    const urlsPermitidas = [*/
@@ -138,6 +144,7 @@ export class SchedulePage{
   componentsEnabled: boolean = true;
   scannedValue: string = '';
   async startScan() {
+    this.refreshView();
     try {
       const devices = await BrowserMultiFormatReader.listVideoInputDevices();
       if (!devices.length) {
@@ -199,15 +206,14 @@ export class SchedulePage{
   getProductById(id: number) {
     this.productService.getProductById(id).subscribe(data => {
       this.prdct = data[0];
-      this.extraQty=0;
-      //console.log("getProductById", this.product);
+      //this.extraQty=0;
     });
   }
-
+  
   getProductByBarcode(barcode: number) {
     this.productService.getProductByBarcode(barcode).subscribe(data => {
       this.prdct = data[0];
-      this.extraQty=0;
+      //this.extraQty=0;
     });
   }
 
@@ -267,17 +273,16 @@ export class SchedulePage{
   }
 
   extraQty = 0;
-  clearQty() {
-    this.extraQty = 0;
-  }
+  /*clearQty() {*/
+    /*this.extraQty = 0;*/
+  /*}*/
 
   addQty(value: number) {
-    //console.log('2product',this.prdct)
-    //console.log('value',value)
+    console.log('2product',this.prdct)
+    console.log('2value',value)
     //const availableQty = Number(this.prdct?.data?.qty) - value;
     const availableQty = Number(this.prdct?.data?.qty);
-    console.log('requestedQty',value+this.extraQty)
-    console.log('availableQty',availableQty)
+    this.utilService.presentToast('requestedQty '+value+this.extraQty)
     if (Number.isNaN(availableQty)) {
       this.utilService.presentToast("availableQty is NaN", "danger", 500);
       return;
@@ -285,7 +290,6 @@ export class SchedulePage{
     if((value+this.extraQty)>availableQty){
       this.utilService.presentToast("not such Qty available", "danger", 500);
       return;
-    
     }
     if (availableQty >= 0) {
       this.extraQty = this.extraQty+value

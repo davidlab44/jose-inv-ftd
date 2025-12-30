@@ -84,15 +84,37 @@ export class ProdrexPage {
   hash:string='';
   table:any
   rexDocument:any;
-  async ngOnInit() {
+  async ngOnInit(){
+    this.refreshView();
+  }
+
+  async refreshView() {
     await this.loadCategories();
     await this.loadUms();
     const ahora = new Date();
     this.todayDate=this.formatFechaLatam(ahora);
     this.loadUsers();
-    this.rexService.getAll().subscribe({
+    this.rexService.getLast().subscribe({
       next: (response) => {
-        this.rexDocument=response;
+        if(response && response.length && response.length>0){
+          console.log('getLast RSPNS',response)
+          if(response[0].state=='draft'){
+            this.rexDocument=response;
+            this.utilService.presentToast('this.rexdocument',response)
+          }else{
+            this.utilService.presentToast('creando rex')
+            this.rexService.addRex().subscribe({
+              next: (r)=>{
+                console.log('addRex response ',r)
+                this.rexService.getLast().subscribe({
+                  next: (res)=>{
+                    console.log('getLast res response',res)
+                  }
+                })
+              }
+            })
+          }
+        }
         //console.log("response rex table",response)
       }
     })
@@ -121,16 +143,28 @@ export class ProdrexPage {
     });
   }
 
+
+  ionViewDidEnter(){
+    this.refreshProdrexList();
+  }
+
   prodrexList:any[]=[];
-  ionViewDidEnter() {
+  refreshProdrexList() {
     this.prodrexService.getAll().subscribe({
       next: response=>{
-        this.prodrexList=response;
-        //console.log("getProdRexList",response)
+        if(this.rexDocument.length && this.rexDocument.length>0){
+          response.forEach(prodrex => {
+            if(prodrex.data.id_rex==this.rexDocument[0].id){
+              this.prodrexList.push(prodrex);
+            }
+          });
+        }else{
+          this.utilService.presentToast('rexDocument is empty')
+        }
       }
     })
   }
-
+  
   posCategId:number=0
   productList:Product[]=[];
   getAllProducts() {
@@ -223,19 +257,14 @@ export class ProdrexPage {
 
   getProductNameById(id: number | string | null | undefined): string {
     //console.log("id product pasado", id);
-
     if (id === null || id === undefined) return 'Sin Nombre';
-
     const idNum = Number(id);
     if (isNaN(idNum)) return 'Sin Nombre';
-
     if (!Array.isArray(this.productListCaos) || this.productListCaos.length === 0) {
       return 'Sin Nombre';
     }
-
     const product = this.productListCaos.find(p => Number(p.id) === idNum);
     if (!product) return 'Sin Nombre';
-
     const name = product?.data?.name;
     if (typeof name === 'string' && name.trim() !== '') {
       return name;
@@ -273,18 +302,33 @@ export class ProdrexPage {
   }
 
   ownerId=0
-  selectUser(u){
-    console.log("component u pasado",u)
-    this.rexService.addUserOwner(this.rexDocument[0],u.id).subscribe({
-      next: (res) =>{
-        console.log("res para usar",res)
-        if(res[0].data.id_user > 0){
-          this.ownerId=res[0].data.id_user;
-          this.hasOwner=true;
-        } 
-      }
-    })
+  selectUser(u: any) {
+    const rexId = this.rexDocument[0].id;
+    this.rexService.addUserOwner(rexId, u.id).subscribe({
+      next: (res) => {
+        if (res?.length && res[0]?.data?.id_user > 0) {
+          this.ownerId = res[0].data.id_user;
+          this.hasOwner = true;
+        }
+      },
+      error: err => console.error(err)
+    });
   }
+
+  /*ownerId=0*/
+  /*selectUser(u){*/
+    /*console.log("component u pasado",u)*/
+    /*console.log("rexDocument[0]",this.rexDocument)*/
+    /*this.rexService.addUserOwner(this.rexDocument[0],u.id).subscribe({*/
+      /*next: (res) =>{*/
+        /*console.log("res para usar",res)*/
+        /*if(res[0].data.id_user > 0){*/
+          /*this.ownerId=res[0].data.id_user;*/
+          /*this.hasOwner=true;*/
+        /*} */
+      /*}*/
+    /*})*/
+  /*}*/
 
   removeFromProdrex(prdct:any){
     this.productService.getProductById(prdct.data.id_product).subscribe({
@@ -324,13 +368,13 @@ export class ProdrexPage {
   }
 
   markAsDelivered(){
-    this.rexService.markAsDelivered(this.rexDocument[0]).subscribe({
+    this.rexService.markAsDelivered(this.rexDocument[0].id,'delivered').subscribe({
       next: (response)=>{
         console.log('markAsDelivered response',response)
+        this.router.navigate(['/app/tabs/schedule']);
       }
     });
   }
-
 
 
 }

@@ -17,6 +17,17 @@ export class RexService {
     return this.http.get<any[]>(`${this.apiUrl}/rex`);
   }
 
+
+  getAllOrderByDesc(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/rex`);
+  }
+
+  /*getLastOne(): Observable<any[]> {*/
+    /*return this.http.get<any[]>(*/
+      /*`${this.apiUrl}/rex?order=id.desc&limit=1`*/
+    /*);*/
+  /*}*/
+
   getLast(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/rex?order=id.desc&limit=1`);
   }
@@ -27,17 +38,18 @@ export class RexService {
     );
   }
 
-
   addRex(): Observable<any> {
     const url = `${this.apiUrl}/rex?select=*`;
     const item = {
-      status:'draft',
+      state:'draft',
       data: {
         id_user: null,
       }
     };
+    console.log('url',url)
+    console.log('item',item)
     return this.http.post(url, item, {
-      headers: {
+         headers: {
         'Content-Type': 'application/json',
         'Prefer': 'return=representation'
       }
@@ -62,9 +74,31 @@ export class RexService {
   /*});*/
 /*}*/
 
-  addUserOwner(body:any,id_user:number): Observable<any> {
-    const url = `${this.apiUrl}/rex?id=eq.${body.id}&select=*`;
-    body.data.id_user = id_user;
+  /*addUserOwner(body:any,id_user:number): Observable<any> {*/
+    /*const url = `${this.apiUrl}/rex?id=eq.${body.id}&select=*`;*/
+    /*body.data.id_user = id_user;*/
+    /*return this.http.patch(url, body, {*/
+      /*headers: {*/
+        /*'Content-Type': 'application/json',*/
+        /*'Prefer': 'return=representation'*/
+      /*}*/
+    /*});*/
+  /*}*/
+
+
+
+  addUserOwner(rexId: number, id_user: number): Observable<any> {
+
+    console.log('rexid request',rexId)
+    console.log('iduser request',id_user)
+    const url = `${this.apiUrl}/rex?id=eq.${rexId}&select=*`;
+
+    const body = {
+      data: {
+        id_user: id_user
+      }
+    };
+
     return this.http.patch(url, body, {
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +106,6 @@ export class RexService {
       }
     });
   }
-
 
 
   /*patchRex(rex:any,qty:number): Observable<any> {*/
@@ -87,20 +120,31 @@ export class RexService {
   /*}*/
 
   changeUserOwner(){}
-  
-  markAsDelivered(rex:any){
-    //console.log("rex pasadox", rex);
-    const url = `${this.apiUrl}/rex?select=*`;
-    rex.state = 'delivered';
-    console.log("rex que se sendiara",rex);
-    return this.http.patch(url, rex, {
+
+  markAsDelivered(id: number,newState:string) {
+    const url = `${this.apiUrl}/rex?id=eq.${id}&select=*`;
+    const body = {
+      state: newState
+    };
+    return this.http.patch(url, body, {
       headers: {
         'Content-Type': 'application/json',
         'Prefer': 'return=representation'
       }
-    }); 
+    });
   }
 
+  /*markAsDelivered(rex:any){*/
+    /*const url = `${this.apiUrl}/rex?select=*`;*/
+    /*rex.state = 'delivered';*/
+    /*//console.log("rex que se sendiara",rex);*/
+    /*return this.http.patch(url, rex, {*/
+      /*headers: {*/
+        /*'Content-Type': 'application/json',*/
+        /*'Prefer': 'return=representation'*/
+      /*}*/
+    /*}); */
+  /*}*/
 
 
 }
