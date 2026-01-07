@@ -66,8 +66,6 @@
 </ion-header>
 
 
-
-
 <ion-content>
   <ion-card class="main-card" [class.disabled]="prdct && !componentsEnabled">
 
@@ -93,21 +91,49 @@
        <ng-container *ngIf="prdct">
         <div class="product-section">
 
-          <ion-card-header>
-            <ion-card-subtitle class="category">
-              {{ getCategoryNameById(prdct.data.categ[0]) | uppercase }}
-            </ion-card-subtitle>
 
-            <ion-card-title class="product-name">
-              {{ prdct.data.name | uppercase }}
-            </ion-card-title>
+           <!--<ion-card-header>-->
+            <ion-grid class="product-row">
+              <ion-row class="ion-align-items-center">
 
-            <ion-card-subtitle class="product-qty">
-              Cantidad actual:
-              <strong>{{ prdct.data.qty }}</strong>
-              {{ getUmNameById(prdct.data.um[0]) }}
-            </ion-card-subtitle>
-          </ion-card-header>
+                <!-- 1️⃣ Categoría (15%) -->
+                <ion-col size="2" class="col-categ" style="font-size:x-small ;"  > 
+                  {{ getCategoryNameById(prdct.data.categ[0]) | uppercase }}
+                </ion-col>
+
+                <!-- 2️⃣ Nombre (68%) -->
+                <ion-col size="8" class="col-name">
+                  {{ prdct.data.name | uppercase }}
+                </ion-col>
+
+                <!-- 3️⃣ Cantidad (5%) -->
+                <ion-col size="1" class="col-qty">
+                  {{ prdct.data.qty }}
+                </ion-col>
+
+                <!-- 4️⃣ UM (12%) -->
+                <ion-col size="1" class="col-um" style="font-size:xx-small;" >
+                  {{ getUmNameById(prdct.data.um) }}
+                </ion-col>
+
+              </ion-row>
+            </ion-grid>
+          <!--</ion-card-header>-->
+
+           <!-- <ion-card-subtitle class="category">-->
+              <!--{{ getCategoryNameById(prdct.data.categ[0]) | uppercase }}-->
+            <!--</ion-card-subtitle>-->
+
+            <!--<ion-card-title class="product-name">-->
+              <!--{{ prdct.data.name | uppercase }}-->
+            <!--</ion-card-title>-->
+
+            <!--<ion-card-subtitle class="product-qty">-->
+              <!--Cantidad actual:-->
+              <!--<pre>{{prdct | json}}</pre>-->
+              <!--<strong>{{ prdct.data.qty }}</strong>-->
+              <!--{{ getUmNameById(prdct.data.um) }}-->
+            <!--</ion-card-subtitle>-->
 
         </div>
 

@@ -3,7 +3,7 @@
 
 
 <ion-app [class.ion-palette-dark]="dark">
-  <ion-split-pane contentId="main-content">
+  <ion-split-pane contentId="main-content" *ngIf="showMenu"   >
     <ion-menu contentId="main-content">
       <ion-content>
         <ion-list lines="none">
@@ -26,6 +26,15 @@
           </ion-menu-toggle> -->
         </ion-list>
         <!-- Rest of the menu -->
+
+        <ion-menu-toggle autoHide="false">
+            <ion-item routerLink="/login" routerLinkActive="active" routerDirection="root" detail="false">
+              <ion-icon slot="start" name="log-in"></ion-icon>
+              <ion-label>Módulo Autenticación</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+
+
         <ion-list *ngIf="loggedIn" lines="none">
           <ion-list-header>Account</ion-list-header>
           <ion-menu-toggle autoHide="false">
@@ -104,7 +113,7 @@
     <ion-router-outlet id="main-content"></ion-router-outlet>
   </ion-split-pane>
 
-  <!-- <ion-router-outlet *ngIf="showMenu" id="main-content"></ion-router-outlet> -->
+   <ion-router-outlet *ngIf="!showMenu" id="main-content"></ion-router-outlet> 
 </ion-app>
 
 

@@ -71,7 +71,7 @@ export class ReadprdctPage {
     console.log("producto recibido",p)
     const paddedId = p.id.toString().padStart(6, '0');
     const selectedBarcodes = [paddedId];
-    this.barcodeService.printIn50mmPortablePrinterBt(selectedBarcodes,p.data.barcode);
+    this.barcodeService.printIn50mmPortablePrinterBt(p.data.name,selectedBarcodes,p.id.toString());
   }
 
   hash:string='';

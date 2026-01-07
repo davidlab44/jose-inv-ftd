@@ -9,6 +9,7 @@ import { UserData } from './providers/user-data';
 import { OpportunityService } from './services/opportunity.service';
 import { environment } from '../environments/environment';
 import { Category } from './interfaces/category';
+import { UserService } from './services/user.service';
 
 @Component({
   selector: 'app-root',
@@ -19,9 +20,8 @@ import { Category } from './interfaces/category';
 export class AppComponent implements OnInit {
 
   categories: Category[] = [];
-  
 
-//appPages=[];
+  //appPages=[];
   
   appPages = [
      {
@@ -66,6 +66,33 @@ export class AppComponent implements OnInit {
      },
 
    ];
+  appPages2 = [
+     {
+       title: 'Inicio',
+       url: '/app/tabs/schedule',
+       icon: 'calendar'
+     },
+     {
+       title: 'Productos',
+       url: '/app/tabs/readprdct',
+       icon: 'cube'
+     },
+     {
+       title: 'Entrada',
+       url: '/app/tabs/kitchen',
+       icon: 'arrow-down'
+     },
+     {
+       title: 'Ingresos de mercancia',
+       url: '/app/tabs/readren',
+       icon: 'chevron-forward-circle'
+     },
+     {
+       title: 'Listar productos ',
+       url: '/app/tabs/asset-supply-readprdct',
+       icon: 'document-text'
+     },
+   ];
   appPages4 = [
      {
        title: 'Inicio',
@@ -88,11 +115,57 @@ export class AppComponent implements OnInit {
        icon: 'bus'
      },
    ];
-  
+  appPages7 = [
+     {
+       title: 'Inicio',
+       url: '/app/tabs/schedule',
+       icon: 'calendar'
+     },
+     {
+       title: 'Productos',
+       url: '/app/tabs/readprdct',
+       icon: 'cube'
+     },
+     {
+       title: 'Entrada',
+       url: '/app/tabs/kitchen',
+       icon: 'arrow-down'
+     },
+     {
+       title: 'Ingresos de mercancia',
+       url: '/app/tabs/readren',
+       icon: 'chevron-forward-circle'
+     },
+     {
+       title: 'Listar productos ',
+       url: '/app/tabs/asset-supply-readprdct',
+       icon: 'document-text'
+     },
+     {
+       title: 'Registrar producto',
+       url: '/app/tabs/asset-supply-post',
+       icon: 'add-circle'
+     },
+     {
+       title: 'Kilos retirados',
+       url: '/app/tabs/replenishment-withdrawn-getall',
+       icon: 'checkbox'
+     },
+     {
+       title: 'Registrar retiro',
+       url: '/app/tabs/replenishment-withdrawn-post',
+       icon: 'add-circle'
+     },
+
+   ];
+
+
+
   loggedIn = false;
   dark = false;
   public showMenu = true; 
   posCategories: any[] = [];
+  storedObject:any;
 
   constructor(
     private menu: MenuController,
@@ -103,82 +176,69 @@ export class AppComponent implements OnInit {
     private swUpdate: SwUpdate,
     private toastCtrl: ToastController,
     private opportunityService:OpportunityService,
-    private updates: SwUpdate
+    private updates: SwUpdate,
+    private userService:UserService
   ) {
     this.checkForUpdates();
-
-
-  console.log("constructor")
+    console.log("constructor")
   }
 
-async checkForUpdates() {
-  if (!this.swUpdate.isEnabled) return;
-
-  // Verificar si hay actualización
-  const updateFound = await this.swUpdate.checkForUpdate();
-
-  if (updateFound) {
-    if (confirm('Nueva versión disponible. ¿Actualizar?')) {
-      await this.swUpdate.activateUpdate();
-      document.location.reload();
+  async checkForUpdates() {
+    if (!this.swUpdate.isEnabled) return;
+    const updateFound = await this.swUpdate.checkForUpdate();
+    if (updateFound) {
+      if (confirm('Nueva versión disponible. ¿Actualizar?')) {
+        await this.swUpdate.activateUpdate();
+        document.location.reload();
+      }
     }
   }
-}
-
-  
-
-
-
-
-
 
   async ngOnInit() {
-    //console.log('hitman')
-    //await this.storage.create();
 
-    //this.checkLoginStatus();
-    //this.listenForLoginEvents();
+    /*this.showMenu=true;*/
+    /*const host = window.location.hostname;*/
+    /*if (host.startsWith("abs.")) {*/
+      /*this.appPages = this.appPages4;*/
+      /*this.router.navigate(['/app/tabs/replenishment']);*/
+    /*}*/
 
-    // this.swUpdate.versionUpdates.subscribe(async res => {
-    //   const toast = await this.toastCtrl.create({
-    //     message: 'Update available!',
-    //     position: 'bottom',
-    //     buttons: [
-    //       {
-    //         role: 'cancel',
-    //         text: 'Reload'
-    //       }
-    //     ]
-    //   });
 
-    //   await toast.present();
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+  
+        this.storedObject = this.userService.getStoredUserInfo();  
+        if(this.storedObject.data.role==2){
+          this.appPages=this.appPages2;
+        }if(this.storedObject.data.role==7){
+          this.appPages=this.appPages7;
+        }
 
-    //   toast
-    //     .onDidDismiss()
-    //     .then(() => this.swUpdate.activateUpdate())
-    //     .then(() => window.location.reload());
-    // });
-
-    this.showMenu=true;
-    //this.getPosCategories();
-
-    const host = window.location.hostname;
-
-    if (host.startsWith("abs.")) {
-      this.appPages = this.appPages4;
-      this.router.navigate(['/app/tabs/replenishment']);
-    }
-
-    
-  console.log("ionviewdidenter1")
+        
+        // Check if the current route is '/login'
+        if (event.url === '/login' || event.url === '/signup') {
+          this.showMenu = false; // Hide the menu
+        } else {
+          this.showMenu = true; // Show the menu on other routes
+        }
+        /*     if (event.url === '/app/tabs/schedule') {*/
+          /*this.dark = false; // Hide the menu*/
+          /*//this.setSesion();*/
+          /*//this.setSesion()*/
+        /*}else{*/
+          /*this.dark = true;*/
+        /*}*/
+        /*if (event.url === '/app/tabs/client') {*/
+          /*//this.setSesion()*/
+        /*}*/
+      }
+    });    
+    console.log("ionviewdidenter1")
   }
 
-
-
-ionViewDidEnter() {
-  console.log("ionviewdidenter")
-}
-
+  ionViewDidEnter() {
+    console.log("ionviewdidenter")
+  }
 
   // getPosCategories() {
   //   this.opportunityService.getPosCategories(environment.i, environment.p).subscribe({
@@ -186,7 +246,6 @@ ionViewDidEnter() {
   //       this.posCategories = response.result;
   //       console.log("response", response);
   //       console.log("pos category", this.posCategories);
-
   //       if (this.posCategories?.length) {
   //         this.appPages = this.posCategories.map((cat: any) => ({
   //           title: cat.name,
@@ -200,8 +259,6 @@ ionViewDidEnter() {
   //     complete: () => {}
   //   });
   // }
-
-
 
   // getPosCategories() {
   //   this.opportunityService.getPosCategories(environment.i, environment.p).subscribe({
@@ -223,8 +280,6 @@ ionViewDidEnter() {
   //     complete: () => {}
   //   });
   // }
-
-
 
   // getPosCategories() {
   //   this.opportunityService.getPosCategories(environment.i, environment.p).subscribe({

@@ -21,6 +21,8 @@ import { BrowserMultiFormatReader } from '@zxing/browser';
 import { RexService } from '../../services/rex.service';
 import { ProdrexService } from '../../services/prodrex.service';
 import { Product, defaultProduct } from '../../interfaces/product';
+import { UserService} from '../../services/user.service';
+
 
 @Component({
   selector: 'page-schedule',
@@ -60,7 +62,8 @@ export class SchedulePage{
     private categoryService: CategoryService,
     private umService: UmService,     
     private prodrexService: ProdrexService,
-    private rexService: RexService
+    private rexService: RexService,
+    private userService:UserService
   ) {
     (window as any).productService=this.productService
   }
@@ -70,14 +73,42 @@ export class SchedulePage{
   hash:string='';
   table:any
 
+  storedObject:any;
+  async ngOnInit() {
+    this.storedObject = await this.userService.getStoredUserInfo();
+   
+    console.log("userInfo schedule",this.storedObject)
 
-
-  ngOnInit() {
-    this.refreshView();
+    if(!this.storedObject){
+      this.router.navigateByUrl('/login');
+      return;
+    }
   }
 
+  /*  storedObject:any*/
+  /*p:any;*/
+  /*async setSesion(){*/
+    /*this.u=localStorage.getItem('u');*/
+    /*this.p=localStorage.getItem('p');*/
+    /*this.storedObject = await this.userService.login(u,p);*/
+    /*console.log("userInfo",this.storedObject)*/
+    /*console.log("p",this.p)*/
+    /*console.log("userInfo",this.storedObject)*/
+    /*if (!this.storedObject.im_hr) {*/
+      /*this.router.navigateByUrl('/app/tabs/client');*/
+    /*} else {*/
+      /*try {*/
+        /*await this.validateUserInfo(this.storedObject);*/
+        /*await this.retrieveAllData();*/
+        /*this.startTimer();*/
+      /*} catch (error) {*/
+        /*console.error('Error validating user info or retrieving data', error);*/
+      /*}*/
+    /*}*/
+  /*}*/
+
   refreshView() {
-    const myUrl = window.location.href;
+    //const myUrl = window.location.href;
     //console.log('URL actual:', myUrl);
       /*    const urlsPermitidas = [*/
       /*'http://10.100.100.4:8505',*/
@@ -94,32 +125,15 @@ export class SchedulePage{
     if (host.startsWith("abs.")) {
       this.router.navigate(['/app/tabs/replenishment']);
     }
-    this.inputChanged.pipe(debounceTime(1000)).subscribe((val) => {
-      console.log('🕐 Input después de 1s sin cambios:', val);
-        const manualBarcode=Number(val);
-        if(manualBarcode>0){
-          this.getProductByBarcode(Number(val));
-          this.componentsEnabled = true;
-          this.stopScan();
-        }else{
-          this.utilService.presentToast('barcode ingresado no es un numero');
-        }
-    });
-  }
 
-  productListOriginal:any[]=[];
-  ionViewWillEnter() {
     this.productService.refreshFromServer().subscribe(data => {
       this.productListOriginal = data;
     });
-  }
 
-  rexDocument:any;
-  async ionViewDidEnter() {
-    await this.loadCategories();
-    await this.loadUms();
+    this.loadCategories();
+    this.loadUms();
     this.getProductById(87); 
-    await this.loadProdrex();
+    this.loadProdrex();
     this.rexService.getLast().subscribe({
       next: (response) => {
         this.rexDocument=response;
@@ -139,6 +153,27 @@ export class SchedulePage{
         }
       }
     })
+
+
+    this.inputChanged.pipe(debounceTime(1000)).subscribe((val) => {
+      console.log('🕐 Input después de 1s sin cambios:', val);
+        const manualBarcode=Number(val);
+        if(manualBarcode>0){
+          this.getProductByBarcode(Number(val));
+          this.componentsEnabled = true;
+          this.stopScan();
+        }else{
+          this.utilService.presentToast('barcode ingresado no es un numero');
+        }
+    });
+  }
+
+  productListOriginal:any[]=[];
+  ionViewWillEnter() {
+  }
+
+  rexDocument:any;
+  async ionViewDidEnter() {
   }
 
   componentsEnabled: boolean = true;
@@ -273,16 +308,16 @@ export class SchedulePage{
   }
 
   extraQty = 0;
-  /*clearQty() {*/
-    /*this.extraQty = 0;*/
-  /*}*/
+  clearQty() {
+    this.extraQty = 0;
+  }
 
   addQty(value: number) {
     console.log('2product',this.prdct)
     console.log('2value',value)
     //const availableQty = Number(this.prdct?.data?.qty) - value;
     const availableQty = Number(this.prdct?.data?.qty);
-    this.utilService.presentToast('requestedQty '+value+this.extraQty)
+    //this.utilService.presentToast('requestedQty '+value+this.extraQty)
     if (Number.isNaN(availableQty)) {
       this.utilService.presentToast("availableQty is NaN", "danger", 500);
       return;
