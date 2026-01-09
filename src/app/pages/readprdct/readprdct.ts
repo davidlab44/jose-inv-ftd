@@ -232,10 +232,11 @@ export class ReadprdctPage {
     /*});*/
   }
 
-
-
-  manualOutbound(){
-    
+  manualOutbound(item:any){
+    this.router.navigate(
+      ['/app/tabs/schedule'],
+      { state: { item } }    
+    ); 
   }
 
 }

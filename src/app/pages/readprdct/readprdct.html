@@ -39,7 +39,8 @@
       </ion-label>
 
       <ion-button color="primary" slot="end" (click)="manualOutbound(p); $event.stopPropagation()">
-        <ion-icon name="swap-horizontal-outline"></ion-icon>
+        <!--<ion-icon name="swap-horizontal-outline"></ion-icon>-->
+        {{p.data.barcode}}
       </ion-button>
 
       <ion-button color="primary" slot="end" (click)="printSelectedBarcodes(p); $event.stopPropagation()">

@@ -23,7 +23,6 @@ import { ProdrexService } from '../../services/prodrex.service';
 import { Product, defaultProduct } from '../../interfaces/product';
 import { UserService} from '../../services/user.service';
 
-
 @Component({
   selector: 'page-schedule',
   templateUrl: 'schedule.html',
@@ -43,6 +42,7 @@ export class SchedulePage{
   exitList: any[] = [];
   queryText:any
   todayDate:any
+  barcodeRouted:any;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -74,11 +74,13 @@ export class SchedulePage{
   table:any
 
   storedObject:any;
-  async ngOnInit() {
+  async ngOnInit(){
+    //this.refreshView();
+  }
+  
+  async setSession() {
     this.storedObject = await this.userService.getStoredUserInfo();
-   
     console.log("userInfo schedule",this.storedObject)
-
     if(!this.storedObject){
       this.router.navigateByUrl('/login');
       return;
@@ -108,6 +110,8 @@ export class SchedulePage{
   /*}*/
 
   refreshView() {
+    this.setSession();
+    //const id_product_route= this.route.snapshot.paramMap.get('id');
     //const myUrl = window.location.href;
     //console.log('URL actual:', myUrl);
       /*    const urlsPermitidas = [*/
@@ -121,18 +125,36 @@ export class SchedulePage{
     /*}*/
     const ahora = new Date();
     this.todayDate=this.formatFechaLatam(ahora);
-    const host = window.location.hostname;
-    if (host.startsWith("abs.")) {
-      this.router.navigate(['/app/tabs/replenishment']);
-    }
-
     this.productService.refreshFromServer().subscribe(data => {
       this.productListOriginal = data;
     });
-
     this.loadCategories();
     this.loadUms();
-    this.getProductById(87); 
+/*    this.barcodeRouted = this.router.getCurrentNavigation()?.extras.state?.item;*/
+    
+    /*console.log('routed',this.barcodeRouted)*/
+    /*if(Number(this.barcodeRouted.data.barcode) && Number(this.barcodeRouted.data.barcode)>0 ){*/
+      /*this.getProductById(Number(this.barcodeRouted.data.barcode))*/
+    /*}else{*/
+      /*//this.getProductById(87); */
+    /*}*/
+
+
+  const state = history.state;
+
+  if (state?.item) {
+    this.barcodeRouted = state.item;
+
+    console.log('routed', this.barcodeRouted);
+
+    if (
+      Number(this.barcodeRouted?.data?.barcode) &&
+      Number(this.barcodeRouted.data.barcode) > 0
+    ) {
+      this.getProductById(Number(this.barcodeRouted.data.barcode));
+    }
+  }
+    //this.getProductById(87);
     this.loadProdrex();
     this.rexService.getLast().subscribe({
       next: (response) => {
@@ -153,8 +175,6 @@ export class SchedulePage{
         }
       }
     })
-
-
     this.inputChanged.pipe(debounceTime(1000)).subscribe((val) => {
       console.log('🕐 Input después de 1s sin cambios:', val);
         const manualBarcode=Number(val);
@@ -170,6 +190,7 @@ export class SchedulePage{
 
   productListOriginal:any[]=[];
   ionViewWillEnter() {
+    this.refreshView();
   }
 
   rexDocument:any;
@@ -239,6 +260,7 @@ export class SchedulePage{
 
   prdct:any
   getProductById(id: number) {
+    console.log('product id',id)
     this.productService.getProductById(id).subscribe(data => {
       this.prdct = data[0];
       //this.extraQty=0;

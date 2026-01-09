@@ -67,6 +67,8 @@
 
 
 <ion-content>
+  <!--  <h2>product</h2>-->
+  <!--<pre>{{prdct | json}}</pre>-->
   <ion-card class="main-card" [class.disabled]="prdct && !componentsEnabled">
 
     <ion-card-content>
@@ -97,7 +99,7 @@
               <ion-row class="ion-align-items-center">
 
                 <!-- 1️⃣ Categoría (15%) -->
-                <ion-col size="2" class="col-categ" style="font-size:x-small ;"  > 
+                <ion-col size="2" class="col-categ" style="font-size:xx-small ;"  > 
                   {{ getCategoryNameById(prdct.data.categ[0]) | uppercase }}
                 </ion-col>
 
@@ -106,15 +108,16 @@
                   {{ prdct.data.name | uppercase }}
                 </ion-col>
 
-                <!-- 3️⃣ Cantidad (5%) -->
-                <ion-col size="1" class="col-qty">
-                  {{ prdct.data.qty }}
+                <!-- 3️⃣ Cantidad (17%) -->
+                <ion-col size="2" class="col-qty">
+                  <strong style="font-size:xx-small;"   >{{ prdct?.data?.qty }}</strong>
+                  <span style="font-size: xx-small;"> {{ getUmNameById(prdct?.data?.um) }}</span>
+                  <!--{{ prdct.data.qty }}-->
                 </ion-col>
 
-                <!-- 4️⃣ UM (12%) -->
-                <ion-col size="1" class="col-um" style="font-size:xx-small;" >
-                  {{ getUmNameById(prdct.data.um) }}
-                </ion-col>
+                <!--   <ion-col size="1" class="col-um" style="font-size:xx-small;" >-->
+                  <!--{{ getUmNameById(prdct.data.um) }}-->
+                <!--</ion-col>-->
 
               </ion-row>
             </ion-grid>
@@ -168,8 +171,8 @@
 
   <ng-container *ngIf="!prdct">
     <div class="loading-container">
-      <ion-spinner name="crescent"></ion-spinner>
-      <p>Cargando producto...</p>
+<!--      <ion-spinner name="crescent"></ion-spinner>-->
+      <!--<p>Cargando producto...</p>-->
     </div>
   </ng-container>
 

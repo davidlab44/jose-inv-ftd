@@ -85,7 +85,6 @@ export class ProdrexPage {
   table:any
   rexDocument:any;
   async ngOnInit(){
-    this.refreshView();
   }
 
   async refreshView() {
@@ -119,6 +118,14 @@ export class ProdrexPage {
       }
     })
 
+    this.productService.getCachedOrServer().subscribe(data => {
+      this.productListCaos = data;
+    });
+
+
+
+
+
   }
   
   userList:any[]=[];
@@ -137,10 +144,9 @@ export class ProdrexPage {
   }
 
   productListCaos:any[]=[];
+
   ionViewWillEnter() {
-    this.productService.getCachedOrServer().subscribe(data => {
-      this.productListCaos = data;
-    });
+    this.refreshView();
   }
 
 
