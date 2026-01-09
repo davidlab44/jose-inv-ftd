@@ -99,7 +99,7 @@ export class ProdrexPage {
           console.log('getLast RSPNS',response)
           if(response[0].state=='draft'){
             this.rexDocument=response;
-            this.utilService.presentToast('this.rexdocument',response)
+            console.log('this.rexdocument',response)
           }else{
             this.utilService.presentToast('creando rex')
             this.rexService.addRex().subscribe({

@@ -356,7 +356,7 @@ export class SchedulePage{
   }
 
   confirmAction() {
-    //console.log('3product to update qty',this.prdct);
+    console.log('3product to update qty',this.prdct);
     this.prdct.data.qty= this.prdct.data.qty-this.extraQty;
     //console.log('4product to update qty',this.prdct);
      this.productService.updateProductQty(this.prdct.id,this.prdct).subscribe({
