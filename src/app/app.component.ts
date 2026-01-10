@@ -74,23 +74,8 @@ export class AppComponent implements OnInit {
      },
      {
        title: 'Productos',
-       url: '/app/tabs/readprdct',
+       url: '/app/tabs/readprd',
        icon: 'cube'
-     },
-     {
-       title: 'Entrada',
-       url: '/app/tabs/kitchen',
-       icon: 'arrow-down'
-     },
-     {
-       title: 'Ingresos de mercancia',
-       url: '/app/tabs/readren',
-       icon: 'chevron-forward-circle'
-     },
-     {
-       title: 'Listar productos ',
-       url: '/app/tabs/asset-supply-readprdct',
-       icon: 'document-text'
      },
    ];
   appPages4 = [
@@ -122,8 +107,13 @@ export class AppComponent implements OnInit {
        icon: 'calendar'
      },
      {
-       title: 'Productos',
-       url: '/app/tabs/readprdct',
+       title: 'Productos',   
+       url: '/app/tabs/readprd',       
+       icon: 'cube'
+     },
+     {
+       title: 'Productos barcode ',                                                                                         
+       url: '/app/tabs/readprdct',     
        icon: 'cube'
      },
      {
@@ -158,8 +148,6 @@ export class AppComponent implements OnInit {
      },
 
    ];
-
-
 
   loggedIn = false;
   dark = false;

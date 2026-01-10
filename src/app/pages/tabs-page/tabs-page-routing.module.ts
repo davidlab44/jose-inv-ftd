@@ -85,6 +85,15 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'readprd',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../readprd/readprd.module').then(m => m.ReadprdModule)
+          }
+        ]
+      },
+{
         path: 'readprdct',
         children: [
           {

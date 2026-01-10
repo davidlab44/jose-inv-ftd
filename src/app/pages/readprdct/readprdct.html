@@ -19,36 +19,63 @@
 </ion-header>
 
 <ion-content>
-  <ion-list>
-    <ion-item *ngFor="let p of productList" button (click)="addToOrder(p)" style="display:flex; align-items:center;">
 
-      <!-- Categoría -->
+
+  <ion-list>
+    <ion-item *ngFor="let p of productList" style="display:flex; align-items:center;">
       <ion-label style="font-size: small; flex: 1;">
         <span>{{ getCategoryNameById(p?.data?.categ?.[0]) | capitalize }}&nbsp;</span>
       </ion-label>
-
-      <!-- Nombre del producto (más espacio) -->
       <ion-label style="font-size: small; flex: 3;">
         <h3>{{ p?.data?.name | uppercase }}</h3>
       </ion-label>
-
-      <!-- Cantidad + UM (menos espacio) -->
       <ion-label style="font-size: small; flex: 0.5; text-align:right;">
         <strong>{{ p?.data?.qty }}</strong>
         <span style="font-size: xx-small;"> {{ getUmNameById(p?.data?.um) }}</span>
       </ion-label>
-
-      <ion-button color="primary" slot="end" (click)="manualOutbound(p); $event.stopPropagation()">
-        <!--<ion-icon name="swap-horizontal-outline"></ion-icon>-->
-        {{p.data.barcode}}
-      </ion-button>
-
-      <ion-button color="primary" slot="end" (click)="printSelectedBarcodes(p); $event.stopPropagation()">
-        <ion-icon name="barcode-outline"></ion-icon>
-      </ion-button>
-
+<!--      <ion-button color="primary" slot="end" (click)="out(p)">-->
+        <!--<ion-icon name="remove-outline"></ion-icon>-->
+      <!--</ion-button>-->
+     <!--<ion-button color="primary" slot="end" (click)="patch(p)">-->
+        <!--<ion-icon name="eye-outline"></ion-icon>-->
+      <!--</ion-button>-->
+     <!--<ion-button color="primary" slot="end" (click)="delete(p); $event.stopPropagation()">-->
+        <!--<ion-icon name="trash-outline"></ion-icon>-->
+      <!--</ion-button>-->
     </ion-item>
   </ion-list>
+
+
+  <!--<ion-list>-->
+    <!--<ion-item *ngFor="let p of productList" button (click)="addToOrder(p)" style="display:flex; align-items:center;">-->
+
+      <!--[> Categoría <]-->
+      <!--<ion-label style="font-size: small; flex: 1;">-->
+        <!--<span>{{ getCategoryNameById(p?.data?.categ?.[0]) | capitalize }}&nbsp;</span>-->
+      <!--</ion-label>-->
+
+      <!--[> Nombre del producto (más espacio) <]-->
+      <!--<ion-label style="font-size: small; flex: 3;">-->
+        <!--<h3>{{ p?.data?.name | uppercase }}</h3>-->
+      <!--</ion-label>-->
+
+      <!--[> Cantidad + UM (menos espacio) <]-->
+      <!--<ion-label style="font-size: small; flex: 0.5; text-align:right;">-->
+        <!--<strong>{{ p?.data?.qty }}</strong>-->
+        <!--<span style="font-size: xx-small;"> {{ getUmNameById(p?.data?.um) }}</span>-->
+      <!--</ion-label>-->
+
+      <!--<ion-button color="primary" slot="end" (click)="manualOutbound(p); $event.stopPropagation()">-->
+        <!--[><ion-icon name="swap-horizontal-outline"></ion-icon><]-->
+        <!--{{p.data.barcode}}-->
+      <!--</ion-button>-->
+
+      <!--<ion-button color="primary" slot="end" (click)="printSelectedBarcodes(p); $event.stopPropagation()">-->
+        <!--<ion-icon name="barcode-outline"></ion-icon>-->
+      <!--</ion-button>-->
+
+    <!--</ion-item>-->
+  <!--</ion-list>-->
 </ion-content>
 
 

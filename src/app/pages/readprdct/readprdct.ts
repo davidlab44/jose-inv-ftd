@@ -1,6 +1,8 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
+
+import { tap } from 'rxjs/operators';
 import { ConferenceData } from '../../providers/conference-data';
 import { UserData } from '../../providers/user-data';
 import { OpportunityService } from '../../services/opportunity.service';
@@ -20,6 +22,8 @@ import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { RexService } from '../../services/rex.service';
+import { IonSearchbar } from '@ionic/angular';
+
 
 @Component({
   selector: 'page-readprdct',
@@ -28,6 +32,7 @@ import { RexService } from '../../services/rex.service';
 })
 export class ReadprdctPage {
 
+  @ViewChild('searchbar', { static: false }) searchbar!: IonSearchbar;
   ios: boolean;
   segment = 'all';
   showSearchbar: boolean;
@@ -44,6 +49,11 @@ export class ReadprdctPage {
   activeSession: Session | null = null;
   sessionId: number | null = null;
   searchSubject = new Subject<string>();
+  filteredCategories: any[] = [];
+  filteredProductsByCategory: any[] = [];
+
+
+
 
   constructor(
     private barcodeService: BarcodeService,
@@ -80,18 +90,69 @@ export class ReadprdctPage {
     await this.loadCategories();
     await this.loadUms();
     this.getAllProducts();
-    this.searchSubject.pipe(
-      debounceTime(1000),          
-      distinctUntilChanged(),      
+
+   this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+
+      tap(text => {
+
+        const query = text.trim().toLowerCase();
+        if (query.length === 0) {
+          this.productList = this.productListFull.slice(0, 20);
+          console.log("Restaurando primeros 20 productos:", this.productList);
+          return; 
+        }
+
+        this.filteredCategories = this.categories.filter(cat => {
+            const nombre = cat?.data?.nombre?.toLowerCase() || "";
+            const coincide = nombre.includes(text.toLowerCase());
+            return coincide;
+          });
+
+        const ids = this.filteredCategories.map(c => Number(c.id));
+
+        this.filteredProductsByCategory = this.productListFull.filter(prod =>
+          ids.includes(Number(prod?.data?.categ?.[0]))
+        );
+
+        console.log("Productos filtrados por categoría:", this.filteredProductsByCategory);
+      }),
+
+      // 4. SEGUIR HACIENDO BÚSQUEDA REMOTA
       switchMap(text => this.productService.searchProducts(text))
+
     )
     .subscribe({
       next: results => {
-        console.log("Resultados de búsqueda:", results);
-        this.productList = results;
+
+        // 1. Unir ambos arreglos
+        const combined = [...results, ...this.filteredProductsByCategory];
+
+        // 2. Eliminar duplicados por id
+        this.productList = combined.filter(
+          (item, index, self) =>
+            index === self.findIndex(p => p.id === item.id)
+        );
+
+        console.log("productList (sin duplicados):", this.productList);
       },
       error: err => console.error("Error en búsqueda:", err)
     });
+
+
+  /*  this.searchSubject.pipe(*/
+      /*debounceTime(1000),          */
+      /*distinctUntilChanged(),      */
+      /*switchMap(text => this.productService.searchProducts(text))*/
+    /*)*/
+    /*.subscribe({*/
+      /*next: results => {*/
+        /*console.log("Resultados de búsqueda:", results);*/
+        /*this.productList = results;*/
+      /*},*/
+      /*error: err => console.error("Error en búsqueda:", err)*/
+    /*});*/
   }
 
   updateSchedule(){
@@ -111,6 +172,19 @@ export class ReadprdctPage {
       complete: () => {}
     });
   }
+
+  productListFull:any[]=[];
+  getAllProductsFull() {
+      this.productService.getAll().subscribe({
+        next: response => {
+          this.productListFull=response;
+          console.log('products full',this.productListFull)
+        },
+        error: error => console.error('Error:', error),
+        complete: () => {}
+     });
+  }
+
 
   searchProducts(hash: string, productList: any[]): any[] {
     if (!hash || hash.trim() === '') return productList;

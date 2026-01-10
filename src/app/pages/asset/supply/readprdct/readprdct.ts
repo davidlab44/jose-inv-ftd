@@ -23,8 +23,6 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { RexService } from '../../../../services/rex.service';
 import { IonSearchbar } from '@ionic/angular';
 
-
-
 @Component({
   selector: 'page-readprdct',
   templateUrl: 'readprdct.html',
@@ -51,7 +49,6 @@ export class AssetSupplyReadprdctPage {
   activeSession: Session | null = null;
   sessionId: number | null = null;
   searchSubject = new Subject<string>();
-
 
   constructor(
     private barcodeService: BarcodeService,
@@ -81,9 +78,8 @@ export class AssetSupplyReadprdctPage {
     /*this.barcodeService.downloadPDF(selectedBarcodes);*/
   /*}*/
 
-filteredCategories: any[] = [];
-filteredProductsByCategory: any[] = [];
-
+  filteredCategories: any[] = [];
+  filteredProductsByCategory: any[] = [];
 
   async ngOnInit(){
     this.refreshView();
