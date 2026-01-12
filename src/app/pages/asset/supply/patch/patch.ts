@@ -83,38 +83,59 @@ export class AssetSupplyPatchPage {
     private fb: FormBuilder ,
     private replenishmentService : ReplenishmentService,
   ) {
-    const item = this.router.getCurrentNavigation()?.extras.state?.item;
-    console.log("Item recibido:", item);
+
+
+       
+       
+    console.log('Bartolito');
+    const item = history.state?.item ?? null;
+    console.log('Item recibido:', item);
     this.assetSupplyProduct = this.buildDefaultAssetSpupplyProduct(item);
+    /* const item = this.router.getCurrentNavigation()?.extras.state?.item;*/
+    /*console.log("Item recibido:", item);*/
+    /*this.assetSupplyProduct = this.buildDefaultAssetSpupplyProduct(item);*/
   }
  
   ngOnInit() {
-    this.loadCategories();
-    this.loadUms();
-    this.form = this.fb.group({
-      id: [this.assetSupplyProduct.id],
-      categ: [this.assetSupplyProduct.data.categ[0]],
-      name: [this.assetSupplyProduct.data.name],
-      barcode: [this.assetSupplyProduct.data.barcode],
-      qty: [this.assetSupplyProduct.data.qty],
-      um: [this.assetSupplyProduct.data.um],
-    });
-    console.log("Formulario inicializado:", this.form.value);
   }
 
-  ionViewWillEnter(){
-    this.loadCategories();
-    this.loadUms();
-    this.form = this.fb.group({
-      id: [this.assetSupplyProduct.id],
-      categ: [this.assetSupplyProduct.data.categ[0]],
-      name: [this.assetSupplyProduct.data.name],
-      barcode: [this.assetSupplyProduct.data.barcode],
-      qty: [this.assetSupplyProduct.data.qty],
-      um: [this.assetSupplyProduct.data.um],
-    });
-    console.log("Formulario inicializado:", this.form.value);
+  ionViewWillEnter() {
+    this.initForm();
+    if (this.assetSupplyProduct) {
+      this.fillForm(this.assetSupplyProduct);
+    }
+  }
 
+  initForm() {
+    this.form = this.fb.group({
+      id: [null],
+      categ: [null],
+      name: [''],
+      barcode: [null],
+      qty: [0],
+      um: [null],
+      target: [0],
+      reorder: [0],
+      minimum: [0],
+    });
+  }
+
+  fillForm(product: any) {
+    if (!product || !product.data || !this.form) {
+      return;
+    }
+    const data = product.data;
+    this.form.patchValue({
+      id: product.id ?? null,
+      categ: data.categ?.[0] ?? null,
+      name: data.name ?? '',
+      barcode: data.barcode ?? null,
+      qty: data.qty ?? 0,
+      um: data.um ?? null,
+      target: data.target ?? 0,
+      reorder: data.reorder ?? 0,
+      minimum: data.minimum ?? 0,
+    });
   }
 
   patch() {
@@ -133,7 +154,6 @@ export class AssetSupplyPatchPage {
     this.productService.patch(id, justData).subscribe({
       next: (r) => {
         console.log("PATCH OK:", r);
-        this.utilService.presentToast("cant: "+r[0].data.qty+" "+r[0].data.name)
         this.resetForm();
        this.utilService.presentToast('resetForm')
        this.router.navigate(['/app/tabs/asset-supply-readprdct']);
@@ -149,40 +169,12 @@ export class AssetSupplyPatchPage {
       name: '',
       barcode: '',
       qty: 1,
-      um: null
+      um: null,
+      target: 0,
+      reorder: 0,
+      minimum: 0,
     });
   }
-
-
-  /*ngViewDidEnter(){*/
-    /*this.loadCategories();*/
-    /*this.loadUms();*/
-    /*this.form = this.fb.group({*/
-      /*id: [this.assetSupplyProduct.id],*/
-      /*categ: [this.assetSupplyProduct.data.categ[0]],*/
-      /*name: [this.assetSupplyProduct.data.name],*/
-      /*barcode: [this.assetSupplyProduct.data.barcode],*/
-      /*qty: [this.assetSupplyProduct.data.qty],*/
-      /*um: [this.assetSupplyProduct.data.um],*/
-    /*});*/
-    /*console.log("Formulario inicializado:", this.form.value);*/
-
-  /*}*/
-  
-
-  /*patch() {*/
-    /*const payload = this.form.value;*/
-    /*const id = payload.id;*/
-    /*const justData = { ...payload };*/
-    /*delete justData.id;*/
-    /*delete justData.ext_id;*/
-    /*delete justData.created_at;*/
-    /*delete justData.updated_at;*/
-    /*this.productService.patch(id, justData).subscribe({*/
-      /*next: (r) => console.log("PATCH OK:", r),*/
-      /*error: (e) => console.error("PATCH ERROR:", e),*/
-    /*});*/
-  /*}*/
 
   slideOpts = {
     initialSlide: 0,
@@ -191,7 +183,6 @@ export class AssetSupplyPatchPage {
   };
 
   updateSchedule(){
-     
   }
 
   prodrexList:any[]=[];
@@ -203,35 +194,8 @@ export class AssetSupplyPatchPage {
       }
     })
   }
-
-  searchProducts(hash: string, productList: any[]): any[] {
-    if (!hash || hash.trim() === '') return productList;
-    return productList.filter(product =>
-      product.name.toLowerCase().includes(hash.toLowerCase())
-    );
-  }
-
+  
   onSearch(text: string) {
-    this.searchSubject.next(text);
-  }
-
-  formatFechaLatam(dateInput: string | Date | number): string {
-    if (!dateInput) return '';
-    const date = new Date(dateInput);
-    const opciones: Intl.DateTimeFormatOptions = {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    };
-    const fechaTexto = new Intl.DateTimeFormat('es-ES', opciones).format(date);
-    let horas = date.getHours();
-    const minutos = String(date.getMinutes()).padStart(2, '0');
-    const segundos = String(date.getSeconds()).padStart(2, '0');
-    const ampm = horas >= 12 ? 'PM' : 'AM';
-    horas = horas % 12;
-    if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
-    const horasTexto = String(horas).padStart(2, '0');
-    return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
   private buildDefaultAssetSpupplyProduct(item: any) {

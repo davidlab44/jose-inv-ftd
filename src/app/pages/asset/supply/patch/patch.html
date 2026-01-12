@@ -20,7 +20,7 @@
 
 
 <ion-content class="ion-padding">
-  <form [formGroup]="form">    
+  <form *ngIf="form" [formGroup]="form">    
     
     <!-- Campo oculto -->
     <input type="hidden" formControlName="id">
@@ -50,6 +50,21 @@
         <ion-label position="floating">UM</ion-label>
         <ion-input type="number" formControlName="um"></ion-input>
       </ion-item>
+
+      <!--<ion-item>-->
+        <!--<ion-label position="floating">Target/ideal</ion-label>-->
+        <!--<ion-input type="number" formControlName="target"></ion-input>-->
+      <!--</ion-item>-->
+
+      <!--<ion-item>-->
+        <!--<ion-label position="floating">Reordenar</ion-label>-->
+        <!--<ion-input type="number" formControlName="reorder"></ion-input>-->
+      <!--</ion-item>-->
+      
+      <!--<ion-item>-->
+        <!--<ion-label position="floating">Minimo</ion-label>-->
+        <!--<ion-input type="number" formControlName="minimum"></ion-input>-->
+      <!--</ion-item>-->
     </ion-list>
 
     <br>

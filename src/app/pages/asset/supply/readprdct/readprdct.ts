@@ -32,302 +32,303 @@ export class AssetSupplyReadprdctPage {
 
 
 
-@ViewChild('searchbar', { static: false }) searchbar!: IonSearchbar;
-  ios: boolean;
-  segment = 'all';
-  showSearchbar: boolean;
-  opportunities = [];
-  storedObject: any;
-  posOrders: any[] = [];
-  posOrderLineList: any[] = [];
-  pendingCommands: any[] = [];
-  deliveredList: any[] = [];
-  filteredProductList: any[] = [];
-  maxQtyDeliveredItems: any[] = [];
-  queryText:any
-  mesas: any[] = [];
-  activeSession: Session | null = null;
-  sessionId: number | null = null;
-  searchSubject = new Subject<string>();
+/*@ViewChild('searchbar', { static: false }) searchbar!: IonSearchbar;*/
+  /*ios: boolean;*/
+  /*segment = 'all';*/
+  /*showSearchbar: boolean;*/
+  /*opportunities = [];*/
+  /*storedObject: any;*/
+  /*posOrders: any[] = [];*/
+  /*posOrderLineList: any[] = [];*/
+  /*pendingCommands: any[] = [];*/
+  /*deliveredList: any[] = [];*/
+  /*filteredProductList: any[] = [];*/
+  /*maxQtyDeliveredItems: any[] = [];*/
+  /*queryText:any*/
+  /*mesas: any[] = [];*/
+  /*activeSession: Session | null = null;*/
+  /*sessionId: number | null = null;*/
+  /*searchSubject = new Subject<string>();*/
 
-  constructor(
-    private barcodeService: BarcodeService,
-    public alertCtrl: AlertController,
-    public confData: ConferenceData,
-    public loadingCtrl: LoadingController,
-    public modalCtrl: ModalController,
-    public router: Router,
-    public toastCtrl: ToastController,
-    public user: UserData,
-    public config: Config,
-    private opportunityService: OpportunityService,
-    private posOrderService: PosOrderService,
-    private tableService: TableService,
-    private route: ActivatedRoute,
-    private sessionService:SessionService,
-    private utilService:UtilService,
-    private productService:ProductService,
-    private categoryService:CategoryService,
-    private umService:UmService,
-    private rexService: RexService
-  ) {}
+  /*constructor(*/
+    /*private barcodeService: BarcodeService,*/
+    /*public alertCtrl: AlertController,*/
+    /*public confData: ConferenceData,*/
+    /*public loadingCtrl: LoadingController,*/
+    /*public modalCtrl: ModalController,*/
+    /*public router: Router,*/
+    /*public toastCtrl: ToastController,*/
+    /*public user: UserData,*/
+    /*public config: Config,*/
+    /*private opportunityService: OpportunityService,*/
+    /*private posOrderService: PosOrderService,*/
+    /*private tableService: TableService,*/
+    /*private route: ActivatedRoute,*/
+    /*private sessionService:SessionService,*/
+    /*private utilService:UtilService,*/
+    /*private productService:ProductService,*/
+    /*private categoryService:CategoryService,*/
+    /*private umService:UmService,*/
+    /*private rexService: RexService*/
+  /*) {}*/
 
-/*  printSelectedBarcodes(p: Product) {*/
-    /*const paddedId = p.id.toString().padStart(6, '0');*/
-    /*const selectedBarcodes = [paddedId];*/
-    /*this.barcodeService.downloadPDF(selectedBarcodes);*/
+
+  /*filteredCategories: any[] = [];*/
+  /*filteredProductsByCategory: any[] = [];*/
+
+  /*async ngOnInit(){*/
+    /*//this.refreshView();*/
   /*}*/
 
-  filteredCategories: any[] = [];
-  filteredProductsByCategory: any[] = [];
+  /*async ionViewWillEnter(){*/
+    /*//this.refreshView();*/
+  /*}*/
 
-  async ngOnInit(){
-    this.refreshView();
-  }
+  /*hash:string='';*/
+  /*table:any*/
+  /*async refreshView() {*/
+    /*console.log("ngOnInit")*/
+    /*await this.loadCategories();*/
+    /*await this.loadUms();*/
+    /*this.getAllProducts();*/
+    /*this.getAllProductsFull();*/
 
-  async ionViewWillEnter(){
-    this.refreshView();
-  }
+    /*this.searchSubject.pipe(*/
+      /*debounceTime(500),*/
+      /*distinctUntilChanged(),*/
 
-  hash:string='';
-  table:any
-  async refreshView() {
-    console.log("ngOnInit")
-    await this.loadCategories();
-    await this.loadUms();
-    this.getAllProducts();
-    this.getAllProductsFull();
+      /*tap(text => {*/
 
-    this.searchSubject.pipe(
-      debounceTime(500),
-      distinctUntilChanged(),
+        /*const query = text.trim().toLowerCase();*/
+        /*if (query.length === 0) {*/
+          /*this.productList = this.productListFull.slice(0, 20);*/
+          /*console.log("Restaurando primeros 20 productos:", this.productList);*/
+          /*return; */
+        /*}*/
 
-      tap(text => {
+        /*this.filteredCategories = this.categories.filter(cat => {*/
+            /*const nombre = cat?.data?.nombre?.toLowerCase() || "";*/
+            /*const coincide = nombre.includes(text.toLowerCase());*/
+            /*return coincide;*/
+          /*});*/
 
-        const query = text.trim().toLowerCase();
-        if (query.length === 0) {
-          this.productList = this.productListFull.slice(0, 20);
-          console.log("Restaurando primeros 20 productos:", this.productList);
-          return; 
-        }
+        /*const ids = this.filteredCategories.map(c => Number(c.id));*/
 
-        this.filteredCategories = this.categories.filter(cat => {
-            const nombre = cat?.data?.nombre?.toLowerCase() || "";
-            const coincide = nombre.includes(text.toLowerCase());
-            return coincide;
-          });
+        /*this.filteredProductsByCategory = this.productListFull.filter(prod =>*/
+          /*ids.includes(Number(prod?.data?.categ?.[0]))*/
+        /*);*/
 
-        const ids = this.filteredCategories.map(c => Number(c.id));
+        /*console.log("Productos filtrados por categoría:", this.filteredProductsByCategory);*/
+      /*}),*/
 
-        this.filteredProductsByCategory = this.productListFull.filter(prod =>
-          ids.includes(Number(prod?.data?.categ?.[0]))
-        );
+      /*// 4. SEGUIR HACIENDO BÚSQUEDA REMOTA*/
+      /*switchMap(text => this.productService.searchProducts(text))*/
 
-        console.log("Productos filtrados por categoría:", this.filteredProductsByCategory);
-      }),
+    /*)*/
+    /*.subscribe({*/
+      /*next: results => {*/
 
-      // 4. SEGUIR HACIENDO BÚSQUEDA REMOTA
-      switchMap(text => this.productService.searchProducts(text))
+        /*// 1. Unir ambos arreglos*/
+        /*const combined = [...results, ...this.filteredProductsByCategory];*/
 
-    )
-    .subscribe({
-      next: results => {
+        /*// 2. Eliminar duplicados por id*/
+        /*this.productList = combined.filter(*/
+          /*(item, index, self) =>*/
+            /*index === self.findIndex(p => p.id === item.id)*/
+        /*);*/
 
-        // 1. Unir ambos arreglos
-        const combined = [...results, ...this.filteredProductsByCategory];
+        /*console.log("productList (sin duplicados):", this.productList);*/
+      /*},*/
+      /*error: err => console.error("Error en búsqueda:", err)*/
+    /*});*/
 
-        // 2. Eliminar duplicados por id
-        this.productList = combined.filter(
-          (item, index, self) =>
-            index === self.findIndex(p => p.id === item.id)
-        );
-
-        console.log("productList (sin duplicados):", this.productList);
-      },
-      error: err => console.error("Error en búsqueda:", err)
-    });
-
-  }
+  /*}*/
 
 
 
 
-  updateSchedule(){
-  }
+  /*updateSchedule(){*/
+  /*}*/
 
-  ionViewDidEnter() {}
+  /*ionViewDidEnter() {}*/
 
-  posCategId:number=0
-  productList:any[]=[];
-   getAllProducts() {
-    this.productService.getAllProducts().subscribe({
-      next: response => {
-        this.productList=response;
-        console.log('products By Cat',this.productList)
-      },
-      error: error => console.error('Error:', error),
-      complete: () => {}
-    });
-   }
+  /*posCategId:number=0*/
+  /*productList:any[]=[];*/
+   /*getAllProducts() {*/
+    /*this.productService.getAllProducts().subscribe({*/
+      /*next: response => {*/
+        /*this.productList=(response ?? [])*/
+        /*.map(p => this.normalizeProduct(p))*/
+        /*.filter(Boolean);*/
 
-   productListFull:any[]=[];
-   getAllProductsFull() {
-      this.productService.getAll().subscribe({
-        next: response => {
-          this.productListFull=response;
-          console.log('products full',this.productListFull)
-        },
-        error: error => console.error('Error:', error),
-        complete: () => {}
-      });
-    }
+      /*console.log('getAllProducts', this.productList);*/
 
-  searchProducts(hash: string, productList: any[]): any[] {
-    if (!hash || hash.trim() === '') return productList;
-    return productList.filter(product =>
-      product.name.toLowerCase().includes(hash.toLowerCase())
-    );
-  }
 
-  categories: any[] = [];    
-    loadCategories() { 
-      this.categoryService.getAllCategories().subscribe({ 
-        next: (res) => {       
-          this.categories = res;          
-          this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.categories = this.categoryService.getCategoriesFromLocal(); 
-        } 
-      }); 
-    }   
+
+      /*},*/
+      /*error: error => console.error('Error:', error),*/
+      /*complete: () => {}*/
+    /*});*/
+   /*}*/
+
+   /*productListFull:any[]=[];*/
+   /*getAllProductsFull() {*/
+      /*this.productService.getAll().subscribe({*/
+        /*next: response => {*/
+          /*this.productListFull=(response ?? []) */
+          /*.map(p => this.normalizeProduct(p))*/
+          /*.filter(Boolean);*/
+          /*console.log('getAllProductsFull', this.productList);*/
+
+        /*},*/
+        /*error: error => console.error('Error:', error),*/
+        /*complete: () => {}*/
+      /*});*/
+    /*}*/
+
+  /*searchProducts(hash: string, productList: any[]): any[] {*/
+    /*if (!hash || hash.trim() === '') return productList;*/
+    /*return productList.filter(product =>*/
+      /*product.name.toLowerCase().includes(hash.toLowerCase())*/
+    /*);*/
+  /*}*/
+
+  /*categories: any[] = [];    */
+    /*loadCategories() { */
+      /*this.categoryService.getAllCategories().subscribe({ */
+        /*next: (res) => {       */
+          /*this.categories = res;          */
+          /*this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage */
+        /*}, */
+        /*error: (err) => {      */
+          /*console.error('❌ Error al cargar categorías:', err); */
+          /*this.categories = this.categoryService.getCategoriesFromLocal(); */
+        /*} */
+      /*}); */
+    /*}   */
         
-    ums: any[] = []; 
+    /*ums: any[] = []; */
         
-    loadUms() {                
-      this.umService.getAllUms().subscribe({ 
-        next: (res) => {       
-          console.log('✅ Ums:', res);    
-          this.ums = res; 
-          this.umService.saveUmsToLocal(res); 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.ums = this.umService.getUmsFromLocal(); 
-        } 
-      }); 
-    }     
+    /*loadUms() {                */
+      /*this.umService.getAllUms().subscribe({ */
+        /*next: (res) => {       */
+          /*console.log('✅ Ums:', res);    */
+          /*this.ums = res; */
+          /*this.umService.saveUmsToLocal(res); */
+        /*}, */
+        /*error: (err) => {      */
+          /*console.error('❌ Error al cargar categorías:', err); */
+          /*this.ums = this.umService.getUmsFromLocal(); */
+        /*} */
+      /*}); */
+    /*}     */
       
-    getCategoryNameById(id: number | null | undefined): string {
-      if (id === null || id === undefined) {
-        return 'Sin categoría';
-      }
+    /*getCategoryNameById(id: number | null | undefined): string {*/
+      /*if (id === null || id === undefined) {*/
+        /*return 'Sin categoría';*/
+      /*}*/
 
-      if (!Array.isArray(this.categories) || this.categories.length === 0) {
-        return 'Sin categoría';
-      }
+      /*if (!Array.isArray(this.categories) || this.categories.length === 0) {*/
+        /*return 'Sin categoría';*/
+      /*}*/
 
-      const cat = this.categories.find(c => Number(c.id) === Number(id));
+      /*const cat = this.categories.find(c => Number(c.id) === Number(id));*/
 
-      const nombre = cat?.data?.nombre;
+      /*const nombre = cat?.data?.nombre;*/
 
-      return typeof nombre === 'string' && nombre.trim() !== ''
-        ? nombre
-        : 'Sin categoría';
-    }
+      /*return typeof nombre === 'string' && nombre.trim() !== ''*/
+        /*? nombre*/
+        /*: 'Sin categoría';*/
+    /*}*/
 
 
-  getUmNameById(id: number | string | null | undefined): string {
-    // Validar ID recibido
-    //console.log("id recibido",id)
-    if (id === null || id === undefined) {
-      return 'Sin UM1';
-    }
+  /*getUmNameById(id: number | string | null | undefined): string {*/
+    /*// Validar ID recibido*/
+    /*//console.log("id recibido",id)*/
+    /*if (id === null || id === undefined) {*/
+      /*return 'Sin UM1';*/
+    /*}*/
 
-    const idNum = Number(id);
-    if (isNaN(idNum)) {
-      return 'Sin UM2';
-    }
+    /*const idNum = Number(id);*/
+    /*if (isNaN(idNum)) {*/
+      /*return 'Sin UM2';*/
+    /*}*/
 
-    // Validar que this.ums exista y tenga elementos
-    if (!Array.isArray(this.ums) || this.ums.length === 0) {
-      return 'Sin UM3';
-    }
+    /*// Validar que this.ums exista y tenga elementos*/
+    /*if (!Array.isArray(this.ums) || this.ums.length === 0) {*/
+      /*return 'Sin UM3';*/
+    /*}*/
 
-    // Buscar la UM por ID
-    const um = this.ums.find(u => Number(u.id) === idNum);
-    if (!um) {
-      return 'Sin UM4';
-    }
+    /*// Buscar la UM por ID*/
+    /*const um = this.ums.find(u => Number(u.id) === idNum);*/
+    /*if (!um) {*/
+      /*return 'Sin UM4';*/
+    /*}*/
 
-    // Extraer el nombre si existe y es válido
-    const nombre = um?.data?.name;
-    if (typeof nombre === 'string' && nombre.trim() !== '') {
-      return nombre;
-    }
+    /*// Extraer el nombre si existe y es válido*/
+    /*const nombre = um?.data?.name;*/
+    /*if (typeof nombre === 'string' && nombre.trim() !== '') {*/
+      /*return nombre;*/
+    /*}*/
 
-    return 'Sin UM5';
-  }
+    /*return 'Sin UM5';*/
+  /*}*/
 
-  onSearch(text: string) {
-    this.searchSubject.next(text);
-  }
+  /*onSearch(text: string) {*/
+    /*this.searchSubject.next(text);*/
+  /*}*/
 
-  enviar() {
-    const items = [
-      {
-        ext_id: 101,
-        data: {
-          nombre: 'Producto de prueba',
-          precio: 249.90,
-          categoria: 'Electrónica',
-          stock: 12
-        }
-      },
-      {
-        ext_id: 102,
-        data: {
-          nombre: 'Audífonos Bluetooth',
-          precio: 89.50,
-          categoria: 'Accesorios',
-          stock: 50
-        }
-      }
-    ];
-  }
 
-  out(item:any){
-    console.log("item to modifyqty",item);
-    this.router.navigate(
-      ['/app/tabs/asset-supply-out'],
-      { state: { item } }
-    );
-  }
+  /*out(item:any){*/
+    /*console.log("item to modifyqty",item);*/
+    /*this.router.navigate(*/
+      /*['/app/tabs/asset-supply-out'],*/
+      /*{ state: { item } }*/
+    /*);*/
+  /*}*/
    
-  patch(item:any){
-    console.log("item to patch",item);
-    this.router.navigate(
-      ['/app/tabs/asset-supply-patch'],
-      { state: { item } }
-    );
-    this.clearSearch();
-  }
+  /*patch(item:any){*/
+    /*console.log("item to patch",item);*/
+    /*this.router.navigate(*/
+      /*['/app/tabs/asset-supply-patch'],*/
+      /*{ state: { item } }*/
+    /*);*/
+    /*this.clearSearch();*/
+  /*}*/
 
-  clearSearch(): void {
-    console.log('searchSubject',this.searchSubject.next )
-    this.searchbar.ionClear;
-    this.searchSubject.next(''); // restaura lista
-  }
+  /*clearSearch(): void {*/
+    /*console.log('searchSubject',this.searchSubject.next )*/
+    /*this.searchbar.ionClear;*/
+    /*this.searchSubject.next(''); // restaura lista*/
+  /*}*/
 
-  delete(p){
-    this.productService.delete(p.id).subscribe({
-      next: (response)=>{
-        console.log("delete response",response);
+  /*delete(p){*/
+    /*this.productService.delete(p.id).subscribe({*/
+      /*next: (response)=>{*/
+        /*console.log("delete response",response);*/
 
-      } 
-    })
-  }
+      /*} */
+    /*})*/
+  /*}*/
+
+
+  /*normalizeProduct(p: any) {*/
+    /*if (!p || !p.data) return null;*/
+
+    /*return {*/
+      /*...p,*/
+      /*data: {*/
+        /*categ: Array.isArray(p.data.categ) ? p.data.categ : [],*/
+        /*name: p.data.name ?? '',*/
+        /*qty: p.data.qty ?? 0,*/
+        /*um: p.data.um ?? null,*/
+        /*barcode: p.data.barcode ?? null,*/
+        /*target: p.data.target ?? 0,*/
+        /*reorder: p.data.reorder ?? 0,*/
+        /*minimum: p.data.minimum ?? 0,*/
+      /*}*/
+    /*};*/
+  /*}*/
 
 
 }
