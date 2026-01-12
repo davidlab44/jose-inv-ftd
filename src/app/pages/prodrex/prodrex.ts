@@ -121,11 +121,6 @@ export class ProdrexPage {
     this.productService.getCachedOrServer().subscribe(data => {
       this.productListCaos = data;
     });
-
-
-
-
-
   }
   
   userList:any[]=[];
@@ -156,6 +151,7 @@ export class ProdrexPage {
 
   prodrexList:any[]=[];
   refreshProdrexList() {
+    this.prodrexList=[];
     this.prodrexService.getAll().subscribe({
       next: response=>{
         if(this.rexDocument.length && this.rexDocument.length>0){
