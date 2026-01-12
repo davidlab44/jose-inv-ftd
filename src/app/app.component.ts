@@ -196,12 +196,12 @@ export class AppComponent implements OnInit {
       if (event instanceof NavigationEnd) {
   
         this.storedObject = this.userService.getStoredUserInfo();  
-        if(this.storedObject.data.role==2){
+        if(this.storedObject && this.storedObject.data && this.storedObject.data.role==2){
           this.appPages=this.appPages2;
-        }if(this.storedObject.data.role==7){
+        }
+        if(this.storedObject && this.storedObject.data && this.storedObject.data.role==7){
           this.appPages=this.appPages7;
         }
-
         
         // Check if the current route is '/login'
         if (event.url === '/login' || event.url === '/signup') {
