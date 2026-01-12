@@ -98,6 +98,9 @@ export class AssetSupplyPatchPage {
       barcode: [this.assetSupplyProduct.data.barcode],
       qty: [this.assetSupplyProduct.data.qty],
       um: [this.assetSupplyProduct.data.um],
+      target: [this.assetSupplyProduct.data.target],
+      reorder: [this.assetSupplyProduct.data.reorder],
+      minimum: [this.assetSupplyProduct.data.minimum],
     });
     console.log("Formulario inicializado:", this.form.value);
   }
@@ -112,9 +115,11 @@ export class AssetSupplyPatchPage {
       barcode: [this.assetSupplyProduct.data.barcode],
       qty: [this.assetSupplyProduct.data.qty],
       um: [this.assetSupplyProduct.data.um],
+      target: [this.assetSupplyProduct.data.target],
+      reorder: [this.assetSupplyProduct.data.reorder],
+      minimum: [this.assetSupplyProduct.data.minimum],
     });
     console.log("Formulario inicializado:", this.form.value);
-
   }
 
   patch() {
@@ -136,7 +141,7 @@ export class AssetSupplyPatchPage {
         this.utilService.presentToast("cant: "+r[0].data.qty+" "+r[0].data.name)
         this.resetForm();
        this.utilService.presentToast('resetForm')
-       this.router.navigate(['/app/tabs/asset-supply-readprdct']);
+       this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });
       },
       error: (e) => console.error("PATCH ERROR:", e),
     });
@@ -149,7 +154,10 @@ export class AssetSupplyPatchPage {
       name: '',
       barcode: '',
       qty: 1,
-      um: null
+      um: null,
+      target: 0,
+      reorder: 0,
+      minimum: 0,
     });
   }
 

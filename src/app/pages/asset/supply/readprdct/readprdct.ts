@@ -30,8 +30,6 @@ import { IonSearchbar } from '@ionic/angular';
 })
 export class AssetSupplyReadprdctPage {
 
-
-
 @ViewChild('searchbar', { static: false }) searchbar!: IonSearchbar;
   ios: boolean;
   segment = 'all';
@@ -72,7 +70,7 @@ export class AssetSupplyReadprdctPage {
     private rexService: RexService
   ) {}
 
-/*  printSelectedBarcodes(p: Product) {*/
+  /*  printSelectedBarcodes(p: Product) {*/
     /*const paddedId = p.id.toString().padStart(6, '0');*/
     /*const selectedBarcodes = [paddedId];*/
     /*this.barcodeService.downloadPDF(selectedBarcodes);*/
@@ -82,7 +80,7 @@ export class AssetSupplyReadprdctPage {
   filteredProductsByCategory: any[] = [];
 
   async ngOnInit(){
-    this.refreshView();
+    //this.refreshView();
   }
 
   async ionViewWillEnter(){
