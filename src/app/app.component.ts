@@ -72,10 +72,15 @@ export class AppComponent implements OnInit {
        url: '/app/tabs/schedule',
        icon: 'calendar'
      },
-     {
+      {
        title: 'Productos',
        url: '/app/tabs/readprd',
        icon: 'cube'
+     },
+     {
+       title: 'Reabastecimiento',
+       url: '/app/tabs/asset-supply-reorder',
+       icon: 'layers'
      },
    ];
   appPages4 = [
@@ -145,6 +150,11 @@ export class AppComponent implements OnInit {
        title: 'Registrar retiro',
        url: '/app/tabs/replenishment-withdrawn-post',
        icon: 'add-circle'
+     },
+     {
+       title: 'Reabastecimiento',
+       url: '/app/tabs/asset-supply-reorder',
+       icon: 'layers'
      },
 
    ];

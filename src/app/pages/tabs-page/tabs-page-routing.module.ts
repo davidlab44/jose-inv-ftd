@@ -192,7 +192,16 @@ const routes: Routes = [
           }
         ]
       },
-       {
+      { 
+        path: 'asset-supply-reorder',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../asset/supply/reorder/reorder.module').then(m => m.AssetSupplyReorderModule)
+          }
+        ]
+      },
+      {
         path: 'replenishment-withdrawn-post',
         children: [
           {
