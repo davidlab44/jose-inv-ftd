@@ -17,8 +17,9 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
-  <ion-toolbar>
 
+
+  <ion-toolbar>
     <div class="filter-row">
       <ion-item lines="none" class="filter-item">
         <ion-button
@@ -51,105 +52,34 @@
           >
             {{ c.data?.nombre }}
           </ion-select-option>
+
         </ion-select>
+
+        &nbsp;&nbsp;
+        <ion-button slot="end" (click)="generatePurchaseOrderPDF()">
+          <ion-icon name="print-outline"></ion-icon>
+        </ion-button>
+
       </ion-item>
     </div>
   </ion-toolbar>
+
+
+
+
+
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="segment" (ionChange)="updateSchedule()">
+      <ion-segment-button value="all"> Normal </ion-segment-button>
+      <ion-segment-button value="favorites"> Critico </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+
+
+
 </ion-header>
 
 <ion-content>
-
-<!--    <div> -->
-      <!--<ion-item>-->
-        <!--[> Botón Reload <]    -->
-        <!--<ion-button              -->
-          <!--slot="start"           -->
-          <!--fill="clear"           -->
-          <!--color="default"        -->
-          <!--(click)="reloadPage()" -->
-        <!--> -->
-          <!--<ion-icon name="refresh-outline"></ion-icon>-->
-        <!--</ion-button>            -->
-        <!--&nbsp;&nbsp;&nbsp;&nbsp;-->
-        <!--<ion-label>Categoría</ion-label>-->
-
-        <!--<ion-select-->
-          <!--[(ngModel)]="selectedCategoryId"-->
-          <!--(ionChange)="filterProductsByCategory($event.detail.value)"-->
-          <!--placeholder="Todas"-->
-        <!-->-->
-          <!--<ion-select-option [value]="null">-->
-            <!--Todas-->
-          <!--</ion-select-option>-->
-
-          <!--<ion-select-option-->
-            <!--*ngFor="let c of categories"-->
-            <!--[value]="c.id"-->
-          <!-->-->
-            <!--{{ c.data?.nombre }}-->
-          <!--</ion-select-option>-->
-        <!--</ion-select>-->
-      <!--</ion-item>-->
-    <!--</div>-->
-
-  <!--<div>-->
-    <!--<ion-item>-->
-      <!--[> Botón Reload <]-->
-      <!--<ion-button-->
-        <!--slot="start"-->
-        <!--fill="clear"-->
-        <!--color="default"-->
-        <!--(click)="reloadPage()"-->
-      <!-->-->
-        <!--<ion-icon name="refresh-outline"></ion-icon>-->
-      <!--</ion-button>-->
-      <!--&nbsp;&nbsp;&nbsp;&nbsp;-->
-      <!--<ion-label>Categoría</ion-label>-->
-
-      <!--<ion-select-->
-        <!--[(ngModel)]="selectedCategoryId"-->
-        <!--(ionChange)="filterProductsByCategory($event.detail.value)"-->
-        <!--placeholder="Todas"-->
-      <!-->-->
-        <!--<ion-select-option [value]="null">-->
-          <!--Todas-->
-        <!--</ion-select-option>-->
-
-        <!--<ion-select-option-->
-          <!--*ngFor="let c of categories"-->
-          <!--[value]="c.id"-->
-        <!-->-->
-          <!--{{ c.data?.nombre }}-->
-        <!--</ion-select-option>-->
-      <!--</ion-select>-->
-    <!--</ion-item>-->
-  <!--</div>-->
-
-
-  <!--<div>-->
-    <!--<ion-item>-->
-     <!--[>boton aqui <]-->
-  <!--<ion-label>Categoría</ion-label>-->
-  <!--<ion-select-->
-    <!--[(ngModel)]="selectedCategoryId"-->
-    <!--(ionChange)="filterProductsByCategory($event.detail.value)"-->
-    <!--placeholder="Todas"-->
-  <!-->-->
-    <!--<ion-select-option [value]="null">-->
-      <!--Todas-->
-    <!--</ion-select-option>-->
-
-    <!--<ion-select-option-->
-      <!--*ngFor="let c of categories"-->
-      <!--[value]="c.id"-->
-    <!-->-->
-      <!--{{ c.data?.nombre }}-->
-    <!--</ion-select-option>-->
-  <!--</ion-select>-->
-<!--</ion-item>-->
-
-  <!--</div>-->
-
 
   <ion-list>
     <ion-item *ngFor="let p of productList" style="display:flex; align-items:center;">

@@ -22,6 +22,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { RexService } from '../../../../services/rex.service';
 import { IonSearchbar } from '@ionic/angular';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'page-reorder',
@@ -47,6 +48,7 @@ export class AssetSupplyReorderPage {
   activeSession: Session | null = null;
   sessionId: number | null = null;
   searchSubject = new Subject<string>();
+  point:string="reorder";
 
   constructor(
     private barcodeService: BarcodeService,
@@ -224,8 +226,13 @@ filterProductsByCategory(categoryId: number | null) {
       this.productService.getAll().subscribe({
         next: response => {
           this.productListFull=response;
-          console.log('products full',this.productListFull)
-          this.productList =  this.filterBelowReorder(this.productListFull);
+          console.log('products full',this.productListFull);
+          if(this.point=="reorder"){
+            this.productList =  this.filterBelowReorder(this.productListFull);
+          }
+          if(this.point=="minimum"){
+            this.productList =  this.filterBelowMinimum(this.productListFull);
+          }
           console.log('this.productList',this.productList)
           console.log('categorias',this.categories)
           
@@ -395,10 +402,96 @@ filterProductsByCategory(categoryId: number | null) {
     });
   }
 
+  filterBelowMinimum(products: any[]): any[] {
+    if (!Array.isArray(products)) {
+      return [];
+    }
+    return products.filter(p => {
+      const qty = p?.data?.qty;
+      const minimum = p?.data?.minimum;
+      return (
+        typeof qty === 'number' &&
+        typeof minimum === 'number' &&
+        qty < minimum
+      );
+    });
+  }
+
   reloadPage() {
     window.location.reload();
   }
 
+
+
+
+  generatePurchaseOrderPDF() {
+    const doc = new jsPDF();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    let y = 15;
+
+    /* ================= HEADER ================= */
+    doc.setFontSize(14);
+    doc.text('Orden de compra', 10, y);
+    doc.setFontSize(10);
+    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 150, y);
+
+    y += 12;
+
+    /* ============== PROVEEDOR ================= */
+    doc.setFontSize(10);
+    doc.text('Proveedor: ____________________', 10, y);
+    doc.text('NIT: ______', 110, y);
+    doc.text('Dirección: ___________________________', 150, y);
+
+    y += 7;
+    doc.text('Teléfono: __________', 10, y);
+    doc.text('Email: __________', 80, y);
+    doc.text('Contacto: __________', 150, y);
+
+    /* ========= ESPACIO / OXÍGENO ========= */
+    y += 20;
+
+    /* ================= TABLE HEADER ================= */
+    doc.setFontSize(10);
+    doc.text('#', 10, y);
+    doc.text('Nombre del producto', 20, y);
+    doc.text('UM', 120, y);
+    doc.text('Precio Unit', 140, y);
+    doc.text('Precio Total', 170, y);
+
+    y += 3;
+    doc.line(10, y, 200, y);
+    y += 8;
+
+    /* ================= PRODUCTS ================= */
+    this.productList.forEach((p, index) => {
+      // antes de escribir, validamos espacio
+      if (y > pageHeight - 50) {
+        doc.addPage();
+        y = 20;
+      }
+
+      doc.text(String(index + 1), 10, y);
+      doc.text(p?.data?.name || '', 20, y);
+
+      y += 7;
+    });
+
+    /* ================= FOOTER (BOTTOM FIXED) ================= */
+    const footerY = pageHeight - 35;
+
+    doc.line(10, footerY - 5, 200, footerY - 5);
+
+    doc.text('Precio en letras:', 10, footerY);
+    doc.text('_____________________________________________', 50, footerY);
+
+    doc.text('Autoriza:', 10, footerY + 15);
+    doc.text('_______________________________', 40, footerY + 15);
+
+    /* ================= SAVE ================= */
+    doc.save('orden-compra.pdf');
+  }
 
 }
 
