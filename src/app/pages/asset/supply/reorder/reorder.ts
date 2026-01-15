@@ -33,7 +33,6 @@ export class AssetSupplyReorderPage {
 
 @ViewChild('searchbar', { static: false }) searchbar!: IonSearchbar;
   ios: boolean;
-  segment = 'all';
   showSearchbar: boolean;
   opportunities = [];
   storedObject: any;
@@ -159,53 +158,55 @@ export class AssetSupplyReorderPage {
 
   /*}*/
 
-selectedCategoryId: number | null = null;
-
-
-filterProductsByCategory(categoryId: number | null) {
-
-  // 👉 Caso "Todas"
-  if (categoryId === null) {
-    this.refreshView();
-    return;
+  selectedCategoryId: number | null = null;
+  
+  filterProductsByCategory(categoryId: number | null) {
+    // 👉 Caso "Todas"
+    if (categoryId === null) {
+      this.refreshView();
+      return;
+    }
+    // 👉 Seguridad extra (por si llega algo raro)
+    if (categoryId === undefined) {
+      return;
+    }
+    // 👉 Filtrar por categoría
+    this.productList = this.productList.filter(p =>
+      Array.isArray(p?.data?.categ) &&
+      p.data.categ.includes(categoryId)
+    );
   }
 
-  // 👉 Seguridad extra (por si llega algo raro)
-  if (categoryId === undefined) {
-    return;
-  }
+  /*v*/
+  /*filterProductsByCategory(categoryId: number | null) {*/
+    /*if (!categoryId) {*/
+      /*// Si no hay categoría seleccionada, mostrar todos*/
+      /*this.productList = [...this.productListFull];*/
+      /*return;*/
+    /*}*/
 
-  // 👉 Filtrar por categoría
-  this.productList = this.productList.filter(p =>
-    Array.isArray(p?.data?.categ) &&
-    p.data.categ.includes(categoryId)
-  );
-}
+    /*if (categoryId === null) {*/
+      /*this.refreshView();*/
+      /*return;*/
+    /*}*/
 
-
-/*v*/
-/*filterProductsByCategory(categoryId: number | null) {*/
-  /*if (!categoryId) {*/
-    /*// Si no hay categoría seleccionada, mostrar todos*/
-    /*this.productList = [...this.productListFull];*/
-    /*return;*/
+    /*this.productList = this.productList.filter(p =>*/
+      /*p?.data?.categ?.includes(categoryId)*/
+    /*);*/
   /*}*/
 
-  /*if (categoryId === null) {*/
-    /*this.refreshView();*/
-    /*return;*/
-  /*}*/
-
-  /*this.productList = this.productList.filter(p =>*/
-    /*p?.data?.categ?.includes(categoryId)*/
-  /*);*/
-/*}*/
-
-
-
-  updateSchedule(){
+  
+  updateSchedule() {
+    if (this.point === 'reorder') {
+      console.log(this.point);
+      this.refreshView();
+    }
+    if (this.point === 'minimum') {
+      console.log(this.point);
+      this.refreshView();
+    }
   }
-
+  
   ionViewDidEnter() {}
 
   posCategId:number=0

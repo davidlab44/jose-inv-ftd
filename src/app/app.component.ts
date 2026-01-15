@@ -20,8 +20,6 @@ import { UserService } from './services/user.service';
 export class AppComponent implements OnInit {
 
   categories: Category[] = [];
-
-  //appPages=[];
   
   appPages = [
      {
@@ -66,7 +64,20 @@ export class AppComponent implements OnInit {
      },
 
    ];
-  appPages2 = [
+   appPages2 = [
+     {
+       title: 'Inicio',
+       url: '/app/tabs/schedule',
+       icon: 'calendar'
+     },
+      {
+       title: 'Productos',
+       url: '/app/tabs/readprd',
+       icon: 'cube'
+     },
+   ];
+
+   appPages3 = [
      {
        title: 'Inicio',
        url: '/app/tabs/schedule',
@@ -83,29 +94,8 @@ export class AppComponent implements OnInit {
        icon: 'layers'
      },
    ];
-  appPages4 = [
-     {
-       title: 'Inicio',
-       url: '/app/tabs/replenishment',
-       icon: 'home'
-     },
-     {
-       title: 'Inventario',
-       url: '/app/tabs/readren',
-       icon: 'cube'
-     },
-     {
-       title: 'Fijar precio',
-       url: '/app/tabs/glpprices',
-       icon: 'cash'
-     },
-     {
-       title: 'Registrar',
-       url: '/app/tabs/replenishment-post',
-       icon: 'bus'
-     },
-   ];
-  appPages7 = [
+  
+   appPages7 = [
      {
        title: 'Inicio',
        url: '/app/tabs/schedule',
@@ -200,19 +190,18 @@ export class AppComponent implements OnInit {
       /*this.appPages = this.appPages4;*/
       /*this.router.navigate(['/app/tabs/replenishment']);*/
     /*}*/
-
-
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-  
         this.storedObject = this.userService.getStoredUserInfo();  
         if(this.storedObject && this.storedObject.data && this.storedObject.data.role==2){
           this.appPages=this.appPages2;
         }
+        if(this.storedObject && this.storedObject.data && this.storedObject.data.role==3){
+          this.appPages=this.appPages3;
+        }
         if(this.storedObject && this.storedObject.data && this.storedObject.data.role==7){
           this.appPages=this.appPages7;
         }
-        
         // Check if the current route is '/login'
         if (event.url === '/login' || event.url === '/signup') {
           this.showMenu = false; // Hide the menu

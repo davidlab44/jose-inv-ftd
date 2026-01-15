@@ -35,18 +35,8 @@ export class PricePage {
   ios: boolean;
   importado: boolean=false;
   hasOwner: boolean = false;
-  //segment = 'all';
   showSearchbar: boolean;
-  //posOrders: any[] = [];
-  //posOrderLineList: any[] = [];
-  //pendingCommands: any[] = [];
-  //deliveredList: any[] = [];
-  //filteredProductList: any[] = [];
-  //maxQtyDeliveredItems: any[] = [];
   queryText:any
-  //mesas: any[] = [];
-  //activeSession: Session | null = null;
-  //sessionId: number | null = null;
   searchSubject = new Subject<string>();
   todayDate:any
 
@@ -76,11 +66,6 @@ export class PricePage {
     private glpricesService : GlppricesService
   ) {}
 
-  /*printSelectedBarcodes(p: Product) {*/
-    /*const paddedId = p.id.toString().padStart(6, '0');*/
-    /*const selectedBarcodes = [paddedId];*/
-    /*this.barcodeService.printIn50mmPortablePrinterBt(selectedBarcodes);*/
-  /*}*/
 
   hash:string='';
   table:any
@@ -89,9 +74,9 @@ export class PricePage {
   glppricesList:any[]=[];
     
   async ngOnInit() {
-    const ahora = new Date();
-    this.todayDate = this.formatFechaLatam(ahora);
-    this.getAllPrices();
+/*    const ahora = new Date();*/
+    /*this.todayDate = this.formatFechaLatam(ahora);*/
+    /*this.getAllPrices();*/
   }
 
   getAllPrices(){
@@ -154,15 +139,6 @@ export class PricePage {
     );
   }
 
-  /*  getMaxIdItem(items: any[]){*/
-    /*if (!items || items.length === 0) {*/
-      /*return null; // No hay elementos*/
-    /*}*/
-    /*this.lastGlpprice= items.reduce((max, item) =>*/
-      /*item.id > max.id ? item : max*/
-    /*);*/
-    /*console.log('lastGlpprice.data',this.lastGlpprice.data)*/
-  /*}*/
 
   lastImportedPrice: any = "";
   getMaxImportedItem(items: any[]) {

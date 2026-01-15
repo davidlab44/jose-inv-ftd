@@ -131,7 +131,7 @@ columns = [
     private withdrawnService: WithdrawnService
   ) {}
 
-/*  printSelectedBarcodes(p: Product) {*/
+  /*printSelectedBarcodes(p: Product) {*/
     /*const paddedId = p.id.toString().padStart(6, '0');*/
     /*const selectedBarcodes = [paddedId];*/
     /*this.barcodeService.printIn50mmPortablePrinterBt(selectedBarcodes);*/
