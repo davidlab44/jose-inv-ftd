@@ -107,7 +107,7 @@ export class AppComponent implements OnInit {
        icon: 'cube'
      },
      {
-       title: 'Productos barcode ',                                                                                         
+       title: 'Productos barcode ',
        url: '/app/tabs/readprdct',     
        icon: 'cube'
      },
@@ -125,6 +125,16 @@ export class AppComponent implements OnInit {
        title: 'Listar productos ',
        url: '/app/tabs/asset-supply-readprdct',
        icon: 'document-text'
+     },
+     {
+       title: 'Replenishment',
+       url: '/app/tabs/replenishment',
+       icon: 'add-circle'
+     },
+     {
+       title: 'Glp precio',
+       url: '/app/tabs/glpprices',
+       icon: 'add-circle'
      },
      {
        title: 'Registrar producto',
@@ -183,7 +193,6 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
-
     /*this.showMenu=true;*/
     /*const host = window.location.hostname;*/
     /*if (host.startsWith("abs.")) {*/

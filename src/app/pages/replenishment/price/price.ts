@@ -74,9 +74,9 @@ export class PricePage {
   glppricesList:any[]=[];
     
   async ngOnInit() {
-/*    const ahora = new Date();*/
-    /*this.todayDate = this.formatFechaLatam(ahora);*/
-    /*this.getAllPrices();*/
+    const ahora = new Date();
+    this.todayDate = this.formatFechaLatam(ahora);
+    this.getAllPrices();
   }
 
   getAllPrices(){

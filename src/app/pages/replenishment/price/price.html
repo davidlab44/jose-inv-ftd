@@ -42,88 +42,88 @@
 
 
 
-<!--<ion-content [ngClass]="{ 'bg-nacional': !importado, 'bg-importado': importado }" class="ion-padding">-->
-  <!--<div>-->
-    <!--<ion-item>-->
-      <!--<ion-input-->
-        <!--type="number"-->
-        <!--inputmode="numeric"-->
-        <!--placeholder="0"-->
-        <!--[(ngModel)]="numero">-->
-      <!--</ion-input>-->
-    <!--</ion-item>-->
-    <!--<br>-->
-    <!--<ion-button expand="block" (click)="addGlpprice(numero)">-->
-      <!--Actualizar precio-->
-    <!--</ion-button>-->
-    <!--<br>-->
+<ion-content [ngClass]="{ 'bg-nacional': !importado, 'bg-importado': importado }" class="ion-padding">
+  <div>
+    <ion-item>
+      <ion-input
+        type="number"
+        inputmode="numeric"
+        placeholder="0"
+        [(ngModel)]="numero">
+      </ion-input>
+    </ion-item>
+    <br>
+    <ion-button expand="block" (click)="addGlpprice(numero)">
+      Actualizar precio
+    </ion-button>
+    <br>
 
-    <!--<table style="width: 100%;">-->
-      <!--<tr [ngClass]="importado ? 'row-importado' : 'row-nacional'">-->
-        <!--<td style="width: 80%;">-->
-          <!--<span style="font-size:small;">-->
-            <!--&nbsp;&nbsp;Precio actual {{ formatFechaLatam(currentPrice?.created_at) }}&nbsp;&nbsp;-->
-          <!--</span>-->
-        <!--</td>-->
-        <!--<td style="padding:8px;width:20%;">-->
-          <!--<h5>{{ currentPrice?.data?.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}&nbsp;</h5>-->
-        <!--</td>-->
-      <!--</tr>-->
-    <!--</table>-->
+    <table style="width: 100%;">
+      <tr [ngClass]="importado ? 'row-importado' : 'row-nacional'">
+        <td style="width: 80%;">
+          <span style="font-size:small;">
+            &nbsp;&nbsp;Precio actual {{ formatFechaLatam(currentPrice?.created_at) }}&nbsp;&nbsp;
+          </span>
+        </td>
+        <td style="padding:8px;width:20%;">
+          <h5>{{ currentPrice?.data?.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}&nbsp;</h5>
+        </td>
+      </tr>
+    </table>
 
-    <!--<br><br>-->
+    <br><br>
 
-     <!--<ion-list *ngIf="!importado">-->
-      <!--<ion-item class="titulo-historico">-->
-        <!--<span>Histórico</span>-->
-      <!--</ion-item>-->
-      <!--<ng-container *ngFor="let p of glppricesList">-->
-        <!--<ion-item-->
-          <!--*ngIf="p.data.id_replenishment_product === 1"-->
-          <!--class="item-historico">-->
-          <!--<div style="display: flex; width: 100%; align-items: center;">-->
-            <!--<div style="flex: 0 0 66%; text-align:left;">-->
-              <!--<span style="font-size: x-small;">-->
-                <!--{{ formatFechaLatam(p.created_at) }}-->
-              <!--</span>-->
-            <!--</div>-->
-            <!--<div style="flex: 0 0 33%; text-align:right; font-size: small;">-->
-              <!--<span>-->
-                <!--{{ p.data.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}-->
-              <!--</span>-->
-            <!--</div>-->
-          <!--</div>-->
-        <!--</ion-item>-->
-      <!--</ng-container>-->
-    <!--</ion-list>-->
+     <ion-list *ngIf="!importado">
+      <ion-item class="titulo-historico">
+        <span>Histórico</span>
+      </ion-item>
+      <ng-container *ngFor="let p of glppricesList">
+        <ion-item
+          *ngIf="p.data.id_replenishment_product === 1"
+          class="item-historico">
+          <div style="display: flex; width: 100%; align-items: center;">
+            <div style="flex: 0 0 66%; text-align:left;">
+              <span style="font-size: x-small;">
+                {{ formatFechaLatam(p.created_at) }}
+              </span>
+            </div>
+            <div style="flex: 0 0 33%; text-align:right; font-size: small;">
+              <span>
+                {{ p.data.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}
+              </span>
+            </div>
+          </div>
+        </ion-item>
+      </ng-container>
+    </ion-list>
 
-   <!--<ion-list *ngIf="importado">-->
-      <!--<ion-item class="titulo-historico">-->
-        <!--<span>Histórico</span>-->
-      <!--</ion-item>-->
-      <!--<ng-container *ngFor="let p of glppricesList">-->
-        <!--<ion-item-->
-          <!--*ngIf="p.data.id_replenishment_product === 2"-->
-          <!--class="item-historico">-->
-          <!--<div style="display: flex; width: 100%; align-items: center;">-->
-            <!--<div style="flex: 0 0 66%; text-align:left;">-->
-              <!--<span style="font-size: x-small;">-->
-                <!--{{ formatFechaLatam(p.created_at) }}-->
-              <!--</span>-->
-            <!--</div>-->
-            <!--<div style="flex: 0 0 33%; text-align:right; font-size: small;">-->
-              <!--<span>-->
-                <!--{{ p.data.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}-->
-              <!--</span>-->
-            <!--</div>-->
-          <!--</div>-->
-        <!--</ion-item>-->
-      <!--</ng-container>-->
-    <!--</ion-list>-->
+   <ion-list *ngIf="importado">
+      <ion-item class="titulo-historico">
+        <span>Histórico</span>
+      </ion-item>
+      <ng-container *ngFor="let p of glppricesList">
+        <ion-item
+          *ngIf="p.data.id_replenishment_product === 2"
+          class="item-historico">
+          <div style="display: flex; width: 100%; align-items: center;">
+            <div style="flex: 0 0 66%; text-align:left;">
+              <span style="font-size: x-small;">
+                {{ formatFechaLatam(p.created_at) }}
+              </span>
+            </div>
+            <div style="flex: 0 0 33%; text-align:right; font-size: small;">
+              <span>
+                {{ p.data.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}
+              </span>
+            </div>
+          </div>
+        </ion-item>
+      </ng-container>
+    </ion-list>
 
 
-  <!--</div>-->
-<!--</ion-content>-->
+  </div>
+</ion-content>
 
 
 

@@ -54,33 +54,33 @@ export class AssetSupplyPostPage {
   form!: FormGroup;
   replenishmentList: any[] = [];
 
-   columns = [
-      { header: 'Fecha V', field: 'fecha_v' },
-      { header: 'Cont vacío', field: 'cont_vacio' },
-      { header: 'Rem vacío', field: 'rem_vacio' },
-      { header: 'Fe ing M', field: 'fe_ing_m' },
-      { header: 'Rem M LL', field: 'rem_m_ll' },
-      { header: 'Sur', field: 'sur' },
-      { header: 'Nort', field: 'nort' },
-      { header: 'Fecha', field: 'fecha' },
-      { header: 'Ticket', field: 'ticket' },
-      { header: 'PSI', field: 'psi' },
-      { header: 'OPC', field: 'opc' },
-      { header: 'IMPO', field: 'impo' },
-      { header: 'P Total', field: 'p_total' },
-      { header: 'Rotogate', field: 'rotogate' },
-      { header: 'P Vacío B', field: 'p_vacio_b' },
-      { header: 'Peso lleno B', field: 'peso_lleno_b' },
-      { header: 'P Neto', field: 'p_neto' },
-      { header: 'Dif', field: 'dif' },
-      { header: 'Precio P', field: 'precio_p' },
-      { header: 'Fecha F', field: 'fecha_f' },
-      { header: 'Factura', field: 'factura' },
-      { header: 'Valor Fact', field: 'valor_fact' },
-      { header: 'Sello1', field: 'sello1' },
-      { header: 'Sello2', field: 'sello2' },
-      { header: 'Sello3', field: 'sello3' },
-    ];
+   /*columns = [*/
+      /*{ header: 'Fecha V', field: 'fecha_v' },*/
+      /*{ header: 'Cont vacío', field: 'cont_vacio' },*/
+      /*{ header: 'Rem vacío', field: 'rem_vacio' },*/
+      /*{ header: 'Fe ing M', field: 'fe_ing_m' },*/
+      /*{ header: 'Rem M LL', field: 'rem_m_ll' },*/
+      /*{ header: 'Sur', field: 'sur' },*/
+      /*{ header: 'Nort', field: 'nort' },*/
+      /*{ header: 'Fecha', field: 'fecha' },*/
+      /*{ header: 'Ticket', field: 'ticket' },*/
+      /*{ header: 'PSI', field: 'psi' },*/
+      /*{ header: 'OPC', field: 'opc' },*/
+      /*{ header: 'IMPO', field: 'impo' },*/
+      /*{ header: 'P Total', field: 'p_total' },*/
+      /*{ header: 'Rotogate', field: 'rotogate' },*/
+      /*{ header: 'P Vacío B', field: 'p_vacio_b' },*/
+      /*{ header: 'Peso lleno B', field: 'peso_lleno_b' },*/
+      /*{ header: 'P Neto', field: 'p_neto' },*/
+      /*{ header: 'Dif', field: 'dif' },*/
+      /*{ header: 'Precio P', field: 'precio_p' },*/
+      /*{ header: 'Fecha F', field: 'fecha_f' },*/
+      /*{ header: 'Factura', field: 'factura' },*/
+      /*{ header: 'Valor Fact', field: 'valor_fact' },*/
+      /*{ header: 'Sello1', field: 'sello1' },*/
+      /*{ header: 'Sello2', field: 'sello2' },*/
+      /*{ header: 'Sello3', field: 'sello3' },*/
+    /*];*/
 
   constructor(
     private barcodeService: BarcodeService,
@@ -109,12 +109,6 @@ export class AssetSupplyPostPage {
     private replenishmentService : ReplenishmentService,
   ) {}
 
-  /*printSelectedBarcodes(p: Product) {*/
-    /*const paddedId = p.id.toString().padStart(6, '0');*/
-    /*const selectedBarcodes = [paddedId];*/
-    /*this.barcodeService.downloadPDF(selectedBarcodes);*/
-  /*}*/
-
   hash:string='';
   table:any
   rexDocument:any;
@@ -122,13 +116,15 @@ export class AssetSupplyPostPage {
   ngOnInit() {
     this.loadCategories();
     this.loadUms();
-
     this.form = this.fb.group({
       category: [0],
       name: [''],
       barcode: [0],
       qty: [0],
       um: [0],
+      target: [0],
+      reorder: [0],
+      minimum: [0],
     });
     const ahora = new Date();
     this.todayDate=this.formatFechaLatam(ahora);
