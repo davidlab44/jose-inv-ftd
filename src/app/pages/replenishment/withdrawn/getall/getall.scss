@@ -48,14 +48,56 @@ ion-card-title {
 
 
 
-/*swiper-container {*/
-  /*--swiper-pagination-bottom: 10px;*/
-  /*height: 100%;*/
-/*}*/
 
-/*swiper-slide {*/
-  /*display: flex;*/
-  /*justify-content: center;*/
-  /*align-items: flex-start;*/
-/*}*/
+
+
+.range-container {
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+.date-boxes {
+  display: flex;
+  width: 100%;
+}
+
+.date-box {
+  width: 50%;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid var(--ion-color-light);
+  background: var(--ion-color-light);
+  border-radius: 6px;
+  margin: 4px;
+}
+
+.date-box .label {
+  display: block;
+  font-size: 10px;
+  color: var(--ion-color-medium);
+}
+
+.date-box .value {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+}
+
+.day-range {
+  width: 100%;
+  padding: 0 8px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 

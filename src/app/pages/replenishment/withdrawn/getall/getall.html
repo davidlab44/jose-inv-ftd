@@ -33,6 +33,177 @@
 
 
 
+<ion-content>
+
+
+
+
+
+
+
+
+
+<ion-item class="range-container" lines="none">
+
+  <!-- Cajas de texto -->
+  <div class="date-boxes">
+    <div class="date-box">
+      <span class="label">Desde</span>
+      <span class="value">{{ formatDay(startDay) }}</span>
+    </div>
+
+    <div class="date-box">
+      <span class="label">Hasta</span>
+      <span class="value">{{ formatDay(endDay) }}</span>
+    </div>
+  </div>
+
+</ion-item>
+
+<ion-item lines="none">
+  <ion-range
+    class="day-range"
+    min="1"
+    max="365"
+    step="1"
+    dualKnobs="true"
+    snaps="true"
+    ticks="true"
+    [(ngModel)]="dayRange"
+    (ionChange)="onRangeChange($event)"
+  >
+<!--    <ion-label slot="start">1</ion-label>-->
+    <!--<ion-label slot="end">365</ion-label>-->
+  </ion-range>
+</ion-item>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><br>
+
+  <ion-item lines="none">
+    <div style="display:flex; width:100%; justify-content:center; gap:8px;">
+
+      <!-- Select Tipo -->
+      <ion-select
+        interface="popover"
+        placeholder="Tipo"
+        style="width:50%;"
+        [(ngModel)]="filterType"
+        (ionChange)="onTypeChange($event)"
+      >
+        <ion-select-option
+          *ngFor="let t of types"
+          [value]="t.value"
+        >
+          {{ t.name }}
+        </ion-select-option>
+      </ion-select>
+
+      <!-- Select Vendor -->
+      <ion-select
+        interface="popover"
+        placeholder="Vendor"
+        style="width:50%;"
+        [(ngModel)]="filterVendor"
+        (ionChange)="onVendorChange($event)"
+      >
+        <ion-select-option
+          *ngFor="let v of vendors"
+          [value]="v.value"
+        >
+          {{ v.name }}
+        </ion-select-option>
+      </ion-select>
+
+    </div>
+  </ion-item>
+
+  <br><br>
+
+  <ion-list>
+    <ion-item style="display:flex; align-items:center;">
+    
+      <ion-label style="font-size: small;">
+        <span style="font-size:xx-small;font-weight:500;">Fecha&nbsp;</span>
+      </ion-label>
+
+
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;font-weight:500;">Isotanque&nbsp;</span>
+      </ion-label>
+
+      <ion-label style="font-size:small;">
+       <span style="font-size:xx-small;font-weight:400;">kg&nbsp;</span>
+      </ion-label>
+
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;font-weight:300;">Vendor&nbsp;</span><br>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+
+  <ion-list>
+    <ion-item *ngFor="let p of withdrawnList " style="display:flex; align-items:center;">
+    
+      <ion-label style="font-size: small;">
+        <span style="font-size:xx-small;" >{{formatFechaLatam(p.data.adate)}}&nbsp;</span>
+      </ion-label>
+
+
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;" >{{p.data.aname}}&nbsp;</span><br>
+        <span style="font-size:xx-small;" >{{p.data.bname}}&nbsp;</span>
+      </ion-label>
+
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;" >{{p.data.akg}}&nbsp;</span><br>
+        <span style="font-size:xx-small;" >{{p.data.bkg}}&nbsp;</span>
+      </ion-label>
+
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;" *ngIf="p.data.avendor==1"   >Plexa&nbsp;</span><br>
+        <span style="font-size:xx-small;" *ngIf="p.data.avendor==2"   >Plexa port&nbsp;</span><br>
+        <span style="font-size:xx-small;" *ngIf="p.data.bvendor==1"   >Plexa&nbsp;</span><br>
+        <span style="font-size:xx-small;" *ngIf="p.data.bvendor==2"   >Plexa port&nbsp;</span><br>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!--<pre>{{withdrawnList | json }}</pre>-->
+
+</ion-content>
+
+
+
+
+
+
+
+
+
 
 
 

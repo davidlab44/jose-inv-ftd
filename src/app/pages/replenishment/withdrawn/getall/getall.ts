@@ -32,35 +32,234 @@ import { WithdrawnService } from '../../../../services/replenishment/withdrawn.s
 })
 export class GetallPage implements OnInit {
 
+
+
+
+
 withdrawnList: any[] = [];
 
-columns = [
-    { header: 'Fecha V', field: 'fecha_v' },
-    { header: 'Cont vacío', field: 'cont_vacio' },
-    { header: 'Rem vacío', field: 'rem_vacio' },
-    { header: 'Fe ing M', field: 'fe_ing_m' },
-    { header: 'Rem M ll', field: 'rem_m_ll' },
-    { header: 'Sur', field: 'sur' },
-    { header: 'Nort', field: 'nort' },
-    { header: 'Fecha', field: 'fecha' },
-    { header: 'Ticket', field: 'ticket' },
-    { header: 'PSI', field: 'psi' },
-    { header: 'OPC', field: 'opc' },
-    { header: 'IMPO', field: 'impo' },
-    { header: 'P Total', field: 'p_total' },
-    { header: 'Rotogate', field: 'rotogate' },
-    { header: 'P Vacío B', field: 'p_vacio_b' },
-    { header: 'Peso Lleno B', field: 'peso_lleno_b' },
-    { header: 'P Neto', field: 'p_neto' },
-    { header: 'DIF', field: 'dif' },
-    { header: 'Precio P', field: 'precio_p' },
-    { header: 'Fecha F', field: 'fecha_f' },
-    { header: 'Factura', field: 'factura' },
-    { header: 'Valor Fact', field: 'valor_fact' },
-    { header: 'Sello 1', field: 'sello1' },
-    { header: 'Sello 2', field: 'sello2' },
-    { header: 'Sello 3', field: 'sello3' }
-  ]; 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /*// Rango seleccionado (día del año)*/
+  /*dayRange = {*/
+    /*lower: 1,*/
+    /*upper: 365*/
+  /*};*/
+
+  /*// Valores individuales*/
+  /*startDay = 1;*/
+  /*endDay = 365;*/
+
+
+  /*onRangeChange(event: any) {*/
+    /*this.startDay = event.detail.value.lower;*/
+    /*this.endDay = event.detail.value.upper;*/
+
+    /*console.log('Desde:', this.formatDay(this.startDay));*/
+    /*console.log('Hasta:', this.formatDay(this.endDay));*/
+  /*}*/
+
+  /*// Sincroniza valores al iniciar*/
+  /*syncDays() {*/
+    /*this.startDay = this.dayRange.lower;*/
+    /*this.endDay = this.dayRange.upper;*/
+  /*}*/
+
+  /*// Convierte día del año → "DD Mes"*/
+  /*formatDay(day: number): string {*/
+    /*const base = new Date('2026-01-01T00:00:00');*/
+    /*base.setDate(base.getDate() + (day - 1));*/
+
+    /*return base.toLocaleDateString('es-ES', {*/
+      /*day: '2-digit',*/
+      /*month: 'short'*/
+    /*});*/
+  /*}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  dayRange = {
+    lower: 1, // inicio del año
+    upper: this.getTodayDayOfYear() // 👈 hoy
+  };
+
+  startDay = 1;
+  endDay = this.dayRange.upper;
+
+
+  onRangeChange(event: any) {
+    this.startDay = event.detail.value.lower;
+    this.endDay = event.detail.value.upper;
+
+    console.log('Desde:', this.formatDay(this.startDay));
+    console.log('Hasta:', this.formatDay(this.endDay));
+  }
+
+  syncDays() {
+    this.startDay = this.dayRange.lower;
+    this.endDay = this.dayRange.upper;
+  }
+
+  formatDay(day: number): string {
+    const base = new Date('2026-01-01T00:00:00');
+    base.setDate(base.getDate() + (day - 1));
+
+    return base.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: 'short'
+    });
+  }
+
+
+
+
+
+
+
+
+
+getTodayDayOfYear(): number {
+  const today = new Date();
+  const start = new Date(today.getFullYear(), 0, 0);
+  const diff =
+    today.getTime() -
+    start.getTime() +
+    (start.getTimezoneOffset() - today.getTimezoneOffset()) * 60 * 1000;
+
+  const oneDay = 1000 * 60 * 60 * 24;
+  return Math.floor(diff / oneDay);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // ==============================
+  // Opciones de los selects
+  // ==============================
+
+  types = [
+    { value: 1, name: 'Nacional' },
+    { value: 2, name: 'Importado' }
+  ];
+
+  vendors = [
+    { value: 1, name: 'Plexa' },
+    { value: 2, name: 'Plexa port' }
+  ];
+
+  // ==============================
+  // Valores seleccionados (default)
+  // ==============================
+
+  filterType: number = this.types[0].value;
+  filterVendor: number = this.vendors[0].value;
+
+  onTypeChange(event: any) {
+    const value = event?.detail?.value ?? this.filterType;
+    this.filterType = value;
+    console.log('Tipo seleccionado:', value);
+  }
+
+  onVendorChange(event: any) {
+    const value = event?.detail?.value ?? this.filterVendor;
+    this.filterVendor = value;
+    console.log('Vendor seleccionado:', value);
+  }
+
+
+
+
+/*columns = [*/
+    /*{ header: 'Fecha V', field: 'fecha_v' },*/
+    /*{ header: 'Cont vacío', field: 'cont_vacio' },*/
+    /*{ header: 'Rem vacío', field: 'rem_vacio' },*/
+    /*{ header: 'Fe ing M', field: 'fe_ing_m' },*/
+    /*{ header: 'Rem M ll', field: 'rem_m_ll' },*/
+    /*{ header: 'Sur', field: 'sur' },*/
+    /*{ header: 'Nort', field: 'nort' },*/
+    /*{ header: 'Fecha', field: 'fecha' },*/
+    /*{ header: 'Ticket', field: 'ticket' },*/
+    /*{ header: 'PSI', field: 'psi' },*/
+    /*{ header: 'OPC', field: 'opc' },*/
+    /*{ header: 'IMPO', field: 'impo' },*/
+    /*{ header: 'P Total', field: 'p_total' },*/
+    /*{ header: 'Rotogate', field: 'rotogate' },*/
+    /*{ header: 'P Vacío B', field: 'p_vacio_b' },*/
+    /*{ header: 'Peso Lleno B', field: 'peso_lleno_b' },*/
+    /*{ header: 'P Neto', field: 'p_neto' },*/
+    /*{ header: 'DIF', field: 'dif' },*/
+    /*{ header: 'Precio P', field: 'precio_p' },*/
+    /*{ header: 'Fecha F', field: 'fecha_f' },*/
+    /*{ header: 'Factura', field: 'factura' },*/
+    /*{ header: 'Valor Fact', field: 'valor_fact' },*/
+    /*{ header: 'Sello 1', field: 'sello1' },*/
+    /*{ header: 'Sello 2', field: 'sello2' },*/
+    /*{ header: 'Sello 3', field: 'sello3' }*/
+  /*]; */
 
   patchThisElement(item:any){
     this.router.navigate(
@@ -76,6 +275,7 @@ columns = [
   };
 
   ngOnInit() {
+     this.syncDays();
     this.loadData();
   }
 

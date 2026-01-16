@@ -20,14 +20,7 @@
 
 
 <ion-content class="ion-padding">
-
-  <!--<form [formGroup]="form">-->
-      <!--<ion-item>-->
-        <!--<ion-label position="floating">Isotanque</ion-label>-->
-        <!--<ion-input formControlName="akg"></ion-input>-->
-      <!--</ion-item>-->
-  <!--</form>-->
-
+  
   <form [formGroup]="form">
 
     <ion-list>
@@ -70,7 +63,12 @@
 
       <ion-item>
         <ion-label position="floating">Isotanque</ion-label>
-        <ion-input formControlName="akg"></ion-input>
+        <ion-input formControlName="aname"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">kg</ion-label>
+        <ion-input type="number" formControlName="akg"></ion-input>
       </ion-item>
 
       <ion-item>
@@ -143,7 +141,12 @@
 
       <ion-item>
         <ion-label position="floating">Isotanque</ion-label>
-        <ion-input formControlName="bkg"></ion-input>
+        <ion-input formControlName="bname"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">kg</ion-label>
+        <ion-input type="number" formControlName="bkg"></ion-input>
       </ion-item>
 
       <ion-item>
@@ -179,13 +182,18 @@
       <br><br>
 
       <h3>Bascula</h3>
-      <ion-item>
-        <ion-label position="floating">Peso vacío</ion-label>
+     <ion-item>
+        <ion-label position="floating">Peso bruto</ion-label>
         <ion-input type="number" formControlName="empty"></ion-input>
+     </ion-item>
+
+     <ion-item>
+        <ion-label position="floating">Tara</ion-label>
+        <ion-input type="number" formControlName="tare"></ion-input>
       </ion-item>
 
       <ion-item>
-        <ion-label position="floating">Peso lleno</ion-label>
+        <ion-label position="floating">Peso neto</ion-label>
         <ion-input type="number" formControlName="full"></ion-input>
       </ion-item>
 

@@ -88,8 +88,12 @@ export class PostPage {
   rexDocument:any;
 
   ngOnInit() {
+
+
+    const now = new Date().toISOString();
+
     this.form = this.fb.group({
-      adate: [''],
+      adate: [now],
       avendor: [''],
       aname: [''],
       aprice: [''],
@@ -100,7 +104,7 @@ export class PostPage {
       aseal2: [''],
       aseal3: [''],
       aticket: [''],
-      bdate: [''],
+      bdate: [now],
       bvendor: [''],
       bname: [''],
       bprice: [''],
@@ -112,6 +116,7 @@ export class PostPage {
       bseal3: [''],
       bticket: [''],
       empty: [''],
+      tare: [''],
       full: [''],
     });
     const ahora = new Date();
