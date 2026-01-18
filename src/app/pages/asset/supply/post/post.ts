@@ -245,6 +245,52 @@ export class AssetSupplyPostPage {
 
 
 
+
+
+
+
+
+
+
+
+
+  optimizedImage: string | null = null;
+    imageName: string = '';
+    async takePicture(): Promise<void> {
+      this.optimizedImage = await this.photoService.takePicture();
+      if (this.optimizedImage) {
+        console.log('Imagen optimizada:', this.optimizedImage);
+      } else {
+        console.error('No se pudo tomar la foto');
+      }
+    }
+    selectedImage: string | null = null;
+    async pickImage(): Promise<void> {
+      this.visibilidadBotonGallery = false;
+      this.selectedImage = await this.imageService.pickImage(); 
+      if (this.selectedImage) {
+        console.log('Imagen seleccionada y comprimida:', this.selectedImage);
+        this.optimizedImage=this.selectedImage; //this.showAttachment=true; //this.showPhoto=false;
+      } else {
+        console.error('No se seleccionó una imagen válida.');//this.showAttachment=false;
+      }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 

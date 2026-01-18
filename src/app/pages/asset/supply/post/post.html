@@ -55,6 +55,48 @@
         <ion-input type="number" formControlName="minimum"></ion-input>
       </ion-item>
 
+
+
+
+
+
+
+
+      <ion-item lines="none" >
+          <table style="width:100%;">
+            <tr>
+              <td style="width:50%;">
+                <span (click)="takePicture()">
+                  <ion-icon style="font-size:30px;color: var(--ion-color-primary2,#585858);" slot="icon-only" name="camera-outline"> camera
+                  </ion-icon>
+                </span>
+              </td>
+              <td style="width:50%;">
+                <span (click)="pickImage()">
+                  <ion-icon style="font-size:30px;color: var(--ion-color-primary2,#585858);" slot="icon-only" name="attach-outline">
+                  </ion-icon>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </ion-item>
+        <ion-item>
+          <table style="width:100%;">
+            <tr>
+              <td style="width:100%;">
+                <div *ngIf="optimizedImage">
+                  <img [src]="optimizedImage" alt="Servicio Image" width="150"/>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </ion-item>
+
+
+
+
+
+
     </ion-list>
     <br>
     <pre>{{lastAsset | json}}</pre>

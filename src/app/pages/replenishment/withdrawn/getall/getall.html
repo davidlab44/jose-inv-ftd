@@ -41,41 +41,39 @@
 
 
 
+  <ion-item class="range-container" lines="none">
 
+    <!-- Cajas de texto -->
+    <div class="date-boxes">
+      <div class="date-box">
+        <span class="label">Desde</span>
+        <span class="value">{{ formatDay(startDay) }}</span>
+      </div>
 
-<ion-item class="range-container" lines="none">
-
-  <!-- Cajas de texto -->
-  <div class="date-boxes">
-    <div class="date-box">
-      <span class="label">Desde</span>
-      <span class="value">{{ formatDay(startDay) }}</span>
+      <div class="date-box">
+        <span class="label">Hasta</span>
+        <span class="value">{{ formatDay(endDay) }}</span>
+      </div>
     </div>
 
-    <div class="date-box">
-      <span class="label">Hasta</span>
-      <span class="value">{{ formatDay(endDay) }}</span>
-    </div>
-  </div>
+  </ion-item>
 
-</ion-item>
-
-<ion-item lines="none">
-  <ion-range
-    class="day-range"
-    min="1"
-    max="365"
-    step="1"
-    dualKnobs="true"
-    snaps="true"
-    ticks="true"
-    [(ngModel)]="dayRange"
-    (ionChange)="onRangeChange($event)"
-  >
-<!--    <ion-label slot="start">1</ion-label>-->
-    <!--<ion-label slot="end">365</ion-label>-->
-  </ion-range>
-</ion-item>
+  <ion-item lines="none">
+    <ion-range
+      class="day-range"
+      min="1"
+      max="365"
+      step="1"
+      dualKnobs="true"
+      snaps="true"
+      ticks="true"
+      [(ngModel)]="dayRange"
+      (ionChange)="onRangeChange($event)"
+    >
+  <!--    <ion-label slot="start">1</ion-label>-->
+      <!--<ion-label slot="end">365</ion-label>-->
+    </ion-range>
+  </ion-item>
 
 
 
@@ -100,7 +98,7 @@
 
 
 
-<br><br>
+  <br><br>
 
   <ion-item lines="none">
     <div style="display:flex; width:100%; justify-content:center; gap:8px;">
@@ -142,6 +140,76 @@
 
   <br><br>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<ion-item-divider class="total-divider"></ion-item-divider>
+
+<ion-item class="total-item highlighted" lines="none">
+  <ion-label class="total-label">
+    <span class="total-title">TOTAL KILOS RETIRADOS</span>
+    <span class="total-value">
+      {{ getTotalKg() | number:'1.0-2' }} kg
+    </span>
+  </ion-label>
+</ion-item>
+
+<ion-item-divider class="total-divider"></ion-item-divider>
+
+
+
+
+
+<!--<ion-item class="total-item" lines="none">-->
+  <!--<ion-label class="total-label">-->
+    <!--<span class="total-title">TOTAL KILOS RETIRADOS</span>-->
+    <!--<span class="total-value">-->
+      <!--{{ getTotalKg() | number:'1.0-2' }} kg-->
+    <!--</span>-->
+  <!--</ion-label>-->
+<!--</ion-item>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <br><br>
   <ion-list>
     <ion-item style="display:flex; align-items:center;">
     
@@ -151,7 +219,7 @@
 
 
       <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;font-weight:500;">Isotanque&nbsp;</span>
+        <span style="font-size:xx-small;font-weight:500;">Isotanq.&nbsp;</span>
       </ion-label>
 
       <ion-label style="font-size:small;">
@@ -160,6 +228,14 @@
 
       <ion-label style="font-size:small;">
         <span style="font-size:xx-small;font-weight:300;">Vendor&nbsp;</span><br>
+      </ion-label>
+     
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;font-weight:300;">Basc&nbsp;</span><br>
+      </ion-label>
+      
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;font-weight:300;">Dif&nbsp;</span><br>
       </ion-label>
     </ion-item>
   </ion-list>
@@ -189,10 +265,17 @@
         <span style="font-size:xx-small;" *ngIf="p.data.bvendor==1"   >Plexa&nbsp;</span><br>
         <span style="font-size:xx-small;" *ngIf="p.data.bvendor==2"   >Plexa port&nbsp;</span><br>
       </ion-label>
+
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;">{{p.data.full}}&nbsp;</span><br>
+      </ion-label>
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;" *ngIf="((p.data.akg+p.data.bkg)-p.data.full)<500">{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>
+        <span style="font-size:xx-small;color:red;" *ngIf="((p.data.akg+p.data.bkg)-p.data.full)>=500">{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>
+      </ion-label>
     </ion-item>
   </ion-list>
 
-  <!--<pre>{{withdrawnList | json }}</pre>-->
 
 </ion-content>
 
@@ -204,34 +287,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!--  <swiper-container-->
-      <!--pagination="true"-->
-      <!--scrollbar="true"-->
-      <!--style="width: 100%; height: 100%;">-->
-    <!--<swiper-slide *ngFor="let col of columns">-->
-      <!--<ion-card >-->
-        <!--<ion-card-content>-->
-          <!--<ion-item>-->
-            <!--<pre>{{col | json}}</pre>-->
-            <!--[>[><div  (click)="patchThisElement(row)" > {{ row.data[col.field] }}  </div><]<]-->
-          <!--</ion-item>-->
-        <!--</ion-card-content>-->
-      <!--</ion-card>-->
-    <!--</swiper-slide>-->
-  <!--</swiper-container>-->
 
 
 

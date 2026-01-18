@@ -99,5 +99,51 @@ ion-card-title {
 
 
 
+.total-item {
+  display: flex;
+  justify-content: center;
+  background: var(--ion-color-light);
+  border-radius: 8px;
+  margin: 12px;
+}
+
+.total-label {
+  text-align: center;
+}
+
+.total-title {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ion-color-medium);
+  letter-spacing: 1px;
+}
+
+.total-value {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ion-color-primary);
+  margin-top: 4px;
+}
+
+
+
+
+
+
+.total-divider {
+  --background: var(--ion-color-light);
+  min-height: 1px;
+}
+
+.highlighted {
+  background: linear-gradient(
+    90deg,
+    rgba(var(--ion-color-primary-rgb), 0.06),
+    rgba(var(--ion-color-primary-rgb), 0.02)
+  );
+}
+
 
 

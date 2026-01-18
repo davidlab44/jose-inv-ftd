@@ -53,6 +53,17 @@ withdrawnList: any[] = [];
 
 
 
+getTotalKg(): number {
+  if (!this.withdrawnList || this.withdrawnList.length === 0) {
+    return 0;
+  }
+
+  return this.withdrawnList.reduce((total, p) => {
+    const akg = Number(p?.data?.akg) || 0;
+    const bkg = Number(p?.data?.bkg) || 0;
+    return total + akg + bkg;
+  }, 0);
+}
 
 
 
@@ -161,18 +172,32 @@ withdrawnList: any[] = [];
 
 
 
+  getTodayDayOfYear(): number {
+    const today = new Date();
+    const start = new Date(today.getFullYear(), 0, 0);
+    const diff =
+      today.getTime() -
+      start.getTime() +
+      (start.getTimezoneOffset() - today.getTimezoneOffset()) * 60 * 1000;
 
-getTodayDayOfYear(): number {
-  const today = new Date();
-  const start = new Date(today.getFullYear(), 0, 0);
-  const diff =
-    today.getTime() -
-    start.getTime() +
-    (start.getTimezoneOffset() - today.getTimezoneOffset()) * 60 * 1000;
+    const oneDay = 1000 * 60 * 60 * 24;
+    return Math.floor(diff / oneDay);
+  }
 
-  const oneDay = 1000 * 60 * 60 * 24;
-  return Math.floor(diff / oneDay);
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
