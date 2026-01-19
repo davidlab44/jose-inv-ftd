@@ -83,7 +83,7 @@ export class AssetSupplyPostPage {
       /*{ header: 'Sello2', field: 'sello2' },*/
       /*{ header: 'Sello3', field: 'sello3' },*/
     /*];*/
-uploadProgress = 0;
+  uploadProgress = 0;
   uploadedUrl: string | null = null;
   uploading = false;
 
@@ -285,62 +285,59 @@ uploadProgress = 0;
 
 
 
+  async takePhotoAndUpload() {
+    this.uploading = true;
+    this.uploadProgress = 0;
+    this.uploadedUrl = null;
 
+    const base64Image = await this.photoService.takePicture();
 
-
-async takePhotoAndUpload() {
-  this.uploading = true;
-  this.uploadProgress = 0;
-  this.uploadedUrl = null;
-
-  const base64Image = await this.photoService.takePicture();
-
-  if (!base64Image) {
-    this.uploading = false;
-    console.error('No se pudo obtener la imagen');
-    return;
-  }
-
-  const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
-
-  progress$.subscribe({
-    next: (p) => this.uploadProgress = p,
-    error: (err) => {
-      console.error('Error subiendo imagen', err);
+    if (!base64Image) {
       this.uploading = false;
+      console.error('No se pudo obtener la imagen');
+      return;
     }
-  });
 
-  url$.subscribe({
-    next: (url) => {
-      this.uploadedUrl = url;
-    },
-    complete: () => this.uploading = false
-  });
-}
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
 
+    progress$.subscribe({
+      next: (p) => this.uploadProgress = p,
+      error: (err) => {
+        console.error('Error subiendo imagen', err);
+        this.uploading = false;
+      }
+    });
 
-
-async pickImageAndUpload() {
-  this.uploading = true;
-  this.uploadProgress = 0;
-  this.uploadedUrl = null;
-
-  const base64Image = await this.photoService.pickImage();
-
-  if (!base64Image) {
-    this.uploading = false;
-    return;
+    url$.subscribe({
+      next: (url) => {
+        this.uploadedUrl = url;
+      },
+      complete: () => this.uploading = false
+    });
   }
 
-  const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
 
-  progress$.subscribe(p => this.uploadProgress = p);
-  url$.subscribe(url => {
-    this.uploadedUrl = url;
-    this.uploading = false;
-  });
-}
+
+  async pickImageAndUpload() {
+    this.uploading = true;
+    this.uploadProgress = 0;
+    this.uploadedUrl = null;
+
+    const base64Image = await this.photoService.pickImage();
+
+    if (!base64Image) {
+      this.uploading = false;
+      return;
+    }
+
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
+
+    progress$.subscribe(p => this.uploadProgress = p);
+    url$.subscribe(url => {
+      this.uploadedUrl = url;
+      this.uploading = false;
+    });
+  }
 
 
 

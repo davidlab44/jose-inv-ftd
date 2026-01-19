@@ -26,6 +26,69 @@
     <input type="hidden" formControlName="id">
 
     <ion-list>
+
+
+
+
+
+
+
+
+
+
+      <ion-button expand="block" (click)="takePhotoAndUpload()">
+        📸 Tomar foto
+      </ion-button>
+
+      <ion-button expand="block" color="secondary" (click)="pickImageAndUpload()">
+        🖼 Elegir de galería
+      </ion-button>
+
+      <ion-progress-bar
+        *ngIf="uploading"
+        [value]="uploadProgress / 100">
+      </ion-progress-bar>
+
+      <p *ngIf="uploading">
+        Subiendo: {{ uploadProgress }} %
+      </p>
+
+      <ion-card *ngIf="uploadedUrl">
+        <ion-card-header>
+          <ion-card-title>Imagen subida</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <img [src]="uploadedUrl" />
+          <p>{{ uploadedUrl }}</p>
+        </ion-card-content>
+      </ion-card>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <ion-item>
         <ion-label position="floating">Category</ion-label>
         <ion-input type="number" formControlName="categ"></ion-input>

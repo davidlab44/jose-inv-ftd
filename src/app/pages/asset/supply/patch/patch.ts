@@ -25,6 +25,7 @@ import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
 import { ReplenishmentService } from '../../../../services/replenishment/replenishment.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PhotoService } from '../../../../services/asset/photo.service';
 
 
 @Component({
@@ -81,6 +82,7 @@ export class AssetSupplyPatchPage {
     private prodrexService: ProdrexService,
     private userService: UserService,
     private fb: FormBuilder ,
+    private photoService: PhotoService,
     private replenishmentService : ReplenishmentService,
   ) {
     const item = this.router.getCurrentNavigation()?.extras.state?.item;
@@ -135,6 +137,7 @@ export class AssetSupplyPatchPage {
     delete justData.created_at;     
     delete justData.updated_at;     
     justData.categ=[justData.categ];
+    justData.img=this.uploadedUrl;
     this.productService.patch(id, justData).subscribe({
       next: (r) => {
         console.log("PATCH OK:", r);
@@ -159,38 +162,14 @@ export class AssetSupplyPatchPage {
       reorder: 0,
       minimum: 0,
     });
+
+    this.uploadProgress = 0; 
+    this.uploadedUrl= null;
+    this.uploading = false;
+
   }
 
 
-  /*ngViewDidEnter(){*/
-    /*this.loadCategories();*/
-    /*this.loadUms();*/
-    /*this.form = this.fb.group({*/
-      /*id: [this.assetSupplyProduct.id],*/
-      /*categ: [this.assetSupplyProduct.data.categ[0]],*/
-      /*name: [this.assetSupplyProduct.data.name],*/
-      /*barcode: [this.assetSupplyProduct.data.barcode],*/
-      /*qty: [this.assetSupplyProduct.data.qty],*/
-      /*um: [this.assetSupplyProduct.data.um],*/
-    /*});*/
-    /*console.log("Formulario inicializado:", this.form.value);*/
-
-  /*}*/
-  
-
-  /*patch() {*/
-    /*const payload = this.form.value;*/
-    /*const id = payload.id;*/
-    /*const justData = { ...payload };*/
-    /*delete justData.id;*/
-    /*delete justData.ext_id;*/
-    /*delete justData.created_at;*/
-    /*delete justData.updated_at;*/
-    /*this.productService.patch(id, justData).subscribe({*/
-      /*next: (r) => console.log("PATCH OK:", r),*/
-      /*error: (e) => console.error("PATCH ERROR:", e),*/
-    /*});*/
-  /*}*/
 
   slideOpts = {
     initialSlide: 0,
@@ -295,6 +274,97 @@ export class AssetSupplyPatchPage {
         } 
       }); 
     }     
+
+
+
+
+
+
+
+  uploadProgress = 0;
+  uploadedUrl: string | null = null;
+  uploading = false;
+
+
+
+
+
+  async takePhotoAndUpload() {
+    this.uploading = true;
+    this.uploadProgress = 0;
+    this.uploadedUrl = null;
+
+    const base64Image = await this.photoService.takePicture();
+
+    if (!base64Image) {
+      this.uploading = false;
+      console.error('No se pudo obtener la imagen');
+      return;
+    }
+
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
+
+    progress$.subscribe({
+      next: (p) => this.uploadProgress = p,
+      error: (err) => {
+        console.error('Error subiendo imagen', err);
+        this.uploading = false;
+      }
+    });
+
+    url$.subscribe({
+      next: (url) => {
+        this.uploadedUrl = url;
+      },
+      complete: () => this.uploading = false
+    });
+  }
+
+
+
+
+
+  async pickImageAndUpload() {
+    this.uploading = true;
+    this.uploadProgress = 0;
+    this.uploadedUrl = null;
+
+    const base64Image = await this.photoService.pickImage();
+
+    if (!base64Image) {
+      this.uploading = false;
+      return;
+    }
+
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
+
+    progress$.subscribe(p => this.uploadProgress = p);
+    url$.subscribe(url => {
+      this.uploadedUrl = url;
+      this.uploading = false;
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
