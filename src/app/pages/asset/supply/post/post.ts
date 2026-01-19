@@ -151,6 +151,7 @@ uploadProgress = 0;
   guardar() {
     const data: any = this.form.value;
     data.categ = [data.category];
+    data.img = this.uploadedUrl; 
     delete data.category;
     console.log('Product to post =>', data);
     this.productService.post(data).subscribe({
@@ -311,7 +312,9 @@ async takePhotoAndUpload() {
   });
 
   url$.subscribe({
-    next: (url) => this.uploadedUrl = url,
+    next: (url) => {
+      this.uploadedUrl = url;
+    },
     complete: () => this.uploading = false
   });
 }
