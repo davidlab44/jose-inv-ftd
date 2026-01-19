@@ -25,6 +25,8 @@ import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
 import { ReplenishmentService } from '../../../../services/replenishment/replenishment.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PhotoService } from '../../../../services/asset/photo.service';
+
 
 @Component({
   selector: 'page-post',
@@ -81,6 +83,9 @@ export class AssetSupplyPostPage {
       /*{ header: 'Sello2', field: 'sello2' },*/
       /*{ header: 'Sello3', field: 'sello3' },*/
     /*];*/
+uploadProgress = 0;
+  uploadedUrl: string | null = null;
+  uploading = false;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -107,6 +112,7 @@ export class AssetSupplyPostPage {
     private userService: UserService,
     private fb: FormBuilder ,
     private replenishmentService : ReplenishmentService,
+    private photoService: PhotoService
   ) {}
 
   hash:string='';
@@ -254,31 +260,84 @@ export class AssetSupplyPostPage {
 
 
 
-  optimizedImage: string | null = null;
-    imageName: string = '';
-    async takePicture(): Promise<void> {
-      this.optimizedImage = await this.photoService.takePicture();
-      if (this.optimizedImage) {
-        console.log('Imagen optimizada:', this.optimizedImage);
-      } else {
-        console.error('No se pudo tomar la foto');
-      }
+  /*optimizedImage: string | null = null;*/
+    /*imageName: string = '';*/
+    /*async takePicture(): Promise<void> {*/
+      /*this.optimizedImage = await this.photoService.takePicture();*/
+      /*if (this.optimizedImage) {*/
+        /*console.log('Imagen optimizada:', this.optimizedImage);*/
+      /*} else {*/
+        /*console.error('No se pudo tomar la foto');*/
+      /*}*/
+    /*}*/
+    /*selectedImage: string | null = null;*/
+    /*async pickImage(): Promise<void> {*/
+      /*this.selectedImage = await this.imageService.pickImage(); */
+      /*if (this.selectedImage) {*/
+        /*console.log('Imagen seleccionada y comprimida:', this.selectedImage);*/
+        /*this.optimizedImage=this.selectedImage; //this.showAttachment=true; //this.showPhoto=false;*/
+      /*} else {*/
+        /*console.error('No se seleccionó una imagen válida.');//this.showAttachment=false;*/
+      /*}*/
+    /*}*/
+
+
+
+
+
+
+
+async takePhotoAndUpload() {
+  this.uploading = true;
+  this.uploadProgress = 0;
+  this.uploadedUrl = null;
+
+  const base64Image = await this.photoService.takePicture();
+
+  if (!base64Image) {
+    this.uploading = false;
+    console.error('No se pudo obtener la imagen');
+    return;
+  }
+
+  const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
+
+  progress$.subscribe({
+    next: (p) => this.uploadProgress = p,
+    error: (err) => {
+      console.error('Error subiendo imagen', err);
+      this.uploading = false;
     }
-    selectedImage: string | null = null;
-    async pickImage(): Promise<void> {
-      this.visibilidadBotonGallery = false;
-      this.selectedImage = await this.imageService.pickImage(); 
-      if (this.selectedImage) {
-        console.log('Imagen seleccionada y comprimida:', this.selectedImage);
-        this.optimizedImage=this.selectedImage; //this.showAttachment=true; //this.showPhoto=false;
-      } else {
-        console.error('No se seleccionó una imagen válida.');//this.showAttachment=false;
-      }
-    }
+  });
+
+  url$.subscribe({
+    next: (url) => this.uploadedUrl = url,
+    complete: () => this.uploading = false
+  });
+}
 
 
 
+async pickImageAndUpload() {
+  this.uploading = true;
+  this.uploadProgress = 0;
+  this.uploadedUrl = null;
 
+  const base64Image = await this.photoService.pickImage();
+
+  if (!base64Image) {
+    this.uploading = false;
+    return;
+  }
+
+  const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
+
+  progress$.subscribe(p => this.uploadProgress = p);
+  url$.subscribe(url => {
+    this.uploadedUrl = url;
+    this.uploading = false;
+  });
+}
 
 
 
