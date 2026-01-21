@@ -137,7 +137,13 @@ export class AssetSupplyPatchPage {
     delete justData.created_at;     
     delete justData.updated_at;     
     justData.categ=[justData.categ];
-    justData.img=this.uploadedUrl;
+    if(this.uploadedUrl && this.uploadedUrl.length>2){ 
+      justData.img=this.uploadedUrl; 
+    }else{
+      if(this.assetSupplyProduct.data.img && this.assetSupplyProduct.data.img.length>2){
+        justData.img=this.assetSupplyProduct.data.img;
+      }
+    }
     this.productService.patch(id, justData).subscribe({
       next: (r) => {
         console.log("PATCH OK:", r);

@@ -27,7 +27,7 @@
       <ion-label style="font-size: small; flex: 1;">
         <span>{{ getCategoryNameById(p?.data?.categ?.[0]) | capitalize }}&nbsp;</span>
       </ion-label>
-      <ion-label style="font-size: small; flex: 3;">
+      <ion-label style="font-size: small; flex: 3;" (click)="openModal(p)" >
         <h3>{{ p?.data?.name | uppercase }}</h3>
       </ion-label>
       <ion-label style="font-size: small; flex: 0.5; text-align:right;">

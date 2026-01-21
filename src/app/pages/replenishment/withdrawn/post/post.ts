@@ -135,7 +135,9 @@ export class PostPage {
     console.log('ReplenishmentData =>', data);
     this.withdrawnService.post(data).subscribe({
       next: response=>{
+        this.utilService.presentToast("retiro registrado exitosamente");
         console.log("replenishment post response",response)
+        this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });
       }
     })
   }

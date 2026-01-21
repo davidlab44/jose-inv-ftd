@@ -1,7 +1,7 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
-import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
+import { AlertController, IonList, LoadingController, ModalController, ToastController, Config, Platform, ViewDidEnter  } from '@ionic/angular';
 import { ConferenceData } from '../../providers/conference-data';
 import { UserData } from '../../providers/user-data';
 import { OpportunityService } from '../../services/opportunity.service';
@@ -22,6 +22,8 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { RexService } from '../../services/rex.service';
 import { IonSearchbar } from '@ionic/angular';
+
+import { RateClientComponent } from '../../pages/modal/rate-client/rate-client.component';   
 
 @Component({
   selector: 'page-readprd',
@@ -59,6 +61,7 @@ export class ReadprdPage {
     public router: Router,
     public toastCtrl: ToastController,
     public user: UserData,
+    private modalController: ModalController, 
     public config: Config,
     private opportunityService: OpportunityService,
     private posOrderService: PosOrderService,
@@ -342,6 +345,19 @@ export class ReadprdPage {
     const selectedBarcodes = [paddedId];
     this.barcodeService.printIn50mmPortablePrinterBt(p.data.name,selectedBarcodes,p.id.toString());
   }
+
+
+
+    async openModal(p) {                                                                                                                                                 
+      const modal = await this.modalController.create({
+        component: RateClientComponent,
+        componentProps: { //items: ['Item 1', 'Item 2', 'Item 3', 'Item 4'] 
+          items:p
+        }
+      });
+      return await modal.present();
+    }
+
 
 
 }
