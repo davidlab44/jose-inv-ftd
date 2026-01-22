@@ -159,6 +159,7 @@ export class AssetSupplyPostPage {
         console.log("product post response", response);
         if(response && response.length>0){
           this.utilService.presentToast(response.toString())
+          this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });    
         }
       }
     });
