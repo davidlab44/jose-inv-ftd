@@ -106,12 +106,7 @@ export class AppComponent implements OnInit {
        url: '/app/tabs/readprd',       
        icon: 'cube'
      },
-     {
-       title: 'Productos barcode ',
-       url: '/app/tabs/readprdct',     
-       icon: 'cube'
-     },
-     {
+    {
        title: 'Entrada',
        url: '/app/tabs/kitchen',
        icon: 'arrow-down'
@@ -127,11 +122,6 @@ export class AppComponent implements OnInit {
        icon: 'document-text'
      },
      {
-       title: 'Replenishment',
-       url: '/app/tabs/replenishment',
-       icon: 'add-circle'
-     },
-     {
        title: 'Glp precio',
        url: '/app/tabs/glpprices',
        icon: 'add-circle'
@@ -142,21 +132,36 @@ export class AppComponent implements OnInit {
        icon: 'add-circle'
      },
      {
+       title: 'Registrar retiro',
+       url: '/app/tabs/replenishment-withdrawn-post',
+       icon: 'add-circle'
+     },
+     {
+       title: 'Reg. retiro express',
+       url: '/app/tabs/replenishment-withdrawn-postaut',
+       icon: 'add-circle'
+     },
+
+       {
        title: 'Kilos retirados',
        url: '/app/tabs/replenishment-withdrawn-getall',
        icon: 'checkbox'
      },
      {
-       title: 'Registrar retiro',
-       url: '/app/tabs/replenishment-withdrawn-post',
-       icon: 'add-circle'
+       title: 'Llegaron',
+       url: '/app/tabs/logistic-logistic-getall-in',
+       icon: 'boat'
+     },
+     {
+       title: 'Salieron',
+       url: '/app/tabs/logistic-logistic-getall-out',
+       icon: 'boat'
      },
      {
        title: 'Reabastecimiento',
        url: '/app/tabs/asset-supply-reorder',
        icon: 'layers'
      },
-
    ];
 
   loggedIn = false;

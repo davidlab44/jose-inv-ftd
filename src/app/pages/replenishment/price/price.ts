@@ -72,12 +72,81 @@ export class PricePage {
 
   rexDocument:any;
   glppricesList:any[]=[];
-    
+   
+
   async ngOnInit() {
     const ahora = new Date();
     this.todayDate = this.formatFechaLatam(ahora);
     this.getAllPrices();
+
+      const now = new Date();
+
+      // Fecha local con hora 00:00 (SIN UTC)
+      const localMidnight = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        0, 0, 0
+      );
+
+      this.dateTimeStart = this.toLocalDateTime(localMidnight);
+      this.dateTimeEnd   = this.toLocalDateTime(localMidnight);
+
+
+
   }
+
+
+
+
+
+
+    dateTimeStart!: string;
+    dateTimeEnd!: string;
+
+
+    onDateTimeChange() {
+      const payload = {
+        start_datetime: this.formatForBackend(this.dateTimeStart),
+        end_datetime: this.formatForBackend(this.dateTimeEnd)
+      };
+
+      console.log('Inicio (raw):', this.dateTimeStart);
+      console.log('Fin (raw):', this.dateTimeEnd);
+      console.log('Payload backend:', payload);
+    }
+
+    // YYYY-MM-DDTHH:mm:ss  → para ion-datetime (local)
+    toLocalDateTime(date: Date): string {
+      const pad = (n: number) => n.toString().padStart(2, '0');
+
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T` +
+             `${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+    }
+
+    // YYYY-MM-DD HH:mm:ss → backend / DB
+    formatForBackend(value: string): string {
+      const d = new Date(value);
+      const pad = (n: number) => n.toString().padStart(2, '0');
+
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +
+             `${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+    }
+
+
+
+
+  /*selectedDate!: string;*/
+  /*selectedTime!: string;*/
+
+  /*onDateTimeChange() {*/
+    /*const fechaHora = `${this.selectedDate} ${this.selectedTime}`;*/
+
+    /*console.log('Fecha seleccionada:', this.selectedDate);*/
+    /*console.log('Hora seleccionada:', this.selectedTime);*/
+    /*console.log('Fecha + Hora:', fechaHora);*/
+  /*}*/
+
 
   getAllPrices(){
     this.glpricesService.getAll().subscribe({

@@ -44,7 +44,73 @@
 
 <ion-content [ngClass]="{ 'bg-nacional': !importado, 'bg-importado': importado }" class="ion-padding">
   <div>
+  
+
+
+
+
+    <div class="datetime-center">
+
+      <!-- FECHA / HORA INICIO -->
+      <ion-item>
+        <ion-label position="stacked">Fecha / Hora inicio</ion-label>
+        <ion-datetime
+          presentation="date-time"
+          [(ngModel)]="dateTimeStart"
+          (ionChange)="onDateTimeChange()">
+        </ion-datetime>
+      </ion-item>
+
+      <br>
+
+      <!-- FECHA / HORA FIN -->
+      <ion-item>
+        <ion-label position="stacked">Fecha / Hora fin</ion-label>
+        <ion-datetime
+          presentation="date-time"
+          [(ngModel)]="dateTimeEnd"
+          (ionChange)="onDateTimeChange()">
+        </ion-datetime>
+      </ion-item>
+
+    </div>
+
+
+    <br>
+
+
+
+
+    <!-- FECHA -->
+    <!--<ion-item>-->
+      <!--<ion-label position="stacked">Fecha</ion-label>-->
+      <!--<ion-datetime-->
+        <!--presentation="date"-->
+        <!--[(ngModel)]="selectedDate"-->
+        <!--(ionChange)="onDateTimeChange()">-->
+      <!--</ion-datetime>-->
+    <!--</ion-item>-->
+
+    <!--<br>-->
+
+    <!--[> HORA <]-->
+    <!--<ion-item>-->
+      <!--<ion-label position="stacked">Hora</ion-label>-->
+      <!--<ion-datetime-->
+        <!--presentation="time"-->
+        <!--[(ngModel)]="selectedTime"-->
+        <!--(ionChange)="onDateTimeChange()">-->
+      <!--</ion-datetime>-->
+    <!--</ion-item>-->
+
+    <!--<br>-->
+
+
+
+    <br>
+
     <ion-item>
+      <ion-label position="stacked">Nuevo precio</ion-label>
       <ion-input
         type="number"
         inputmode="numeric"
@@ -52,6 +118,18 @@
         [(ngModel)]="numero">
       </ion-input>
     </ion-item>
+
+
+
+
+    <!--<ion-item>-->
+      <!--<ion-input-->
+        <!--type="number"-->
+        <!--inputmode="numeric"-->
+        <!--placeholder="0"-->
+        <!--[(ngModel)]="numero">-->
+      <!--</ion-input>-->
+    <!--</ion-item>-->
     <br>
     <ion-button expand="block" (click)="addGlpprice(numero)">
       Actualizar precio

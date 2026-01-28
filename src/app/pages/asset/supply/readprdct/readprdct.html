@@ -20,15 +20,20 @@
 </ion-header>
 
 <ion-content>
-
-
-
-
   <ion-list>
     <ion-item *ngFor="let p of productList" style="display:flex; align-items:center;">
       <ion-label style="font-size: small; flex: 1;">
-        <span>{{ getCategoryNameById(p?.data?.categ?.[0]) | capitalize }}&nbsp;</span>
+        <span *ngIf="p?.data?.img?.length >= 3">
+          {{ getCategoryNameById(p?.data?.categ?.[0]) | capitalize }}&nbsp;
+        </span>
+        <span *ngIf="p?.data?.img?.length < 3">
+          <i>{{ getCategoryNameById(p?.data?.categ?.[0]) | capitalize }}&nbsp;</i>
+        </span>
       </ion-label>
+      <!--<ion-label style="font-size: small; flex: 1;">-->
+        <!--<span *ngIf="p?.data?.img.length>2" >{{ getCategoryNameById(p?.data?.categ?.[0]) | capitalize }}&nbsp;</span>-->
+        <!--<span *ngIf="p?.data?.img.length<3" ><b>{{ getCategoryNameById(p?.data?.categ?.[0]) | capitalize }}&nbsp;</b></span>-->
+      <!--</ion-label>-->
       <ion-label style="font-size: small; flex: 3;">
         <h3>{{ p?.data?.name | uppercase }}</h3>
       </ion-label>

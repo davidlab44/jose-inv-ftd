@@ -23,6 +23,7 @@ import { DateService } from '@services/local/date.service';
 import { RexService } from '@services/rex.service';
 import { ProdrexService } from '@services/prodrex.service';
 import { UserService } from '@services/user.service';
+import { ShipService } from '../../../../services/logistic/ship.service';
 import { ReplenishmentService } from '@services/replenishment/replenishment.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
@@ -54,6 +55,7 @@ export class PostPage {
   todayDate:any;
   form!: FormGroup;
   replenishmentList: any[] = [];
+  shipList: any[] = [];
 
   constructor(
     private barcodeService: BarcodeService,
@@ -80,6 +82,7 @@ export class PostPage {
     private userService: UserService,
     private fb: FormBuilder ,
     private replenishmentService : ReplenishmentService,
+    private shipService: ShipService,
     private withdrawnService: WithdrawnService
   ) {}
 
@@ -88,7 +91,6 @@ export class PostPage {
   rexDocument:any;
 
   ngOnInit() {
-
 
     const now = new Date().toISOString();
 
@@ -104,6 +106,16 @@ export class PostPage {
       aseal2: [''],
       aseal3: [''],
       aticket: [''],
+      adatein: [now],
+      adeliveryin: [''],
+      atripin: [''],
+      ashipin: [''],
+      adateout: [now],
+      adeliveryout: [''],
+      atripout: [''],
+      aextra1: [''],
+      aextra2: [''],
+      ashipout: [''],     
       bdate: [now],
       bvendor: [''],
       bname: [''],
@@ -115,6 +127,16 @@ export class PostPage {
       bseal2: [''],
       bseal3: [''],
       bticket: [''],
+      bdatein: [now],
+      bdeliveryin: [''],
+      btripin: [''],
+      bshipin: [''],
+      bdateout: [now],
+      bdeliveryout: [''],
+      btripout: [''],
+      bshipout: [''],     
+      bextra1: [''],
+      bextra2: [''],
       empty: [''],
       tare: [''],
       full: [''],
@@ -122,11 +144,18 @@ export class PostPage {
     const ahora = new Date();
     this.todayDate=this.formatFechaLatam(ahora);
     this.getAll();
+    this.getAllShips();
   }
 
-  getAll(){
+   getAll(){
     this.withdrawnService.getAll().subscribe((data: any[]) => {
       this.replenishmentList = data;
+    });
+  }
+
+  getAllShips(){
+    this.shipService.getAll().subscribe((data: any[]) => {
+      this.shipList = data;
     });
   }
 

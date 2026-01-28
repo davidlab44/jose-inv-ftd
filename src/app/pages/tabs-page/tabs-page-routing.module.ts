@@ -93,7 +93,7 @@ const routes: Routes = [
           }
         ]
       },
-{
+      {
         path: 'readprdct',
         children: [
           {
@@ -211,11 +211,38 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'replenishment-withdrawn-postaut',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/withdrawn/postaut/post.module').then(m => m.PostModule)
+          }
+        ]
+      },
+      {
         path: 'replenishment-withdrawn-getall',
         children: [
           {
             path: '',
             loadChildren: () => import('../replenishment/withdrawn/getall/getall.module').then(m => m.GetallModule)
+          }
+        ]
+      },
+      {
+        path: 'logistic-logistic-getall-in',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../logistic/logistic/getallin/getall.module').then(m => m.GetallModule)
+          }
+        ]
+      },
+      {
+        path: 'logistic-logistic-getall-out',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../logistic/logistic/getallout/getall.module').then(m => m.GetallModule)
           }
         ]
       },

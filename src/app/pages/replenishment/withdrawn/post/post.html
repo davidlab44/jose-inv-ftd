@@ -101,6 +101,78 @@
         <ion-input formControlName="aticket"></ion-input>
       </ion-item>
 
+      <ion-item>
+        <ion-label position="floating">Fecha in/vacio</ion-label>
+        <ion-datetime
+          formControlName="adatein"
+          presentation="date-time"
+          display-format="YYYY-MM-DD HH:mm"
+          value-format="YYYY-MM-DDTHH:mm:ss"
+          locale="es-ES"
+          prefer-wheel="false"
+        ></ion-datetime>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Delivery in</ion-label>
+        <ion-input formControlName="adeliveryin"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Viaje in</ion-label>
+        <ion-input formControlName="atripin"></ion-input>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label position="floating">Motonave in</ion-label>
+        <ion-input formControlName="ashipin"></ion-input>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label position="floating">Fecha out/lleno</ion-label>
+        <ion-datetime
+          formControlName="adateout"
+          presentation="date-time"
+          display-format="YYYY-MM-DD HH:mm"
+          value-format="YYYY-MM-DDTHH:mm:ss"
+          locale="es-ES"
+          prefer-wheel="false"
+        ></ion-datetime>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Delivery out</ion-label>
+        <ion-input formControlName="adeliveryout"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Viaje out</ion-label>
+        <ion-input formControlName="atripout"></ion-input>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label position="floating">Motonave out</ion-label>
+        <ion-input formControlName="ashipout"></ion-input>
+      </ion-item>
+
+      <h6><i>A extras</i></h6>
+
+      <ion-item>
+        <ion-label position="floating">A extra 1</ion-label>
+        <ion-input formControlName="aextra1"></ion-input>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label position="floating">A extra 2</ion-label>
+        <ion-input formControlName="aextra2"></ion-input>
+      </ion-item>
+
+
+
       <br><br>
 
       <h3>Isotanque 2</h3>
@@ -179,15 +251,86 @@
         <ion-input formControlName="bticket"></ion-input>
       </ion-item>
 
+
+
+
+      <ion-item>
+        <ion-label position="floating">Fecha B in</ion-label>
+        <ion-datetime
+          formControlName="bdatein"
+          presentation="date-time"
+          display-format="YYYY-MM-DD HH:mm"
+          value-format="YYYY-MM-DDTHH:mm:ss"
+          locale="es-ES"
+          prefer-wheel="false"
+        ></ion-datetime>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Delivery B in</ion-label>
+        <ion-input formControlName="bdeliveryin"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Viaje B in</ion-label>
+        <ion-input formControlName="btripin"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Motonave B in</ion-label>
+        <ion-input formControlName="bshipin"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Fecha B out/lleno</ion-label>
+        <ion-datetime
+          formControlName="bdateout"
+          presentation="date-time"
+          display-format="YYYY-MM-DD HH:mm"
+          value-format="YYYY-MM-DDTHH:mm:ss"
+          locale="es-ES"
+          prefer-wheel="false"
+        ></ion-datetime>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Delivery B out</ion-label>
+        <ion-input formControlName="bdeliveryout"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Viaje B out</ion-label>
+        <ion-input formControlName="btripout"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Motonave b out</ion-label>
+        <ion-input formControlName="bshipout"></ion-input>
+      </ion-item>
+
+
+      <h6><i>B extras</i></h6>
+
+      <ion-item>
+        <ion-label position="floating">B extra 1</ion-label>
+        <ion-input formControlName="bextra1"></ion-input>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label position="floating">B extra 2</ion-label>
+        <ion-input formControlName="bextra2"></ion-input>
+      </ion-item>
+
       <br><br>
 
       <h3>Bascula</h3>
-     <ion-item>
+      <ion-item>
         <ion-label position="floating">Peso bruto</ion-label>
         <ion-input type="number" formControlName="empty"></ion-input>
-     </ion-item>
+      </ion-item>
 
-     <ion-item>
+      <ion-item>
         <ion-label position="floating">Tara</ion-label>
         <ion-input type="number" formControlName="tare"></ion-input>
       </ion-item>
@@ -196,6 +339,9 @@
         <ion-label position="floating">Peso neto</ion-label>
         <ion-input type="number" formControlName="full"></ion-input>
       </ion-item>
+
+      <pre>{{shipList | json}}</pre>
+      <br>
 
     </ion-list>
 
