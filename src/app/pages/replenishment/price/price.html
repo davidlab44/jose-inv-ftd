@@ -24,33 +24,9 @@
   </ion-toolbar>
 </ion-header>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <ion-content [ngClass]="{ 'bg-nacional': !importado, 'bg-importado': importado }" class="ion-padding">
   <div>
-  
-
-
-
-
     <div class="datetime-center">
-
       <!-- FECHA / HORA INICIO -->
       <ion-item>
         <ion-label position="stacked">Fecha / Hora inicio</ion-label>
@@ -74,38 +50,7 @@
       </ion-item>
 
     </div>
-
-
     <br>
-
-
-
-
-    <!-- FECHA -->
-    <!--<ion-item>-->
-      <!--<ion-label position="stacked">Fecha</ion-label>-->
-      <!--<ion-datetime-->
-        <!--presentation="date"-->
-        <!--[(ngModel)]="selectedDate"-->
-        <!--(ionChange)="onDateTimeChange()">-->
-      <!--</ion-datetime>-->
-    <!--</ion-item>-->
-
-    <!--<br>-->
-
-    <!--[> HORA <]-->
-    <!--<ion-item>-->
-      <!--<ion-label position="stacked">Hora</ion-label>-->
-      <!--<ion-datetime-->
-        <!--presentation="time"-->
-        <!--[(ngModel)]="selectedTime"-->
-        <!--(ionChange)="onDateTimeChange()">-->
-      <!--</ion-datetime>-->
-    <!--</ion-item>-->
-
-    <!--<br>-->
-
-
 
     <br>
 
@@ -118,18 +63,6 @@
         [(ngModel)]="numero">
       </ion-input>
     </ion-item>
-
-
-
-
-    <!--<ion-item>-->
-      <!--<ion-input-->
-        <!--type="number"-->
-        <!--inputmode="numeric"-->
-        <!--placeholder="0"-->
-        <!--[(ngModel)]="numero">-->
-      <!--</ion-input>-->
-    <!--</ion-item>-->
     <br>
     <ion-button expand="block" (click)="addGlpprice(numero)">
       Actualizar precio
@@ -140,18 +73,19 @@
       <tr [ngClass]="importado ? 'row-importado' : 'row-nacional'">
         <td style="width: 80%;">
           <span style="font-size:small;">
-            &nbsp;&nbsp;Precio actual {{ formatFechaLatam(currentPrice?.created_at) }}&nbsp;&nbsp;
+            &nbsp;&nbsp;Precio actual {{ formatFechaLatam(currentPrice?.data.init) }}&nbsp;&nbsp;
           </span>
         </td>
         <td style="padding:8px;width:20%;">
-          <h5>{{ currentPrice?.data?.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}&nbsp;</h5>
+          <h5>{{ currentPrice?.data?.price }}&nbsp;</h5>
+          <!--<h5>{{ currentPrice?.data?.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}&nbsp;</h5>-->
         </td>
       </tr>
     </table>
 
     <br><br>
 
-     <ion-list *ngIf="!importado">
+    <ion-list *ngIf="!importado">
       <ion-item class="titulo-historico">
         <span>Histórico</span>
       </ion-item>
@@ -162,20 +96,23 @@
           <div style="display: flex; width: 100%; align-items: center;">
             <div style="flex: 0 0 66%; text-align:left;">
               <span style="font-size: x-small;">
-                {{ formatFechaLatam(p.created_at) }}
+                {{ formatFechaLatam(p.data.init) }}
               </span>
             </div>
             <div style="flex: 0 0 33%; text-align:right; font-size: small;">
               <span>
-                {{ p.data.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}
+                {{ p.data.price }}
               </span>
+   <!--           <span>-->
+                <!--{{ p.data.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}-->
+              <!--</span>-->
             </div>
           </div>
         </ion-item>
       </ng-container>
     </ion-list>
 
-   <ion-list *ngIf="importado">
+    <ion-list *ngIf="importado">
       <ion-item class="titulo-historico">
         <span>Histórico</span>
       </ion-item>
@@ -191,14 +128,16 @@
             </div>
             <div style="flex: 0 0 33%; text-align:right; font-size: small;">
               <span>
-                {{ p.data.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}
+                {{ p.data.price }}
               </span>
+<!--              <span>-->
+                <!--{{ p.data.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}-->
+              <!--</span>-->
             </div>
           </div>
         </ion-item>
       </ng-container>
     </ion-list>
-
 
   </div>
 </ion-content>

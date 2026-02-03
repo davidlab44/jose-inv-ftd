@@ -66,51 +66,58 @@ export class PricePage {
     private glpricesService : GlppricesService
   ) {}
 
-
   hash:string='';
   table:any
-
   rexDocument:any;
   glppricesList:any[]=[];
-   
 
   async ngOnInit() {
     const ahora = new Date();
     this.todayDate = this.formatFechaLatam(ahora);
     this.getAllPrices();
-
-      const now = new Date();
-
-      // Fecha local con hora 00:00 (SIN UTC)
-      const localMidnight = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        0, 0, 0
-      );
-
-      this.dateTimeStart = this.toLocalDateTime(localMidnight);
-      this.dateTimeEnd   = this.toLocalDateTime(localMidnight);
-
-
-
+    const now = new Date();
+    // ⏰ Inicio del día: 00:00
+    const startOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      0, 0, 0
+    );
+    // ⏰ Fin del día: 23:59
+    const endOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      23, 59, 0
+    );
+    this.dateTimeStart = this.toLocalDateTime(startOfDay);
+    this.dateTimeEnd   = this.toLocalDateTime(endOfDay);
   }
 
-
-
-
-
+  /*async ngOnInit() {*/
+    /*const ahora = new Date();*/
+    /*this.todayDate = this.formatFechaLatam(ahora);*/
+    /*this.getAllPrices();*/
+      /*const now = new Date();*/
+      /*// Fecha local con hora 00:00 (SIN UTC)*/
+      /*const localMidnight = new Date(*/
+        /*now.getFullYear(),*/
+        /*now.getMonth(),*/
+        /*now.getDate(),*/
+        /*0, 0, 0*/
+      /*);*/
+      /*this.dateTimeStart = this.toLocalDateTime(localMidnight);*/
+      /*this.dateTimeEnd   = this.toLocalDateTime(localMidnight);*/
+  /*}*/
 
     dateTimeStart!: string;
     dateTimeEnd!: string;
-
-
+    
     onDateTimeChange() {
       const payload = {
         start_datetime: this.formatForBackend(this.dateTimeStart),
         end_datetime: this.formatForBackend(this.dateTimeEnd)
       };
-
       console.log('Inicio (raw):', this.dateTimeStart);
       console.log('Fin (raw):', this.dateTimeEnd);
       console.log('Payload backend:', payload);
@@ -119,7 +126,6 @@ export class PricePage {
     // YYYY-MM-DDTHH:mm:ss  → para ion-datetime (local)
     toLocalDateTime(date: Date): string {
       const pad = (n: number) => n.toString().padStart(2, '0');
-
       return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T` +
              `${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
     }
@@ -132,8 +138,6 @@ export class PricePage {
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +
              `${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
     }
-
-
 
 
   /*selectedDate!: string;*/
@@ -182,7 +186,7 @@ export class PricePage {
     }else{
       idReplenishmentProduct=2;
     }
-    this.glpricesService.addGlpprice(price,idReplenishmentProduct).subscribe({
+    this.glpricesService.addGlpprice(price,this.dateTimeStart,this.dateTimeEnd,idReplenishmentProduct).subscribe({
       next: (response)=>{
         console.log("response",response)
         this.getAllPrices();

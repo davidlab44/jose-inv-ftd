@@ -27,11 +27,13 @@
     }
 
 
-    addGlpprice(price: number, id_replenishment_product:number): Observable<any> {
+    addGlpprice(price: number,init:string,end:string,id_replenishment_product:number): Observable<any> {
       const url = `${this.apiUrl}/replenishment_glp_prices?select=*`;
       const item = {
         data: {
           price: price,
+          init: init,
+          end: end,
           currency: 57,
           id_replenishment_product:id_replenishment_product
         }
