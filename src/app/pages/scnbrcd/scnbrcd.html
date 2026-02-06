@@ -1,0 +1,58 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-searchbar  [(ngModel)]="queryText" (ionInput)="updateSchedule()" (ionCancel)="showSearchbar = false" placeholder="Search"></ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+
+<ion-content>
+  <ion-button (click)="printSelectedBarcodes()">
+    Descargar PDF con códigos de barra
+  </ion-button>
+  <div class="ion-padding">
+    <h2>Escanear código</h2>
+    <ion-button expand="block" color="danger" (click)="stopScan()">Detener</ion-button>
+    <ion-item>
+      <ion-label position="floating">Código leído</ion-label>
+      <ion-input readonly [value]="scannedValue"></ion-input>
+    </ion-item>
+  </div>
+  <ion-grid>
+    <ion-row>
+      <ion-col
+        size="6"
+        size-md="4"
+        size-lg="3"
+        *ngFor="let p of filteredProductList">
+        <ion-card button (click)="addToOrder(p)" class="product-card">
+          <ion-card-content>
+            <p class="title">{{ p.display_name }}</p>
+            <p>
+              {{ p.list_price | currency:'COP':'symbol-narrow':'1.0-0' }}
+            </p>
+            <p class="stock">
+              disponible: {{ p.qty_available }}
+            </p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+
+
+
+
+

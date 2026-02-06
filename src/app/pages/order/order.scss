@@ -1,0 +1,232 @@
+ion-content {
+  --background: #f8f9fa; /* Fondo suave */
+}
+
+.bottom-button {
+  position: fixed;
+  bottom: 20px;
+  left: 10px;
+  right: 10px;
+  text-align: center;
+}
+
+ion-button {
+  --background: linear-gradient(45deg, #3880ff, #4c8dff);
+  --border-radius: 12px;
+  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  font-size: 18px;
+  font-weight: bold;
+  height: 56px;
+}
+
+
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px;
+}
+
+.danger-button {
+  background-color: #ff4444;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+.danger-button:hover {
+  background-color: #cc0000;
+}
+.danger-button:active {
+  transform: scale(0.95);
+}
+
+/* Bloques de categorías */
+.category-block {
+  background: #f9f9f9;
+  margin: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.category-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #444;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 4px;
+}
+
+/* Listado de productos */
+.product-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+}
+.product-item:last-child {
+  border-bottom: none;
+}
+
+.product-name {
+  flex: 2;
+  font-weight: 500;
+  color: #333;
+}
+.product-info {
+  flex: 1;
+  text-align: center;
+  color: #666;
+}
+.product-price {
+  flex: 1;
+  text-align: right;
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+
+
+
+// ion-fab-button {
+//   --background: var(--ion-color-step-150, #ffffff);
+//   --background-hover: var(--ion-color-step-200, #f2f2f2);
+//   --background-focused: var(--ion-color-step-250, #d9d9d9);
+//   --color: var(--ion-color-primary, #3880ff);
+// }
+
+// /*
+//  * Material Design uses the ripple for activated
+//  * so only style the iOS activated background
+//  */
+// .ios ion-fab-button {
+//   --background-activated: var(--ion-color-step-250, #d9d9d9);
+// }
+
+// .opportunity-labeled{
+//   font-size:10px;
+//   line-height: 0px;
+// }
+
+// $categories: (
+//   ionic: var(--ion-color-primary),
+//   angular: #ac282b,
+//   communication: #8e8d93,
+//   tooling: #fe4c52,
+//   services: #fd8b2d,
+//   design: #fed035,
+//   workshop: #69bb7b,
+//   food: #3bc7c4,
+//   documentation: #b16be3,
+//   navigation: #6600cc
+// );
+
+// @each $track, $value in map-remove($categories) {
+//   ion-item-sliding[track='#{$track}'] ion-label {
+//     padding-left: 10px;
+
+//     border-left: 2px solid $value;
+//   }
+// }
+
+// .draft-container {
+//   border: solid 1px #d5d5d5;
+//   border-radius: 8px;
+//   overflow: hidden;
+//   margin-bottom: 10px;
+// }
+
+// .draft-header {
+//   width: 100%;
+//   background-color: rgb(229, 243, 255);
+//   padding: 10px;
+//   font-weight: bold;
+// }
+
+// .draft-body {
+//   width: 100%;
+//   padding: 10px 20px;
+// }
+
+// .product-line {
+//   display: flex;
+//   align-items: center;
+//   gap: 10px;
+//   padding: 5px 0;
+// }
+
+// .product-qty {
+//   font-weight: bold;
+//   color: #333;
+// }
+
+// .product-name {
+//   flex-grow: 1;
+//   color: #666;
+// }
+
+// .custom-checkbox {
+//   --size: 20px;
+//   --background: #ffffff;
+//   --border-radius: 4px;
+//   --border-color: #007bff;
+// }
+
+// .custom-checkbox::part(container) {
+//   width: var(--size);
+//   height: var(--size);
+//   border-radius: var(--border-radius);
+//   border: 2px solid var(--border-color);
+// }
+
+// .custom-checkbox::part(mark) {
+//   color: #007bff;
+// }
+
+// .order-table {
+//   width: 100%;
+//   border-collapse: collapse;
+//   text-align: left;
+//   background: #fff;
+//   border-radius: 8px;
+//   overflow: hidden;
+//   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+
+//   thead {
+//     background-color: #007bff;
+//     color: white;
+//   }
+
+//   th, td {
+//     padding: 12px;
+//     border-bottom: 1px solid #ddd;
+//   }
+
+//   tbody tr:hover {
+//     background-color: #f1f1f1;
+//   }
+
+//   .small-text {
+//     font-size: 12px;
+//     color: gray;
+//   }
+
+//   .custom-checkbox {
+//     transform: scale(1.2);
+//   }
+// }
+
+

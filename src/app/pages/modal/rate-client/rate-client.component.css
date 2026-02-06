@@ -1,0 +1,48 @@
+/* Contenedor imagen */
+.image-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.product-image {
+  width: 100%;
+  max-width: 280px;
+  border-radius: 12px;
+}
+
+/* Información */
+.info {
+  text-align: center;
+}
+
+.name {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.qty {
+  font-size: 16px;
+}
+
+/* Zoom fullscreen */
+.zoom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.zoom-image {
+  max-width: 95%;
+  max-height: 95%;
+  border-radius: 12px;
+}
+

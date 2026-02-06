@@ -1,0 +1,7 @@
+{
+    "/jsonrpc":{
+        "target":"http://localhost:55765",
+        "secure":false,
+        "logLevel":"debug"
+    }
+}

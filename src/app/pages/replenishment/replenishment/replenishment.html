@@ -1,0 +1,55 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-searchbar
+      placeholder="Buscar"
+     (ionInput)="onSearch($event.target.value)">
+    </ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar color="light" class="subheader-toolbar">
+    <ion-row>
+      <ion-col size=12     style="text-align:center;"      >
+        <ion-title class="subheader-title">
+          <span    style="text-align:center;font-size: x-small;font-weight: 600;"      >Reabastecimiento Provigas</span>
+        </ion-title>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <swiper-container
+      pagination="true"
+      scrollbar="true"
+      style="width: 100%; height: 100%;">
+    <swiper-slide *ngFor="let col of columns">
+      <ion-card >
+        <ion-card-header>
+          <ion-card-title>{{ col.header }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item *ngFor="let row of replenishmentList">
+            <div  (click)="patchThisElement(row)" > {{ row.data[col.field] }}  </div>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+    </swiper-slide>
+  </swiper-container>
+</ion-content>
+
+
+
+
+
+

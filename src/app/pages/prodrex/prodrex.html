@@ -1,0 +1,106 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-searchbar
+      placeholder="Buscar"
+      (ionInput)="onSearch($event.target.value)">
+    </ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar color="light" class="subheader-toolbar">
+    <ion-row>
+      <ion-col size=1>
+        <ion-button color="secondary" (click)="selectUsers()" style="height: 28px; min-width: 28px;">
+          <ion-icon name="person-outline"></ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col size=11>
+        <ion-title class="subheader-title">
+          Movimientos | Salida de mercancia <br><br>
+          <span style= "font-size:xx-small;padding-bottom:5px;">
+            <i>{{todayDate}}</i>
+          </span>
+        </ion-title>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+<!--  <pre *ngIf="rexDocument?.length">-->
+    <!--{{rexDocument[0] | json }}-->
+  <!--</pre>-->
+  <ion-list>
+    <ng-container *ngFor="let p of prodrexList">
+      <ion-item button (click)="addToOrder(p)" lines="none" style="padding-top: 6px; padding-bottom: 6px;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="font-size: 13px; width: 70%;">
+                <span style="font-size: small;">{{ getProductNameById(p?.data?.id_product) }}</span>
+            </td>
+            <td style="width: 15%; text-align: center;">
+                <span style="font-size: small;">{{ p?.data?.qty }}</span>
+            </td>
+            <td style="width: 15%; text-align: center;">
+              <ion-button color="secondary" (click)="removeFromProdrex(p)" style="height: 28px; min-width: 28px;">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </td>
+          </tr>
+        </table>
+      </ion-item>
+    </ng-container>
+  </ion-list>
+  <br>
+  <ion-grid class="user-table" *ngIf="!hasOwner">
+    <ion-row class="header">
+      <ion-col size="9">Nombre</ion-col>
+      <ion-col size="3" class="check-col">Seleccionar</ion-col>
+    </ion-row>
+    <ion-row *ngFor="let u of userList" class="user-row">
+      <ion-col size="9">
+        {{ u.data.name }}
+      </ion-col>
+      <ion-col size="3" class="check-col">
+        <ion-checkbox
+          (ionChange)="selectUser(u)"
+          mode="ios">
+        </ion-checkbox>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <div *ngIf="hasOwner" style="width:100%;border-bottom: solid 1px #d5d5d5;padding: 10px;">
+    <ion-row *ngFor="let u of userList" style="width:100%; justify-content:center; display:flex;">
+      <span *ngIf="u.id == ownerId" style="text-align:center; width:100%;">
+        <b>{{ u.data.name }}</b>
+      </span>
+    </ion-row>
+  </div>
+
+  <div class="button-right" style="padding-right: 12px;" >
+    <ion-button color="primary" (click)="markAsDelivered()">
+      <ion-icon name="checkbox-outline"></ion-icon>&nbsp; 
+    </ion-button>
+  </div>
+
+  <!--<app-signature></app-signature>-->
+
+</ion-content>
+
+
+
+
+
+
+

@@ -1,0 +1,151 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-searchbar
+      placeholder="Buscar"
+      (ionInput)="onSearch($event.target.value)">
+    </ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment>
+      <ion-segment-button value="all"  (click)="importado = false"> NACIONAL </ion-segment-button>
+      <ion-segment-button value="favorites"  (click)="importado = true"  > IMPORTADO </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [ngClass]="{ 'bg-nacional': !importado, 'bg-importado': importado }" class="ion-padding">
+  <div>
+    <div class="datetime-center">
+      <!-- FECHA / HORA INICIO -->
+      <ion-item>
+        <ion-label position="stacked">Fecha / Hora inicio</ion-label>
+        <ion-datetime
+          presentation="date-time"
+          [(ngModel)]="dateTimeStart"
+          (ionChange)="onDateTimeChange()">
+        </ion-datetime>
+      </ion-item>
+
+      <br>
+
+      <!-- FECHA / HORA FIN -->
+      <ion-item>
+        <ion-label position="stacked">Fecha / Hora fin</ion-label>
+        <ion-datetime
+          presentation="date-time"
+          [(ngModel)]="dateTimeEnd"
+          (ionChange)="onDateTimeChange()">
+        </ion-datetime>
+      </ion-item>
+
+    </div>
+    <br>
+
+    <br>
+
+    <ion-item>
+      <ion-label position="stacked">Nuevo precio</ion-label>
+      <ion-input
+        type="number"
+        inputmode="numeric"
+        placeholder="0"
+        [(ngModel)]="numero">
+      </ion-input>
+    </ion-item>
+    <br>
+    <ion-button expand="block" (click)="addGlpprice(numero)">
+      Actualizar precio
+    </ion-button>
+    <br>
+
+    <table style="width: 100%;">
+      <tr [ngClass]="importado ? 'row-importado' : 'row-nacional'">
+        <td style="width: 80%;">
+          <span style="font-size:small;">
+            &nbsp;&nbsp;Precio actual {{ formatFechaLatam(currentPrice?.data.init) }}&nbsp;&nbsp;
+          </span>
+        </td>
+        <td style="padding:8px;width:20%;">
+          <h5>{{ currentPrice?.data?.price }}&nbsp;</h5>
+          <!--<h5>{{ currentPrice?.data?.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}&nbsp;</h5>-->
+        </td>
+      </tr>
+    </table>
+
+    <br><br>
+
+    <ion-list *ngIf="!importado">
+      <ion-item class="titulo-historico">
+        <span>Histórico</span>
+      </ion-item>
+      <ng-container *ngFor="let p of glppricesList">
+        <ion-item
+          *ngIf="p.data.id_replenishment_product === 1"
+          class="item-historico">
+          <div style="display: flex; width: 100%; align-items: center;">
+            <div style="flex: 0 0 66%; text-align:left;">
+              <span style="font-size: x-small;">
+                {{ formatFechaLatam(p.data.init) }}
+              </span>
+            </div>
+            <div style="flex: 0 0 33%; text-align:right; font-size: small;">
+              <span>
+                {{ p.data.price }}
+              </span>
+   <!--           <span>-->
+                <!--{{ p.data.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}-->
+              <!--</span>-->
+            </div>
+          </div>
+        </ion-item>
+      </ng-container>
+    </ion-list>
+
+    <ion-list *ngIf="importado">
+      <ion-item class="titulo-historico">
+        <span>Histórico</span>
+      </ion-item>
+      <ng-container *ngFor="let p of glppricesList">
+        <ion-item
+          *ngIf="p.data.id_replenishment_product === 2"
+          class="item-historico">
+          <div style="display: flex; width: 100%; align-items: center;">
+            <div style="flex: 0 0 66%; text-align:left;">
+              <span style="font-size: x-small;">
+                {{ formatFechaLatam(p.created_at) }}
+              </span>
+            </div>
+            <div style="flex: 0 0 33%; text-align:right; font-size: small;">
+              <span>
+                {{ p.data.price }}
+              </span>
+<!--              <span>-->
+                <!--{{ p.data.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}-->
+              <!--</span>-->
+            </div>
+          </div>
+        </ion-item>
+      </ng-container>
+    </ion-list>
+
+  </div>
+</ion-content>
+
+
+
+
+
+
+
+

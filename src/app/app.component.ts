@@ -1,0 +1,372 @@
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { SwUpdate } from '@angular/service-worker';
+import { MenuController, Platform, ToastController } from '@ionic/angular';
+import { StatusBar } from '@capacitor/status-bar';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { Storage } from '@ionic/storage-angular';
+import { UserData } from './providers/user-data';
+import { OpportunityService } from './services/opportunity.service';
+import { environment } from '../environments/environment';
+import { Category } from './interfaces/category';
+import { UserService } from './services/user.service';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+  encapsulation: ViewEncapsulation.None
+})
+export class AppComponent implements OnInit {
+
+  categories: Category[] = [];
+  
+  appPages = [
+     {
+       title: 'Inicio',
+       url: '/app/tabs/schedule',
+       icon: 'calendar'
+     },
+     {
+       title: 'Productos',
+       url: '/app/tabs/readprdct',
+       icon: 'cube'
+     },
+     {
+       title: 'Entrada',
+       url: '/app/tabs/kitchen',
+       icon: 'arrow-down'
+     },
+     {
+       title: 'Ingresos de mercancia',
+       url: '/app/tabs/readren',
+       icon: 'chevron-forward-circle'
+     },
+     {
+       title: 'Listar productos ',
+       url: '/app/tabs/asset-supply-readprdct',
+       icon: 'document-text'
+     },
+     {
+       title: 'Registrar producto',
+       url: '/app/tabs/asset-supply-post',
+       icon: 'add-circle'
+     },
+     {
+       title: 'Kilos retirados',
+       url: '/app/tabs/replenishment-withdrawn-getall',
+       icon: 'checkbox'
+     },
+     {
+       title: 'Registrar retiro',
+       url: '/app/tabs/replenishment-withdrawn-post',
+       icon: 'add-circle'
+     },
+
+   ];
+   appPages2 = [
+     {
+       title: 'Inicio',
+       url: '/app/tabs/schedule',
+       icon: 'calendar'
+     },
+      {
+       title: 'Productos',
+       url: '/app/tabs/readprd',
+       icon: 'cube'
+     },
+   ];
+
+   appPages3 = [
+     {
+       title: 'Inicio',
+       url: '/app/tabs/schedule',
+       icon: 'calendar'
+     },
+      {
+       title: 'Productos',
+       url: '/app/tabs/readprd',
+       icon: 'cube'
+     },
+     {
+       title: 'Reabastecimiento',
+       url: '/app/tabs/asset-supply-reorder',
+       icon: 'layers'
+     },
+   ];
+  
+   appPages7 = [
+     {
+       title: 'Inicio',
+       url: '/app/tabs/schedule',
+       icon: 'calendar'
+     },
+     {
+       title: 'Productos',   
+       url: '/app/tabs/readprd',       
+       icon: 'cube'
+     },
+    {
+       title: 'Entrada',
+       url: '/app/tabs/kitchen',
+       icon: 'arrow-down'
+     },
+     {
+       title: 'Ingresos de mercancia',
+       url: '/app/tabs/readren',
+       icon: 'chevron-forward-circle'
+     },
+     {
+       title: 'Listar productos ',
+       url: '/app/tabs/asset-supply-readprdct',
+       icon: 'document-text'
+     },
+     {
+       title: 'Glp precio',
+       url: '/app/tabs/glpprices',
+       icon: 'add-circle'
+     },
+     {
+       title: 'Registrar producto',
+       url: '/app/tabs/asset-supply-post',
+       icon: 'add-circle'
+     },
+     {
+       title: 'Registrar retiro',
+       url: '/app/tabs/replenishment-withdrawn-post',
+       icon: 'add-circle'
+     },
+     {
+       title: 'Reg. retiro express',
+       url: '/app/tabs/replenishment-withdrawn-postaut',
+       icon: 'add-circle'
+     },
+
+       {
+       title: 'Kilos retirados',
+       url: '/app/tabs/replenishment-withdrawn-getall',
+       icon: 'checkbox'
+     },
+     {
+       title: 'Llegaron',
+       url: '/app/tabs/logistic-logistic-getall-in',
+       icon: 'boat'
+     },
+     {
+       title: 'Salieron',
+       url: '/app/tabs/logistic-logistic-getall-out',
+       icon: 'boat'
+     },
+     {
+       title: 'Reabastecimiento',
+       url: '/app/tabs/asset-supply-reorder',
+       icon: 'layers'
+     },
+   ];
+
+  loggedIn = false;
+  dark = false;
+  public showMenu = true; 
+  posCategories: any[] = [];
+  storedObject:any;
+
+  constructor(
+    private menu: MenuController,
+    private platform: Platform,
+    private router: Router,
+    private storage: Storage,
+    private userData: UserData,
+    private swUpdate: SwUpdate,
+    private toastCtrl: ToastController,
+    private opportunityService:OpportunityService,
+    private updates: SwUpdate,
+    private userService:UserService
+  ) {
+    this.checkForUpdates();
+    console.log("constructor")
+  }
+
+  async checkForUpdates() {
+    if (!this.swUpdate.isEnabled) return;
+    const updateFound = await this.swUpdate.checkForUpdate();
+    if (updateFound) {
+      if (confirm('Nueva versión disponible. ¿Actualizar?')) {
+        await this.swUpdate.activateUpdate();
+        document.location.reload();
+      }
+    }
+  }
+
+  async ngOnInit() {
+    /*this.showMenu=true;*/
+    /*const host = window.location.hostname;*/
+    /*if (host.startsWith("abs.")) {*/
+      /*this.appPages = this.appPages4;*/
+      /*this.router.navigate(['/app/tabs/replenishment']);*/
+    /*}*/
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.storedObject = this.userService.getStoredUserInfo();  
+        if(this.storedObject && this.storedObject.data && this.storedObject.data.role==2){
+          this.appPages=this.appPages2;
+        }
+        if(this.storedObject && this.storedObject.data && this.storedObject.data.role==3){
+          this.appPages=this.appPages3;
+        }
+        if(this.storedObject && this.storedObject.data && this.storedObject.data.role==7){
+          this.appPages=this.appPages7;
+        }
+        // Check if the current route is '/login'
+        if (event.url === '/login' || event.url === '/signup') {
+          this.showMenu = false; // Hide the menu
+        } else {
+          this.showMenu = true; // Show the menu on other routes
+        }
+        /*     if (event.url === '/app/tabs/schedule') {*/
+          /*this.dark = false; // Hide the menu*/
+          /*//this.setSesion();*/
+          /*//this.setSesion()*/
+        /*}else{*/
+          /*this.dark = true;*/
+        /*}*/
+        /*if (event.url === '/app/tabs/client') {*/
+          /*//this.setSesion()*/
+        /*}*/
+      }
+    });    
+    console.log("ionviewdidenter1")
+  }
+
+  ionViewDidEnter() {
+    console.log("ionviewdidenter")
+  }
+
+  // getPosCategories() {
+  //   this.opportunityService.getPosCategories(environment.i, environment.p).subscribe({
+  //     next: response => {
+  //       this.posCategories = response.result;
+  //       console.log("response", response);
+  //       console.log("pos category", this.posCategories);
+  //       if (this.posCategories?.length) {
+  //         this.appPages = this.posCategories.map((cat: any) => ({
+  //           title: cat.name,
+  //           url: `/app/tabs/map?id=${cat.id}`,  // ✅ id como query param
+  //           icon: 'log-in',
+  //           id: cat.id
+  //         }));
+  //       }
+  //     },
+  //     error: error => console.error('Error:', error),
+  //     complete: () => {}
+  //   });
+  // }
+
+  // getPosCategories() {
+  //   this.opportunityService.getPosCategories(environment.i, environment.p).subscribe({
+  //     next: response => {
+  //       this.posCategories = response.result;
+  //       console.log("response", response);
+  //       console.log("pos category", this.posCategories);
+
+  //       if (this.posCategories?.length) {
+  //         this.appPages = this.posCategories.map((cat: any) => ({
+  //           title: cat.name,
+  //           url: '/app/tabs/map',
+  //           icon: 'log-in',
+  //           id: cat.id
+  //         }));
+  //       }
+  //     },
+  //     error: error => console.error('Error:', error),
+  //     complete: () => {}
+  //   });
+  // }
+
+  // getPosCategories() {
+  //   this.opportunityService.getPosCategories(environment.i, environment.p).subscribe({
+  //     next: response => {
+  //       this.posCategories = response.result;
+  //       console.log("response",response)
+  //       console.log("pos category",this.posCategories)
+  //       if(this.posCategories && this.posCategories.length && this.posCategories.length>0){
+  //         this.appPages = [
+  //           {
+  //             title: this.posCategories[0].name,
+  //             url: '/app/tabs/map',
+  //             icon: 'log-in',
+  //             id: this.posCategories[0].id
+  //           },
+  //           {
+  //             title: this.posCategories[1].name,
+  //             url: '/app/tabs/map',
+  //             icon: 'log-in',
+  //             id: this.posCategories[1].id
+  //           },
+  //           {
+  //             title: this.posCategories[2].name,
+  //             url: '/app/tabs/map',
+  //             icon: 'log-in',
+  //             id: this.posCategories[2].id
+  //           },
+  //           {
+  //             title: this.posCategories[3].name,
+  //             url: '/app/tabs/map',
+  //             icon: 'log-in',
+  //             id: this.posCategories[3].id
+  //           },
+  //         ];
+  //       }
+  //     },
+  //     error: error => console.error('Error:', error),
+  //     complete: () => {}
+  //   });
+  // }
+
+  initializeApp() {
+    this.platform.ready().then(() => {
+      if (this.platform.is('hybrid')) {
+        StatusBar.hide();
+        SplashScreen.hide();
+      }
+    });
+  }
+
+  // checkLoginStatus() {
+  //   return this.userData.isLoggedIn().then(loggedIn => {
+  //     return this.updateLoggedInStatus(loggedIn);
+  //   });
+  // }
+
+  // updateLoggedInStatus(loggedIn: boolean) {
+  //   setTimeout(() => {
+  //     this.loggedIn = loggedIn;
+  //   }, 300);
+  // }
+
+  // listenForLoginEvents() {
+  //   window.addEventListener('user:login', () => {
+  //     this.updateLoggedInStatus(true);
+  //   });
+
+  //   window.addEventListener('user:signup', () => {
+  //     this.updateLoggedInStatus(true);
+  //   });
+
+  //   window.addEventListener('user:logout', () => {
+  //     this.updateLoggedInStatus(false);
+  //   });
+  // }
+
+  logout() {
+    this.userData.logout().then(() => {
+      return this.router.navigateByUrl('/app/tabs/schedule');
+    });
+  }
+
+  openTutorial() {
+    this.menu.enable(false);
+    this.storage.set('ion_did_tutorial', false);
+    this.router.navigateByUrl('/tutorial');
+  }
+
+}

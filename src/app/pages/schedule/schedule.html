@@ -1,0 +1,189 @@
+<ion-header translucent="true">
+
+  <!-- Toolbar principal -->
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Subheader con tu diseño y columnas -->
+  <ion-toolbar color="light" class="subheader-toolbar">
+    <ion-grid>
+      <ion-row>
+
+        <!-- Columna izquierda (size 8) -->
+        <ion-col size="8">
+
+          <ion-row>
+            <ion-col>
+              <ion-title class="subheader-title">
+                Movimientos | Salida de mercancia
+              </ion-title>
+            </ion-col>
+          </ion-row>
+            
+          <ion-row>
+              <ion-col>
+                <ion-title class="subheader-title" style="font-size: xx-small;"  >
+                  <i> {{todayDate}} </i>                      
+                </ion-title>
+              </ion-col>
+          </ion-row>
+
+          <!--<ion-row>productos cantidad sum <pre>{{productListOriginal.length }}</pre></ion-row>-->
+        </ion-col>
+
+        <!-- Columna derecha (size 4) -->
+        <ion-col size="4" class="ion-text-right">
+
+          <ion-row>
+            <ion-col>
+              <ng-container *ngIf="exitList?.length > 0; else noItems">
+                <strong>{{ exitList.length }} items</strong>
+              </ng-container>
+              <ng-template #noItems style="font-size: small;" >
+                <span style="font-size: xx-small;" ><strong>No hay items</strong></span>
+              </ng-template>
+            </ion-col>
+          </ion-row>
+
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+
+</ion-header>
+
+
+<ion-content>
+  <!--  <h2>product</h2>-->
+  <!--<pre>{{prdct | json}}</pre>-->
+  <ion-card class="main-card" [class.disabled]="prdct && !componentsEnabled">
+
+    <ion-card-content>
+
+      <div class="scan-container">
+        <video #video autoplay playsinline class="video-preview"></video>
+
+        <div class="scan-row">
+          <ion-button color="danger" class="scan-btn" (click)="stopScan()">
+            <ion-icon name="stop-circle-outline"></ion-icon>
+          </ion-button>
+          <ion-item class="scan-input">
+            <ion-input #scanInput [(ngModel)]="scannedValue" (ionInput)="onInputChange()" type="text"></ion-input>
+          </ion-item>
+          <ion-button class="scan-btn" (click)="startScan()">
+            <ion-icon name="camera-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+      </div>
+
+       <ng-container *ngIf="prdct">
+        <div class="product-section">
+
+
+           <!--<ion-card-header>-->
+            <ion-grid class="product-row">
+              <ion-row class="ion-align-items-center">
+
+                <!-- 1️⃣ Categoría (15%) -->
+                <ion-col size="2" class="col-categ" style="font-size:xx-small ;"  > 
+                  {{ getCategoryNameById(prdct.data.categ[0]) | uppercase }}
+                </ion-col>
+
+                <!-- 2️⃣ Nombre (68%) -->
+                <ion-col size="8" class="col-name">
+                  {{ prdct.data.name | uppercase }}
+                </ion-col>
+
+                <!-- 3️⃣ Cantidad (17%) -->
+                <ion-col size="2" class="col-qty">
+                  <strong style="font-size:xx-small;"   >{{ prdct?.data?.qty }}</strong>
+                  <span style="font-size: xx-small;"> {{ getUmNameById(prdct?.data?.um) }}</span>
+                  <!--{{ prdct.data.qty }}-->
+                </ion-col>
+
+                <!--   <ion-col size="1" class="col-um" style="font-size:xx-small;" >-->
+                  <!--{{ getUmNameById(prdct.data.um) }}-->
+                <!--</ion-col>-->
+
+              </ion-row>
+            </ion-grid>
+          <!--</ion-card-header>-->
+
+           <!-- <ion-card-subtitle class="category">-->
+              <!--{{ getCategoryNameById(prdct.data.categ[0]) | uppercase }}-->
+            <!--</ion-card-subtitle>-->
+
+            <!--<ion-card-title class="product-name">-->
+              <!--{{ prdct.data.name | uppercase }}-->
+            <!--</ion-card-title>-->
+
+            <!--<ion-card-subtitle class="product-qty">-->
+              <!--Cantidad actual:-->
+              <!--<pre>{{prdct | json}}</pre>-->
+              <!--<strong>{{ prdct.data.qty }}</strong>-->
+              <!--{{ getUmNameById(prdct.data.um) }}-->
+            <!--</ion-card-subtitle>-->
+
+        </div>
+
+        <!-- QTY INPUT -->
+        <div class="quantity-container">
+          <ion-item class="quantity-item">
+            <ion-input
+              type="number"
+              [(ngModel)]="extraQty"
+              [readonly]="!componentsEnabled"
+              inputmode="numeric"
+              class="quantity-input">
+            </ion-input>
+          </ion-item>
+          <div class="quantity-buttons">
+            <ion-button color="medium" expand="block" (click)="clearQty()" [disabled]="!componentsEnabled">Clear</ion-button>
+            <ion-button color="primary" expand="block" (click)="addQty(1)" [disabled]="!componentsEnabled">1</ion-button>
+            <ion-button color="success" expand="block" (click)="addQty(10)" [disabled]="!componentsEnabled">10</ion-button>
+          </div>
+          <div class="action-buttons-row ion-padding">
+            <ion-button color="medium" shape="round" (click)="exitApp()">
+              <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
+            </ion-button>
+            <ion-button color="primary" shape="round" (click)="confirmAction()">
+              <ion-icon slot="icon-only" name="checkmark-circle-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </ng-container>
+   </ion-card-content>
+  </ion-card>
+
+  <ng-container *ngIf="!prdct">
+    <div class="loading-container">
+<!--      <ion-spinner name="crescent"></ion-spinner>-->
+      <!--<p>Cargando producto...</p>-->
+    </div>
+  </ng-container>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="primary" (click)="openReport()">
+      <ion-icon name="document-text-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
+
+
+
+

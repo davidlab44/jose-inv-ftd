@@ -1,0 +1,113 @@
+
+
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Producto</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Imagen -->
+  <div class="image-container" (click)="openZoom()">
+    <img
+      [src]="items?.data?.img"
+      alt="Imagen del producto"
+      class="product-image"
+    />
+  </div>
+
+  <!-- Datos -->
+  <div class="info">
+    <h2 class="name">{{ items?.data?.name }}</h2>
+    <p class="qty">Cantidad: <strong>{{ items?.data?.qty }}</strong></p>
+  </div>
+
+</ion-content>
+
+<!-- Zoom fullscreen -->
+<div class="zoom-overlay" *ngIf="zoomActive" (click)="closeZoom()">
+  <img
+    [src]="items?.data?.img"
+    alt="Zoom imagen"
+    class="zoom-image"
+  />
+</div>
+
+
+
+
+<!--<ion-header>-->
+  <!--<ion-toolbar>-->
+    <!--<ion-title>Detalle del Producto</ion-title>-->
+    <!--<ion-buttons slot="end">-->
+      <!--<ion-button fill="clear" (click)="cerrar()">✕</ion-button>-->
+    <!--</ion-buttons>-->
+  <!--</ion-toolbar>-->
+<!--</ion-header>-->
+
+<!--<ion-content class="modal-content ion-padding">-->
+
+  <!--<div class="product-card" *ngIf="items?.data">-->
+
+    <!--<div class="image-container">-->
+      <!--<img-->
+        <!--[src]="items.data.img"-->
+        <!--alt="Imagen del producto"-->
+        <!--class="product-image"-->
+      <!--/>-->
+    <!--</div>-->
+
+    <!--<div class="product-info">-->
+      <!--<h2 class="product-name">-->
+        <!--{{ items.data.name }}-->
+      <!--</h2>-->
+
+      <!--<p class="product-qty">-->
+        <!--Cantidad: <strong>{{ items.data.qty }}</strong>-->
+      <!--</p>-->
+    <!--</div>-->
+
+  <!--</div>-->
+
+<!--</ion-content>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<ion-header>-->
+  <!--<ion-toolbar translucent>-->
+    <!--<ion-title>Calificar Cliente</ion-title>-->
+    <!--<ion-buttons slot="end">-->
+      <!--<ion-button (click)="cerrar()">X</ion-button>-->
+    <!--</ion-buttons>-->
+  <!--</ion-toolbar>-->
+<!--</ion-header>-->
+
+<!--<ion-content class="modal-content ion-padding" [style.background]="'rgba(255,255,255,0.9)'">-->
+
+  <!--<h3>Hola Cachones</h3>-->
+
+<!--</ion-content>-->
+
+
