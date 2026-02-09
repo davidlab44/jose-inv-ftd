@@ -278,17 +278,6 @@ export class GetallPage implements OnInit {
   }
 
 
-  /*getAll(){*/
-    /*console.log('entro en getall')*/
-    /*console.log('startDay',this.startDay.toString());*/
-    /*console.log('endDay',this.endDay.toString());*/
-    /*[>    this.withdrawnService.getInterval(this.startDay.toString(),this.endDay.toString()).subscribe({<]*/
-      /*[>next: response=>{<]*/
-        /*[>console.log("response gettall withdrawn",response);<]*/
-      /*[>}<]*/
-    /*[>})<]*/
-  /*}*/
-
   prodrexList:any[]=[];
   ionViewDidEnter() {
     this.prodrexService.getAll().subscribe({

@@ -306,7 +306,7 @@ getTotalKg(): number {
 
   loadData() {
     this.withdrawnService.getAll().subscribe((resp) => {
-      this.withdrawnList = resp;
+      this.withdrawnList = this.orderByDate(resp);
       console.log('DATA:', this.withdrawnList);
     });
   }
@@ -445,6 +445,16 @@ getTotalKg(): number {
     if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
     const horasTexto = String(horas).padStart(2, '0');
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
+  }
+
+
+
+  orderByDate(data: any[]): any[] {
+    return data.sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return dateB - dateA; // más reciente primero
+    });
   }
 
 

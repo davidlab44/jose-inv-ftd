@@ -34,45 +34,20 @@ export class GetallPage implements OnInit {
 
 
 
+  withdrawnList: any[] = [];
 
 
-withdrawnList: any[] = [];
+  getTotalKg(): number {
+    if (!this.withdrawnList || this.withdrawnList.length === 0) {
+      return 0;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-getTotalKg(): number {
-  if (!this.withdrawnList || this.withdrawnList.length === 0) {
-    return 0;
+    return this.withdrawnList.reduce((total, p) => {
+      const akg = Number(p?.data?.akg) || 0;
+      const bkg = Number(p?.data?.bkg) || 0;
+      return total + akg + bkg;
+    }, 0);
   }
-
-  return this.withdrawnList.reduce((total, p) => {
-    const akg = Number(p?.data?.akg) || 0;
-    const bkg = Number(p?.data?.bkg) || 0;
-    return total + akg + bkg;
-  }, 0);
-}
-
-
-
-
-
-
-
-
-
 
 
 
@@ -113,13 +88,6 @@ getTotalKg(): number {
       /*month: 'short'*/
     /*});*/
   /*}*/
-
-
-
-
-
-
-
 
 
 
@@ -300,13 +268,14 @@ getTotalKg(): number {
   };
 
   ngOnInit() {
-     this.syncDays();
+    this.syncDays();
     this.loadData();
   }
 
   loadData() {
     this.withdrawnService.getAll().subscribe((resp) => {
-      this.withdrawnList = resp;
+      //this.withdrawnList = resp;
+      this.withdrawnList = this.orderByDate(resp);
       console.log('DATA:', this.withdrawnList);
     });
   }
@@ -429,6 +398,8 @@ getTotalKg(): number {
   }
 
   formatFechaLatam(dateInput: string | Date | number): string {
+    //console.log("fechalatam",dateInput) 
+
     if (!dateInput) return '';
     const date = new Date(dateInput);
     const opciones: Intl.DateTimeFormatOptions = {
@@ -447,6 +418,14 @@ getTotalKg(): number {
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
+
+  orderByDate(data: any[]): any[] {
+    return data.sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return dateB - dateA; // más reciente primero
+    });
+  }
 
 
 
