@@ -264,11 +264,9 @@ export class GetallPage implements OnInit {
   getAll() {
     const since = this.dayOfYearToISO(this.startDay);
     const until = this.dayOfYearToISO(this.endDay, true);
-
     console.log('Filtro real desde:', since);
     console.log('Filtro real hasta:', until);
-
-    this.withdrawnService.getInterval(since, until).subscribe({
+    this.withdrawnService.getIntervalByAdate(since, until).subscribe({
       next: response => {
         this.withdrawnList = response;
         console.log('Withdrawn filtrados:', response);

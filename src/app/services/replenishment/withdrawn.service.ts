@@ -31,6 +31,22 @@ export class WithdrawnService {
       );
   }
 
+
+
+  getIntervalByAdate(since: string, until: string): Observable<any[]> {
+    const params = [
+      `data->>adate=gte.${since}`,
+      `data->>adate=lte.${until}`
+    ].join('&');
+
+    return this.http
+      .get<any[]>(`${this.apiUrl}/${this.model}?${params}`)
+      .pipe(
+        map(response => response ?? [])
+      );
+  }
+
+
   post(data:any): Observable<any> {
     const url = `${this.apiUrl}/${this.model}?select=*`;
     const item = {
