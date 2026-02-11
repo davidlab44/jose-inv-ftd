@@ -13,11 +13,11 @@
         
     constructor(private http: HttpClient) {
     }   
-        
+         
     getAll(): Observable<any[]> {   
       return this.http.get<any[]>(`${this.apiUrl}/replenishment_glp_prices`);
     }   
-       
+        
     getLast(): Observable<any> {
       return this.http
         .get<any[]>(`${this.apiUrl}/replenishment_glp_prices?order=id.desc&limit=1`)
@@ -26,6 +26,13 @@
         );
     }
 
+    getLast20(): Observable<any> {
+      return this.http
+        .get<any[]>(`${this.apiUrl}/replenishment_glp_prices?order=id.desc&limit=20`)
+        .pipe(
+          map(results => results[0] ?? null)
+        );
+    }
 
     addGlpprice(price: number,init:string,end:string,id_replenishment_product:number): Observable<any> {
       const url = `${this.apiUrl}/replenishment_glp_prices?select=*`;

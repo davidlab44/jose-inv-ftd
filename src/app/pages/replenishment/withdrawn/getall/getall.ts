@@ -347,6 +347,25 @@ export class GetallPage implements OnInit {
 
 
 
+
+
+  valor1 = 0;
+  valor2 = 0;
+  valor3 = 0;
+  valor4 = 0;
+
+  calcularResultado(): number {
+    return (this.valor1 || 0) * (this.valor2 || 0);
+  }
+
+  calcularResultadoImportado(): number {
+    return (this.valor3 || 0) * (this.valor4 || 0);
+  }
+
+
+
+
+
 }
 
 

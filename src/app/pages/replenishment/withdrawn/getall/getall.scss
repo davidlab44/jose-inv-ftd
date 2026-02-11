@@ -147,3 +147,102 @@ ion-card-title {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===== FONDO ROJO CLARO ===== */
+.red-bg {
+  background-color: #fdecea !important;
+  padding: 10px 6px !important;
+  border-radius: 6px;
+}
+
+.red-bg::part(native) {
+  background: transparent !important;
+}
+
+/* ===== INPUT COMPUESTO (reutilizado) ===== */
+.compound-input {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 34px;
+  border: 1px solid #c8e6c9;
+}
+
+/* ===== ROJO ESPECÍFICO ===== */
+.red-input {
+  border-color: #f5b7b1;
+}
+
+.red-input:focus-within {
+  border-color: #e57373;
+  box-shadow: 0 0 0 2px rgba(229, 115, 115, 0.18);
+}
+
+/* ===== TAGS ===== */
+.compound-tag {
+  background: #c8e6c9;
+  color: #1b5e20;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+}
+
+.red-tag {
+  background: #f5b7b1;
+  color: #7b241c;
+}
+
+/* ===== RESULTADOS ===== */
+.red-result .result-value {
+  color: #922b21;
+}
+

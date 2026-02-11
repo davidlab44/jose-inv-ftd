@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
 import { ConferenceData } from '../../../../providers/conference-data';
 import { UserData } from '../../../../providers/user-data';
-import { OpportunityService } from '@services/opportunity.service';
+import { GlppricesService } from '@services/replenishment/glpprices.service';
 import { PosOrderService } from '@services/pos-order.service';
 import { TableService } from '@services/table.service';
 import { environment } from '../../../../../environments/environment';
@@ -56,6 +56,7 @@ export class PostPage {
   form!: FormGroup;
   replenishmentList: any[] = [];
   shipList: any[] = [];
+  priceList: any[] = [];
 
   constructor(
     private barcodeService: BarcodeService,
@@ -67,7 +68,7 @@ export class PostPage {
     public toastCtrl: ToastController,
     public user: UserData,
     public config: Config,
-    private opportunityService: OpportunityService,
+    private glppricesService: GlppricesService,
     private posOrderService: PosOrderService,
     private tableService: TableService,
     private route: ActivatedRoute,
@@ -159,16 +160,23 @@ export class PostPage {
     });
   }
 
+  getPrices(){
+    this.glppricesService.getLast20().subscribe((data: any[]) => {
+      this.priceList = data;
+    });
+  }
+
   guardar() {
     const data: any = this.form.value;
     console.log('ReplenishmentData =>', data);
-    this.withdrawnService.post(data).subscribe({
-      next: response=>{
-        this.utilService.presentToast("retiro registrado exitosamente");
-        console.log("replenishment post response",response)
-        this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });
-      }
-    })
+        
+    /*this.withdrawnService.post(data).subscribe({*/
+      /*next: response=>{*/
+        /*this.utilService.presentToast("retiro registrado exitosamente");*/
+        /*console.log("replenishment post response",response)*/
+        /*this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });*/
+      /*}*/
+    /*})*/
   }
 
   slideOpts = {
