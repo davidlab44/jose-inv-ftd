@@ -137,12 +137,6 @@ export class AppComponent implements OnInit {
        icon: 'add-circle'
      },
      {
-       title: 'Reg. retiro express',
-       url: '/app/tabs/replenishment-withdrawn-postaut',
-       icon: 'add-circle'
-     },
-
-       {
        title: 'Kilos retirados',
        url: '/app/tabs/replenishment-withdrawn-getall',
        icon: 'checkbox'

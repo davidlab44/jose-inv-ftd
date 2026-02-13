@@ -246,3 +246,149 @@ ion-card-title {
   color: #922b21;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Row más compacta */
+.button-row {
+  padding: 6px 4px !important;
+}
+
+/* Centrar botones */
+.btn-col {
+  display: flex;
+  justify-content: center;
+}
+
+/* Botón verde personalizado */
+.green-btn {
+  --background: #2ecc71;
+  --background-hover: #27ae60;
+  --background-activated: #239b56;
+  --color: #ffffff;
+  --border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  height: 30px;
+}
+
+
+
+
+
+
+
+
+
+
+/* Reducir espacio entre total y botones */
+.total-item {
+  margin-bottom: 2px !important;
+  padding-bottom: 4px !important;
+}
+
+.button-row {
+  margin-top: 0 !important;
+  padding-top: 2px !important;
+}
+
+/* Quitar separación innecesaria del divider */
+.total-divider {
+  margin: 4px 0 !important;
+}
+
+
+
+.green-btn {
+  --background: #2ecc71;
+  --background-hover: #27ae60;
+  --background-activated: #239b56;
+  --color: #ffffff;
+  --border-radius: 5px;
+
+  height: 26px;              /* más pequeño */
+  font-size: 12px;           /* texto más pequeño */
+  font-weight: 400;          /* normal (no bold) */
+  min-height: 26px;
+  padding: 0;
+}
+
+
+
+
+.button-row {
+  padding: 4px 4px !important;
+}
+
+.btn-col {
+  padding: 0 4px !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

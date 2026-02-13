@@ -5,8 +5,7 @@ import { IonicModule } from '@ionic/angular';
 import { PricePage } from './price';
 import { PricePageRoutingModule } from './price-routing.module';
 import { SharedModule } from '../../../shared/shared.module'; // ✅ Correcto
-
-
+import { FullCalendarModule } from '@fullcalendar/angular';
 import { PipesModule } from '../../../pipes/pipes.module';
 
 @NgModule({
@@ -16,7 +15,8 @@ import { PipesModule } from '../../../pipes/pipes.module';
     IonicModule,
     PricePageRoutingModule,
     SharedModule, // ✅ Aquí es donde entra el componente
-    PipesModule
+    PipesModule,
+    FullCalendarModule
   ],
   declarations: [
     PricePage,

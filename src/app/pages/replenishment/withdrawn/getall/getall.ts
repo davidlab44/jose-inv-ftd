@@ -47,8 +47,8 @@ export class GetallPage implements OnInit {
   }
 
   dayRange = {
-    lower: 1, // inicio del año
-    upper: this.getTodayDayOfYear() // 👈 hoy
+    lower: 1, 
+    upper: this.getTodayDayOfYear() 
   };
 
   startDay = 1;
@@ -78,8 +78,6 @@ export class GetallPage implements OnInit {
       month: 'short'
     });
   }
-
-
 
   getTodayDayOfYear(): number {
     const today = new Date();
@@ -163,7 +161,6 @@ export class GetallPage implements OnInit {
     this.filterVendor = value;
     console.log('Vendor seleccionado:', value);
   }
-
 
   patchThisElement(item:any){
     this.router.navigate(
@@ -259,8 +256,6 @@ export class GetallPage implements OnInit {
     this.getAll();
   }
 
-
-
   getAll() {
     const since = this.dayOfYearToISO(this.startDay);
     const until = this.dayOfYearToISO(this.endDay, true);
@@ -274,7 +269,6 @@ export class GetallPage implements OnInit {
       error: err => console.error('Error filtro:', err)
     });
   }
-
 
   prodrexList:any[]=[];
   ionViewDidEnter() {
@@ -324,15 +318,15 @@ export class GetallPage implements OnInit {
     const segundos = String(date.getSeconds()).padStart(2, '0');
     const ampm = horas >= 12 ? 'PM' : 'AM';
     horas = horas % 12;
-    if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
+    if (horas === 0) horas = 12; 
     const horasTexto = String(horas).padStart(2, '0');
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
 
   dayOfYearToISO(day: number, endOfDay = false): string {
-    const year = 2026; // o dinámico si quieres
-    const date = new Date(year, 0); // 1 enero
+    const year = 2026; 
+    const date = new Date(year, 0); 
     date.setDate(day);
 
     if (endOfDay) {
@@ -341,12 +335,8 @@ export class GetallPage implements OnInit {
       date.setHours(0, 0, 0, 0);
     }
 
-    // formato compatible con PostgREST
     return date.toISOString().slice(0, 19);
   }
-
-
-
 
 
   valor1 = 0;
@@ -361,6 +351,18 @@ export class GetallPage implements OnInit {
   calcularResultadoImportado(): number {
     return (this.valor3 || 0) * (this.valor4 || 0);
   }
+
+
+
+  setValor(valor: number) {
+    this.valor1 = valor; 
+  }
+
+
+
+
+
+
 
 
 

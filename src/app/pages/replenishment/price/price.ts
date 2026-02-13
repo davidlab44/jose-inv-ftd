@@ -24,21 +24,63 @@ import { RexService } from '../../../services/rex.service';
 import { ProdrexService } from '../../../services/prodrex.service';
 import { UserService } from '../../../services/user.service';
 import { GlppricesService } from '../../../services/replenishment/glpprices.service';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import { CalendarOptions } from '@fullcalendar/core';
+
 
 @Component({
   selector: 'page-price',
   templateUrl: 'price.html',
   styleUrls: ['./price.scss'],
 })
+
+
+
+
+
+
+
+
+
+
+
+
 export class PricePage {
 
+
+
+   calendarOptions: CalendarOptions = {
+    initialView: 'dayGridMonth',
+    plugins: [dayGridPlugin],
+    height: 'auto',
+  };
+
+
   ios: boolean;
-  importado: boolean=false;
+  importado: boolean = false;
   hasOwner: boolean = false;
   showSearchbar: boolean;
-  queryText:any
+  queryText: any;
   searchSubject = new Subject<string>();
-  todayDate:any
+  todayDate: any;
+
+  hash: string = '';
+  table: any;
+  rexDocument: any;
+  glppricesList: any[] = [];
+
+  yearPrices: any[] = [];
+  occupiedDatesSet: Set<string> = new Set();
+
+  dateTimeStart!: string;
+  dateTimeEnd!: string;
+
+  numero!: number;
+  cents!: number;
+  valor: number = 0;
+
+  lastGlpprice: any = null;
+  lastImportedPrice: any = null;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -54,220 +96,312 @@ export class PricePage {
     private posOrderService: PosOrderService,
     private tableService: TableService,
     private route: ActivatedRoute,
-    private sessionService:SessionService,
-    private utilService:UtilService,
-    private productService:ProductService,
-    private categoryService:CategoryService,
-    private umService:UmService,
+    private sessionService: SessionService,
+    private utilService: UtilService,
+    private productService: ProductService,
+    private categoryService: CategoryService,
+    private umService: UmService,
     private dateService: DateService,
     private rexService: RexService,
     private prodrexService: ProdrexService,
     private userService: UserService,
-    private glpricesService : GlppricesService
+    private glpricesService: GlppricesService
   ) {}
 
-  hash:string='';
-  table:any
-  rexDocument:any;
-  glppricesList:any[]=[];
 
   async ngOnInit() {
+
     const ahora = new Date();
     this.todayDate = this.formatFechaLatam(ahora);
+
     this.getAllPrices();
+
     const now = new Date();
-    // ⏰ Inicio del día: 00:00
+
     const startOfDay = new Date(
       now.getFullYear(),
       now.getMonth(),
       now.getDate(),
       0, 0, 0
     );
-    // ⏰ Fin del día: 23:59
+
     const endOfDay = new Date(
       now.getFullYear(),
       now.getMonth(),
       now.getDate(),
       23, 59, 0
     );
+
     this.dateTimeStart = this.toLocalDateTime(startOfDay);
-    this.dateTimeEnd   = this.toLocalDateTime(endOfDay);
+    this.dateTimeEnd = this.toLocalDateTime(endOfDay);
+
+    this.loadYearPrices(); // 🔥 Carga y construye calendario
   }
 
-  /*async ngOnInit() {*/
-    /*const ahora = new Date();*/
-    /*this.todayDate = this.formatFechaLatam(ahora);*/
-    /*this.getAllPrices();*/
-      /*const now = new Date();*/
-      /*// Fecha local con hora 00:00 (SIN UTC)*/
-      /*const localMidnight = new Date(*/
-        /*now.getFullYear(),*/
-        /*now.getMonth(),*/
-        /*now.getDate(),*/
-        /*0, 0, 0*/
-      /*);*/
-      /*this.dateTimeStart = this.toLocalDateTime(localMidnight);*/
-      /*this.dateTimeEnd   = this.toLocalDateTime(localMidnight);*/
-  /*}*/
 
-    dateTimeStart!: string;
-    dateTimeEnd!: string;
-    
-    onDateTimeChange() {
-      const payload = {
-        start_datetime: this.formatForBackend(this.dateTimeStart),
-        end_datetime: this.formatForBackend(this.dateTimeEnd)
+  highlightedDates = (isoString: string) => {
+
+    const date = isoString.substring(0, 10);
+
+    if (this.occupiedDatesSet.has(date)) {
+      return {
+        textColor: '#ffffff',
+        backgroundColor: this.importado ? '#7b2cbf' : '#2e7d32'
       };
-      console.log('Inicio (raw):', this.dateTimeStart);
-      console.log('Fin (raw):', this.dateTimeEnd);
-      console.log('Payload backend:', payload);
     }
 
-    // YYYY-MM-DDTHH:mm:ss  → para ion-datetime (local)
-    toLocalDateTime(date: Date): string {
-      const pad = (n: number) => n.toString().padStart(2, '0');
-      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T` +
-             `${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
-    }
-
-    // YYYY-MM-DD HH:mm:ss → backend / DB
-    formatForBackend(value: string): string {
-      const d = new Date(value);
-      const pad = (n: number) => n.toString().padStart(2, '0');
-
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +
-             `${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
-    }
+    return undefined;
+  };
 
 
-  /*selectedDate!: string;*/
-  /*selectedTime!: string;*/
 
-  /*onDateTimeChange() {*/
-    /*const fechaHora = `${this.selectedDate} ${this.selectedTime}`;*/
 
-    /*console.log('Fecha seleccionada:', this.selectedDate);*/
-    /*console.log('Hora seleccionada:', this.selectedTime);*/
-    /*console.log('Fecha + Hora:', fechaHora);*/
+
+  loadYearPrices() {
+
+    this.glpricesService
+      .getCurrentYearPrices()
+      .subscribe(results => {
+
+        console.log("RESULTS FROM BACKEND:", results);
+
+        this.yearPrices = results || [];
+
+        this.buildCalendar();
+
+      });
+
+  }
+
+
+
+  calendarReady = false;
+  buildCalendar() {
+
+    const productId = this.importado ? 2 : 1;
+
+    const filtered = this.yearPrices
+      .filter(p => p.data?.id_replenishment_product === productId);
+
+    this.occupiedDatesSet.clear();
+
+    filtered.forEach(p => {
+
+      const initDate = new Date(p.data.init);
+      const endDate  = new Date(p.data.end);
+
+      let current = new Date(initDate);
+
+      while (current <= endDate) {
+
+        const year  = current.getFullYear();
+        const month = String(current.getMonth() + 1).padStart(2, '0');
+        const day   = String(current.getDate()).padStart(2, '0');
+
+        const dateOnly = `${year}-${month}-${day}`;
+
+        this.occupiedDatesSet.add(dateOnly);
+
+        current.setDate(current.getDate() + 1);
+      }
+    });
+
+    this.calendarReady = false;
+    setTimeout(() => {
+      this.calendarReady = true;
+    }, 0);
+  }
+
+
+
+
+
+
+  /*buildCalendar() {*/
+
+    /*const productId = this.importado ? 2 : 1;*/
+
+    /*const filtered = this.yearPrices*/
+      /*.filter(p => p.data?.id_replenishment_product === productId);*/
+
+    /*this.occupiedDatesSet.clear();*/
+
+    /*filtered.forEach(p => {*/
+
+      /*const initDate = new Date(p.data.init);*/
+      /*const endDate  = new Date(p.data.end);*/
+
+      /*let current = new Date(initDate);*/
+
+      /*while (current <= endDate) {*/
+
+        /*const year  = current.getFullYear();*/
+        /*const month = String(current.getMonth() + 1).padStart(2, '0');*/
+        /*const day   = String(current.getDate()).padStart(2, '0');*/
+
+        /*const dateOnly = `${year}-${month}-${day}`;*/
+
+        /*this.occupiedDatesSet.add(dateOnly);*/
+
+        /*current.setDate(current.getDate() + 1);*/
+
+      /*}*/
+
+    /*});*/
+
+    /*console.log("SET SIZE:", this.occupiedDatesSet.size);*/
+
+    /*this.occupiedDatesSet = new Set(this.occupiedDatesSet);*/
+
   /*}*/
 
 
-  getAllPrices(){
+
+
+
+  onSegmentChange(event: any) {
+    this.importado = event.detail.value === 'favorites';
+    this.buildCalendar();
+  }
+
+  getAllPrices() {
     this.glpricesService.getAll().subscribe({
       next: (response) => {
-        console.log("glp prices table", response);
         this.glppricesList = response.slice().reverse();
         this.getMaxIdItem(this.glppricesList);
         this.getMaxImportedItem(this.glppricesList);
-        console.log("Nacional:", this.lastGlpprice);
-        console.log("Importado:", this.lastImportedPrice);
       }
-    });   
+    });
   }
 
-  numero: number;
-  valor:number=0
-  mostrarValor() {
-    console.log('Valor ingresado:', this.valor);
-  }
 
-  mostrarNumero() {
-    console.log("Número ingresado:", this.numero);
-  }
-  
-  updateSchedule(){
-     
-  }
 
-  addGlpprice(price:number){
-    let idReplenishmentProduct:number=1;
-    if(!this.importado){
-      idReplenishmentProduct=1;
-    }else{
-      idReplenishmentProduct=2;
+  addGlpprice(price: number, cents: number) {
+
+    const productId = this.importado ? 2 : 1;
+
+    const newStart = new Date(this.dateTimeStart);
+    const newEnd   = new Date(this.dateTimeEnd);
+
+    const overlap = this.hasOverlap(productId, newStart, newEnd);
+
+    if (overlap) {
+      alert("⚠ Ya existe un rango que se solapa con este.");
+      return;
     }
-    this.glpricesService.addGlpprice(price,this.dateTimeStart,this.dateTimeEnd,idReplenishmentProduct).subscribe({
-      next: (response)=>{
-        console.log("response",response)
+
+    // Si no hay solapamiento → insertar
+
+    this.glpricesService
+      .addGlpprice(price, cents, this.dateTimeStart, this.dateTimeEnd, productId)
+      .subscribe(() => {
         this.getAllPrices();
-      }
-    })
+        this.loadYearPrices();
+      });
   }
 
   get currentPrice() {
     return this.importado ? this.lastImportedPrice : this.lastGlpprice;
   }
 
-  lastGlpprice: any = null;
   getMaxIdItem(items: any[]) {
     const filtered = items.filter(i => i.data?.id_replenishment_product === 1);
-
-    if (filtered.length === 0) {
-      this.lastGlpprice = null;
-      return null;
-    }
-
+    if (!filtered.length) return;
     this.lastGlpprice = filtered.reduce((max, item) =>
       item.id > max.id ? item : max
     );
   }
 
-
-  lastImportedPrice: any = "";
   getMaxImportedItem(items: any[]) {
-    if (!items || items.length === 0) {
-      return null;
-    }
     const filtered = items.filter(i => i.data?.id_replenishment_product === 2);
-    if (filtered.length === 0) {
-      this.lastImportedPrice = null;
-      return null; // No imported items found
-    }
+    if (!filtered.length) return;
     this.lastImportedPrice = filtered.reduce((max, item) =>
       item.id > max.id ? item : max
     );
-    console.log("lastImportedPrice.data", this.lastImportedPrice.data);
   }
 
-  getFormatedDate(){
-    return
-  }
-  
-  ionViewWillEnter() {
+  toLocalDateTime(date: Date): string {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T` +
+      `${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
   }
 
-  ionViewDidEnter() {
+  formatForBackend(value: string): string {
+    const d = new Date(value);
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +
+      `${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
   }
-  
-  searchProducts(hash: string, productList: any[]): any[] {
-    if (!hash || hash.trim() === '') return productList;
-    return productList.filter(product =>
-      product.name.toLowerCase().includes(hash.toLowerCase())
-    );
+
+  formatFechaLatam(dateInput: string | Date | number): string {
+    if (!dateInput) return '';
+    const date = new Date(dateInput);
+
+    const opciones: Intl.DateTimeFormatOptions = {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    };
+
+    const fechaTexto = new Intl.DateTimeFormat('es-ES', opciones).format(date);
+
+    let horas = date.getHours();
+    const minutos = String(date.getMinutes()).padStart(2, '0');
+    const segundos = String(date.getSeconds()).padStart(2, '0');
+    const ampm = horas >= 12 ? 'PM' : 'AM';
+
+    horas = horas % 12;
+    if (horas === 0) horas = 12;
+
+    const horasTexto = String(horas).padStart(2, '0');
+
+    return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
   onSearch(text: string) {
     this.searchSubject.next(text);
   }
 
-  formatFechaLatam(dateInput: string | Date | number): string {
-    if (!dateInput) return '';
-    const date = new Date(dateInput);
-    const opciones: Intl.DateTimeFormatOptions = {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
+  onDateTimeChange() {
+    const payload = {
+      start_datetime: this.formatForBackend(this.dateTimeStart),
+      end_datetime: this.formatForBackend(this.dateTimeEnd)
     };
-    const fechaTexto = new Intl.DateTimeFormat('es-ES', opciones).format(date);
-    let horas = date.getHours();
-    const minutos = String(date.getMinutes()).padStart(2, '0');
-    const segundos = String(date.getSeconds()).padStart(2, '0');
-    const ampm = horas >= 12 ? 'PM' : 'AM';
-    horas = horas % 12;
-    if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
-    const horasTexto = String(horas).padStart(2, '0');
-    return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
+    console.log('Inicio (raw):', this.dateTimeStart);
+    console.log('Fin (raw):', this.dateTimeEnd);
+    console.log('Payload backend:', payload);
   }
+
+hasOverlap(
+  productId: number,
+  newStart: Date,
+  newEnd: Date
+): boolean {
+
+  const filtered = this.yearPrices
+    .filter(p => p.data?.id_replenishment_product === productId);
+
+  for (const p of filtered) {
+
+    const existingStart = new Date(p.data.init);
+    const existingEnd   = new Date(p.data.end);
+
+    const overlap =
+      newStart <= existingEnd &&
+      newEnd   >= existingStart;
+
+    if (overlap) {
+      console.log("Overlap detectado con ID:", p.id);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+
 
 
 }
