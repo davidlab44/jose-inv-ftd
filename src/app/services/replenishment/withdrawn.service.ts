@@ -63,7 +63,7 @@ export class WithdrawnService {
   patch(id: number, updatedElement: any): Observable<any> {
     const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;
     const body = {
-      data: updatedElement   // updatedElement ES la data, NO el objeto completo
+      data: updatedElement  
     };
     return this.http.patch(url, body, {
       headers: {

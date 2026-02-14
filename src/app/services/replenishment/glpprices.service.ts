@@ -8,7 +8,8 @@
     providedIn: 'root'         
   })
   export class GlppricesService {
-    
+   
+    private model = 'replenishment_glp_prices';  
     private apiUrl = environment.apiHost; 
         
     constructor(private http: HttpClient) {
@@ -115,12 +116,11 @@
 
     const url =
       `${this.apiUrl}/replenishment_glp_prices` +
-      `?valid_range=ov.[${start},${end}]` +   // overlap operator
+      `?valid_range=ov.[${start},${end}]` +   
       `&order=id.asc`;
 
     return this.http.get<any[]>(url);
   }
-
 
   checkOverlap(
     productId: number,
@@ -136,8 +136,17 @@
     return this.http.get<any[]>(url);
   }
 
+  patch(id: number, updatedElement: any) {
+    const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;
+    const body = { data: updatedElement };
 
-
+    return this.http.patch(url, body, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      }
+    });
+  }
 
 
 }

@@ -16,48 +16,79 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
+
+
   <ion-toolbar>
     <ion-segment (ionChange)="onSegmentChange($event)">
-      <ion-segment-button value="all"> NACIONAL </ion-segment-button>
-      <ion-segment-button value="favorites"> IMPORTADO </ion-segment-button>
+      <ion-segment-button value="all">NACIONAL</ion-segment-button>
+      <ion-segment-button value="favorites">IMPORTADO</ion-segment-button>
     </ion-segment>
   </ion-toolbar>
+  <!--<ion-toolbar>-->
+    <!--<ion-segment (ionChange)="onSegmentChange($event)">-->
+      <!--<ion-segment-button value="all"> NACIONAL </ion-segment-button>-->
+      <!--<ion-segment-button value="favorites"> IMPORTADO </ion-segment-button>-->
+    <!--</ion-segment>-->
+  <!--</ion-toolbar>-->
 </ion-header>
+
+
 
 <ion-content [ngClass]="{ 'bg-nacional': !importado, 'bg-importado': importado }" class="ion-padding">
 
-<full-calendar [options]="calendarOptions"></full-calendar>
+  <full-calendar [options]="calendarOptions"></full-calendar>
 
+  <div *ngIf="showEditForm" class="edit-form">
 
+    <ion-card>
 
-<br>
-<ion-content>
-  <full-calendar></full-calendar>
-</ion-content>
+      <ion-card-header>
+        <ion-card-title>Editar Precio</ion-card-title>
+      </ion-card-header>
 
+      <ion-card-content>
 
+        <ion-item>
+          <ion-label position="stacked">Precio</ion-label>
+          <ion-input type="number" [(ngModel)]="selectedPrice.price"></ion-input>
+        </ion-item>
 
-  <!--<ion-datetime-->
-    <!--*ngIf="calendarReady"-->
-    <!--presentation="date"-->
-    <!--[highlightedDates]="highlightedDates"-->
-    <!--locale="es-ES">-->
-  <!--</ion-datetime>-->
+        <ion-item>
+          <ion-label position="stacked">Cents</ion-label>
+          <ion-input type="number" [(ngModel)]="selectedPrice.cents"></ion-input>
+        </ion-item>
 
+        <ion-item>
+          <ion-label position="stacked">Fecha Inicio</ion-label>
+          <ion-input type="datetime-local" [(ngModel)]="selectedPrice.init"></ion-input>
+        </ion-item>
 
+        <ion-item>
+          <ion-label position="stacked">Fecha Fin</ion-label>
+          <ion-input type="datetime-local" [(ngModel)]="selectedPrice.end"></ion-input>
+        </ion-item>
 
-  <!--<ion-datetime-->
-    <!--presentation="date"-->
-    <!--value="2026-02-01"-->
-    <!--[highlightedDates]="highlightedDates"-->
-    <!--locale="es-ES">-->
-  <!--</ion-datetime>-->
+        <ion-button expand="block" color="primary" (click)="updatePrice()">
+          Guardar Cambios
+        </ion-button>
 
-<br>
+        <ion-button expand="block" fill="outline" (click)="cancelEdit()">
+          Cancelar
+        </ion-button>
 
-<p>divider</p>
+      </ion-card-content>
 
-<br>
+    </ion-card>
+
+  </div>
+
+  <!--<full-calendar [options]="calendarOptions"></full-calendar>-->
+
+  <br>
+
+  <p>divider</p>
+
+  <br>
 
   <div>
     <div class="datetime-center">
@@ -111,13 +142,13 @@
 
     <table style="width: 100%;">
       <tr [ngClass]="importado ? 'row-importado' : 'row-nacional'">
-        <td style="width: 80%;">
+        <td style="width: 70%;">
           <span style="font-size:small;">
-            &nbsp;&nbsp;Precio actual {{ formatFechaLatam(currentPrice?.data.init) }}&nbsp;&nbsp;
+            &nbsp;&nbsp;Precio actual {{formatFechaLatam(currentPrice?.data.init) }}-{{formatFechaLatam(currentPrice?.data.end)}}&nbsp;&nbsp;
           </span>
         </td>
-        <td style="padding:8px;width:20%;">
-          <h5>{{ currentPrice?.data?.price }}&nbsp;</h5>
+         <td style="padding:8px;width:20%;">
+           <h5>{{ currentPrice?.data?.price }}.{{currentPrice?.data?.cents}}&nbsp;</h5>
           <!--<h5>{{ currentPrice?.data?.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}&nbsp;</h5>-->
         </td>
       </tr>
