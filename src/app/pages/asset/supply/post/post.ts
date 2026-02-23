@@ -125,6 +125,7 @@ export class AssetSupplyPostPage {
     this.form = this.fb.group({
       category: [0],
       name: [''],
+      bop: [''],
       barcode: [0],
       qty: [0],
       um: [0],
@@ -251,41 +252,6 @@ export class AssetSupplyPostPage {
       }); 
    }     
 
-
-
-
-
-
-
-
-
-
-
-
-  /*optimizedImage: string | null = null;*/
-    /*imageName: string = '';*/
-    /*async takePicture(): Promise<void> {*/
-      /*this.optimizedImage = await this.photoService.takePicture();*/
-      /*if (this.optimizedImage) {*/
-        /*console.log('Imagen optimizada:', this.optimizedImage);*/
-      /*} else {*/
-        /*console.error('No se pudo tomar la foto');*/
-      /*}*/
-    /*}*/
-    /*selectedImage: string | null = null;*/
-    /*async pickImage(): Promise<void> {*/
-      /*this.selectedImage = await this.imageService.pickImage(); */
-      /*if (this.selectedImage) {*/
-        /*console.log('Imagen seleccionada y comprimida:', this.selectedImage);*/
-        /*this.optimizedImage=this.selectedImage; //this.showAttachment=true; //this.showPhoto=false;*/
-      /*} else {*/
-        /*console.error('No se seleccionó una imagen válida.');//this.showAttachment=false;*/
-      /*}*/
-    /*}*/
-
-
-
-
   async takePhotoAndUpload() {
     this.uploading = true;
     this.uploadProgress = 0;
@@ -317,8 +283,6 @@ export class AssetSupplyPostPage {
     });
   }
 
-
-
   async pickImageAndUpload() {
     this.uploading = true;
     this.uploadProgress = 0;
@@ -339,12 +303,6 @@ export class AssetSupplyPostPage {
       this.uploading = false;
     });
   }
-
-
-
-
-
-
 
 
 

@@ -110,7 +110,7 @@ export class ProductService {
     const body = {
       data: updatedElement
     };
-    //console.log("request patch body",body)
+    console.log("request patch body",body)
     return this.http.patch(url, body, {
       headers: {
         'Content-Type': 'application/json',

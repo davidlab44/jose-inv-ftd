@@ -361,8 +361,6 @@ export class ProdrexPage {
         })
       }
     })
-    //actualizar la cantidad (updateqty)
-    //eliminar el producto
   }
 
   addToOrder(p){

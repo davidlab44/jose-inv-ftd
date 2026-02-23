@@ -22,7 +22,6 @@
   <form [formGroup]="form">
     <ion-list>
 
-
       <ion-button expand="block" (click)="takePhotoAndUpload()">
         📸 Tomar foto
       </ion-button>
@@ -54,9 +53,13 @@
         <ion-label position="floating">Category</ion-label>
         <ion-input type="number" formControlName="category"></ion-input>
       </ion-item>
-      <ion-item>
+       <ion-item>
         <ion-label position="floating">Name</ion-label>
         <ion-input formControlName="name"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Bop</ion-label>
+        <ion-input formControlName="bop"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="floating">Barcode</ion-label>

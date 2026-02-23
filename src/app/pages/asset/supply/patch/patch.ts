@@ -89,39 +89,43 @@ export class AssetSupplyPatchPage {
     console.log("Item recibido:", item);
     this.assetSupplyProduct = this.buildDefaultAssetSpupplyProduct(item);
   }
- 
-  ngOnInit() {
-    this.loadCategories();
-    this.loadUms();
+
+
+
+ ngOnInit() {               
+    this.loadCategories();   
+    this.loadUms();          
     this.form = this.fb.group({
-      id: [this.assetSupplyProduct.id],
-      categ: [this.assetSupplyProduct.data.categ[0]],
-      name: [this.assetSupplyProduct.data.name],
-      barcode: [this.assetSupplyProduct.data.barcode],
-      qty: [this.assetSupplyProduct.data.qty],
-      um: [this.assetSupplyProduct.data.um],
-      target: [this.assetSupplyProduct.data.target],
-      reorder: [this.assetSupplyProduct.data.reorder],
-      minimum: [this.assetSupplyProduct.data.minimum],
+      id: [this.assetSupplyProduct?.id ?? null],
+      categ: [this.assetSupplyProduct?.data?.categ?.[0] ?? null],
+      name: [this.assetSupplyProduct?.data?.name ?? ''],
+      bop: [this.assetSupplyProduct?.data?.bop ?? ''],  // ← aquí controlado
+      barcode: [this.assetSupplyProduct?.data?.barcode ?? ''],
+      qty: [this.assetSupplyProduct?.data?.qty ?? 0],
+      um: [this.assetSupplyProduct?.data?.um ?? null],
+      target: [this.assetSupplyProduct?.data?.target ?? 0],
+      reorder: [this.assetSupplyProduct?.data?.reorder ?? 0],
+      minimum: [this.assetSupplyProduct?.data?.minimum ?? 0],
     });
-    console.log("Formulario inicializado:", this.form.value);
+    console.log("Formulario inicializado ionviewwillenter:", this.form.value);
   }
 
-  ionViewWillEnter(){
-    this.loadCategories();
-    this.loadUms();
+  ionViewWillEnter() {               
+    this.loadCategories();   
+    this.loadUms();          
     this.form = this.fb.group({
-      id: [this.assetSupplyProduct.id],
-      categ: [this.assetSupplyProduct.data.categ[0]],
-      name: [this.assetSupplyProduct.data.name],
-      barcode: [this.assetSupplyProduct.data.barcode],
-      qty: [this.assetSupplyProduct.data.qty],
-      um: [this.assetSupplyProduct.data.um],
-      target: [this.assetSupplyProduct.data.target],
-      reorder: [this.assetSupplyProduct.data.reorder],
-      minimum: [this.assetSupplyProduct.data.minimum],
+      id: [this.assetSupplyProduct?.id ?? null],
+      categ: [this.assetSupplyProduct?.data?.categ?.[0] ?? null],
+      name: [this.assetSupplyProduct?.data?.name ?? ''],
+      bop: [this.assetSupplyProduct?.data?.bop ?? ''],  // ← aquí controlado
+      barcode: [this.assetSupplyProduct?.data?.barcode ?? ''],
+      qty: [this.assetSupplyProduct?.data?.qty ?? 0],
+      um: [this.assetSupplyProduct?.data?.um ?? null],
+      target: [this.assetSupplyProduct?.data?.target ?? 0],
+      reorder: [this.assetSupplyProduct?.data?.reorder ?? 0],
+      minimum: [this.assetSupplyProduct?.data?.minimum ?? 0],
     });
-    console.log("Formulario inicializado:", this.form.value);
+    console.log("Formulario inicializado ionviewwillenter:", this.form.value);
   }
 
   patch() {
@@ -144,6 +148,7 @@ export class AssetSupplyPatchPage {
         justData.img=this.assetSupplyProduct.data.img;
       }
     }
+
     this.productService.patch(id, justData).subscribe({
       next: (r) => {
         console.log("PATCH OK:", r);
@@ -161,6 +166,7 @@ export class AssetSupplyPatchPage {
       id: 0,
       categ: null,
       name: '',
+      bop: '',
       barcode: '',
       qty: 1,
       um: null,
@@ -236,6 +242,7 @@ export class AssetSupplyPatchPage {
       data: {
        categ:[],
         name: "",
+        bop: "",
         barcode: 0,
         qty: 0,
         um: 0,

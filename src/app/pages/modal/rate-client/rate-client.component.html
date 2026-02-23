@@ -23,12 +23,15 @@
   <!-- Datos -->
   <div class="info">
     <h2 class="name">{{ items?.data?.name }}</h2>
-    <p class="qty">Cantidad: <strong>{{ items?.data?.qty }}</strong></p>
+    <p class="qty">Cantidad: <i>{{ items?.data?.qty }}</i></p>
+  </div>
+
+  <div class="info">
+    <p class="qty">{{ items?.data?.bop }}</p>
   </div>
 
 </ion-content>
 
-<!-- Zoom fullscreen -->
 <div class="zoom-overlay" *ngIf="zoomActive" (click)="closeZoom()">
   <img
     [src]="items?.data?.img"
@@ -36,47 +39,6 @@
     class="zoom-image"
   />
 </div>
-
-
-
-
-<!--<ion-header>-->
-  <!--<ion-toolbar>-->
-    <!--<ion-title>Detalle del Producto</ion-title>-->
-    <!--<ion-buttons slot="end">-->
-      <!--<ion-button fill="clear" (click)="cerrar()">✕</ion-button>-->
-    <!--</ion-buttons>-->
-  <!--</ion-toolbar>-->
-<!--</ion-header>-->
-
-<!--<ion-content class="modal-content ion-padding">-->
-
-  <!--<div class="product-card" *ngIf="items?.data">-->
-
-    <!--<div class="image-container">-->
-      <!--<img-->
-        <!--[src]="items.data.img"-->
-        <!--alt="Imagen del producto"-->
-        <!--class="product-image"-->
-      <!--/>-->
-    <!--</div>-->
-
-    <!--<div class="product-info">-->
-      <!--<h2 class="product-name">-->
-        <!--{{ items.data.name }}-->
-      <!--</h2>-->
-
-      <!--<p class="product-qty">-->
-        <!--Cantidad: <strong>{{ items.data.qty }}</strong>-->
-      <!--</p>-->
-    <!--</div>-->
-
-  <!--</div>-->
-
-<!--</ion-content>-->
-
-
-
 
 
 
