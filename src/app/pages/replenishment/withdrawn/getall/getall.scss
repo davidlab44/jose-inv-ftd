@@ -1,5 +1,15 @@
 
 
+/* Clase para resaltar las filas seleccionadas */
+.highlight {
+  background-color: #F52742; /* Rojo claro */
+  font-size:18px;
+  font-weight: bold;
+}
+
+
+
+
 /* Asegura que el contenedor del swiper use todo el ancho y alto */
 swiper-container {
   width: 100%;
@@ -333,7 +343,6 @@ ion-card-title {
 
 
 
-/* Reducir espacio entre total y botones */
 .total-item {
   margin-bottom: 2px !important;
   padding-bottom: 4px !important;
@@ -344,7 +353,6 @@ ion-card-title {
   padding-top: 2px !important;
 }
 
-/* Quitar separación innecesaria del divider */
 .total-divider {
   margin: 4px 0 !important;
 }
@@ -375,18 +383,6 @@ ion-card-title {
 .btn-col {
   padding: 0 4px !important;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

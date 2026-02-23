@@ -35,7 +35,6 @@
 
   <ion-item class="range-container" lines="none">
 
-    <!-- Cajas de texto -->
     <div class="date-boxes">
       <div class="date-box">
         <span class="label">Desde</span>
@@ -47,7 +46,6 @@
         <span class="value">{{ formatDay(endDay) }}</span>
       </div>
     </div>
-
   </ion-item>
 
   <ion-item lines="none">
@@ -62,31 +60,8 @@
       [(ngModel)]="dayRange"
       (ionChange)="onRangeChange($event)"
     >
-  <!--    <ion-label slot="start">1</ion-label>-->
-      <!--<ion-label slot="end">365</ion-label>-->
     </ion-range>
   </ion-item>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -129,213 +104,147 @@
 
     </div>
   </ion-item>
-
   <br><br>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<ion-item-divider class="total-divider"></ion-item-divider>
-
-<ion-item class="total-item highlighted" lines="none">
-  <ion-label class="total-label">
-    <span class="total-title">TOTAL KILOS RETIRADOS</span>
-    <span class="total-value">
-      {{ getTotalKg() | number:'1.0-2' }} kg
-    </span>
-  </ion-label>
-</ion-item>
-
-
-
-
-
-<ion-item class="calc-row green-bg button-row" lines="none">
-  <ion-grid>
-    <ion-row class="ion-justify-content-center ion-align-items-center">
-
-      <ion-col size="4" class="btn-col">
-        <ion-button
-          expand="block"
-          size="small"
-          class="green-btn"
-          (click)="setValor(50)">
-          50
-        </ion-button>
-      </ion-col>
-
-      <ion-col size="4" class="btn-col">
-        <ion-button
-          expand="block"
-          size="small"
-          class="green-btn"
-          (click)="setValor(100)">
-          100
-        </ion-button>
-      </ion-col>
-
-      <ion-col size="4" class="btn-col">
-        <ion-button
-          expand="block"
-          size="small"
-          class="green-btn"
-          (click)="setValor(150)">
-          150
-        </ion-button>
-      </ion-col>
-
-    </ion-row>
-  </ion-grid>
-</ion-item>
-
-
-
-
-<br>
-
-<ion-item class="calc-row green-bg" lines="none">
-  <ion-grid>
-    <ion-row class="ion-align-items-center">
-
-      <ion-col size="4">
-        <div class="compound-input">
-          <span class="compound-tag">KGS</span>
-          <ion-input
-            type="number"
-            [(ngModel)]="valor1"
-            placeholder="0"
-            inputmode="decimal">
-          </ion-input>
-        </div>
-      </ion-col>
-
-      <ion-col size="4">
-        <div class="compound-input">
-          <span class="compound-tag">PRECIO</span>
-          <ion-input
-            type="number"
-            [(ngModel)]="valor2"
-            placeholder="0"
-            inputmode="decimal">
-          </ion-input>
-        </div>
-      </ion-col>
-
-      <ion-col size="4" class="result-col">
-        <span class="result-label">TOTAL</span>
-        <span class="result-value">
-          {{ calcularResultado() | number:'1.0-2' }}
-        </span>
-      </ion-col>
-
-    </ion-row>
-  </ion-grid>
-</ion-item>
-
-<br>
-
-<ion-item class="calc-row red-bg" lines="none">
-  <ion-grid>
-    <ion-row class="ion-align-items-center">
-
-      <ion-col size="4">
-        <div class="compound-input red-input">
-          <span class="compound-tag red-tag">KGS</span>
-          <ion-input
-            type="number"
-            [(ngModel)]="valor3"
-            placeholder="0"
-            inputmode="decimal">
-          </ion-input>
-        </div>
-      </ion-col>
-
-      <ion-col size="4">
-        <div class="compound-input red-input">
-          <span class="compound-tag red-tag">PRECIO</span>
-          <ion-input
-            type="number"
-            [(ngModel)]="valor4"
-            placeholder="0"
-            inputmode="decimal">
-          </ion-input>
-        </div>
-      </ion-col>
-
-      <ion-col size="4" class="result-col red-result">
-        <span class="result-label">TOTAL</span>
-        <span class="result-value">
-          {{ calcularResultadoImportado() | number:'1.0-2' }}
-        </span>
-      </ion-col>
-
-    </ion-row>
-  </ion-grid>
-</ion-item>
-
-<br>
-
-
-
-
-
-
-
-
-
-<ion-item-divider class="total-divider"></ion-item-divider>
-
-
-
-
-
-<!--<ion-item class="total-item" lines="none">-->
-  <!--<ion-label class="total-label">-->
-    <!--<span class="total-title">TOTAL KILOS RETIRADOS</span>-->
-    <!--<span class="total-value">-->
-      <!--{{ getTotalKg() | number:'1.0-2' }} kg-->
-    <!--</span>-->
-  <!--</ion-label>-->
-<!--</ion-item>-->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  <ion-item-divider class="total-divider"></ion-item-divider>
+
+  <ion-item class="total-item highlighted" lines="none">
+    <ion-label class="total-label">
+      <span class="total-title">TOTAL KILOS RETIRADOS</span>
+      <span class="total-value">
+        {{ getTotalKg() | number:'1.0-2' }} kg
+      </span>
+    </ion-label>
+  </ion-item>
+
+
+  <ion-item class="calc-row green-bg button-row" lines="none">
+    <ion-grid>
+      <ion-row class="ion-justify-content-center ion-align-items-center">
+
+        <ion-col size="4" class="btn-col">
+          <ion-button
+            expand="block"
+            size="small"
+            class="green-btn"
+            (click)="setValor(50)">
+            50
+          </ion-button>
+        </ion-col>
+
+        <ion-col size="4" class="btn-col">
+          <ion-button
+            expand="block"
+            size="small"
+            class="green-btn"
+            (click)="setValor(100)">
+            100
+          </ion-button>
+        </ion-col>
+
+        <ion-col size="4" class="btn-col">
+          <ion-button
+            expand="block"
+            size="small"
+            class="green-btn"
+            (click)="setValor(150)">
+            150
+          </ion-button>
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+  </ion-item>
+
+
+
+
+  <br>
+
+  <ion-item class="calc-row green-bg" lines="none">
+    <ion-grid>
+      <ion-row class="ion-align-items-center">
+
+        <ion-col size="4">
+          <div class="compound-input">
+            <span class="compound-tag">KGS</span>
+            <ion-input
+              type="number"
+              [(ngModel)]="valor1"
+              placeholder="0"
+              inputmode="decimal">
+            </ion-input>
+          </div>
+        </ion-col>
+
+        <ion-col size="4">
+          <div class="compound-input">
+            <span class="compound-tag">PRECIO</span>
+            <ion-input
+              type="number"
+              [(ngModel)]="valor2"
+              placeholder="0"
+              inputmode="decimal">
+            </ion-input>
+          </div>
+        </ion-col>
+
+        <ion-col size="4" class="result-col">
+          <span class="result-label">TOTAL</span>
+          <span class="result-value">
+            {{ calcularResultado() | number:'1.0-2' }}
+          </span>
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+  </ion-item>
+
+  <br>
+
+  <ion-item class="calc-row red-bg" lines="none">
+    <ion-grid>
+      <ion-row class="ion-align-items-center">
+
+        <ion-col size="4">
+          <div class="compound-input red-input">
+            <span class="compound-tag red-tag">KGS</span>
+            <ion-input
+              type="number"
+              [(ngModel)]="valor3"
+              placeholder="0"
+              inputmode="decimal">
+            </ion-input>
+          </div>
+        </ion-col>
+
+        <ion-col size="4">
+          <div class="compound-input red-input">
+            <span class="compound-tag red-tag">PRECIO</span>
+            <ion-input
+              type="number"
+              [(ngModel)]="valor4"
+              placeholder="0"
+              inputmode="decimal">
+            </ion-input>
+          </div>
+        </ion-col>
+
+        <ion-col size="4" class="result-col red-result">
+          <span class="result-label">TOTAL</span>
+          <span class="result-value">
+            {{ calcularResultadoImportado() | number:'1.0-2' }}
+          </span>
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+  </ion-item>
+
+  <br>
+
+  <ion-item-divider class="total-divider"></ion-item-divider>
 
 
   <br><br>
@@ -349,8 +258,6 @@
       <ion-label style="font-size:small;">
         <span style="font-size:xx-small;font-weight:500;">Isotanq.&nbsp;</span>
       </ion-label>
-
-
 
       <ion-label style="font-size:small;">
         <span style="font-size:xx-small;font-weight:500;">Tkt.&nbsp;</span>
@@ -374,61 +281,123 @@
   </ion-list>
 
 
-  <ion-list>
-    <ion-item *ngFor="let p of withdrawnList " style="display:flex; align-items:center;">
+
+
+
+<ion-list>
+  <ion-item *ngFor="let p of withdrawnList; let i = index" 
+    [ngClass]="{'highlight': isSelected(i)}" 
+    (click)="selectRow(i)"  
+    style="display:flex; align-items:center;">
+
+    <ion-label style="font-size: small;">
+      <span style="font-size:xx-small;">{{formatFechaLatam(p.data.adate)}}&nbsp;</span>
+    </ion-label>
+
+    <ion-label style="font-size:small;">
+      <span style="font-size:xx-small;" >{{p.data.aname}}&nbsp;</span><br>
+      <span style="font-size:xx-small;" >{{p.data.bname}}&nbsp;</span>
+    </ion-label>
+
+    <!-- Otros elementos aquí -->
+  </ion-item>
+</ion-list>
+
+
+
+
+
+  <!--<ion-list>-->
+    <!--<ion-item *ngFor="let p of withdrawnList; let i = index" -->
+      <!--[ngClass]="{'highlight': isSelected(i)}" -->
+      <!--style="display:flex; align-items:center;">-->
+      
+      <!--<ion-label style="font-size: small;" (click)="selectRow(i)">-->
+        <!--<span style="font-size:xx-small;">{{formatFechaLatam(p.data.adate)}}&nbsp;</span>-->
+      <!--</ion-label>-->
+
+      <!--<ion-label style="font-size:small;">-->
+        <!--<span style="font-size:xx-small;" >{{p.data.aname}}&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;" >{{p.data.bname}}&nbsp;</span>-->
+      <!--</ion-label>-->
+
+      <!--<ion-label style="font-size:small;">-->
+        <!--<span style="font-size:xx-small;" >{{p.data.aticket}}&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;" >{{p.data.bticket}}&nbsp;</span>-->
+      <!--</ion-label>-->
+
+      <!--<ion-label style="font-size:small;">-->
+        <!--<span style="font-size:xx-small;" >{{p.data.akg}}&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;" >{{p.data.bkg}}&nbsp;</span>-->
+      <!--</ion-label>-->
+
+      <!--<ion-label style="font-size:small;">-->
+        <!--<span style="font-size:xx-small;" *ngIf="p.data.avendor==1" >Plexa&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;" *ngIf="p.data.avendor==2" >Plexa port&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;" *ngIf="p.data.bvendor==1" >Plexa&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;" *ngIf="p.data.bvendor==2" >Plexa port&nbsp;</span><br>-->
+      <!--</ion-label>-->
+
+      <!--<ion-label style="font-size:small;">-->
+        <!--<span style="font-size:xx-small;">{{p.data.full}}&nbsp;</span><br>-->
+      <!--</ion-label>-->
+      
+      <!--<ion-label style="font-size:small;">-->
+        <!--<span style="font-size:xx-small;" *ngIf="((p.data.akg+p.data.bkg)-p.data.full)<500">-->
+          <!--{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;color:red;" -->
+          <!--*ngIf="((p.data.akg+p.data.bkg)-p.data.full)>=500">-->
+          <!--{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>-->
+      <!--</ion-label>-->
+    <!--</ion-item>-->
+  <!--</ion-list>-->
+
+
+
+
+
+<!--  <ion-list>-->
+    <!--<ion-item *ngFor="let p of withdrawnList " style="display:flex; align-items:center;">-->
     
-      <ion-label style="font-size: small;">
-        <span style="font-size:xx-small;" >{{formatFechaLatam(p.data.adate)}}&nbsp;</span>
-      </ion-label>
+      <!--<ion-label style="font-size: small;">-->
+        <!--<span style="font-size:xx-small;" >{{formatFechaLatam(p.data.adate)}}&nbsp;</span>-->
+      <!--</ion-label>-->
 
 
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;" >{{p.data.aname}}&nbsp;</span><br>
-        <span style="font-size:xx-small;" >{{p.data.bname}}&nbsp;</span>
-      </ion-label>
+      <!--<ion-label style="font-size:small;">-->
+        <!--<span style="font-size:xx-small;" >{{p.data.aname}}&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;" >{{p.data.bname}}&nbsp;</span>-->
+      <!--</ion-label>-->
 
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;" >{{p.data.aticket}}&nbsp;</span><br>
-        <span style="font-size:xx-small;" >{{p.data.bticket}}&nbsp;</span>
-      </ion-label>
+      <!--<ion-label style="font-size:small;">-->
+        <!--<span style="font-size:xx-small;" >{{p.data.aticket}}&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;" >{{p.data.bticket}}&nbsp;</span>-->
+      <!--</ion-label>-->
 
 
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;" >{{p.data.akg}}&nbsp;</span><br>
-        <span style="font-size:xx-small;" >{{p.data.bkg}}&nbsp;</span>
-      </ion-label>
+      <!--<ion-label style="font-size:small;">-->
+        <!--<span style="font-size:xx-small;" >{{p.data.akg}}&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;" >{{p.data.bkg}}&nbsp;</span>-->
+      <!--</ion-label>-->
 
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;" *ngIf="p.data.avendor==1"   >Plexa&nbsp;</span><br>
-        <span style="font-size:xx-small;" *ngIf="p.data.avendor==2"   >Plexa port&nbsp;</span><br>
-        <span style="font-size:xx-small;" *ngIf="p.data.bvendor==1"   >Plexa&nbsp;</span><br>
-        <span style="font-size:xx-small;" *ngIf="p.data.bvendor==2"   >Plexa port&nbsp;</span><br>
-      </ion-label>
+      <!--<ion-label style="font-size:small;">-->
+        <!--<span style="font-size:xx-small;" *ngIf="p.data.avendor==1"   >Plexa&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;" *ngIf="p.data.avendor==2"   >Plexa port&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;" *ngIf="p.data.bvendor==1"   >Plexa&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;" *ngIf="p.data.bvendor==2"   >Plexa port&nbsp;</span><br>-->
+      <!--</ion-label>-->
 
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;">{{p.data.full}}&nbsp;</span><br>
-      </ion-label>
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;" *ngIf="((p.data.akg+p.data.bkg)-p.data.full)<500">{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>
-        <span style="font-size:xx-small;color:red;" *ngIf="((p.data.akg+p.data.bkg)-p.data.full)>=500">{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+      <!--<ion-label style="font-size:small;">-->
+        <!--<span style="font-size:xx-small;">{{p.data.full}}&nbsp;</span><br>-->
+      <!--</ion-label>-->
+      <!--<ion-label style="font-size:small;">-->
+        <!--<span style="font-size:xx-small;" *ngIf="((p.data.akg+p.data.bkg)-p.data.full)<500">{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>-->
+        <!--<span style="font-size:xx-small;color:red;" *ngIf="((p.data.akg+p.data.bkg)-p.data.full)>=500">{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>-->
+      <!--</ion-label>-->
+    <!--</ion-item>-->
+  <!--</ion-list>-->
 
 
 </ion-content>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

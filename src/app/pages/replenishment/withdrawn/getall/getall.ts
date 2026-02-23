@@ -362,10 +362,48 @@ export class GetallPage implements OnInit {
 
 
 
+selectRow(index: number) {
+  this.selectedIndex = index;  // Guardamos el índice de la fila seleccionada
+  console.log(`Fila seleccionada: ${index}`);  // Imprimimos el índice en la consola
+  
+  // Accedemos a la fila seleccionada usando el índice
+  const selectedItem = this.withdrawnList[index];
+
+  // Verificamos si hay un elemento en esa posición
+  if (selectedItem) {
+    // Imprimimos toda la data de la fila seleccionada
+    console.log('Datos completos de la fila seleccionada:', selectedItem);
+
+    // Aquí puedes imprimir los campos que necesites de la data
+    console.log('Fecha de la fila seleccionada:', selectedItem.data.adate);
+    console.log('Nombre de A:', selectedItem.data.aname);
+    console.log('Nombre de B:', selectedItem.data.bname);
+    console.log('Ticket A:', selectedItem.data.aticket);
+    console.log('Ticket B:', selectedItem.data.bticket);
+    console.log('Plexa Vendor A:', selectedItem.data.avendor);
+    console.log('Plexa Vendor B:', selectedItem.data.bvendor);
+    console.log('Peso A:', selectedItem.data.akg);
+    console.log('Peso B:', selectedItem.data.bkg);
+    console.log('Full:', selectedItem.data.full);
+    console.log('Empty:', selectedItem.data.empty);
+    console.log('Tare:', selectedItem.data.tare);
+
+    // Agrega más campos si es necesario
+  } else {
+    console.error('No se encontró la fila seleccionada.');
+  }
+}
 
 
 
 
+
+  selectedIndex: number | null = null;
+
+
+isSelected(index) {
+    return index <= this.selectedIndex;
+  }
 
 
 }
