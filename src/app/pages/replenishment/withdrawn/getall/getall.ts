@@ -42,9 +42,9 @@ export class GetallPage implements OnInit {
     }
 
     return this.withdrawnList.reduce((total, p) => {
-      const akg = Number(p?.data?.akg) || 0;
-      const bkg = Number(p?.data?.bkg) || 0;
-      return total + akg + bkg;
+      //const akg = Number(p?.data?.akg) || 0;
+      const kg = Number(p?.data?.kg) || 0;
+      return total + kg;
     }, 0);
   }
 
@@ -265,6 +265,7 @@ export class GetallPage implements OnInit {
     console.log('Filtro real hasta:', until);
     this.withdrawnService.getIntervalByAdate(since, until).subscribe({
       next: response => {
+        console.log("Withdrawn pure",response)
         this.withdrawnList = response.reverse();
         console.log('Withdrawn filtrados:', response);
       },
