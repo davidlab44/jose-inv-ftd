@@ -24,6 +24,8 @@ import { RexService } from '../../../../services/rex.service';
 import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
+import { IonItemSliding } from '@ionic/angular';
+
 
 @Component({
   selector: 'page-getall',
@@ -182,7 +184,7 @@ export class GetallPage implements OnInit {
 
   loadData() {
     this.withdrawnService.getAll().subscribe((resp) => {
-      this.withdrawnList = resp;
+      this.withdrawnList = resp.reverse();
       console.log('DATA:', this.withdrawnList);
     });
   }
@@ -263,7 +265,7 @@ export class GetallPage implements OnInit {
     console.log('Filtro real hasta:', until);
     this.withdrawnService.getIntervalByAdate(since, until).subscribe({
       next: response => {
-        this.withdrawnList = response;
+        this.withdrawnList = response.reverse();
         console.log('Withdrawn filtrados:', response);
       },
       error: err => console.error('Error filtro:', err)
@@ -338,7 +340,6 @@ export class GetallPage implements OnInit {
     return date.toISOString().slice(0, 19);
   }
 
-
   valor1 = 0;
   valor2 = 0;
   valor3 = 0;
@@ -352,57 +353,53 @@ export class GetallPage implements OnInit {
     return (this.valor3 || 0) * (this.valor4 || 0);
   }
 
-
-
   setValor(valor: number) {
     this.valor1 = valor; 
   }
 
+  selectRow(index: number) {
+    this.selectedIndex = index;  // Guardamos el índice de la fila seleccionada
+    console.log(`Fila seleccionada: ${index}`);  // Imprimimos el índice en la consola
+    
+    // Accedemos a la fila seleccionada usando el índice
+    const selectedItem = this.withdrawnList[index];
 
+    // Verificamos si hay un elemento en esa posición
+    if (selectedItem) {
+      // Imprimimos toda la data de la fila seleccionada
+      console.log('Datos completos de la fila seleccionada:', selectedItem);
 
+      // Aquí puedes imprimir los campos que necesites de la data
+      console.log('Fecha de la fila seleccionada:', selectedItem.data.adate);
+      console.log('Nombre de A:', selectedItem.data.aname);
+      console.log('Nombre de B:', selectedItem.data.bname);
+      console.log('Ticket A:', selectedItem.data.aticket);
+      console.log('Ticket B:', selectedItem.data.bticket);
+      console.log('Plexa Vendor A:', selectedItem.data.avendor);
+      console.log('Plexa Vendor B:', selectedItem.data.bvendor);
+      console.log('Peso A:', selectedItem.data.akg);
+      console.log('Peso B:', selectedItem.data.bkg);
+      console.log('Full:', selectedItem.data.full);
+      console.log('Empty:', selectedItem.data.empty);
+      console.log('Tare:', selectedItem.data.tare);
 
-
-selectRow(index: number) {
-  this.selectedIndex = index;  // Guardamos el índice de la fila seleccionada
-  console.log(`Fila seleccionada: ${index}`);  // Imprimimos el índice en la consola
-  
-  // Accedemos a la fila seleccionada usando el índice
-  const selectedItem = this.withdrawnList[index];
-
-  // Verificamos si hay un elemento en esa posición
-  if (selectedItem) {
-    // Imprimimos toda la data de la fila seleccionada
-    console.log('Datos completos de la fila seleccionada:', selectedItem);
-
-    // Aquí puedes imprimir los campos que necesites de la data
-    console.log('Fecha de la fila seleccionada:', selectedItem.data.adate);
-    console.log('Nombre de A:', selectedItem.data.aname);
-    console.log('Nombre de B:', selectedItem.data.bname);
-    console.log('Ticket A:', selectedItem.data.aticket);
-    console.log('Ticket B:', selectedItem.data.bticket);
-    console.log('Plexa Vendor A:', selectedItem.data.avendor);
-    console.log('Plexa Vendor B:', selectedItem.data.bvendor);
-    console.log('Peso A:', selectedItem.data.akg);
-    console.log('Peso B:', selectedItem.data.bkg);
-    console.log('Full:', selectedItem.data.full);
-    console.log('Empty:', selectedItem.data.empty);
-    console.log('Tare:', selectedItem.data.tare);
-
-    // Agrega más campos si es necesario
-  } else {
-    console.error('No se encontró la fila seleccionada.');
+      // Agrega más campos si es necesario
+    } else {
+      console.error('No se encontró la fila seleccionada.');
+    }
   }
-}
-
-
-
-
 
   selectedIndex: number | null = null;
 
 
-isSelected(index) {
-    return index <= this.selectedIndex;
+  isSelected(index) {
+    return index > this.selectedIndex;
+  }
+
+
+  onPartialSwipe(index: number, slidingItem: IonItemSliding) {
+    console.log('Swipe derecha detectado en index:', index);
+    slidingItem.close(); // cerramos para estabilidad
   }
 
 

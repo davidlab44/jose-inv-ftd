@@ -32,10 +32,7 @@ import { WithdrawnService } from '../../../../services/replenishment/withdrawn.s
 })
 export class GetallPage implements OnInit {
 
-
-
   withdrawnList: any[] = [];
-
 
   getTotalKg(): number {
     if (!this.withdrawnList || this.withdrawnList.length === 0) {
@@ -49,73 +46,22 @@ export class GetallPage implements OnInit {
     }, 0);
   }
 
-
-
-
-
-  /*// Rango seleccionado (día del año)*/
-  /*dayRange = {*/
-    /*lower: 1,*/
-    /*upper: 365*/
-  /*};*/
-
-  /*// Valores individuales*/
-  /*startDay = 1;*/
-  /*endDay = 365;*/
-
-
-  /*onRangeChange(event: any) {*/
-    /*this.startDay = event.detail.value.lower;*/
-    /*this.endDay = event.detail.value.upper;*/
-
-    /*console.log('Desde:', this.formatDay(this.startDay));*/
-    /*console.log('Hasta:', this.formatDay(this.endDay));*/
-  /*}*/
-
-  /*// Sincroniza valores al iniciar*/
-  /*syncDays() {*/
-    /*this.startDay = this.dayRange.lower;*/
-    /*this.endDay = this.dayRange.upper;*/
-  /*}*/
-
-  /*// Convierte día del año → "DD Mes"*/
-  /*formatDay(day: number): string {*/
-    /*const base = new Date('2026-01-01T00:00:00');*/
-    /*base.setDate(base.getDate() + (day - 1));*/
-
-    /*return base.toLocaleDateString('es-ES', {*/
-      /*day: '2-digit',*/
-      /*month: 'short'*/
-    /*});*/
-  /*}*/
-
-
-
-
-
-
-
-
-
-
-
-
-
   dayRange = {
-    lower: 1, // inicio del año
-    upper: this.getTodayDayOfYear() // 👈 hoy
+    lower: 1, 
+    upper: this.getTodayDayOfYear() 
   };
 
   startDay = 1;
   endDay = this.dayRange.upper;
-
 
   onRangeChange(event: any) {
     this.startDay = event.detail.value.lower;
     this.endDay = event.detail.value.upper;
 
     console.log('Desde:', this.formatDay(this.startDay));
-    console.log('Hasta:', this.formatDay(this.endDay));
+    console.log('Hasta2', this.formatDay(this.endDay));
+    
+    this.getAll();
   }
 
   syncDays() {
@@ -132,13 +78,6 @@ export class GetallPage implements OnInit {
       month: 'short'
     });
   }
-
-
-
-
-
-
-
 
   getTodayDayOfYear(): number {
     const today = new Date();
@@ -223,37 +162,6 @@ export class GetallPage implements OnInit {
     console.log('Vendor seleccionado:', value);
   }
 
-
-
-
-/*columns = [*/
-    /*{ header: 'Fecha V', field: 'fecha_v' },*/
-    /*{ header: 'Cont vacío', field: 'cont_vacio' },*/
-    /*{ header: 'Rem vacío', field: 'rem_vacio' },*/
-    /*{ header: 'Fe ing M', field: 'fe_ing_m' },*/
-    /*{ header: 'Rem M ll', field: 'rem_m_ll' },*/
-    /*{ header: 'Sur', field: 'sur' },*/
-    /*{ header: 'Nort', field: 'nort' },*/
-    /*{ header: 'Fecha', field: 'fecha' },*/
-    /*{ header: 'Ticket', field: 'ticket' },*/
-    /*{ header: 'PSI', field: 'psi' },*/
-    /*{ header: 'OPC', field: 'opc' },*/
-    /*{ header: 'IMPO', field: 'impo' },*/
-    /*{ header: 'P Total', field: 'p_total' },*/
-    /*{ header: 'Rotogate', field: 'rotogate' },*/
-    /*{ header: 'P Vacío B', field: 'p_vacio_b' },*/
-    /*{ header: 'Peso Lleno B', field: 'peso_lleno_b' },*/
-    /*{ header: 'P Neto', field: 'p_neto' },*/
-    /*{ header: 'DIF', field: 'dif' },*/
-    /*{ header: 'Precio P', field: 'precio_p' },*/
-    /*{ header: 'Fecha F', field: 'fecha_f' },*/
-    /*{ header: 'Factura', field: 'factura' },*/
-    /*{ header: 'Valor Fact', field: 'valor_fact' },*/
-    /*{ header: 'Sello 1', field: 'sello1' },*/
-    /*{ header: 'Sello 2', field: 'sello2' },*/
-    /*{ header: 'Sello 3', field: 'sello3' }*/
-  /*]; */
-
   patchThisElement(item:any){
     this.router.navigate(
       ['/app/tabs/withdrawn-patch'],
@@ -268,14 +176,13 @@ export class GetallPage implements OnInit {
   };
 
   ngOnInit() {
-    this.syncDays();
+     this.syncDays();
     this.loadData();
   }
 
   loadData() {
     this.withdrawnService.getAll().subscribe((resp) => {
-      //this.withdrawnList = resp;
-      this.withdrawnList = this.orderByDate(resp);
+      this.withdrawnList = resp;
       console.log('DATA:', this.withdrawnList);
     });
   }
@@ -325,12 +232,6 @@ export class GetallPage implements OnInit {
     private withdrawnService: WithdrawnService
   ) {}
 
-  /*printSelectedBarcodes(p: Product) {*/
-    /*const paddedId = p.id.toString().padStart(6, '0');*/
-    /*const selectedBarcodes = [paddedId];*/
-    /*this.barcodeService.printIn50mmPortablePrinterBt(selectedBarcodes);*/
-  /*}*/
-
   hash:string='';
   table:any
   userList:any[]=[];
@@ -355,12 +256,18 @@ export class GetallPage implements OnInit {
     this.getAll();
   }
 
-  getAll(){
-    this.withdrawnService.getAll().subscribe({
-      next: response=>{
-        console.log("response gettall withdrawn",response);
-      }
-    })
+  getAll() {
+    const since = this.dayOfYearToISO(this.startDay);
+    const until = this.dayOfYearToISO(this.endDay, true);
+    console.log('Filtro real desde:', since);
+    console.log('Filtro real hasta:', until);
+    this.withdrawnService.getIntervalByAdate(since, until).subscribe({
+      next: response => {
+        this.withdrawnList = response;
+        console.log('Withdrawn filtrados:', response);
+      },
+      error: err => console.error('Error filtro:', err)
+    });
   }
 
   prodrexList:any[]=[];
@@ -398,8 +305,6 @@ export class GetallPage implements OnInit {
   }
 
   formatFechaLatam(dateInput: string | Date | number): string {
-    //console.log("fechalatam",dateInput) 
-
     if (!dateInput) return '';
     const date = new Date(dateInput);
     const opciones: Intl.DateTimeFormatOptions = {
@@ -413,20 +318,92 @@ export class GetallPage implements OnInit {
     const segundos = String(date.getSeconds()).padStart(2, '0');
     const ampm = horas >= 12 ? 'PM' : 'AM';
     horas = horas % 12;
-    if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
+    if (horas === 0) horas = 12; 
     const horasTexto = String(horas).padStart(2, '0');
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
 
-  orderByDate(data: any[]): any[] {
-    return data.sort((a, b) => {
-      const dateA = new Date(a.created_at).getTime();
-      const dateB = new Date(b.created_at).getTime();
-      return dateB - dateA; // más reciente primero
-    });
+  dayOfYearToISO(day: number, endOfDay = false): string {
+    const year = 2026; 
+    const date = new Date(year, 0); 
+    date.setDate(day);
+
+    if (endOfDay) {
+      date.setHours(23, 59, 59, 999);
+    } else {
+      date.setHours(0, 0, 0, 0);
+    }
+
+    return date.toISOString().slice(0, 19);
   }
 
+
+  valor1 = 0;
+  valor2 = 0;
+  valor3 = 0;
+  valor4 = 0;
+
+  calcularResultado(): number {
+    return (this.valor1 || 0) * (this.valor2 || 0);
+  }
+
+  calcularResultadoImportado(): number {
+    return (this.valor3 || 0) * (this.valor4 || 0);
+  }
+
+
+
+  setValor(valor: number) {
+    this.valor1 = valor; 
+  }
+
+
+
+
+
+selectRow(index: number) {
+  this.selectedIndex = index;  // Guardamos el índice de la fila seleccionada
+  console.log(`Fila seleccionada: ${index}`);  // Imprimimos el índice en la consola
+  
+  // Accedemos a la fila seleccionada usando el índice
+  const selectedItem = this.withdrawnList[index];
+
+  // Verificamos si hay un elemento en esa posición
+  if (selectedItem) {
+    // Imprimimos toda la data de la fila seleccionada
+    console.log('Datos completos de la fila seleccionada:', selectedItem);
+
+    // Aquí puedes imprimir los campos que necesites de la data
+    console.log('Fecha de la fila seleccionada:', selectedItem.data.adate);
+    console.log('Nombre de A:', selectedItem.data.aname);
+    console.log('Nombre de B:', selectedItem.data.bname);
+    console.log('Ticket A:', selectedItem.data.aticket);
+    console.log('Ticket B:', selectedItem.data.bticket);
+    console.log('Plexa Vendor A:', selectedItem.data.avendor);
+    console.log('Plexa Vendor B:', selectedItem.data.bvendor);
+    console.log('Peso A:', selectedItem.data.akg);
+    console.log('Peso B:', selectedItem.data.bkg);
+    console.log('Full:', selectedItem.data.full);
+    console.log('Empty:', selectedItem.data.empty);
+    console.log('Tare:', selectedItem.data.tare);
+
+    // Agrega más campos si es necesario
+  } else {
+    console.error('No se encontró la fila seleccionada.');
+  }
+}
+
+
+
+
+
+  selectedIndex: number | null = null;
+
+
+isSelected(index) {
+    return index <= this.selectedIndex;
+  }
 
 
 }

@@ -28,9 +28,6 @@
   </ion-toolbar>
 </ion-header>
 
-
-
-
 <ion-content>
 
   <ion-item class="range-container" lines="none">
@@ -46,6 +43,7 @@
         <span class="value">{{ formatDay(endDay) }}</span>
       </div>
     </div>
+
   </ion-item>
 
   <ion-item lines="none">
@@ -62,8 +60,6 @@
     >
     </ion-range>
   </ion-item>
-
-
 
   <br><br>
 
@@ -246,7 +242,6 @@
 
   <ion-item-divider class="total-divider"></ion-item-divider>
 
-
   <br><br>
   <ion-list>
     <ion-item style="display:flex; align-items:center;">
@@ -281,118 +276,83 @@
   </ion-list>
 
 
+  <ion-list>
+    <ion-item-sliding
+      *ngFor="let p of withdrawnList; let i = index"
+      #slidingItem>
 
+      <ion-item
+        [ngClass]="{'highlight': isSelected(i)}"
+        (click)="selectRow(i)"
+        style="display:flex; align-items:center;">
 
+        <ion-label style="font-size:xx-small;">
+          {{formatFechaLatam(p.data.adate)}}
+        </ion-label>
 
-<ion-list>
-  <ion-item *ngFor="let p of withdrawnList; let i = index" 
-    [ngClass]="{'highlight': isSelected(i)}" 
-    (click)="selectRow(i)"  
-    style="display:flex; align-items:center;">
+        <ion-label style="font-size:xx-small;">
+          {{p.data.aname}}<br>
+          {{p.data.bname}}
+        </ion-label>
 
-    <ion-label style="font-size: small;">
-      <span style="font-size:xx-small;">{{formatFechaLatam(p.data.adate)}}&nbsp;</span>
-    </ion-label>
+        <ion-label style="font-size:xx-small;">
+          {{p.data.aticket}}<br>
+          {{p.data.bticket}}
+        </ion-label>
 
-    <ion-label style="font-size:small;">
-      <span style="font-size:xx-small;" >{{p.data.aname}}&nbsp;</span><br>
-      <span style="font-size:xx-small;" >{{p.data.bname}}&nbsp;</span>
-    </ion-label>
+      </ion-item>
 
-    <!-- Otros elementos aquí -->
-  </ion-item>
-</ion-list>
+      <!-- SOLO SWIPE HACIA LA DERECHA -->
+      <ion-item-options side="start">
+        <ion-item-option
+          color="primary"
+          expandable="false"
+          (click)="onPartialSwipe(i, slidingItem)">
+          Acción
+        </ion-item-option>
+      </ion-item-options>
 
-
-
+    </ion-item-sliding>
+  </ion-list>
 
 
   <!--<ion-list>-->
     <!--<ion-item *ngFor="let p of withdrawnList; let i = index" -->
       <!--[ngClass]="{'highlight': isSelected(i)}" -->
+      <!--(click)="selectRow(i)"  -->
       <!--style="display:flex; align-items:center;">-->
-      
-      <!--<ion-label style="font-size: small;" (click)="selectRow(i)">-->
+      <!--<ion-label style="font-size: small;">-->
         <!--<span style="font-size:xx-small;">{{formatFechaLatam(p.data.adate)}}&nbsp;</span>-->
       <!--</ion-label>-->
-
       <!--<ion-label style="font-size:small;">-->
         <!--<span style="font-size:xx-small;" >{{p.data.aname}}&nbsp;</span><br>-->
         <!--<span style="font-size:xx-small;" >{{p.data.bname}}&nbsp;</span>-->
       <!--</ion-label>-->
-
       <!--<ion-label style="font-size:small;">-->
         <!--<span style="font-size:xx-small;" >{{p.data.aticket}}&nbsp;</span><br>-->
         <!--<span style="font-size:xx-small;" >{{p.data.bticket}}&nbsp;</span>-->
       <!--</ion-label>-->
-
       <!--<ion-label style="font-size:small;">-->
         <!--<span style="font-size:xx-small;" >{{p.data.akg}}&nbsp;</span><br>-->
         <!--<span style="font-size:xx-small;" >{{p.data.bkg}}&nbsp;</span>-->
       <!--</ion-label>-->
-
       <!--<ion-label style="font-size:small;">-->
         <!--<span style="font-size:xx-small;" *ngIf="p.data.avendor==1" >Plexa&nbsp;</span><br>-->
         <!--<span style="font-size:xx-small;" *ngIf="p.data.avendor==2" >Plexa port&nbsp;</span><br>-->
         <!--<span style="font-size:xx-small;" *ngIf="p.data.bvendor==1" >Plexa&nbsp;</span><br>-->
         <!--<span style="font-size:xx-small;" *ngIf="p.data.bvendor==2" >Plexa port&nbsp;</span><br>-->
       <!--</ion-label>-->
-
-      <!--<ion-label style="font-size:small;">-->
-        <!--<span style="font-size:xx-small;">{{p.data.full}}&nbsp;</span><br>-->
-      <!--</ion-label>-->
-      
-      <!--<ion-label style="font-size:small;">-->
-        <!--<span style="font-size:xx-small;" *ngIf="((p.data.akg+p.data.bkg)-p.data.full)<500">-->
-          <!--{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>-->
-        <!--<span style="font-size:xx-small;color:red;" -->
-          <!--*ngIf="((p.data.akg+p.data.bkg)-p.data.full)>=500">-->
-          <!--{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>-->
-      <!--</ion-label>-->
-    <!--</ion-item>-->
-  <!--</ion-list>-->
-
-
-
-
-
-<!--  <ion-list>-->
-    <!--<ion-item *ngFor="let p of withdrawnList " style="display:flex; align-items:center;">-->
-    
-      <!--<ion-label style="font-size: small;">-->
-        <!--<span style="font-size:xx-small;" >{{formatFechaLatam(p.data.adate)}}&nbsp;</span>-->
-      <!--</ion-label>-->
-
-
-      <!--<ion-label style="font-size:small;">-->
-        <!--<span style="font-size:xx-small;" >{{p.data.aname}}&nbsp;</span><br>-->
-        <!--<span style="font-size:xx-small;" >{{p.data.bname}}&nbsp;</span>-->
-      <!--</ion-label>-->
-
-      <!--<ion-label style="font-size:small;">-->
-        <!--<span style="font-size:xx-small;" >{{p.data.aticket}}&nbsp;</span><br>-->
-        <!--<span style="font-size:xx-small;" >{{p.data.bticket}}&nbsp;</span>-->
-      <!--</ion-label>-->
-
-
-      <!--<ion-label style="font-size:small;">-->
-        <!--<span style="font-size:xx-small;" >{{p.data.akg}}&nbsp;</span><br>-->
-        <!--<span style="font-size:xx-small;" >{{p.data.bkg}}&nbsp;</span>-->
-      <!--</ion-label>-->
-
-      <!--<ion-label style="font-size:small;">-->
-        <!--<span style="font-size:xx-small;" *ngIf="p.data.avendor==1"   >Plexa&nbsp;</span><br>-->
-        <!--<span style="font-size:xx-small;" *ngIf="p.data.avendor==2"   >Plexa port&nbsp;</span><br>-->
-        <!--<span style="font-size:xx-small;" *ngIf="p.data.bvendor==1"   >Plexa&nbsp;</span><br>-->
-        <!--<span style="font-size:xx-small;" *ngIf="p.data.bvendor==2"   >Plexa port&nbsp;</span><br>-->
-      <!--</ion-label>-->
-
       <!--<ion-label style="font-size:small;">-->
         <!--<span style="font-size:xx-small;">{{p.data.full}}&nbsp;</span><br>-->
       <!--</ion-label>-->
       <!--<ion-label style="font-size:small;">-->
-        <!--<span style="font-size:xx-small;" *ngIf="((p.data.akg+p.data.bkg)-p.data.full)<500">{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>-->
-        <!--<span style="font-size:xx-small;color:red;" *ngIf="((p.data.akg+p.data.bkg)-p.data.full)>=500">{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>-->
+        <!--<div *ngIf="p.data.full>0">-->
+          <!--<span style="font-size:xx-small;" *ngIf="((p.data.akg+p.data.bkg)-p.data.full)<500">-->
+            <!--{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>-->
+          <!--<span style="font-size:xx-small;color:red;" -->
+            <!--*ngIf="((p.data.akg+p.data.bkg)-p.data.full)>=500">-->
+            <!--{{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>-->
+        <!--</div>-->
       <!--</ion-label>-->
     <!--</ion-item>-->
   <!--</ion-list>-->

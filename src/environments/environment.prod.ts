@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiHost: 'https://invapi.chrisantemogourmet.com',
+  apiHost: 'https://invapidev.chrisantemogourmet.com',
   db:"na",
   i:38,
   p:"tumae"

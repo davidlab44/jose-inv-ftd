@@ -1,5 +1,15 @@
 
 
+/* Clase para resaltar las filas seleccionadas */
+.highlight {
+  background-color: #F52742; /* Rojo claro */
+  font-size:18px;
+  font-weight: bold;
+}
+
+
+
+
 /* Asegura que el contenedor del swiper use todo el ancho y alto */
 swiper-container {
   width: 100%;
@@ -144,6 +154,237 @@ ion-card-title {
     rgba(var(--ion-color-primary-rgb), 0.02)
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===== FONDO ROJO CLARO ===== */
+.red-bg {
+  background-color: #fdecea !important;
+  padding: 10px 6px !important;
+  border-radius: 6px;
+}
+
+.red-bg::part(native) {
+  background: transparent !important;
+}
+
+/* ===== INPUT COMPUESTO (reutilizado) ===== */
+.compound-input {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 34px;
+  border: 1px solid #c8e6c9;
+}
+
+/* ===== ROJO ESPECÍFICO ===== */
+.red-input {
+  border-color: #f5b7b1;
+}
+
+.red-input:focus-within {
+  border-color: #e57373;
+  box-shadow: 0 0 0 2px rgba(229, 115, 115, 0.18);
+}
+
+/* ===== TAGS ===== */
+.compound-tag {
+  background: #c8e6c9;
+  color: #1b5e20;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+}
+
+.red-tag {
+  background: #f5b7b1;
+  color: #7b241c;
+}
+
+/* ===== RESULTADOS ===== */
+.red-result .result-value {
+  color: #922b21;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Row más compacta */
+.button-row {
+  padding: 6px 4px !important;
+}
+
+/* Centrar botones */
+.btn-col {
+  display: flex;
+  justify-content: center;
+}
+
+/* Botón verde personalizado */
+.green-btn {
+  --background: #2ecc71;
+  --background-hover: #27ae60;
+  --background-activated: #239b56;
+  --color: #ffffff;
+  --border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  height: 30px;
+}
+
+
+
+
+
+
+
+
+
+
+.total-item {
+  margin-bottom: 2px !important;
+  padding-bottom: 4px !important;
+}
+
+.button-row {
+  margin-top: 0 !important;
+  padding-top: 2px !important;
+}
+
+.total-divider {
+  margin: 4px 0 !important;
+}
+
+
+
+.green-btn {
+  --background: #2ecc71;
+  --background-hover: #27ae60;
+  --background-activated: #239b56;
+  --color: #ffffff;
+  --border-radius: 5px;
+
+  height: 26px;              /* más pequeño */
+  font-size: 12px;           /* texto más pequeño */
+  font-weight: 400;          /* normal (no bold) */
+  min-height: 26px;
+  padding: 0;
+}
+
+
+
+
+.button-row {
+  padding: 4px 4px !important;
+}
+
+.btn-col {
+  padding: 0 4px !important;
+}
+
+
 
 
 
