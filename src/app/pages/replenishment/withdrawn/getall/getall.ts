@@ -24,6 +24,7 @@ import { RexService } from '../../../../services/rex.service';
 import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
+import { CcoService } from '../../../../services/cc/cco.service';
 import { IonItemSliding } from '@ionic/angular';
 
 
@@ -180,6 +181,7 @@ export class GetallPage implements OnInit {
   ngOnInit() {
      this.syncDays();
     this.loadData();
+    this.getCco();
   }
 
   loadData() {
@@ -231,7 +233,8 @@ export class GetallPage implements OnInit {
     private rexService: RexService,
     private prodrexService: ProdrexService,
     private userService: UserService,
-    private withdrawnService: WithdrawnService
+    private withdrawnService: WithdrawnService,
+    private ccoService: CcoService,
   ) {}
 
   hash:string='';
@@ -402,6 +405,18 @@ export class GetallPage implements OnInit {
     console.log('Swipe derecha detectado en index:', index);
     slidingItem.close(); // cerramos para estabilidad
   }
+
+
+
+  ccoList:any[]=[];
+  getCco() {
+    this.ccoService.getAll().subscribe((resp) => {
+      this.ccoList = resp;
+      console.log('ccoList:', this.ccoList);
+    });
+  }
+
+
 
 
 }
