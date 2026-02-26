@@ -19,17 +19,17 @@
     </ion-buttons>
   </ion-toolbar>
 
-  <ion-toolbar color="light" class="subheader-toolbar">
-    <ion-row>
-      <ion-col size="12" style="text-align:center;">
-        <ion-title class="subheader-title">
-          <span style="text-align:center;font-size:x-small;font-weight:600;">
-            Reabastecimiento Provigas
-          </span>
-        </ion-title>
-      </ion-col>
-    </ion-row>
-  </ion-toolbar>
+  <!--<ion-toolbar color="light" class="subheader-toolbar">-->
+    <!--<ion-row>-->
+      <!--<ion-col size="12" style="text-align:center;">-->
+        <!--<ion-title class="subheader-title">-->
+          <!--<span style="text-align:center;font-size:x-small;font-weight:600;">-->
+            <!--Reabastecimiento Provigas-->
+          <!--</span>-->
+        <!--</ion-title>-->
+      <!--</ion-col>-->
+    <!--</ion-row>-->
+  <!--</ion-toolbar>-->
 </ion-header>
 
 <ion-content>
@@ -63,37 +63,37 @@
 
   <br><br>
 
-  <ion-item lines="none">
-    <div style="display:flex;width:100%;justify-content:center;gap:8px;">
-      <ion-select
-        interface="popover"
-        placeholder="Tipo"
-        style="width:50%;"
-        [(ngModel)]="filterType"
-        (ionChange)="onTypeChange($event)">
-        <ion-select-option
-          *ngFor="let t of types"
-          [value]="t.value">
-          {{ t.name }}
-        </ion-select-option>
-      </ion-select>
+  <!--<ion-item lines="none">-->
+    <!--<div style="display:flex;width:100%;justify-content:center;gap:8px;">-->
+      <!--<ion-select-->
+        <!--interface="popover"-->
+        <!--placeholder="Tipo"-->
+        <!--style="width:50%;"-->
+        <!--[(ngModel)]="filterType"-->
+        <!--(ionChange)="onTypeChange($event)">-->
+        <!--<ion-select-option-->
+          <!--*ngFor="let t of types"-->
+          <!--[value]="t.value">-->
+          <!--{{ t.name }}-->
+        <!--</ion-select-option>-->
+      <!--</ion-select>-->
 
-      <ion-select
-        interface="popover"
-        placeholder="Vendor"
-        style="width:50%;"
-        [(ngModel)]="filterVendor"
-        (ionChange)="onVendorChange($event)">
-        <ion-select-option
-          *ngFor="let v of vendors"
-          [value]="v.value">
-          {{ v.name }}
-        </ion-select-option>
-      </ion-select>
-    </div>
-  </ion-item>
+      <!--<ion-select-->
+        <!--interface="popover"-->
+        <!--placeholder="Vendor"-->
+        <!--style="width:50%;"-->
+        <!--[(ngModel)]="filterVendor"-->
+        <!--(ionChange)="onVendorChange($event)">-->
+        <!--<ion-select-option-->
+          <!--*ngFor="let v of vendors"-->
+          <!--[value]="v.value">-->
+          <!--{{ v.name }}-->
+        <!--</ion-select-option>-->
+      <!--</ion-select>-->
+    <!--</div>-->
+  <!--</ion-item>-->
 
-  <br><br>
+  <!--<br><br>-->
 
   <ion-item-divider class="total-divider"></ion-item-divider>
 
@@ -240,7 +240,6 @@
   </ion-list>
 
 
-
   <!-- ================= TEMPLATE FILA ================= -->
 
   <ng-template #withdrawnRow let-p="p">
@@ -249,7 +248,6 @@
 
       <!--<ion-row class="withdrawn-row ion-align-items-center">-->
       <ion-row  class="withdrawn-row ion-align-items-center" [ngClass]="{ 'row-erp': p.state === 'erp' }">
-
 
         <!-- Fecha -->
         <ion-col size="2">
@@ -274,18 +272,18 @@
         </ion-col>
 
         <ion-col size="2">
-          {{ p.data.deliveryin }}
+          {{ p.data.deliveryout }}
         </ion-col>
       
         <ion-col size="2">
-          {{ p.data.tripin }}
+          {{ p.data.tripout }}
         </ion-col>
 
         <ion-col
           size="2"
           [ngStyle]="{ 'background-color': getCcoColorById(p?.data?.name) }"
           class="isotank-col ship-cell">
-          {{ getShipNameById(p?.data?.shipin) | uppercase }}
+          {{ getShipNameById(p?.data?.shipout) | uppercase }}
         </ion-col>
 
       </ion-row>
