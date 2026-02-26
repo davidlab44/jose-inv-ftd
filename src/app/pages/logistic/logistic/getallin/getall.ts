@@ -1,29 +1,35 @@
-import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
+import {
+  AlertController,
+  IonList,
+  LoadingController,
+  ModalController,
+  ToastController,
+  Config,
+  IonItemSliding
+} from '@ionic/angular';
 import { ConferenceData } from '../../../../providers/conference-data';
 import { UserData } from '../../../../providers/user-data';
 import { OpportunityService } from '../../../../services/opportunity.service';
 import { PosOrderService } from '../../../../services/pos-order.service';
 import { TableService } from '../../../../services/table.service';
-import { environment } from '../../../../../environments/environment';
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute } from '@angular/router';
 import { Session } from '../../../../interfaces/session';
 import { SessionService } from '../../../../services/session.service';
 import { UtilService } from '../../../../services/util.service';
 import { ProductService } from '../../../../services/product.service';
 import { BarcodeService } from '../../../../services/barcode.service';
 import { CategoryService } from '../../../../services/category.service';
-import { UmService } from '../../../../services/um.service';
 import { Product } from '../../../../interfaces/product';
-import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { DateService } from '../../../../services/local/date.service';
 import { RexService } from '../../../../services/rex.service';
 import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
+import { CcoService } from '../../../../services/cc/cco.service';
+import { ShipService } from '../../../../services/logistic/ship.service';
 
 @Component({
   selector: 'page-getall',
@@ -32,106 +38,18 @@ import { WithdrawnService } from '../../../../services/replenishment/withdrawn.s
 })
 export class GetallPage implements OnInit {
 
+  @ViewChild(IonList, { static: false }) ionList!: IonList;
+
   withdrawnList: any[] = [];
-
-  getTotalKg(): number {
-    if (!this.withdrawnList || this.withdrawnList.length === 0) {
-      return 0;
-    }
-
-    return this.withdrawnList.reduce((total, p) => {
-      const akg = Number(p?.data?.akg) || 0;
-      const bkg = Number(p?.data?.bkg) || 0;
-      return total + akg + bkg;
-    }, 0);
-  }
+  groupedWithdrawnList: any[] = [];
 
   dayRange = {
-    lower: 1, 
-    upper: this.getTodayDayOfYear() 
+    lower: 1,
+    upper: this.getTodayDayOfYear()
   };
 
   startDay = 1;
   endDay = this.dayRange.upper;
-
-  onRangeChange(event: any) {
-    this.startDay = event.detail.value.lower;
-    this.endDay = event.detail.value.upper;
-
-    console.log('Desde:', this.formatDay(this.startDay));
-    console.log('Hasta2', this.formatDay(this.endDay));
-    
-    this.getAll();
-  }
-
-  syncDays() {
-    this.startDay = this.dayRange.lower;
-    this.endDay = this.dayRange.upper;
-  }
-
-  formatDay(day: number): string {
-    const base = new Date('2026-01-01T00:00:00');
-    base.setDate(base.getDate() + (day - 1));
-
-    return base.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: 'short'
-    });
-  }
-
-  getTodayDayOfYear(): number {
-    const today = new Date();
-    const start = new Date(today.getFullYear(), 0, 0);
-    const diff =
-      today.getTime() -
-      start.getTime() +
-      (start.getTimezoneOffset() - today.getTimezoneOffset()) * 60 * 1000;
-
-    const oneDay = 1000 * 60 * 60 * 24;
-    return Math.floor(diff / oneDay);
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // ==============================
-  // Opciones de los selects
-  // ==============================
 
   types = [
     { value: 1, name: 'Nacional' },
@@ -143,68 +61,19 @@ export class GetallPage implements OnInit {
     { value: 2, name: 'Plexa port' }
   ];
 
-  // ==============================
-  // Valores seleccionados (default)
-  // ==============================
-
   filterType: number = this.types[0].value;
   filterVendor: number = this.vendors[0].value;
 
-  onTypeChange(event: any) {
-    const value = event?.detail?.value ?? this.filterType;
-    this.filterType = value;
-    console.log('Tipo seleccionado:', value);
-  }
-
-  onVendorChange(event: any) {
-    const value = event?.detail?.value ?? this.filterVendor;
-    this.filterVendor = value;
-    console.log('Vendor seleccionado:', value);
-  }
-
-  patchThisElement(item:any){
-    this.router.navigate(
-      ['/app/tabs/withdrawn-patch'],
-      { state: { item } }
-    );
-  }
-
-  slideOpts = {
-    initialSlide: 0,
-    slidesPerView: 1,
-    speed: 300
-  };
-
-  ngOnInit() {
-     this.syncDays();
-    this.loadData();
-  }
-
-  loadData() {
-    this.withdrawnService.getAll().subscribe((resp) => {
-      this.withdrawnList = resp;
-      console.log('DATA:', this.withdrawnList);
-    });
-  }
+  valor1 = 0;
+  valor2 = 0;
+  valor3 = 0;
+  valor4 = 0;
 
   ios: boolean;
-  hasOwner:boolean=false;
-  segment = 'all';
   showSearchbar: boolean;
-  opportunities = [];
-  storedObject: any;
-  posOrders: any[] = [];
-  posOrderLineList: any[] = [];
-  pendingCommands: any[] = [];
-  deliveredList: any[] = [];
-  filteredProductList: any[] = [];
-  maxQtyDeliveredItems: any[] = [];
-  queryText:any
-  mesas: any[] = [];
-  activeSession: Session | null = null;
-  sessionId: number | null = null;
   searchSubject = new Subject<string>();
-  todayDate:any
+  ccoList: any[] = [];
+  shipList: any[] = [];
 
   constructor(
     private barcodeService: BarcodeService,
@@ -220,129 +89,233 @@ export class GetallPage implements OnInit {
     private posOrderService: PosOrderService,
     private tableService: TableService,
     private route: ActivatedRoute,
-    private sessionService:SessionService,
-    private utilService:UtilService,
-    private productService:ProductService,
-    private categoryService:CategoryService,
-    private umService:UmService,
+    private sessionService: SessionService,
+    private utilService: UtilService,
+    private productService: ProductService,
+    private categoryService: CategoryService,
     private dateService: DateService,
     private rexService: RexService,
     private prodrexService: ProdrexService,
     private userService: UserService,
-    private withdrawnService: WithdrawnService
+    private withdrawnService: WithdrawnService,
+    private ccoService: CcoService,
+    private shipService: ShipService,
   ) {}
 
-  hash:string='';
-  table:any
-  userList:any[]=[];
-  loadUsers(){
-    this.userService.getAll().subscribe({
-      next: (response)=>{
-        console.log("users",response)
-        this.userList=response;
-      }
-    })
+  ngOnInit() {
+    this.syncDays();
+    this.getCco();
+    this.getShip();
+  
   }
 
-  updateSchedule(){
-     
-  }
-
-  productListCaos:any[]=[];
   ionViewWillEnter() {
-    this.productService.getCachedOrServer().subscribe(data => {
-      this.productListCaos = data;
-    });
     this.getAll();
   }
 
   getAll() {
     const since = this.dayOfYearToISO(this.startDay);
     const until = this.dayOfYearToISO(this.endDay, true);
-    console.log('Filtro real desde:', since);
-    console.log('Filtro real hasta:', until);
+
     this.withdrawnService.getIntervalByAdate(since, until).subscribe({
       next: response => {
         this.withdrawnList = response;
-        console.log('Withdrawn filtrados:', response);
-      },
-      error: err => console.error('Error filtro:', err)
-    });
-  }
-
-  prodrexList:any[]=[];
-  ionViewDidEnter() {
-    this.prodrexService.getAll().subscribe({
-      next: response=>{
-        this.prodrexList=response;
-        console.log("getProdRexList",response)
+        console.log("withdrawnList response",this.withdrawnList)
+        this.groupWithdrawnByRefdate();
       }
-    })
-  }
-
-  posCategId:number=0
-  productList:Product[]=[];
-  getAllProducts() {
-    this.productService.getAllProducts().subscribe({
-      next: response => {
-        this.productList=response;
-        console.log('products By Cat',this.productList)
-      },
-      error: error => console.error('Error:', error),
-      complete: () => {}
     });
   }
 
-  searchProducts(hash: string, productList: any[]): any[] {
-    if (!hash || hash.trim() === '') return productList;
-    return productList.filter(product =>
-      product.name.toLowerCase().includes(hash.toLowerCase())
-    );
+
+
+
+
+
+private groupWithdrawnByRefdate(): void {
+
+  if (!this.withdrawnList?.length) {
+    this.groupedWithdrawnList = [];
+    return;
   }
 
-  onSearch(text: string) {
-    this.searchSubject.next(text);
+  const sorted = [...this.withdrawnList].sort(
+    (a, b) => new Date(a.refdate).getTime() - new Date(b.refdate).getTime()
+  );
+
+  const grouped: any[] = [];
+  let i = 0;
+
+  while (i < sorted.length) {
+
+    const current = sorted[i];
+    const next = sorted[i + 1];
+
+    if (next && current.refdate === next.refdate) {
+
+      const group = {
+        type: 'pair',
+        refdate: current.refdate,
+        items: [current, next]
+      };
+
+      this.calculateDiff(group);
+      grouped.push(group);
+
+      i += 2;
+
+    } else {
+
+      const group = {
+        type: 'single',
+        refdate: current.refdate,
+        items: [current]
+      };
+
+      this.calculateDiff(group);
+      grouped.push(group);
+
+      i += 1;
+
+    }
+
   }
 
-  formatFechaLatam(dateInput: string | Date | number): string {
-    if (!dateInput) return '';
-    const date = new Date(dateInput);
-    const opciones: Intl.DateTimeFormatOptions = {
+  this.groupedWithdrawnList = grouped;
+}
+
+
+
+
+
+
+
+  /*private groupWithdrawnByRefdate(): void {*/
+
+    /*if (!this.withdrawnList?.length) {*/
+      /*this.groupedWithdrawnList = [];*/
+      /*return;*/
+    /*}*/
+
+    /*const sorted = [...this.withdrawnList].sort(*/
+      /*(a, b) => new Date(a.refdate).getTime() - new Date(b.refdate).getTime()*/
+    /*);*/
+
+    /*const grouped: any[] = [];*/
+    /*let i = 0;*/
+
+    /*while (i < sorted.length) {*/
+
+      /*const current = sorted[i];*/
+      /*const next = sorted[i + 1];*/
+
+      /*if (next && current.refdate === next.refdate) {*/
+        /*grouped.push({*/
+          /*type: 'pair',*/
+          /*refdate: current.refdate,*/
+          /*items: [current, next]*/
+        /*});*/
+        /*i += 2;*/
+      /*} else {*/
+        /*grouped.push({*/
+          /*type: 'single',*/
+          /*refdate: current.refdate,*/
+          /*items: [current]*/
+        /*});*/
+        /*i += 1;*/
+      /*}*/
+
+    /*}*/
+
+    /*this.groupedWithdrawnList = grouped;*/
+  /*}*/
+
+
+  trackByGroup(index: number, group: any): string {
+    return group.refdate + '-' + index;
+  }
+
+  /*onSwipeSingle(item: any, slidingItem: IonItemSliding): void {*/
+    /*console.log("swippe item",item)*/
+    /*console.log("swippe sliding item",item)*/
+    /*slidingItem.close();*/
+    /*if (this.ionList) {*/
+      /*this.ionList.closeSlidingItems();*/
+    /*}*/
+  /*}*/
+
+  onSwipeSingle(item: any, slidingItem: IonItemSliding): void {
+
+    console.log("swipe item", item);
+
+    this.withdrawnService.updateStateToErp(item.id)
+      .subscribe({
+        next: (res) => {
+          console.log("Updated OK", res);
+
+          slidingItem.close();
+          if (this.ionList) {
+            this.ionList.closeSlidingItems();
+          }
+
+          // opcional: actualizar localmente
+          item.state = 'erp';
+        },
+        error: (err) => {
+          console.error("Update error", err);
+        }
+      });
+
+  }
+
+  getTotalKg(): number {
+    if (!this.withdrawnList?.length) return 0;
+    return this.withdrawnList.reduce((total, p) => {
+      const kg = Number(p?.data?.kg) || 0;
+      return total + kg;
+    }, 0);
+  }
+
+  onRangeChange(event: any) {
+    this.startDay = event.detail.value.lower;
+    this.endDay = event.detail.value.upper;
+    this.getAll();
+  }
+
+  syncDays() {
+    this.startDay = this.dayRange.lower;
+    this.endDay = this.dayRange.upper;
+  }
+
+  formatDay(day: number): string {
+    const base = new Date('2026-01-01T00:00:00');
+    base.setDate(base.getDate() + (day - 1));
+    return base.toLocaleDateString('es-ES', {
       day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    };
-    const fechaTexto = new Intl.DateTimeFormat('es-ES', opciones).format(date);
-    let horas = date.getHours();
-    const minutos = String(date.getMinutes()).padStart(2, '0');
-    const segundos = String(date.getSeconds()).padStart(2, '0');
-    const ampm = horas >= 12 ? 'PM' : 'AM';
-    horas = horas % 12;
-    if (horas === 0) horas = 12; 
-    const horasTexto = String(horas).padStart(2, '0');
-    return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
+      month: 'short'
+    });
   }
 
+  getTodayDayOfYear(): number {
+    const today = new Date();
+    const start = new Date(today.getFullYear(), 0, 0);
+    const diff =
+      today.getTime() -
+      start.getTime() +
+      (start.getTimezoneOffset() - today.getTimezoneOffset()) * 60 * 1000;
+    return Math.floor(diff / (1000 * 60 * 60 * 24));
+  }
 
   dayOfYearToISO(day: number, endOfDay = false): string {
-    const year = 2026; 
-    const date = new Date(year, 0); 
+    const year = 2026;
+    const date = new Date(year, 0);
     date.setDate(day);
-
     if (endOfDay) {
       date.setHours(23, 59, 59, 999);
     } else {
       date.setHours(0, 0, 0, 0);
     }
-
     return date.toISOString().slice(0, 19);
   }
-
-
-  valor1 = 0;
-  valor2 = 0;
-  valor3 = 0;
-  valor4 = 0;
 
   calcularResultado(): number {
     return (this.valor1 || 0) * (this.valor2 || 0);
@@ -352,58 +325,109 @@ export class GetallPage implements OnInit {
     return (this.valor3 || 0) * (this.valor4 || 0);
   }
 
-
-
   setValor(valor: number) {
-    this.valor1 = valor; 
+    this.valor1 = valor;
+  }
+
+  onTypeChange(event: any) {
+    this.filterType = event?.detail?.value ?? this.filterType;
+  }
+
+  onVendorChange(event: any) {
+    this.filterVendor = event?.detail?.value ?? this.filterVendor;
+  }
+
+  onSearch(text: string) {
+    this.searchSubject.next(text);
+  }
+
+  getCco() {
+    this.ccoService.getAll().subscribe(resp => {
+      this.ccoList = resp;
+    });
+  }
+
+  getShip() {
+    this.shipService.getAll().subscribe(resp => {
+      this.shipList = resp;
+    });
+  }
+
+  getCcoNameById(id: number | null | undefined): string {
+    if (id == null) return 'Sin nombre';
+    const cco = this.ccoList.find(c => Number(c.id) === Number(id));
+    const nombre = cco?.data?.name;
+    return typeof nombre === 'string' && nombre.trim() !== ''
+      ? nombre
+      : 'Sin Nombre';
+  }
+
+
+  getShipNameById(id: number | null | undefined): string {
+    if (id == null) return 'Sin nombre';
+    const ship = this.shipList.find(c => Number(c.id) === Number(id));
+    const nombre = ship?.data?.name;
+    return typeof nombre === 'string' && nombre.trim() !== ''
+      ? nombre
+      : 'Sin Nombre';
+  }
+
+  getCcoColorById(id: number | null | undefined): string {
+    if (id == null) return '#ffffff';
+    const cco = this.ccoList.find(c => Number(c.id) === Number(id));
+    const color = cco?.data?.color;
+    return typeof color === 'string' && color.trim() !== ''
+      ? color
+      : '#ffffff';
+  }
+
+  formatFechaLatam(dateInput: string | Date | number): string {
+    if (!dateInput) return '';
+    const date = new Date(dateInput);
+    const fechaTexto = new Intl.DateTimeFormat('es-ES', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    }).format(date);
+
+    let horas = date.getHours();
+    const minutos = String(date.getMinutes()).padStart(2, '0');
+    const segundos = String(date.getSeconds()).padStart(2, '0');
+    const ampm = horas >= 12 ? 'PM' : 'AM';
+    horas = horas % 12;
+    if (horas === 0) horas = 12;
+    return `${fechaTexto} ${String(horas).padStart(2, '0')}:${minutos}:${segundos} ${ampm}`;
+  }
+
+
+  private calculateDiff(group: any): void {
+    if (group.type === 'pair') {
+      const kg1 = Number(group.items[0]?.data?.kg) || 0;
+      const kg2 = Number(group.items[1]?.data?.kg) || 0;
+      const wnet = Number(group.items[0]?.data?.wnet) || 0;
+      let diff = 0;
+      if (wnet !== 0) {
+        const subtotalKg = kg1 + kg2;
+        diff = subtotalKg - wnet;
+      }
+      group.items[0].diff = diff;
+      group.items[1].diff = diff;
+    } else {
+      const kg = Number(group.items[0]?.data?.kg) || 0;
+      const wnet = Number(group.items[0]?.data?.wnet) || 0;
+      let diff = 0;
+      if (wnet !== 0) {
+        diff = kg - wnet;
+      }
+      group.items[0].diff = diff;
+    }
+
   }
 
 
 
 
 
-selectRow(index: number) {
-  this.selectedIndex = index;  // Guardamos el índice de la fila seleccionada
-  console.log(`Fila seleccionada: ${index}`);  // Imprimimos el índice en la consola
-  
-  // Accedemos a la fila seleccionada usando el índice
-  const selectedItem = this.withdrawnList[index];
-
-  // Verificamos si hay un elemento en esa posición
-  if (selectedItem) {
-    // Imprimimos toda la data de la fila seleccionada
-    console.log('Datos completos de la fila seleccionada:', selectedItem);
-
-    // Aquí puedes imprimir los campos que necesites de la data
-    console.log('Fecha de la fila seleccionada:', selectedItem.data.adate);
-    console.log('Nombre de A:', selectedItem.data.aname);
-    console.log('Nombre de B:', selectedItem.data.bname);
-    console.log('Ticket A:', selectedItem.data.aticket);
-    console.log('Ticket B:', selectedItem.data.bticket);
-    console.log('Plexa Vendor A:', selectedItem.data.avendor);
-    console.log('Plexa Vendor B:', selectedItem.data.bvendor);
-    console.log('Peso A:', selectedItem.data.akg);
-    console.log('Peso B:', selectedItem.data.bkg);
-    console.log('Full:', selectedItem.data.full);
-    console.log('Empty:', selectedItem.data.empty);
-    console.log('Tare:', selectedItem.data.tare);
-
-    // Agrega más campos si es necesario
-  } else {
-    console.error('No se encontró la fila seleccionada.');
-  }
-}
-
-
-
-
-
-  selectedIndex: number | null = null;
-
-
-isSelected(index) {
-    return index <= this.selectedIndex;
-  }
 
 
 }

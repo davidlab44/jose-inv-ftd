@@ -1,0 +1,600 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-searchbar
+      placeholder="Buscar"
+     (ionInput)="onSearch($event.target.value)">
+    </ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar color="light" class="subheader-toolbar">
+    <ion-row>
+      <ion-col size=12     style="text-align:center;"      >
+        <ion-title class="subheader-title">
+          <span style="text-align:center;font-size: x-small;font-weight: 600;" >Reabastecimiento Provigas</span>
+        </ion-title>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+
+
+<ion-content>
+
+  <ion-item class="range-container" lines="none">
+
+    <div class="date-boxes">
+      <div class="date-box">
+        <span class="label">Desde</span>
+        <span class="value">{{ formatDay(startDay) }}</span>
+      </div>
+
+      <div class="date-box">
+        <span class="label">Hasta</span>
+        <span class="value">{{ formatDay(endDay) }}</span>
+      </div>
+    </div>
+
+  </ion-item>
+
+  <ion-item lines="none">
+    <ion-range
+      class="day-range"
+      min="1"
+      max="365"
+      step="1"
+      dualKnobs="true"
+      snaps="true"
+      ticks="true"
+      [(ngModel)]="dayRange"
+      (ionChange)="onRangeChange($event)"
+    >
+    </ion-range>
+  </ion-item>
+
+  <br><br>
+
+  <ion-item lines="none">
+    <div style="display:flex; width:100%; justify-content:center; gap:8px;">
+
+      <!-- Select Tipo -->
+      <ion-select
+        interface="popover"
+        placeholder="Tipo"
+        style="width:50%;"
+        [(ngModel)]="filterType"
+        (ionChange)="onTypeChange($event)"
+      >
+        <ion-select-option
+          *ngFor="let t of types"
+          [value]="t.value"
+        >
+          {{ t.name }}
+        </ion-select-option>
+      </ion-select>
+
+      <!-- Select Vendor -->
+      <ion-select
+        interface="popover"
+        placeholder="Vendor"
+        style="width:50%;"
+        [(ngModel)]="filterVendor"
+        (ionChange)="onVendorChange($event)"
+      >
+        <ion-select-option
+          *ngFor="let v of vendors"
+          [value]="v.value"
+        >
+          {{ v.name }}
+        </ion-select-option>
+      </ion-select>
+
+    </div>
+  </ion-item>
+  <br><br>
+
+
+  <ion-item-divider class="total-divider"></ion-item-divider>
+
+  <ion-item class="total-item highlighted" lines="none">
+    <ion-label class="total-label">
+      <span class="total-title">TOTAL KILOS RETIRADOS</span>
+      <span class="total-value">
+        {{ getTotalKg() | number:'1.0-2' }} kg
+      </span>
+    </ion-label>
+  </ion-item>
+
+
+  <ion-item class="calc-row green-bg button-row" lines="none">
+    <ion-grid>
+      <ion-row class="ion-justify-content-center ion-align-items-center">
+
+        <ion-col size="4" class="btn-col">
+          <ion-button
+            expand="block"
+            size="small"
+            class="green-btn"
+            (click)="setValor(50)">
+            50
+          </ion-button>
+        </ion-col>
+
+        <ion-col size="4" class="btn-col">
+          <ion-button
+            expand="block"
+            size="small"
+            class="green-btn"
+            (click)="setValor(100)">
+            100
+          </ion-button>
+        </ion-col>
+
+        <ion-col size="4" class="btn-col">
+          <ion-button
+            expand="block"
+            size="small"
+            class="green-btn"
+            (click)="setValor(150)">
+            150
+          </ion-button>
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+  </ion-item>
+
+
+
+
+  <br>
+
+  <ion-item class="calc-row green-bg" lines="none">
+    <ion-grid>
+      <ion-row class="ion-align-items-center">
+
+        <ion-col size="4">
+          <div class="compound-input">
+            <span class="compound-tag">KGS</span>
+            <ion-input
+              type="number"
+              [(ngModel)]="valor1"
+              placeholder="0"
+              inputmode="decimal">
+            </ion-input>
+          </div>
+        </ion-col>
+
+        <ion-col size="4">
+          <div class="compound-input">
+            <span class="compound-tag">PRECIO</span>
+            <ion-input
+              type="number"
+              [(ngModel)]="valor2"
+              placeholder="0"
+              inputmode="decimal">
+            </ion-input>
+          </div>
+        </ion-col>
+
+        <ion-col size="4" class="result-col">
+          <span class="result-label">TOTAL</span>
+          <span class="result-value">
+            {{ calcularResultado() | number:'1.0-2' }}
+          </span>
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+  </ion-item>
+
+  <br>
+
+  <ion-item class="calc-row red-bg" lines="none">
+    <ion-grid>
+      <ion-row class="ion-align-items-center">
+
+        <ion-col size="4">
+          <div class="compound-input red-input">
+            <span class="compound-tag red-tag">KGS</span>
+            <ion-input
+              type="number"
+              [(ngModel)]="valor3"
+              placeholder="0"
+              inputmode="decimal">
+            </ion-input>
+          </div>
+        </ion-col>
+
+        <ion-col size="4">
+          <div class="compound-input red-input">
+            <span class="compound-tag red-tag">PRECIO</span>
+            <ion-input
+              type="number"
+              [(ngModel)]="valor4"
+              placeholder="0"
+              inputmode="decimal">
+            </ion-input>
+          </div>
+        </ion-col>
+
+        <ion-col size="4" class="result-col red-result">
+          <span class="result-label">TOTAL</span>
+          <span class="result-value">
+            {{ calcularResultadoImportado() | number:'1.0-2' }}
+          </span>
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+  </ion-item>
+
+  <br>
+
+  <ion-item-divider class="total-divider"></ion-item-divider>
+
+  <br><br>
+  <ion-list>
+    <ion-item style="display:flex; align-items:center;">
+    
+      <ion-label style="font-size: small;">
+        <span style="font-size:xx-small;font-weight:500;">Fecha&nbsp;</span>
+      </ion-label>
+
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;font-weight:500;">Isotanq.&nbsp;</span>
+      </ion-label>
+
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;font-weight:500;">Tkt.&nbsp;</span>
+      </ion-label>
+      <ion-label style="font-size:small;">
+       <span style="font-size:xx-small;font-weight:400;">kg&nbsp;</span>
+      </ion-label>
+
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;font-weight:300;">Vendor&nbsp;</span><br>
+      </ion-label>
+     
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;font-weight:300;">Basc&nbsp;</span><br>
+      </ion-label>
+      
+      <ion-label style="font-size:small;">
+        <span style="font-size:xx-small;font-weight:300;">Dif&nbsp;</span><br>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<ion-list>
+
+    <ng-container *ngFor="let group of groupedWithdrawnList">
+
+      <div class="group-block">
+
+        <!-- ================= SINGLE ================= -->
+
+        <ng-container *ngIf="group.type === 'single'">
+
+          <ion-item-sliding #slidingItem>
+
+            <ion-item class="single-item">
+
+              <ng-container
+                *ngTemplateOutlet="withdrawnRow; context:{ p: group.items[0] }">
+              </ng-container>
+
+            </ion-item>
+
+            <ion-item-options side="start">
+              <ion-item-option
+                color="primary"
+                (click)="onSwipeSingle(group.items[0], slidingItem)">
+                Acción
+              </ion-item-option>
+            </ion-item-options>
+
+          </ion-item-sliding>
+
+        </ng-container>
+
+
+        <!-- ================= PAIR ================= -->
+
+        <ng-container *ngIf="group.type === 'pair'">
+
+          <!-- ITEM A -->
+          <ion-item-sliding #slidingItemA>
+
+            <ion-item class="pair-top">
+
+              <ng-container
+                *ngTemplateOutlet="withdrawnRow; context:{ p: group.items[0] }">
+              </ng-container>
+
+            </ion-item>
+
+            <ion-item-options side="start">
+              <ion-item-option
+                color="primary"
+                (click)="onSwipeSingle(group.items[0], slidingItemA)">
+                Acción
+              </ion-item-option>
+            </ion-item-options>
+
+          </ion-item-sliding>
+
+          <!-- ITEM B -->
+          <ion-item-sliding #slidingItemB>
+
+            <ion-item class="pair-bottom">
+
+              <ng-container
+                *ngTemplateOutlet="withdrawnRow; context:{ p: group.items[1] }">
+              </ng-container>
+
+            </ion-item>
+
+            <ion-item-options side="start">
+              <ion-item-option
+                color="primary"
+                (click)="onSwipeSingle(group.items[1], slidingItemB)">
+                Acción
+              </ion-item-option>
+            </ion-item-options>
+
+          </ion-item-sliding>
+
+        </ng-container>
+
+      </div>
+
+    </ng-container>
+
+  </ion-list>
+
+
+  <!-- ================= TEMPLATE FILA ================= -->
+
+  <ng-template #withdrawnRow let-p="p">
+
+    <div style="display:flex; align-items:center; width:100%;">
+
+      <!-- Fecha -->
+      <ion-label>
+        {{ formatFechaLatam(p.data.date) }}
+      </ion-label>
+
+      <!-- Isotanque con color -->
+      <ion-label
+        [ngStyle]="{ 'background-color': getCcoColorById(p?.data?.name) }"
+        style="border-radius:6px; padding:2px 4px;">
+        {{ getCcoNameById(p?.data?.name) }}
+      </ion-label>
+
+      <!-- Ticket -->
+      <ion-label>
+        {{ p.data.ticket }}
+      </ion-label>
+
+      <!-- kg -->
+      <ion-label>
+        {{ p.data.kg }}
+      </ion-label>
+
+      <!-- Vendor -->
+      <ion-label>
+        <span *ngIf="p.data.vendor==1">Plexa</span>
+        <span *ngIf="p.data.vendor==2">Plexa port</span>
+        <span *ngIf="p.data.vendor==3">Otro</span>
+      </ion-label>
+
+      <!-- Báscula -->
+      <ion-label>
+        {{ p.data.wnet }}
+      </ion-label>
+
+      <!-- Diferencia -->
+      <ion-label
+        [ngClass]="(p.data.kg - p.data.wnet) >= 500 ? 'diff-warning' : 'diff-normal'">
+        {{ p.data.kg - p.data.wnet }}
+      </ion-label>
+
+    </div>
+
+  </ng-template>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <!--<ng-container *ngFor="let group of groupedWithdrawnList">-->
+    <!--[> Si es par <]-->
+    <!--<div *ngIf="group.type === 'pair'">-->
+      <!--<ion-item>-->
+        <!--<ion-label>-->
+          <!--{{ group.items[0].data.ticket }}-->
+        <!--</ion-label>-->
+      <!--</ion-item>-->
+      <!--<ion-item>-->
+        <!--<ion-label>-->
+          <!--{{ group.items[1].data.ticket }}-->
+        <!--</ion-label>-->
+      <!--</ion-item>-->
+    <!--</div>-->
+    <!--[> Si es individual <]-->
+    <!--<div *ngIf="group.type === 'single'">-->
+      <!--<ion-item>-->
+        <!--<ion-label>-->
+          <!--{{ group.items[0].data.ticket }}-->
+        <!--</ion-label>-->
+      <!--</ion-item>-->
+    <!--</div>-->
+  <!--</ng-container>-->
+
+
+  <!--<ion-list>-->
+    <!--<ion-item-sliding-->
+      <!--*ngFor="let p of withdrawnList; let i = index"
+      #slidingItem>-->
+
+      <!--<ion-item>-->
+
+        <!--<ion-label style="font-size: small;">-->
+          <!--<span style="font-size:xx-small;">{{formatFechaLatam(p.data.date)}}&nbsp;</span>-->
+        <!--</ion-label>-->
+
+        <!--<ion-label -->
+          <!--[ngStyle]="{ 'background-color': getCcoColorById(p?.data?.name) }"-->
+          <!--style="font-size:small;" >-->
+          <!--<span>{{ getCcoNameById(p?.data?.name) }}&nbsp;</span>-->
+        <!--</ion-label>-->
+
+        <!--<ion-label style="font-size:small;">-->
+          <!--<span style="font-size:xx-small;" >{{p.data.ticket}}&nbsp;</span>-->
+        <!--</ion-label>-->
+        <!--<ion-label style="font-size:small;">-->
+          <!--<span style="font-size:xx-small;" >{{p.data.kg}}&nbsp;</span><br>-->
+        <!--</ion-label>-->
+        <!--<ion-label style="font-size:small;">-->
+          <!--<span style="font-size:xx-small;" *ngIf="p.data.vendor==1" >Plexa&nbsp;</span><br>-->
+          <!--<span style="font-size:xx-small;" *ngIf="p.data.vendor==2" >Plexa port&nbsp;</span><br>-->
+          <!--<span style="font-size:xx-small;" *ngIf="p.data.vendor==3" >Otro&nbsp;</span><br>-->
+        <!--</ion-label>-->
+        <!--<ion-label style="font-size:small;">-->
+          <!--<span style="font-size:xx-small;">{{p.data.wnet}}&nbsp;</span><br>-->
+        <!--</ion-label>-->
+
+        <!--<ion-label style="font-size:small;">-->
+          <!--<span style="font-size:xx-small;" *ngIf="(p.data.kg-p.data.wnet)<500">-->
+            <!--{{p.data.kg-p.data.wnet}}&nbsp;</span><br>-->
+          
+          <!--<span style="font-size:xx-small;color:red;" -->
+            <!--*ngIf="(p.data.kg-p.data.wnet)>=500">-->
+            <!--{{p.data.kg-p.data.wnet}}&nbsp;</span><br>-->
+        <!--</ion-label>-->
+
+      <!--</ion-item>-->
+
+      <!--[> SOLO SWIPE HACIA LA DERECHA <]-->
+      <!--<ion-item-options side="start">-->
+        <!--<ion-item-option-->
+          <!--color="primary"-->
+          <!--expandable="false"-->
+          <!--(click)="onPartialSwipe(i, slidingItem)">-->
+          <!--Acción-->
+        <!--</ion-item-option>-->
+      <!--</ion-item-options>-->
+
+    <!--</ion-item-sliding>-->
+  <!--</ion-list>-->
+
+
+  <!--<ion-list>-->
+    <!--<ion-item-sliding-->
+      <!--*ngFor="let p of withdrawnList; let i = index"
+      #slidingItem>-->
+
+      <!--<ion-item-->
+        <!--[ngClass]="{'highlight': isSelected(i)}"-->
+        <!--(click)="selectRow(i)"-->
+        <!--style="display:flex; align-items:center;">-->
+
+        <!--<ion-label style="font-size:xx-small;">-->
+          <!--{{formatFechaLatam(p.data.adate)}}-->
+        <!--</ion-label>-->
+
+        <!--<ion-label style="font-size:xx-small;">-->
+          <!--{{p.data.aname}}<br>-->
+          <!--{{p.data.bname}}-->
+        <!--</ion-label>-->
+
+        <!--<ion-label style="font-size:xx-small;">-->
+          <!--{{p.data.aticket}}<br>-->
+          <!--{{p.data.bticket}}-->
+        <!--</ion-label>-->
+
+      <!--</ion-item>-->
+
+      <!--[> SOLO SWIPE HACIA LA DERECHA <]-->
+      <!--<ion-item-options side="start">-->
+        <!--<ion-item-option-->
+          <!--color="primary"-->
+          <!--expandable="false"-->
+          <!--(click)="onPartialSwipe(i, slidingItem)">-->
+          <!--Acción-->
+        <!--</ion-item-option>-->
+      <!--</ion-item-options>-->
+
+    <!--</ion-item-sliding>-->
+  <!--</ion-list>-->
+
+
+
+</ion-content>
+
+

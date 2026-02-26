@@ -3,10 +3,12 @@
     <ion-buttons *ngIf="!showSearchbar" slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
+
     <ion-searchbar
       placeholder="Buscar"
-     (ionInput)="onSearch($event.target.value)">
+      (ionInput)="onSearch($event.target.value)">
     </ion-searchbar>
+
     <ion-buttons slot="end">
       <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
         <span *ngIf="ios">Filter</span>
@@ -19,26 +21,25 @@
 
   <ion-toolbar color="light" class="subheader-toolbar">
     <ion-row>
-      <ion-col size=12     style="text-align:center;"      >
+      <ion-col size="12" style="text-align:center;">
         <ion-title class="subheader-title">
-          <span style="text-align:center;font-size: x-small;font-weight: 600;" >Reabastecimiento Provigas</span>
+          <span style="text-align:center;font-size:x-small;font-weight:600;">
+            Reabastecimiento Provigas
+          </span>
         </ion-title>
       </ion-col>
     </ion-row>
   </ion-toolbar>
 </ion-header>
 
-
 <ion-content>
 
   <ion-item class="range-container" lines="none">
-
     <div class="date-boxes">
       <div class="date-box">
         <span class="label">Desde</span>
         <span class="value">{{ formatDay(startDay) }}</span>
       </div>
-
       <div class="date-box">
         <span class="label">Hasta</span>
         <span class="value">{{ formatDay(endDay) }}</span>
@@ -56,52 +57,43 @@
       snaps="true"
       ticks="true"
       [(ngModel)]="dayRange"
-      (ionChange)="onRangeChange($event)"
-    >
+      (ionChange)="onRangeChange($event)">
     </ion-range>
   </ion-item>
 
   <br><br>
 
   <ion-item lines="none">
-    <div style="display:flex; width:100%; justify-content:center; gap:8px;">
-
-      <!-- Select Tipo -->
+    <div style="display:flex;width:100%;justify-content:center;gap:8px;">
       <ion-select
         interface="popover"
         placeholder="Tipo"
         style="width:50%;"
         [(ngModel)]="filterType"
-        (ionChange)="onTypeChange($event)"
-      >
+        (ionChange)="onTypeChange($event)">
         <ion-select-option
           *ngFor="let t of types"
-          [value]="t.value"
-        >
+          [value]="t.value">
           {{ t.name }}
         </ion-select-option>
       </ion-select>
 
-      <!-- Select Vendor -->
       <ion-select
         interface="popover"
         placeholder="Vendor"
         style="width:50%;"
         [(ngModel)]="filterVendor"
-        (ionChange)="onVendorChange($event)"
-      >
+        (ionChange)="onVendorChange($event)">
         <ion-select-option
           *ngFor="let v of vendors"
-          [value]="v.value"
-        >
+          [value]="v.value">
           {{ v.name }}
         </ion-select-option>
       </ion-select>
-
     </div>
   </ion-item>
-  <br><br>
 
+  <br><br>
 
   <ion-item-divider class="total-divider"></ion-item-divider>
 
@@ -114,208 +106,193 @@
     </ion-label>
   </ion-item>
 
-
-  <ion-item class="calc-row green-bg button-row" lines="none">
-    <ion-grid>
-      <ion-row class="ion-justify-content-center ion-align-items-center">
-
-        <ion-col size="4" class="btn-col">
-          <ion-button
-            expand="block"
-            size="small"
-            class="green-btn"
-            (click)="setValor(50)">
-            50
-          </ion-button>
-        </ion-col>
-
-        <ion-col size="4" class="btn-col">
-          <ion-button
-            expand="block"
-            size="small"
-            class="green-btn"
-            (click)="setValor(100)">
-            100
-          </ion-button>
-        </ion-col>
-
-        <ion-col size="4" class="btn-col">
-          <ion-button
-            expand="block"
-            size="small"
-            class="green-btn"
-            (click)="setValor(150)">
-            150
-          </ion-button>
-        </ion-col>
-
-      </ion-row>
-    </ion-grid>
-  </ion-item>
-
-
-
-
-  <br>
-
-  <ion-item class="calc-row green-bg" lines="none">
-    <ion-grid>
-      <ion-row class="ion-align-items-center">
-
-        <ion-col size="4">
-          <div class="compound-input">
-            <span class="compound-tag">KGS</span>
-            <ion-input
-              type="number"
-              [(ngModel)]="valor1"
-              placeholder="0"
-              inputmode="decimal">
-            </ion-input>
-          </div>
-        </ion-col>
-
-        <ion-col size="4">
-          <div class="compound-input">
-            <span class="compound-tag">PRECIO</span>
-            <ion-input
-              type="number"
-              [(ngModel)]="valor2"
-              placeholder="0"
-              inputmode="decimal">
-            </ion-input>
-          </div>
-        </ion-col>
-
-        <ion-col size="4" class="result-col">
-          <span class="result-label">TOTAL</span>
-          <span class="result-value">
-            {{ calcularResultado() | number:'1.0-2' }}
-          </span>
-        </ion-col>
-
-      </ion-row>
-    </ion-grid>
-  </ion-item>
-
-  <br>
-
-  <ion-item class="calc-row red-bg" lines="none">
-    <ion-grid>
-      <ion-row class="ion-align-items-center">
-
-        <ion-col size="4">
-          <div class="compound-input red-input">
-            <span class="compound-tag red-tag">KGS</span>
-            <ion-input
-              type="number"
-              [(ngModel)]="valor3"
-              placeholder="0"
-              inputmode="decimal">
-            </ion-input>
-          </div>
-        </ion-col>
-
-        <ion-col size="4">
-          <div class="compound-input red-input">
-            <span class="compound-tag red-tag">PRECIO</span>
-            <ion-input
-              type="number"
-              [(ngModel)]="valor4"
-              placeholder="0"
-              inputmode="decimal">
-            </ion-input>
-          </div>
-        </ion-col>
-
-        <ion-col size="4" class="result-col red-result">
-          <span class="result-label">TOTAL</span>
-          <span class="result-value">
-            {{ calcularResultadoImportado() | number:'1.0-2' }}
-          </span>
-        </ion-col>
-
-      </ion-row>
-    </ion-grid>
-  </ion-item>
-
-  <br>
-
-  <ion-item-divider class="total-divider"></ion-item-divider>
-
   <br><br>
+
+
+<!-- ================= HEADER COLUMNAS ================= -->
+
+<ion-grid class="withdrawn-header">
+
+  <ion-row class="ion-align-items-center header-row">
+
+    <ion-col size="2" class="header-col">
+      <ion-label>Fecha</ion-label>
+    </ion-col>
+
+    <ion-col size="2" class="header-col">
+      <ion-label>Isotanq.</ion-label>
+    </ion-col>
+
+    <ion-col size="1" class="header-col">
+      <ion-label>Tkt.</ion-label>
+    </ion-col>
+
+    <ion-col size="1" class="header-col">
+      <ion-label>kg</ion-label>
+    </ion-col>
+
+    <ion-col size="2" class="header-col">
+      <ion-label>Entrg</ion-label>
+    </ion-col>
+
+    <ion-col size="2" class="header-col">
+      <ion-label>Viaje</ion-label>
+    </ion-col>
+
+    <ion-col size="2" class="header-col">
+      <ion-label>Motonave</ion-label>
+    </ion-col>
+
+  </ion-row>
+
+</ion-grid>
+
+
   <ion-list>
-    <ion-item style="display:flex; align-items:center;">
-    
-      <ion-label style="font-size: small;">
-        <span style="font-size:xx-small;font-weight:500;">Fecha&nbsp;</span>
-      </ion-label>
 
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;font-weight:500;">Isotanq.&nbsp;</span>
-      </ion-label>
+    <ng-container
+      *ngFor="let group of groupedWithdrawnList; let i = index; trackBy: trackByGroup">
 
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;font-weight:500;">Tkt.&nbsp;</span>
-      </ion-label>
-      <ion-label style="font-size:small;">
-       <span style="font-size:xx-small;font-weight:400;">kg&nbsp;</span>
-      </ion-label>
+      <ng-container *ngIf="i > 0 && groupedWithdrawnList[i-1].refdate !== group.refdate">
+        <br>
+        <br>
+      </ng-container>
 
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;font-weight:300;">Vendor&nbsp;</span><br>
-      </ion-label>
-     
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;font-weight:300;">Basc&nbsp;</span><br>
-      </ion-label>
+      <div class="group-block">
+
+        <!-- ================= SINGLE ================= -->
+
+        <ng-container *ngIf="group.type === 'single'">
+          <ion-item-sliding #slidingItem>
+
+            <ion-item class="single-item">
+
+              <ng-container
+                *ngTemplateOutlet="withdrawnRow; context:{ p: group.items[0] }">
+              </ng-container>
+
+            </ion-item>
+
+            <ion-item-options side="start">
+              <ion-item-option
+                color="primary"
+                (click)="onSwipeSingle(group.items[0], slidingItem)">
+                Hecho
+              </ion-item-option>
+            </ion-item-options>
+
+          </ion-item-sliding>
+        </ng-container>
+
+
+        <!-- ================= PAIR ================= -->
+
+        <ng-container *ngIf="group.type === 'pair'">
+
+          <!-- ITEM A -->
+          <ion-item-sliding #slidingItemA>
+
+            <ion-item class="pair-top">
+
+              <ng-container
+                *ngTemplateOutlet="withdrawnRow; context:{ p: group.items[0] }">
+              </ng-container>
+
+            </ion-item>
+
+            <ion-item-options side="start">
+              <ion-item-option
+                color="primary"
+                (click)="onSwipeSingle(group.items[0], slidingItemA)">
+                Hecho
+              </ion-item-option>
+            </ion-item-options>
+
+          </ion-item-sliding>
+
+          <!-- ITEM B -->
+          <ion-item-sliding #slidingItemB>
+
+            <ion-item class="pair-bottom">
+
+              <ng-container
+                *ngTemplateOutlet="withdrawnRow; context:{ p: group.items[1] }">
+              </ng-container>
+
+            </ion-item>
+
+            <ion-item-options side="start">
+              <ion-item-option
+                color="primary"
+                (click)="onSwipeSingle(group.items[1], slidingItemB)">
+                Hecho
+              </ion-item-option>
+            </ion-item-options>
+
+          </ion-item-sliding>
+
+        </ng-container>
+
+      </div>
+
+    </ng-container>
+
+  </ion-list>
+
+
+
+  <!-- ================= TEMPLATE FILA ================= -->
+
+  <ng-template #withdrawnRow let-p="p">
+
+    <ion-grid class="withdrawn-grid">
+
+      <!--<ion-row class="withdrawn-row ion-align-items-center">-->
+      <ion-row  class="withdrawn-row ion-align-items-center" [ngClass]="{ 'row-erp': p.state === 'erp' }">
+
+
+        <!-- Fecha -->
+        <ion-col size="2">
+          {{ formatFechaLatam(p.data.date) }}
+        </ion-col>
+
+        <!-- Isotanque -->
+        <ion-col
+          size="2"
+          [ngStyle]="{ 'background-color': getCcoColorById(p?.data?.name) }"
+          class="isotank-col">
+          {{ getCcoNameById(p?.data?.name) }}
+        </ion-col>
+
+        <!-- Ticket -->
+        <ion-col size="1">
+          {{ p.data.ticket }}
+        </ion-col>
+
+        <ion-col size="1">
+          {{ p.data.kg }}
+        </ion-col>
+
+        <ion-col size="2">
+          {{ p.data.deliveryin }}
+        </ion-col>
       
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;font-weight:300;">Dif&nbsp;</span><br>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+        <ion-col size="2">
+          {{ p.data.tripin }}
+        </ion-col>
 
+        <ion-col
+          size="2"
+          [ngStyle]="{ 'background-color': getCcoColorById(p?.data?.name) }"
+          class="isotank-col ship-cell">
+          {{ getShipNameById(p?.data?.shipin) | uppercase }}
+        </ion-col>
 
-  <ion-list>
-    <ion-item *ngFor="let p of withdrawnList; let i = index" 
-      [ngClass]="{'highlight': isSelected(i)}" 
-      (click)="selectRow(i)"  
-      style="display:flex; align-items:center;">
-      <ion-label style="font-size: small;">
-        <span style="font-size:xx-small;">{{formatFechaLatam(p.data.adate)}}&nbsp;</span>
-      </ion-label>
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;" >{{p.data.aname}}&nbsp;</span><br>
-        <span style="font-size:xx-small;" >{{p.data.bname}}&nbsp;</span>
-      </ion-label>
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;" >{{p.data.aticket}}&nbsp;</span><br>
-        <span style="font-size:xx-small;" >{{p.data.bticket}}&nbsp;</span>
-      </ion-label>
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;" >{{p.data.akg}}&nbsp;</span><br>
-        <span style="font-size:xx-small;" >{{p.data.bkg}}&nbsp;</span>
-      </ion-label>
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;" *ngIf="p.data.avendor==1" >Plexa&nbsp;</span><br>
-        <span style="font-size:xx-small;" *ngIf="p.data.avendor==2" >Plexa port&nbsp;</span><br>
-        <span style="font-size:xx-small;" *ngIf="p.data.bvendor==1" >Plexa&nbsp;</span><br>
-        <span style="font-size:xx-small;" *ngIf="p.data.bvendor==2" >Plexa port&nbsp;</span><br>
-      </ion-label>
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;">{{p.data.full}}&nbsp;</span><br>
-      </ion-label>
-      <ion-label style="font-size:small;">
-        <span style="font-size:xx-small;" *ngIf="((p.data.akg+p.data.bkg)-p.data.full)<500">
-          {{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>
-        <span style="font-size:xx-small;color:red;" 
-          *ngIf="((p.data.akg+p.data.bkg)-p.data.full)>=500">
-          {{(p.data.akg+p.data.bkg)-p.data.full}}&nbsp;</span><br>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+      </ion-row>
+
+    </ion-grid>
+
+  </ng-template>
 
 
 </ion-content>
-
-

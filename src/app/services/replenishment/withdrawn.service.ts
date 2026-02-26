@@ -77,6 +77,25 @@ export class WithdrawnService {
     });
   }
 
+
+
+
+  updateStateToErp(id: number): Observable<any> {
+    const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;
+
+    console.log("id peticion", id)
+    return this.http.patch(
+      url,
+      { state: 'erp' },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        }
+      }
+    );
+  }
+
 }
 
 

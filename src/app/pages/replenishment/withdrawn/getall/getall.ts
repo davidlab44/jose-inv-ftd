@@ -114,7 +114,8 @@ export class GetallPage implements OnInit {
 
     this.withdrawnService.getIntervalByAdate(since, until).subscribe({
       next: response => {
-        this.withdrawnList = response.reverse();
+        this.withdrawnList = response;
+        console.log("withdrawnList response",this.withdrawnList)
         this.groupWithdrawnByRefdate();
       }
     });
@@ -224,21 +225,41 @@ private groupWithdrawnByRefdate(): void {
   /*}*/
 
 
-
-
-
-
-
-
   trackByGroup(index: number, group: any): string {
     return group.refdate + '-' + index;
   }
 
+  /*onSwipeSingle(item: any, slidingItem: IonItemSliding): void {*/
+    /*console.log("swippe item",item)*/
+    /*console.log("swippe sliding item",item)*/
+    /*slidingItem.close();*/
+    /*if (this.ionList) {*/
+      /*this.ionList.closeSlidingItems();*/
+    /*}*/
+  /*}*/
+
   onSwipeSingle(item: any, slidingItem: IonItemSliding): void {
-    slidingItem.close();
-    if (this.ionList) {
-      this.ionList.closeSlidingItems();
-    }
+
+    console.log("swipe item", item);
+
+    this.withdrawnService.updateStateToErp(item.id)
+      .subscribe({
+        next: (res) => {
+          console.log("Updated OK", res);
+
+          slidingItem.close();
+          if (this.ionList) {
+            this.ionList.closeSlidingItems();
+          }
+
+          // opcional: actualizar localmente
+          item.state = 'erp';
+        },
+        error: (err) => {
+          console.error("Update error", err);
+        }
+      });
+
   }
 
   getTotalKg(): number {

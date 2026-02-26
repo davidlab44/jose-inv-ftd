@@ -148,26 +148,6 @@
 </ion-grid>
 
 
-
-  <!--<ion-list>-->
-    <!--<ion-item class="header-row">-->
-      <!--<ion-label>Fecha</ion-label>-->
-      <!--<ion-label>Isotanq.</ion-label>-->
-      <!--<ion-label>Tkt.</ion-label>-->
-      <!--<ion-label>kg</ion-label>-->
-      <!--<ion-label>Vendor</ion-label>-->
-      <!--<ion-label>Basc</ion-label>-->
-      <!--<ion-label>Dif</ion-label>-->
-    <!--</ion-item>-->
-  <!--</ion-list>-->
-
-
-
-
-
-
-
-
   <ion-list>
 
     <ng-container
@@ -245,7 +225,7 @@
               <ion-item-option
                 color="primary"
                 (click)="onSwipeSingle(group.items[1], slidingItemB)">
-                Acción
+                Hecho
               </ion-item-option>
             </ion-item-options>
 
@@ -267,7 +247,9 @@
 
     <ion-grid class="withdrawn-grid">
 
-      <ion-row class="withdrawn-row ion-align-items-center">
+      <!--<ion-row class="withdrawn-row ion-align-items-center">-->
+      <ion-row  class="withdrawn-row ion-align-items-center" [ngClass]="{ 'row-erp': p.state === 'erp' }">
+
 
         <!-- Fecha -->
         <ion-col size="2">
