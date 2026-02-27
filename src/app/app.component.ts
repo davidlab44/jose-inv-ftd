@@ -149,7 +149,7 @@ export class AppComponent implements OnInit {
      {
        title: 'Salieron',
        url: '/app/tabs/logistic-logistic-getall-out',
-       icon: 'boat'
+       icon: 'basket'
      },
      {
        title: 'Reabastecimiento',
