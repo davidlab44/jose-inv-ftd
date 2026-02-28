@@ -137,6 +137,12 @@ export class AppComponent implements OnInit {
        icon: 'add-circle'
      },
      {
+       title: 'AI gen',
+       url: '/app/tabs/replenishment-ai-post',
+       icon: 'add-circle'
+     },
+
+     {
        title: 'Kilos retirados',
        url: '/app/tabs/replenishment-withdrawn-getall',
        icon: 'checkbox'

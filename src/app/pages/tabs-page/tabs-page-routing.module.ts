@@ -246,6 +246,18 @@ const routes: Routes = [
           }
         ]
       },
+     
+      {
+        path: 'replenishment-ai-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/ai/post/post.module').then(m => m.PostModule)
+          }
+        ]
+      },
+
+
       {
         path: '',
         redirectTo: '/app/tabs/schedule',
