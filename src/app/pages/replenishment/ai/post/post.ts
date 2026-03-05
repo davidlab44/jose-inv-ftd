@@ -25,6 +25,7 @@ import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
 import { ReplenishmentService } from '../../../../services/replenishment/replenishment.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PhotoService } from '../../../../services/asset/photo.service';
 
 
 @Component({
@@ -54,36 +55,9 @@ export class PostPage {
   todayDate:any;
   form!: FormGroup;
   replenishmentList: any[] = [];
-
-
-   columns = [
-      { header: 'Fecha V', field: 'fecha_v' },
-      { header: 'Cont vacío', field: 'cont_vacio' },
-      { header: 'Rem vacío', field: 'rem_vacio' },
-      { header: 'Fe ing M', field: 'fe_ing_m' },
-      { header: 'Rem M LL', field: 'rem_m_ll' },
-      { header: 'Sur', field: 'sur' },
-      { header: 'Nort', field: 'nort' },
-      { header: 'Fecha', field: 'fecha' },
-      { header: 'Ticket', field: 'ticket' },
-      { header: 'PSI', field: 'psi' },
-      { header: 'OPC', field: 'opc' },
-      { header: 'IMPO', field: 'impo' },
-      { header: 'P Total', field: 'p_total' },
-      { header: 'Rotogate', field: 'rotogate' },
-      { header: 'P Vacío B', field: 'p_vacio_b' },
-      { header: 'Peso lleno B', field: 'peso_lleno_b' },
-      { header: 'P Neto', field: 'p_neto' },
-      { header: 'Dif', field: 'dif' },
-      { header: 'Precio P', field: 'precio_p' },
-      { header: 'Fecha F', field: 'fecha_f' },
-      { header: 'Factura', field: 'factura' },
-      { header: 'Valor Fact', field: 'valor_fact' },
-      { header: 'Sello1', field: 'sello1' },
-      { header: 'Sello2', field: 'sello2' },
-      { header: 'Sello3', field: 'sello3' },
-    ];
-
+  uploadProgress = 0;
+  uploadedUrl: string | null = null;
+  uploading = false;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -110,65 +84,58 @@ export class PostPage {
     private userService: UserService,
     private fb: FormBuilder ,
     private replenishmentService : ReplenishmentService,
+    private photoService: PhotoService
   ) {}
-
-  /*printSelectedBarcodes(p: Product) {*/
-    /*const paddedId = p.id.toString().padStart(6, '0');*/
-    /*const selectedBarcodes = [paddedId];*/
-    /*this.barcodeService.printIn50mmPortablePrinterBt(selectedBarcodes);*/
-  /*}*/
 
   hash:string='';
   table:any
   rexDocument:any;
 
   ngOnInit() {
+    this.loadCategories();
+    this.loadUms();
     this.form = this.fb.group({
-      fecha_v: [''],
-      cont_vacio: [''],
-      rem_vacio: [''],
-      fe_ing_m: [''],
-      rem_m_ll: [''],
-      sur: [''],
-      nort: [''],
-      fecha: [''],
-      ticket: [''],
-      psi: [0],
-      opc: [0],
-      impo: [0],
-      p_total: [0],
-      rotogate: [0],
-      p_vacio_b: [0],
-      peso_lleno_b: [0],
-      p_neto: [0],
-      dif: [0],
-      precio_p: [0],
-      fecha_f: [''],
-      factura: [''],
-      valor_fact: [0],
-      sello1: [''],
-      sello2: [''],
-      sello3: ['']
+      category: [0],
+      name: [''],
+      bop: [''],
+      barcode: [0],
+      qty: [0],
+      um: [0],
+      target: [0],
+      reorder: [0],
+      minimum: [0],
     });
     const ahora = new Date();
     this.todayDate=this.formatFechaLatam(ahora);
-    this.getAll();
+    this.displayLast();
   }
-
-  getAll(){
-    this.replenishmentService.getAll().subscribe((data: any[]) => {
-      this.replenishmentList = data;
+ 
+  lastAsset:any;
+  displayLast() {
+    this.productService.getAll().subscribe({
+      next: (response) => {
+        this.lastAsset = response.reduce((max, item) =>
+          item.id > max.id ? item : max
+        );
+      }
     });
   }
 
   guardar() {
     const data: any = this.form.value;
-    console.log('ReplenishmentData =>', data);
-    this.replenishmentService.postReplenishment(data).subscribe({
-      next: response=>{
-        console.log("replenishment post response",response)
+    data.categ = [data.category];
+    data.img = this.uploadedUrl; 
+    delete data.category;
+    console.log('Product to post =>', data);
+    this.productService.post(data).subscribe({
+      next: (response) => {
+        console.log("product post response", response);
+        if(response && response.length>0){
+          this.utilService.presentToast(response.toString())
+          this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });    
+        }
       }
-    })
+    });
   }
 
   slideOpts = {
@@ -227,6 +194,93 @@ export class PostPage {
     const horasTexto = String(horas).padStart(2, '0');
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
+
+  categories: any[] = [];    
+  loadCategories() { 
+      this.categoryService.getAllCategories().subscribe({ 
+        next: (res) => {       
+          this.categories = res;          
+          this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
+        }, 
+        error: (err) => {      
+          console.error('❌ Error al cargar categorías:', err); 
+          this.categories = this.categoryService.getCategoriesFromLocal(); 
+        } 
+      }); 
+   }   
+       
+   ums: any[] = []; 
+   loadUms() {                
+     this.umService.getAllUms().subscribe({ 
+        next: (res) => {       
+          console.log('✅ Ums:', res);    
+          this.ums = res; 
+          this.umService.saveUmsToLocal(res); 
+        }, 
+        error: (err) => {      
+          console.error('❌ Error al cargar categorías:', err); 
+          this.ums = this.umService.getUmsFromLocal(); 
+        } 
+      }); 
+   }     
+
+  async takePhotoAndUpload(albaranCode:number) {
+    console.log("Albaran code",albaranCode)
+    this.uploading = true;
+    this.uploadProgress = 0;
+    this.uploadedUrl = null;
+
+    const base64Image = await this.photoService.takePicture();
+
+    if (!base64Image) {
+      this.uploading = false;
+      console.error('No se pudo obtener la imagen');
+      return;
+    }
+
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
+
+    progress$.subscribe({
+      next: (p) => this.uploadProgress = p,
+      error: (err) => {
+        console.error('Error subiendo imagen', err);
+        this.uploading = false;
+      }
+    });
+
+    url$.subscribe({
+      next: (url) => {
+        this.uploadedUrl = url;
+      },
+      complete: () => this.uploading = false
+    });
+  }
+
+  async pickImageAndUpload() {
+    this.uploading = true;
+    this.uploadProgress = 0;
+    this.uploadedUrl = null;
+
+    const base64Image = await this.photoService.pickImage();
+
+    if (!base64Image) {
+      this.uploading = false;
+      return;
+    }
+
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
+
+    progress$.subscribe(p => this.uploadProgress = p);
+    url$.subscribe(url => {
+      this.uploadedUrl = url;
+      this.uploading = false;
+    });
+  }
+
+
+
+
+
 
 }
 

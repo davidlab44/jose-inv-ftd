@@ -106,7 +106,12 @@ export class AppComponent implements OnInit {
        url: '/app/tabs/readprd',       
        icon: 'cube'
      },
-    {
+     {
+       title: 'Reabastecimiento',
+       url: '/app/tabs/asset-supply-reorder',
+       icon: 'layers'
+     },
+     {
        title: 'Entrada',
        url: '/app/tabs/kitchen',
        icon: 'arrow-down'
@@ -124,7 +129,7 @@ export class AppComponent implements OnInit {
      {
        title: 'Glp precio',
        url: '/app/tabs/glpprices',
-       icon: 'add-circle'
+       icon: 'cash'
      },
      {
        title: 'Registrar producto',
@@ -134,12 +139,12 @@ export class AppComponent implements OnInit {
      {
        title: 'Registrar retiro',
        url: '/app/tabs/replenishment-withdrawn-post',
-       icon: 'add-circle'
+       icon: 'scale'
      },
      {
-       title: 'AI gen',
+       title: 'AI reg. retiro',
        url: '/app/tabs/replenishment-ai-post',
-       icon: 'add-circle'
+       icon: 'hardware-chip'
      },
 
      {
@@ -156,11 +161,6 @@ export class AppComponent implements OnInit {
        title: 'Salieron',
        url: '/app/tabs/logistic-logistic-getall-out',
        icon: 'basket'
-     },
-     {
-       title: 'Reabastecimiento',
-       url: '/app/tabs/asset-supply-reorder',
-       icon: 'layers'
      },
    ];
 
