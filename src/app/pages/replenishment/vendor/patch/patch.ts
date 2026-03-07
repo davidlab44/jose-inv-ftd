@@ -26,6 +26,7 @@ import { UserService } from '../../../../services/user.service';
 import { ReplenishmentService } from '../../../../services/replenishment/replenishment.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PhotoService } from '../../../../services/asset/photo.service';
+import { OcrService } from '../../../../services/ai/ocr.service';
 
 @Component({
   selector: 'page-patch',
@@ -83,7 +84,7 @@ export class PatchPage {
     private userService: UserService,
     private fb: FormBuilder ,
     private photoService: PhotoService,
-    private replenishmentService : ReplenishmentService,
+    private ocrService : OcrService,
   ) {
     const item = this.router.getCurrentNavigation()?.extras.state?.item;
     console.log("Item recibido:", item);
@@ -237,7 +238,12 @@ export class PatchPage {
   uploadedUrl: string | null = null;
   uploading = false;
 
+
+
+
+
   async takePhotoAndUpload() {
+
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
@@ -262,14 +268,87 @@ export class PatchPage {
 
     url$.subscribe({
       next: (url) => {
+
         this.uploadedUrl = url;
+
+        // 👇 aquí llamas el OCR
+        this.launchOcr(url);
+
       },
-      complete: () => this.uploading = false
+      error: (err) => {
+        console.error('Error obteniendo URL', err);
+      },
+      complete: () => {
+        this.uploading = false;
+      }
     });
+
   }
 
 
+
+
+
+
+
+  /*async takePhotoAndUpload() {*/
+    /*this.uploading = true;*/
+    /*this.uploadProgress = 0;*/
+    /*this.uploadedUrl = null;*/
+
+    /*const base64Image = await this.photoService.takePicture();*/
+
+    /*if (!base64Image) {*/
+      /*this.uploading = false;*/
+      /*console.error('No se pudo obtener la imagen');*/
+      /*return;*/
+    /*}*/
+
+    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);*/
+
+    /*progress$.subscribe({*/
+      /*next: (p) => this.uploadProgress = p,*/
+      /*error: (err) => {*/
+        /*console.error('Error subiendo imagen', err);*/
+        /*this.uploading = false;*/
+      /*}*/
+    /*});*/
+
+    /*url$.subscribe({*/
+      /*next: (url) => {*/
+        /*this.uploadedUrl = url;*/
+      /*},*/
+      /*complete: () => this.uploading = false*/
+    /*});*/
+  /*}*/
+
+
+  /*async pickImageAndUpload() {*/
+    /*this.uploading = true;*/
+    /*this.uploadProgress = 0;*/
+    /*this.uploadedUrl = null;*/
+
+    /*const base64Image = await this.photoService.pickImage();*/
+
+    /*if (!base64Image) {*/
+      /*this.uploading = false;*/
+      /*return;*/
+    /*}*/
+
+    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);*/
+
+    /*progress$.subscribe(p => this.uploadProgress = p);*/
+    /*url$.subscribe(url => {*/
+      /*this.uploadedUrl = url;*/
+      /*this.uploading = false;*/
+    /*});*/
+  /*}*/
+
+
+
+
   async pickImageAndUpload() {
+
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
@@ -284,15 +363,41 @@ export class PatchPage {
     const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
 
     progress$.subscribe(p => this.uploadProgress = p);
-    url$.subscribe(url => {
-      this.uploadedUrl = url;
-      this.uploading = false;
+
+    url$.subscribe({
+      next: (url) => {
+
+        this.uploadedUrl = url;
+
+        // 👇 lanzar OCR cuando la URL esté disponible
+        this.launchOcr(url);
+
+      },
+      error: (err) => {
+        console.error('Error upload', err);
+        this.uploading = false;
+      },
+      complete: () => {
+        this.uploading = false;
+      }
     });
+
   }
 
 
+
+  ocrResponse:any;
   launchOcr(url:string){
-    
+    this.ocrService.uploadFromUrl(url).subscribe({
+      next: (res) => {
+        this.ocrResponse=res;
+        console.log('OCR Response:', res);
+      },
+      error: (err) => {
+        console.error('Error OCR:', err);
+      }
+    })
+    ;
   }
 
 }

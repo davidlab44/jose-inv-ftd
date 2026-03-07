@@ -6,7 +6,11 @@
 export const environment = {
   production: false,
   apiHost: 'https://invapi.chrisantemogourmet.com',
+  //ocrUrl: 'http://10.100.100.3:8000',
+  ocrUrl: 'https://ocr.inbemetal.com',
   //apiHost: '/jsonrpc',
+  //
+  //
   db:"na",
   i:38,
   p:"tumae"
