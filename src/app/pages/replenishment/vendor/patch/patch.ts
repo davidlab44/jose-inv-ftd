@@ -93,18 +93,15 @@ export class PatchPage {
 
 
 
-
-
-
   ngOnInit() {
     this.form = this.fb.group({
       id: [this.movement?.id ?? null],
       fecha: [this.movement?.data.date ?? ''],
       name: [this.movement?.data.name ?? ''],
       ticket: [this.movement?.data.ticket ?? ''],
-      /*sello1: [this.movement?.data.sail[0] ?? ''],*/
-      /*sello2: [this.movement?.data.sail[1] ?? ''],*/
-      /*sello3: [this.movement?.data.sail[2] ?? ''],*/
+      sello1: [this.movement?.data.seal[0] ?? ''],
+      sello2: [this.movement?.data.seal[1] ?? ''],
+      sello3: [this.movement?.data.seal[2] ?? ''],
       kg: [this.movement?.data?.kg ?? ''],
       rotogate: [this.movement?.data?.rotogate ?? 0], 
       psi: [this.movement?.data?.psi ?? 0], 
@@ -119,9 +116,9 @@ export class PatchPage {
       fecha: [this.movement?.data.date ?? ''],
       name: [this.movement?.data.name ?? ''],
       ticket: [this.movement?.data.ticket ?? ''],
-      /*sello1: [this.movement?.data.sail[0] ?? ''],*/
-      /*sello2: [this.movement?.data.sail[1] ?? ''],*/
-      /*sello3: [this.movement?.data.sail[2] ?? ''],*/
+      sello1: [this.movement?.data.seal[0] ?? ''],
+      sello2: [this.movement?.data.seal[1] ?? ''],
+      sello3: [this.movement?.data.seal[2] ?? ''],
       kg: [this.movement?.data?.kg ?? ''],
       rotogate: [this.movement?.data?.rotogate ?? 0], 
       psi: [this.movement?.data?.psi ?? 0], 
@@ -129,24 +126,6 @@ export class PatchPage {
  
   }
 
-
-  /*ionViewWillEnter() {               */
-    /*this.loadCategories();   */
-    /*this.loadUms();          */
-    /*this.form = this.fb.group({*/
-      /*id: [this.assetSupplyProduct?.id ?? null],*/
-      /*categ: [this.assetSupplyProduct?.data?.categ?.[0] ?? null],*/
-      /*name: [this.assetSupplyProduct?.data?.name ?? ''],*/
-      /*bop: [this.assetSupplyProduct?.data?.bop ?? ''],  // ← aquí controlado*/
-      /*barcode: [this.assetSupplyProduct?.data?.barcode ?? ''],*/
-      /*qty: [this.assetSupplyProduct?.data?.qty ?? 0],*/
-      /*um: [this.assetSupplyProduct?.data?.um ?? null],*/
-      /*target: [this.assetSupplyProduct?.data?.target ?? 0],*/
-      /*reorder: [this.assetSupplyProduct?.data?.reorder ?? 0],*/
-      /*minimum: [this.assetSupplyProduct?.data?.minimum ?? 0],*/
-    /*});*/
-    /*console.log("Formulario inicializado ionviewwillenter:", this.form.value);*/
-  /*}*/
 
   patch() {
     const payload = this.form.value;
@@ -174,8 +153,8 @@ export class PatchPage {
         console.log("PATCH OK:", r);
         this.utilService.presentToast("cant: "+r[0].data.qty+" "+r[0].data.name)
         this.resetForm();
-       this.utilService.presentToast('resetForm')
-       this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });
+        this.utilService.presentToast('resetForm')
+        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });
       },
       error: (e) => console.error("PATCH ERROR:", e),
     });
@@ -253,74 +232,10 @@ export class PatchPage {
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
-  private buildDefaultAssetSpupplyProduct(item: any) {
-    const template = {
-      id: null,
-      ext_id: null,
-      created_at: null,
-      updated_at: null,
-      data: {
-       categ:[],
-        name: "",
-        bop: "",
-        barcode: 0,
-        qty: 0,
-        um: 0,
-      }
-    };
-    return {
-      ...template,
-      ...item,
-      data: {
-        ...template.data,
-        ...(item?.data ?? {})
-      }
-    };
-  }
-
-
-   categories: any[] = [];    
-   loadCategories() { 
-      this.categoryService.getAllCategories().subscribe({ 
-        next: (res) => {       
-          this.categories = res;          
-          this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.categories = this.categoryService.getCategoriesFromLocal(); 
-        } 
-      }); 
-    }   
-        
-    ums: any[] = []; 
-    loadUms() {                
-      this.umService.getAllUms().subscribe({ 
-        next: (res) => {       
-          console.log('✅ Ums:', res);    
-          this.ums = res; 
-          this.umService.saveUmsToLocal(res); 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.ums = this.umService.getUmsFromLocal(); 
-        } 
-      }); 
-    }     
-
-
-
-
-
-
 
   uploadProgress = 0;
   uploadedUrl: string | null = null;
   uploading = false;
-
-
-
-
 
   async takePhotoAndUpload() {
     this.uploading = true;
@@ -354,9 +269,6 @@ export class PatchPage {
   }
 
 
-
-
-
   async pickImageAndUpload() {
     this.uploading = true;
     this.uploadProgress = 0;
@@ -379,26 +291,9 @@ export class PatchPage {
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  launchOcr(url:string){
+    
+  }
 
 }
 
