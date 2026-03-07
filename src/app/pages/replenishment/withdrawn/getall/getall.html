@@ -18,22 +18,9 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
-
-  <!--<ion-toolbar color="light" class="subheader-toolbar">-->
-    <!--<ion-row>-->
-      <!--<ion-col size="12" style="text-align:center;">-->
-        <!--<ion-title class="subheader-title">-->
-          <!--<span style="text-align:center;font-size:x-small;font-weight:600;">-->
-            <!--Reabastecimiento Provigas-->
-          <!--</span>-->
-        <!--</ion-title>-->
-      <!--</ion-col>-->
-    <!--</ion-row>-->
-  <!--</ion-toolbar>-->
 </ion-header>
 
 <ion-content>
-
   <ion-item class="range-container" lines="none">
     <div class="date-boxes">
       <div class="date-box">
@@ -109,6 +96,10 @@
   <br><br>
 
 
+
+
+
+
 <!-- ================= HEADER COLUMNAS ================= -->
 
 <ion-grid class="withdrawn-header">
@@ -131,7 +122,7 @@
       <ion-label>kg</ion-label>
     </ion-col>
 
-    <ion-col size="2" class="header-col">
+    <ion-col size="1" class="header-col">
       <ion-label>Vendor</ion-label>
     </ion-col>
 
@@ -139,8 +130,12 @@
       <ion-label>Basc</ion-label>
     </ion-col>
 
-    <ion-col size="2" class="header-col">
+    <ion-col size="1" class="header-col">
       <ion-label>Dif</ion-label>
+    </ion-col>
+
+    <ion-col size="2" class="header-col">
+      <ion-label></ion-label>
     </ion-col>
 
   </ion-row>
@@ -148,156 +143,188 @@
 </ion-grid>
 
 
+<ion-list>
+
+  <ng-container
+    *ngFor="let group of groupedWithdrawnList; let i = index; yGroup">
+
+    <br>
+    <br>
+
+    <div class="group-block">
+
+      <!-- ================= ITEM 1 ================= -->
+
+      <ion-item-sliding>
+
+        <ion-item class="single-item">
+
+          <ng-container
+            *ngTemplateOutlet="withdrawnRow; context:{ p: group.items[0] }">
+          </ng-container>
+
+        </ion-item>
+
+        <ion-item-options side="start">
+
+          <ion-item-option
+            color="primary"
+            (click)="onSwipeSingle(group.items[0], slidingItem)">
+            Hecho
+
+          </ion-item-option>
+
+        </ion-item-options>
+
+      </ion-item-sliding>
+
+
+      <!-- ================= ITEM 2 ================= -->
+
+      <ion-item-sliding>
+
+        <ion-item>
+        </ion-item>
+
+        <ion-item-options side="start">
+
+          <ion-item-option
+            color="primary"
+            (click)="onSwipeSingle(group.items[1], slidingItemB)">
+            Hecho
+          </ion-item-option>
+
+        </ion-item-options>
+
+      </ion-item-sliding>
+
+    </div>
+
+  </ng-container>
+
+
+  <!-- ================= BOTON NUEVO ================= -->
+
   <ion-list>
 
-    <ng-container
-      *ngFor="let group of groupedWithdrawnList; let i = index; trackBy: trackByGroup">
+    <ion-item lines="none">
 
-      <ng-container *ngIf="i > 0 && groupedWithdrawnList[i-1].refdate !== group.refdate">
-        <br>
-        <br>
-      </ng-container>
+      <ion-button
+        color="primary"
+        slot="end"
+        (click)="plexaUploader(); $event.stopPropagation()">
 
-      <div class="group-block">
+        <ion-icon name="add-outline"></ion-icon>
 
-        <!-- ================= SINGLE ================= -->
+      </ion-button>
 
-        <ng-container *ngIf="group.type === 'single'">
-          <ion-item-sliding #slidingItem>
+      &nbsp;&nbsp;
 
-            <ion-item class="single-item">
-
-              <ng-container
-                *ngTemplateOutlet="withdrawnRow; context:{ p: group.items[0] }">
-              </ng-container>
-
-            </ion-item>
-
-            <ion-item-options side="start">
-              <ion-item-option
-                color="primary"
-                (click)="onSwipeSingle(group.items[0], slidingItem)">
-                Hecho
-              </ion-item-option>
-            </ion-item-options>
-
-          </ion-item-sliding>
-        </ng-container>
-
-
-        <!-- ================= PAIR ================= -->
-
-        <ng-container *ngIf="group.type === 'pair'">
-
-          <!-- ITEM A -->
-          <ion-item-sliding #slidingItemA>
-
-            <ion-item class="pair-top">
-
-              <ng-container
-                *ngTemplateOutlet="withdrawnRow; context:{ p: group.items[0] }">
-              </ng-container>
-
-            </ion-item>
-
-            <ion-item-options side="start">
-              <ion-item-option
-                color="primary"
-                (click)="onSwipeSingle(group.items[0], slidingItemA)">
-                Hecho
-              </ion-item-option>
-            </ion-item-options>
-
-          </ion-item-sliding>
-
-          <!-- ITEM B -->
-          <ion-item-sliding #slidingItemB>
-
-            <ion-item class="pair-bottom">
-
-              <ng-container
-                *ngTemplateOutlet="withdrawnRow; context:{ p: group.items[1] }">
-              </ng-container>
-
-            </ion-item>
-
-            <ion-item-options side="start">
-              <ion-item-option
-                color="primary"
-                (click)="onSwipeSingle(group.items[1], slidingItemB)">
-                Hecho
-              </ion-item-option>
-            </ion-item-options>
-
-          </ion-item-sliding>
-
-        </ng-container>
-
-      </div>
-
-    </ng-container>
+    </ion-item>
 
   </ion-list>
 
+</ion-list>
 
 
-  <!-- ================= TEMPLATE FILA ================= -->
+<!-- ================= TEMPLATE ROW ================= -->
 
-  <ng-template #withdrawnRow let-p="p">
+<ng-template #withdrawnRow let-p="p">
 
-    <ion-grid class="withdrawn-grid">
+  <ion-grid class="withdrawn-grid">
 
-      <!--<ion-row class="withdrawn-row ion-align-items-center">-->
-      <ion-row  class="withdrawn-row ion-align-items-center" [ngClass]="{ 'row-erp': p.state === 'erp' }">
-
-
-        <!-- Fecha -->
-        <ion-col size="2">
-          {{ formatFechaLatam(p.data.date) }}
-        </ion-col>
-
-        <!-- Isotanque -->
-        <ion-col
-          size="2"
-          [ngStyle]="{ 'background-color': getCcoColorById(p?.data?.name) }"
-          class="isotank-col">
-          {{ getCcoNameById(p?.data?.name) }}
-        </ion-col>
-
-        <!-- Ticket -->
-        <ion-col size="1">
-          {{ p.data.ticket }}
-        </ion-col>
-
-        <!-- KG -->
-        <ion-col size="1">
-          {{ p.data.kg }}
-        </ion-col>
-
-        <!-- Vendor -->
-        <ion-col size="2">
-          <span *ngIf="p.data.vendor==1">Plexa</span>
-          <span *ngIf="p.data.vendor==2">Plexa port</span>
-          <span *ngIf="p.data.vendor==3">Otro</span>
-        </ion-col>
-
-        <!-- Báscula -->
-        <ion-col size="2">
-          {{ p.data.wnet }}
-        </ion-col>
-
-        <ion-col
-          size="2"
-          [ngClass]="p.diff >= 500 ? 'diff-warning' : 'diff-normal'">
-          {{ p.diff }}
-        </ion-col>
-
-      </ion-row>
-
-    </ion-grid>
-
-  </ng-template>
+    <ion-row
+      class="withdrawn-row ion-align-items-center"
+      [ngClass]="{ 'row-erp': p.state === 'erp' }">
 
 
+      <!-- FECHA -->
 
-</ion-content>
+      <ion-col size="2">
+        F: {{ formatFechaLatam(p.data.date) }}
+      </ion-col>
+
+
+      <!-- ISOTANQUE -->
+
+      <ion-col
+        size="2"
+        [ngStyle]="{ 'background-color': getCcoColorById(p?.data?.name) }"
+        class="isotank-col">
+
+        {{ getCcoNameById(p?.data?.name) }}
+
+      </ion-col>
+
+      <!-- TICKET -->
+      <ion-col size="1">
+        {{ p.data.ticket }}
+      </ion-col>
+
+      <!-- KG -->
+      <ion-col size="1">
+        {{ p.data.kg }}
+      </ion-col>
+
+      <!-- VENDOR -->
+      <ion-col size="1">
+        <span *ngIf="p.data.vendor==1">Plexa</span>
+        <span *ngIf="p.data.vendor==2">Plexa port</span>
+        <span *ngIf="p.data.vendor==3">Otro</span>
+      </ion-col>
+
+      <!-- BASCULA -->
+      <ion-col size="2">
+        {{ p.data.wnet }}
+      </ion-col>
+
+      <!-- DIF -->
+      <ion-col
+        size="1"
+        [ngClass]="p.diff >= 500 ? 'diff-warning' : 'diff-normal'">
+        {{ p.diff }}
+      </ion-col>
+
+
+      <ion-col size="2" class="actions-col">
+        <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Plexa"
+          (click)="patcho(p); $event.stopPropagation()">
+          <ion-icon name="logo-amplify"></ion-icon>
+        </ion-button>
+      <!--  <ion-button-->
+          <!--fill="clear"-->
+          <!--size="small"-->
+          <!--class="btn-compact"-->
+          <!--title="Báscula"-->
+          <!--(click)="openUploader('basc'); $event.stopPropagation()">-->
+          <!--<ion-icon name="scale-outline"></ion-icon>-->
+        <!--</ion-button>-->
+        <!--<ion-button-->
+          <!--fill="clear"-->
+          <!--size="small"-->
+          <!--class="btn-compact"-->
+          <!--title="Viajes | Llegadas"-->
+          <!--(click)="openUploader('in'); $event.stopPropagation()">-->
+          <!--<ion-icon name="boat-outline"></ion-icon>-->
+        <!--</ion-button>-->
+        <!--<ion-button-->
+          <!--fill="clear"-->
+          <!--size="default"-->
+          <!--class="btn-compact"-->
+          <!--title="Viajes | Salidas"-->
+          <!--(click)="openUploader('out'); $event.stopPropagation()">-->
+          <!--<ion-icon name="basket-outline"></ion-icon>-->
+        <!--</ion-button>-->
+      </ion-col>
+
+
+    </ion-row>
+
+  </ion-grid>
+
+</ng-template>
+

@@ -142,23 +142,17 @@ export class AppComponent implements OnInit {
        icon: 'scale'
      },
      {
-       title: 'AI reg. retiro',
-       url: '/app/tabs/replenishment-ai-post',
-       icon: 'hardware-chip'
-     },
-
-     {
-       title: 'Kilos retirados',
+       title: 'Plexa',
        url: '/app/tabs/replenishment-withdrawn-getall',
-       icon: 'checkbox'
+       icon: 'scale'
      },
      {
-       title: 'Llegaron',
+       title: 'Viajes | Llegadas',
        url: '/app/tabs/logistic-logistic-getall-in',
        icon: 'boat'
      },
      {
-       title: 'Salieron',
+       title: 'Viajes | Salidas',
        url: '/app/tabs/logistic-logistic-getall-out',
        icon: 'basket'
      },

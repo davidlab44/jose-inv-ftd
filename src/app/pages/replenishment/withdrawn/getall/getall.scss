@@ -1,3 +1,60 @@
+/* Contenedor de botones: usa flex y gap para separar botones de manera uniforme */
+.actions-col {
+  display: flex;
+  justify-content: flex-start; /* alineación a la izquierda */
+  gap: 4px; /* espacio horizontal entre botones */
+  padding: 0; /* eliminar padding del ion-col */
+}
+
+/* Botones compactos: reduce padding interno al mínimo */
+.btn-compact {
+  --padding-start: 2px;
+  --padding-end: 2px;
+  --padding-top: 2px;
+  --padding-bottom: 2px;
+  min-width: 32px; /* opcional: tamaño mínimo para que el botón no se achique demasiado */
+  height: 32px;    /* opcional: botón pequeño y uniforme */
+}
+
+/* Diferencias de color según valor */
+.diff-warning {
+  color: red;
+  font-weight: bold;
+}
+
+.diff-normal {
+  color: black;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .withdrawn-header {
   font-size: 12px;
   font-weight: 600;

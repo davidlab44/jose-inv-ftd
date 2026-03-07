@@ -23,7 +23,7 @@ import { DateService } from '../../../../services/local/date.service';
 import { RexService } from '../../../../services/rex.service';
 import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
-import { ReplenishmentService } from '../../../../services/replenishment/replenishment.service';
+import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PhotoService } from '../../../../services/asset/photo.service';
 
@@ -58,6 +58,7 @@ export class PostPage {
   uploadProgress = 0;
   uploadedUrl: string | null = null;
   uploading = false;
+  withdrawnList: any[] = []; 
 
   constructor(
     private barcodeService: BarcodeService,
@@ -83,33 +84,43 @@ export class PostPage {
     private prodrexService: ProdrexService,
     private userService: UserService,
     private fb: FormBuilder ,
-    private replenishmentService : ReplenishmentService,
+    private withdrawnService : WithdrawnService,
     private photoService: PhotoService
-  ) {}
+  ) {
 
+    const item = this.router.getCurrentNavigation()?.extras.state?.item;
+    console.log("Movement recibido:", item);
+    this.movement = item;
+
+  }
+
+  movement:any
   hash:string='';
   table:any
   rexDocument:any;
 
   ngOnInit() {
-    this.loadCategories();
-    this.loadUms();
     this.form = this.fb.group({
-      category: [0],
-      name: [''],
-      bop: [''],
-      barcode: [0],
-      qty: [0],
-      um: [0],
-      target: [0],
-      reorder: [0],
-      minimum: [0],
+      id: [this.movement?.id ?? null],
+      fecha: [this.movement?.data.date ?? ''],
+      name: [this.movement?.data.name ?? ''],
+      ticket: [this.movement?.data.ticket ?? ''],
+      /*sello1: [this.movement?.data.sail[0] ?? ''],*/
+      /*sello2: [this.movement?.data.sail[1] ?? ''],*/
+      /*sello3: [this.movement?.data.sail[2] ?? ''],*/
+      kg: [this.movement?.data?.kg ?? ''],
+      rotogate: [this.movement?.data?.rotogate ?? 0], 
+      psi: [this.movement?.data?.psi ?? 0], 
     });
-    const ahora = new Date();
-    this.todayDate=this.formatFechaLatam(ahora);
-    this.displayLast();
-  }
  
+  }
+
+  /*getAllWithrawn(){*/
+    /*this.withdrawnService.getAll().subscribe((data: any[]) => {*/
+      /*this.withdrawnList = data;*/
+    /*});*/
+  /*}*/
+
   lastAsset:any;
   displayLast() {
     this.productService.getAll().subscribe({
@@ -224,8 +235,7 @@ export class PostPage {
       }); 
    }     
 
-  async takePhotoAndUpload(albaranCode:number) {
-    console.log("Albaran code",albaranCode)
+  async takePhotoAndUpload() {
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
@@ -278,6 +288,8 @@ export class PostPage {
   }
 
 
+
+ patch(){} 
 
 
 

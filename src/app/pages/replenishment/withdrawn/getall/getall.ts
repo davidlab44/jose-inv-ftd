@@ -403,11 +403,33 @@ private groupWithdrawnByRefdate(): void {
 
   }
 
+  /*openUploader(pageName: string) {*/
+
+      /*this.router.navigate(   */
+        /*['/app/tabs/t'] */
+      /*);*/
+
+  /*}*/
+
+  /*openUploader(item:any){*/
+    /*console.log("item",item);*/
+    /*this.router.navigate(    */
+      /*['tabs/t'], */
+      /*{ state: { item } }    */
+    /*);      */
+  /*}  */
 
 
+    patcho(item:any){
+      console.log("item to patch",item);
+      this.router.navigate(    
+        ['/app/tabs/replenishment-vendor-patch'], 
+        { state: { item } }    
+      );
+    } 
 
 
-
+  plexaUploader(){}
 
 }
 

@@ -237,6 +237,7 @@ const routes: Routes = [
           }
         ]
       },
+
       {
         path: 'logistic-logistic-getall-out',
         children: [
@@ -246,18 +247,26 @@ const routes: Routes = [
           }
         ]
       },
-     
+
+      /*{*/
+        /*path: 'ass',*/
+        /*children: [*/
+          /*{*/
+            /*path: '',*/
+            /*loadChildren: () => import('../replenishment/vendor/post/post.module').then(m => m.PostModule)*/
+          /*}*/
+        /*]*/
+      /*},*/
       {
-        path: 'replenishment-ai-post',
+        path: 'replenishment-vendor-patch',
         children: [
           {
             path: '',
-            loadChildren: () => import('../replenishment/ai/post/post.module').then(m => m.PostModule)
+            loadChildren: () => import('../replenishment/vendor/patch/patch.module').then(m => m.PatchModule)
           }
         ]
       },
-
-
+     
       {
         path: '',
         redirectTo: '/app/tabs/schedule',
