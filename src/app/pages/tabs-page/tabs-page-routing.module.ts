@@ -266,7 +266,29 @@ const routes: Routes = [
           }
         ]
       },
-     
+
+      {
+        path: 'replenishment-vendor-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/vendor/post/post.module').then(m => m.AssetSupplyPostModule)
+          }
+        ]
+      },
+
+      {
+        path: 'replenishment-in-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/in/post/post.module').then(m => m.AssetSupplyPostModule)
+          }
+        ]
+      },
+
+
+
       {
         path: '',
         redirectTo: '/app/tabs/schedule',

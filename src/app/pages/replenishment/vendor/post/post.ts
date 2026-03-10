@@ -23,9 +23,13 @@ import { DateService } from '../../../../services/local/date.service';
 import { RexService } from '../../../../services/rex.service';
 import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
-import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
+import { ReplenishmentService } from '../../../../services/replenishment/replenishment.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PhotoService } from '../../../../services/asset/photo.service';
+import { OcrService } from '../../../../services/ai/ocr.service';
+import { CcoService } from '../../../../services/cc/cco.service';
+import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
+import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
 
 
 @Component({
@@ -33,7 +37,7 @@ import { PhotoService } from '../../../../services/asset/photo.service';
   templateUrl: 'post.html',
   styleUrls: ['./post.scss'],
 })
-export class PostPage {
+export class AssetSupplyPostPage {
 
   ios: boolean;
   hasOwner:boolean=false;
@@ -55,10 +59,37 @@ export class PostPage {
   todayDate:any;
   form!: FormGroup;
   replenishmentList: any[] = [];
+
+   /*columns = [*/
+      /*{ header: 'Fecha V', field: 'fecha_v' },*/
+      /*{ header: 'Cont vacío', field: 'cont_vacio' },*/
+      /*{ header: 'Rem vacío', field: 'rem_vacio' },*/
+      /*{ header: 'Fe ing M', field: 'fe_ing_m' },*/
+      /*{ header: 'Rem M LL', field: 'rem_m_ll' },*/
+      /*{ header: 'Sur', field: 'sur' },*/
+      /*{ header: 'Nort', field: 'nort' },*/
+      /*{ header: 'Fecha', field: 'fecha' },*/
+      /*{ header: 'Ticket', field: 'ticket' },*/
+      /*{ header: 'PSI', field: 'psi' },*/
+      /*{ header: 'OPC', field: 'opc' },*/
+      /*{ header: 'IMPO', field: 'impo' },*/
+      /*{ header: 'P Total', field: 'p_total' },*/
+      /*{ header: 'Rotogate', field: 'rotogate' },*/
+      /*{ header: 'P Vacío B', field: 'p_vacio_b' },*/
+      /*{ header: 'Peso lleno B', field: 'peso_lleno_b' },*/
+      /*{ header: 'P Neto', field: 'p_neto' },*/
+      /*{ header: 'Dif', field: 'dif' },*/
+      /*{ header: 'Precio P', field: 'precio_p' },*/
+      /*{ header: 'Fecha F', field: 'fecha_f' },*/
+      /*{ header: 'Factura', field: 'factura' },*/
+      /*{ header: 'Valor Fact', field: 'valor_fact' },*/
+      /*{ header: 'Sello1', field: 'sello1' },*/
+      /*{ header: 'Sello2', field: 'sello2' },*/
+      /*{ header: 'Sello3', field: 'sello3' },*/
+    /*];*/
   uploadProgress = 0;
   uploadedUrl: string | null = null;
   uploading = false;
-  withdrawnList: any[] = []; 
 
   constructor(
     private barcodeService: BarcodeService,
@@ -84,43 +115,31 @@ export class PostPage {
     private prodrexService: ProdrexService,
     private userService: UserService,
     private fb: FormBuilder ,
-    private withdrawnService : WithdrawnService,
-    private photoService: PhotoService
-  ) {
+    private replenishmentService : ReplenishmentService,
+    private photoService: PhotoService,
+    private ocrService: OcrService,
+    private ccoService: CcoService,
+    private withdrawnService: WithdrawnService
+  ) {}
 
-    const item = this.router.getCurrentNavigation()?.extras.state?.item;
-    console.log("Movement recibido:", item);
-    this.movement = item;
-
-  }
-
-  movement:any
   hash:string='';
   table:any
   rexDocument:any;
 
   ngOnInit() {
     this.form = this.fb.group({
-      id: [this.movement?.id ?? null],
-      fecha: [this.movement?.data.date ?? ''],
-      name: [this.movement?.data.name ?? ''],
-      ticket: [this.movement?.data.ticket ?? ''],
-      /*sello1: [this.movement?.data.sail[0] ?? ''],*/
-      /*sello2: [this.movement?.data.sail[1] ?? ''],*/
-      /*sello3: [this.movement?.data.sail[2] ?? ''],*/
-      kg: [this.movement?.data?.kg ?? ''],
-      rotogate: [this.movement?.data?.rotogate ?? 0], 
-      psi: [this.movement?.data?.psi ?? 0], 
+      name: [''],
+      date: [''],
+      ticket: [''],
+      kg: [0],
+      psi: [0],
+      rotogate: [0],
     });
- 
+    const ahora = new Date();
+    this.todayDate=this.formatFechaLatam(ahora);
+    this.displayLast();
   }
-
-  /*getAllWithrawn(){*/
-    /*this.withdrawnService.getAll().subscribe((data: any[]) => {*/
-      /*this.withdrawnList = data;*/
-    /*});*/
-  /*}*/
-
+ 
   lastAsset:any;
   displayLast() {
     this.productService.getAll().subscribe({
@@ -128,23 +147,6 @@ export class PostPage {
         this.lastAsset = response.reduce((max, item) =>
           item.id > max.id ? item : max
         );
-      }
-    });
-  }
-
-  guardar() {
-    const data: any = this.form.value;
-    data.categ = [data.category];
-    data.img = this.uploadedUrl; 
-    delete data.category;
-    console.log('Product to post =>', data);
-    this.productService.post(data).subscribe({
-      next: (response) => {
-        console.log("product post response", response);
-        if(response && response.length>0){
-          this.utilService.presentToast(response.toString())
-          this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });    
-        }
       }
     });
   }
@@ -159,11 +161,8 @@ export class PostPage {
      
   }
 
-  productListCaos:any[]=[];
   ionViewWillEnter() {
-    this.productService.getCachedOrServer().subscribe(data => {
-      this.productListCaos = data;
-    });
+    this.loadCco();
   }
 
   prodrexList:any[]=[];
@@ -206,36 +205,8 @@ export class PostPage {
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
-  categories: any[] = [];    
-  loadCategories() { 
-      this.categoryService.getAllCategories().subscribe({ 
-        next: (res) => {       
-          this.categories = res;          
-          this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.categories = this.categoryService.getCategoriesFromLocal(); 
-        } 
-      }); 
-   }   
-       
-   ums: any[] = []; 
-   loadUms() {                
-     this.umService.getAllUms().subscribe({ 
-        next: (res) => {       
-          console.log('✅ Ums:', res);    
-          this.ums = res; 
-          this.umService.saveUmsToLocal(res); 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.ums = this.umService.getUmsFromLocal(); 
-        } 
-      }); 
-   }     
-
   async takePhotoAndUpload() {
+
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
@@ -260,13 +231,26 @@ export class PostPage {
 
     url$.subscribe({
       next: (url) => {
+
         this.uploadedUrl = url;
+
+        // 👇 aquí llamas el OCR
+        this.launchOcr(url);
+
       },
-      complete: () => this.uploading = false
+      error: (err) => {
+        console.error('Error obteniendo URL', err);
+      },
+      complete: () => {
+        this.uploading = false;
+      }
     });
+
   }
 
+
   async pickImageAndUpload() {
+
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
@@ -281,17 +265,159 @@ export class PostPage {
     const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
 
     progress$.subscribe(p => this.uploadProgress = p);
-    url$.subscribe(url => {
-      this.uploadedUrl = url;
-      this.uploading = false;
+
+    url$.subscribe({
+      next: (url) => {
+
+        this.uploadedUrl = url;
+
+        // 👇 lanzar OCR cuando la URL esté disponible
+        this.launchOcr(url);
+
+      },
+      error: (err) => {
+        console.error('Error upload', err);
+        this.uploading = false;
+      },
+      complete: () => {
+        this.uploading = false;
+      }
     });
+
+  }
+
+  ocrResponse:any;
+  launchOcr(url:string){
+    this.ocrService.uploadFromUrl(url).subscribe({
+      next: (res) => {
+        this.ocrResponse=res;
+        console.log('OCR Response:', this.ocrResponse);
+        console.log('ocrResponse.data:', this.ocrResponse.data);
+        console.log('ocrResponse.data.date:', this.ocrResponse.data.date);
+        this.updateUi();
+      },
+      error: (err) => {
+        console.error('Error OCR:', err);
+      }
+    })
+    ;
+  }
+
+
+isotanq:any;
+
+  updateUi(){
+      this.form = this.fb.group({
+      name: this.ocrResponse.data.isotanq ?? null,
+      date: this.ocrResponse.data.date ?? null,
+      ticket: this.ocrResponse.data.ticket ?? null,
+      kg: this.ocrResponse.data.kg ?? null,
+      psi: this.ocrResponse.data.psi ?? null ,
+      rotogate: this.ocrResponse.data.rotogate ?? null,
+    });
+
+
+     this.isotanq = this.validateIsotanqName(this.ocrResponse.data.isotanq, this.ccos);
+
+    if (this.isotanq && this.isotanq.id) {
+      console.log("CCO encontrado:", this.isotanq);
+    } else {
+      console.log("No existe");
+    }
+
+
+
+  }
+
+  
+
+   ccos: any[] = []; 
+   loadCco() {                
+     this.ccoService.getAll().subscribe({ 
+        next: (res) => {       
+          console.log('✅ Cco:', res);    
+          this.ccos = res;
+        }, 
+        error: (err) => {      
+          console.error(' Error al cargar cco:', err); 
+        } 
+      }); 
+   } 
+
+
+  validateIsotanqName(hash: string, ccos: any[]): any | null {
+
+    if (!hash || !ccos) {
+      return null;
+    }
+
+    const cleanHash = hash.trim();
+
+    for (const cco of ccos) {
+
+      const name: string = cco?.data?.name || '';
+
+      // extrae ######-#
+      const match = name.match(/(\d{6}-\d)/);
+
+      if (match && match[1] === cleanHash) {
+        return cco;   // ← devuelve el objeto completo
+      }
+
+    }
+
+    return null;
   }
 
 
 
- patch(){} 
+  guardar() {
 
+    const formData: Partial<WithdrawnData> = this.form.value;
 
+    const withdrawn: Withdrawn = createDefaultWithdrawn();
+
+    // fusionar defaults + form
+    withdrawn.data = {
+      ...withdrawn.data,
+      ...formData
+    };
+
+    // campos calculados
+    withdrawn.data.name = this.isotanq.id;
+    withdrawn.data.img = this.uploadedUrl;
+
+    // eliminar campos que genera la BD
+    const { id, created_at, updated_at, ...payload } = withdrawn;
+
+    console.log('Withdrawn to post =>', payload);
+
+    this.withdrawnService.post(payload).subscribe({
+
+      next: (response) => {
+
+        console.log("Withdrawn post response", response);
+
+  /*      if (response && response.length > 0) {*/
+
+          /*this.utilService.presentToast(response.toString());*/
+
+          /*this.router.navigate(*/
+            /*['/app/tabs/replenishment-withdrawn-getall'],*/
+            /*{ replaceUrl: true }*/
+          /*);*/
+
+        /*}*/
+
+      },
+
+      error: (err) => {
+        console.error("Withdrawn post error", err);
+      }
+
+    });
+
+  }
 
 
 }

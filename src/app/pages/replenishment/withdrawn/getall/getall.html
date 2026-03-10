@@ -212,7 +212,7 @@
       <ion-button
         color="primary"
         slot="end"
-        (click)="plexaUploader(); $event.stopPropagation()">
+        (click)="plexaUploader('no estoy pasando nada'); $event.stopPropagation()">
 
         <ion-icon name="add-outline"></ion-icon>
 
@@ -287,38 +287,47 @@
 
 
       <ion-col size="2" class="actions-col">
-        <ion-button
+               
+           <ion-button
           fill="clear"
           size="small"
           class="btn-compact"
           title="Plexa"
-          (click)="patcho(p); $event.stopPropagation()">
+          [color]="p.data.kg > 0 ? 'primary' : 'dark'"
+          (click)="patch(p,'vendor'); $event.stopPropagation()">
           <ion-icon name="logo-amplify"></ion-icon>
         </ion-button>
-      <!--  <ion-button-->
-          <!--fill="clear"-->
-          <!--size="small"-->
-          <!--class="btn-compact"-->
-          <!--title="Báscula"-->
-          <!--(click)="openUploader('basc'); $event.stopPropagation()">-->
-          <!--<ion-icon name="scale-outline"></ion-icon>-->
-        <!--</ion-button>-->
-        <!--<ion-button-->
-          <!--fill="clear"-->
-          <!--size="small"-->
-          <!--class="btn-compact"-->
-          <!--title="Viajes | Llegadas"-->
-          <!--(click)="openUploader('in'); $event.stopPropagation()">-->
-          <!--<ion-icon name="boat-outline"></ion-icon>-->
-        <!--</ion-button>-->
-        <!--<ion-button-->
-          <!--fill="clear"-->
-          <!--size="default"-->
-          <!--class="btn-compact"-->
-          <!--title="Viajes | Salidas"-->
-          <!--(click)="openUploader('out'); $event.stopPropagation()">-->
-          <!--<ion-icon name="basket-outline"></ion-icon>-->
-        <!--</ion-button>-->
+
+       <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Bascula"
+          [color]="p.data.wnet > 0 ? 'primary' : 'dark'"
+          (click)="patch(p,'scale'); $event.stopPropagation()">
+          <ion-icon name="scale-outline"></ion-icon>
+        </ion-button>
+
+       <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Viajes | Llegadas"
+          [color]="p.data.shipin > 0 ? 'primary' : 'dark'"
+          (click)="patch(p,'in'); $event.stopPropagation()">
+          <ion-icon name="boat-outline"></ion-icon>
+        </ion-button>
+
+       <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Viajes | Salidas"
+          [color]="p.data.shipout > 0 ? 'primary' : 'dark'"
+          (click)="patch(p,'out'); $event.stopPropagation()">
+          <ion-icon name="basket-outline"></ion-icon>
+        </ion-button>
+
       </ion-col>
 
 

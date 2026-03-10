@@ -404,11 +404,9 @@ private groupWithdrawnByRefdate(): void {
   }
 
   /*openUploader(pageName: string) {*/
-
       /*this.router.navigate(   */
         /*['/app/tabs/t'] */
       /*);*/
-
   /*}*/
 
   /*openUploader(item:any){*/
@@ -420,16 +418,22 @@ private groupWithdrawnByRefdate(): void {
   /*}  */
 
 
-    patcho(item:any){
-      console.log("item to patch",item);
-      this.router.navigate(    
-        ['/app/tabs/replenishment-vendor-patch'], 
-        { state: { item } }    
-      );
-    } 
+  plexaUploader(item:any){
+    console.log("item to patch",item);
+    this.router.navigate(    
+      ['/app/tabs/replenishment-vendor-post'], 
+      { state: { item } }    
+    );
+  } 
 
+  patch(withdrawn:any,page:any){
+    console.log("item to patch",withdrawn);
+    this.router.navigate(    
+      [`/app/tabs/replenishment-${page}-post`], 
+      { state: { withdrawn } }    
+    );
+  } 
 
-  plexaUploader(){}
 
 }
 

@@ -23,7 +23,7 @@ import { DateService } from '../../../../services/local/date.service';
 import { RexService } from '../../../../services/rex.service';
 import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
-import { ReplenishmentService } from '../../../../services/replenishment/replenishment.service';
+import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PhotoService } from '../../../../services/asset/photo.service';
 import { OcrService } from '../../../../services/ai/ocr.service';
@@ -85,6 +85,7 @@ export class PatchPage {
     private fb: FormBuilder ,
     private photoService: PhotoService,
     private ocrService : OcrService,
+    private withdrawnService : WithdrawnService,
   ) {
     const item = this.router.getCurrentNavigation()?.extras.state?.item;
     console.log("Item recibido:", item);
@@ -128,38 +129,40 @@ export class PatchPage {
   }
 
 
-  patch() {
-    const payload = this.form.value;
-    const id = payload.id;
-    if (!id) {
-      console.error("No ID found in form");
-      return;
-    }
-    const justData = { ...payload };
-    delete justData.id;      
-    delete justData.ext_id;
-    delete justData.created_at;     
-    delete justData.updated_at;     
-    justData.categ=[justData.categ];
-    if(this.uploadedUrl && this.uploadedUrl.length>2){ 
-      justData.img=this.uploadedUrl; 
-    }else{
-      if(this.movement.data.img && this.movement.data.img.length>2){
-        justData.img=this.movement.data.img;
-      }
-    }
+  /*patch() {*/
+    /*const payload = this.form.value;*/
+    /*const id = payload.id;*/
+    /*if (!id) {*/
+      /*console.error("No ID found in form");*/
+      /*return;*/
+    /*}*/
+    /*const justData = { ...payload };*/
+/*[>    delete justData.id;      <]*/
+    /*[>delete justData.ext_id;<]*/
+    /*[>delete justData.created_at;     <]*/
+    /*[>delete justData.updated_at; <]    */
+    /*//justData.categ=[justData.categ];*/
+    /*justData.tripin='hardcodedtripin';*/
+    /*justData.tripout='hardcodedtripout';*/
+    /*if(this.uploadedUrl && this.uploadedUrl.length>2){ */
+      /*justData.img=this.uploadedUrl; */
+    /*}else{*/
+      /*if(this.movement.data.img && this.movement.data.img.length>2){*/
+        /*justData.img=this.movement.data.img;*/
+      /*}*/
+    /*}*/
 
-    this.productService.patch(id, justData).subscribe({
-      next: (r) => {
-        console.log("PATCH OK:", r);
-        this.utilService.presentToast("cant: "+r[0].data.qty+" "+r[0].data.name)
-        this.resetForm();
-        this.utilService.presentToast('resetForm')
-        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });
-      },
-      error: (e) => console.error("PATCH ERROR:", e),
-    });
-  }
+    /*this.withdrawnService.patch(id, justData).subscribe({*/
+      /*next: (r) => {*/
+        /*console.log("PATCH OK:", r);*/
+        /*this.utilService.presentToast("cant: "+r[0].data.qty+" "+r[0].data.name)*/
+        /*this.resetForm();*/
+        /*this.utilService.presentToast('resetForm')*/
+        /*this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });*/
+      /*},*/
+      /*error: (e) => console.error("PATCH ERROR:", e),*/
+    /*});*/
+  /*}*/
 
   resetForm(): void {
     this.form.reset({
@@ -384,14 +387,17 @@ export class PatchPage {
 
   }
 
-
-
   ocrResponse:any;
   launchOcr(url:string){
     this.ocrService.uploadFromUrl(url).subscribe({
       next: (res) => {
         this.ocrResponse=res;
         console.log('OCR Response:', res);
+        this.movement.date=res.data.date;
+        this.movement.kg=res.data.kg;
+        this.movement.seal=res.data.seal[0];
+        this.movement.psi=res.data.psi;
+        this.movement.rotogate=res.data.rotogate;
       },
       error: (err) => {
         console.error('Error OCR:', err);
@@ -399,6 +405,13 @@ export class PatchPage {
     })
     ;
   }
+
+
+  patch(){
+
+  }
+
+
 
 }
 

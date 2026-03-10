@@ -18,106 +18,78 @@
   </ion-toolbar>
 </ion-header>
 
-
-
-
-
-
-
-
-
-
-
-
-
 <ion-content class="ion-padding">
-  <form [formGroup]="form">    
-    
-    <input type="hidden" formControlName="id">
-
+  <form [formGroup]="form">
     <ion-list>
 
-      <!--<ion-button expand="block" (click)="takePhotoAndUpload()">-->
-        <!--📸 Tomar foto-->
-      <!--</ion-button>-->
-
-      <!--<ion-button expand="block" color="secondary" (click)="pickImageAndUpload()">-->
-        <!--🖼 Elegir de galería-->
-      <!--</ion-button>-->
-
-      <!--<ion-progress-bar-->
-        <!--*ngIf="uploading"-->
-        <!--[value]="uploadProgress / 100">-->
-      <!--</ion-progress-bar>-->
-
-      <!--<p *ngIf="uploading">-->
-        <!--Subiendo: {{ uploadProgress }} %-->
-      <!--</p>-->
-
-      <!--<ion-card *ngIf="uploadedUrl">-->
-        <!--<ion-card-header>-->
-          <!--<ion-card-title>Imagen subida</ion-card-title>-->
-        <!--</ion-card-header>-->
-        <!--<ion-card-content>-->
-          <!--<img [src]="uploadedUrl" />-->
-          <!--<p>{{ uploadedUrl }}</p>-->
-        <!--</ion-card-content>-->
-      <!--</ion-card>-->
-      
-      <!--<p>ImageUrl: {{movement.data.img}}</p>-->
-
-
-
-      <!--[><div *ngIf="movement && movement.data && movement.data.date && movement.data.date.length>10" ><]-->
-        <ion-item>
-          <ion-label position="floating">Fecha</ion-label>
-          <ion-input formControlName="date"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="floating">Name</ion-label>
-          <ion-input formControlName="name"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="floating">Ticket</ion-label>
-          <ion-input formControlName="ticket"></ion-input>
-        </ion-item>
-
-        <!--<ion-item>-->
-          <!--<ion-label position="floating">Sello1</ion-label>-->
-          <!--<ion-input formControlName="sello1"></ion-input>-->
-        <!--</ion-item>-->
-
-        <!--<ion-item>-->
-        <!--<ion-label position="floating">Sello1</ion-label>-->
-          <!--<ion-input formControlName="sello2"></ion-input>-->
-        <!--</ion-item>-->
-
-        <!--<ion-item>-->
-          <!--<ion-label position="floating">Sello3</ion-label>-->
-          <!--<ion-input formControlName="sello3"></ion-input>-->
-        <!--</ion-item>-->
-        <ion-item>
-          <ion-label position="floating">Kg</ion-label>
-          <ion-input type="number" formControlName="kg"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="floating">Rotogate</ion-label>
-          <ion-input type="number" formControlName="rotogate"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="floating">Psi</ion-label>
-          <ion-input type="number" formControlName="psi"></ion-input>
-        </ion-item>
-      </ion-list>
-      <br>
-      <ion-button expand="block" (click)="patch()">
-        Guardar
+      <ion-button expand="block" (click)="takePhotoAndUpload()">
+        📸 Tomar foto
       </ion-button>
+
+      <ion-button expand="block" color="secondary" (click)="pickImageAndUpload()">
+        🖼 Elegir de galería
+      </ion-button>
+
+      <ion-progress-bar
+        *ngIf="uploading"
+        [value]="uploadProgress / 100">
+      </ion-progress-bar>
+
+      <p *ngIf="uploading">
+        Subiendo: {{ uploadProgress }} %
+      </p>
+
+      <ion-card *ngIf="uploadedUrl">
+        <ion-card-header>
+          <ion-card-title>Imagen subida</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <img [src]="uploadedUrl" />
+          <p>{{ uploadedUrl }}</p>
+        </ion-card-content>
+      </ion-card>
+
+       <ion-item>
+        <ion-label position="floating">Name</ion-label>
+        <ion-input formControlName="name"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Date</ion-label>
+        <ion-input formControlName="date"></ion-input>
+      </ion-item>
+     <ion-item>
+        <ion-label position="floating">Ticket</ion-label>
+        <ion-input formControlName="ticket"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Kg</ion-label>
+        <ion-input type="number" formControlName="kg"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Psi</ion-label>
+        <ion-input type="number" formControlName="psi"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Rotogate</ion-label>
+        <ion-input type="number" formControlName="rotogate"></ion-input>
+      </ion-item>
+
+
+    </ion-list>
+    <br>
+    <pre>{{ocrResponse | json}}</pre>
+    <br>
+    <ion-button expand="block" (click)="guardar()">
+      Guardar
+    </ion-button>
   </form>
+
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+
 </ion-content>
-
-
 
 
