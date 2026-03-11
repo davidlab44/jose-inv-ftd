@@ -342,7 +342,7 @@ export class AssetSupplyPostPage {
 
   ocrResponse:any;
   launchOcr(url:string){
-    this.ocrService.uploadFromUrl(url).subscribe({
+    this.ocrService.postVendor(url).subscribe({
       next: (res) => {
         this.ocrResponse=res;
         console.log('OCR Response:', this.ocrResponse);

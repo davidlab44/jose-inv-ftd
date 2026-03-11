@@ -40,7 +40,7 @@ export class GetallPage implements OnInit {
   @ViewChild(IonList, { static: false }) ionList!: IonList;
 
   withdrawnList: any[] = [];
-  groupedWithdrawnList: any[] = [];
+  fullWithdrawnList: any[] = [];
 
   dayRange = {
     lower: 1,
@@ -111,77 +111,77 @@ export class GetallPage implements OnInit {
   getAll() {
     const since = this.dayOfYearToISO(this.startDay);
     const until = this.dayOfYearToISO(this.endDay, true);
-
     this.withdrawnService.getIntervalByAdate(since, until).subscribe({
       next: response => {
         this.withdrawnList = response;
         console.log("withdrawnList response",this.withdrawnList)
-        this.groupWithdrawnByRefdate();
+      
+        this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList);
+        console.log('full',this,this.fullWithdrawnList)
+        //this.groupWithdrawnByRefdate();
       }
     });
   }
 
-
-
-
-
-
-private groupWithdrawnByRefdate(): void {
-
-  if (!this.withdrawnList?.length) {
-    this.groupedWithdrawnList = [];
-    return;
+  sortWithdrawnByDate(withdrawnList: any[]): any[] {
+    return withdrawnList.sort((a, b) => {
+      const dateA = new Date(a.data.date).getTime();
+      const dateB = new Date(b.data.date).getTime();
+      return dateA - dateB;
+    });
   }
 
-  const sorted = [...this.withdrawnList].sort(
-    (a, b) => new Date(a.refdate).getTime() - new Date(b.refdate).getTime()
-  );
+/*  private groupWithdrawnByRefdate(): void {*/
 
-  const grouped: any[] = [];
-  let i = 0;
+    /*if (!this.withdrawnList?.length) {*/
+      /*this.groupedWithdrawnList = [];*/
+      /*return;*/
+    /*}*/
 
-  while (i < sorted.length) {
+    /*const sorted = [...this.withdrawnList].sort(*/
+      /*(a, b) => new Date(a.refdate).getTime() - new Date(b.refdate).getTime()*/
+    /*);*/
 
-    const current = sorted[i];
-    const next = sorted[i + 1];
+    /*const grouped: any[] = [];*/
+    /*let i = 0;*/
 
-    if (next && current.refdate === next.refdate) {
+    /*while (i < sorted.length) {*/
 
-      const group = {
-        type: 'pair',
-        refdate: current.refdate,
-        items: [current, next]
-      };
+      /*const current = sorted[i];*/
+      /*const next = sorted[i + 1];*/
 
-      this.calculateDiff(group);
-      grouped.push(group);
+      /*if (next && current.refdate === next.refdate) {*/
 
-      i += 2;
+        /*const group = {*/
+          /*type: 'pair',*/
+          /*refdate: current.refdate,*/
+          /*items: [current, next]*/
+        /*};*/
 
-    } else {
+        /*this.calculateDiff(group);*/
+        /*grouped.push(group);*/
 
-      const group = {
-        type: 'single',
-        refdate: current.refdate,
-        items: [current]
-      };
+        /*i += 2;*/
 
-      this.calculateDiff(group);
-      grouped.push(group);
+      /*} else {*/
 
-      i += 1;
+        /*const group = {*/
+          /*type: 'single',*/
+          /*refdate: current.refdate,*/
+          /*items: [current]*/
+        /*};*/
 
-    }
+        /*this.calculateDiff(group);*/
+        /*grouped.push(group);*/
 
-  }
+        /*i += 1;*/
 
-  this.groupedWithdrawnList = grouped;
-}
+      /*}*/
 
+    /*}*/
 
-
-
-
+    /*this.groupedWithdrawnList = grouped;*/
+  /*}*/
 
 
   /*private groupWithdrawnByRefdate(): void {*/
@@ -417,7 +417,6 @@ private groupWithdrawnByRefdate(): void {
     /*);      */
   /*}  */
 
-
   plexaUploader(item:any){
     console.log("item to patch",item);
     this.router.navigate(    
@@ -428,10 +427,12 @@ private groupWithdrawnByRefdate(): void {
 
   patch(withdrawn:any,page:any){
     console.log("item to patch",withdrawn);
-    this.router.navigate(    
-      [`/app/tabs/replenishment-${page}-post`], 
-      { state: { withdrawn } }    
-    );
+    this.router.navigate([`/app/tabs/replenishment-${page}-patch`], { state: { item: withdrawn } });
+
+    /*this.router.navigate(    */
+      /*[`/app/tabs/replenishment-${page}-patch`], */
+      /*{ state: { withdrawn } }    */
+    /*);*/
   } 
 
 

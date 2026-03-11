@@ -2,31 +2,122 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OcrService {
-  
-  private ocrUrl = environment.ocrUrl; 
-  
-  
-  //private apiUrl = environment.apiHost; 
-  //private model = 'withdrawn';
 
-  constructor(private http: HttpClient) {}   
-     
+  private ocrUrl = environment.ocrUrl;
 
+  constructor(private http: HttpClient) {}
 
-  uploadFromUrl(imageUrl: string): Observable<any> {
+  /**
+   * OCR Vendor document
+   */
+  postVendor(imageUrl: string): Observable<any> {
 
     const body = {
       url: imageUrl
     };
 
-    return this.http.post(`${this.ocrUrl}/upload`, body);
+    return this.http.post(`${this.ocrUrl}/post-vendor`, body);
   }
+
+
+  /**
+   * OCR IN document
+   */
+  postIn(imageUrl: string): Observable<any> {
+
+    const body = {
+      url: imageUrl
+    };
+
+    return this.http.post(`${this.ocrUrl}/post-in`, body);
+  }
+
+
+  /**
+   * OCR OUT document
+   */
+  postOut(imageUrl: string): Observable<any> {
+
+    const body = {
+      url: imageUrl
+    };
+
+    return this.http.post(`${this.ocrUrl}/post-out`, body);
+  }
+
+
+  /**
+   * OCR SCALE document
+   */
+  postScale(imageUrl: string): Observable<any> {
+
+    const body = {
+      url: imageUrl
+    };
+
+    return this.http.post(`${this.ocrUrl}/post-scale`, body);
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*import { Injectable } from '@angular/core';*/
+/*import { HttpClient } from '@angular/common/http';*/
+/*import { Observable } from 'rxjs';*/
+/*import { environment } from '../../../environments/environment';*/
+/*import { map } from 'rxjs/operators';*/
+
+/*@Injectable({*/
+  /*providedIn: 'root'*/
+/*})*/
+/*export class OcrService {*/
+  
+  /*private ocrUrl = environment.ocrUrl; */
+  
+  
+  /*//private apiUrl = environment.apiHost; */
+  /*//private model = 'withdrawn';*/
+
+  /*constructor(private http: HttpClient) {}   */
+     
+
+
+  /*uploadFromUrl(imageUrl: string): Observable<any> {*/
+
+    /*const body = {*/
+      /*url: imageUrl*/
+    /*};*/
+
+    /*return this.http.post(`${this.ocrUrl}/upload`, body);*/
+  /*}*/
+
+
+
+
+
+
+
 
   /*getAll(): Observable<any[]> {   */
     /*return this.http.get<any[]>(`${this.apiUrl}/${this.model}`);*/
@@ -110,7 +201,7 @@ export class OcrService {
     /*);*/
   /*}*/
 
-}
+//}
 
 
 

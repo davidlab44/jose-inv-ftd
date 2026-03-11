@@ -270,8 +270,7 @@ export class AssetSupplyPostPage {
       next: (url) => {
 
         this.uploadedUrl = url;
-
-        // 👇 lanzar OCR cuando la URL esté disponible
+        // lanzar OCR cuando la URL esté disponible
         this.launchOcr(url);
 
       },
@@ -283,17 +282,17 @@ export class AssetSupplyPostPage {
         this.uploading = false;
       }
     });
-
   }
 
   ocrResponse:any;
   launchOcr(url:string){
-    this.ocrService.uploadFromUrl(url).subscribe({
+    this.ocrService.postVendor(url).subscribe({
       next: (res) => {
         this.ocrResponse=res;
         console.log('OCR Response:', this.ocrResponse);
         console.log('ocrResponse.data:', this.ocrResponse.data);
         console.log('ocrResponse.data.date:', this.ocrResponse.data.date);
+             
         this.updateUi();
       },
       error: (err) => {
@@ -303,33 +302,42 @@ export class AssetSupplyPostPage {
     ;
   }
 
+  isotanq:any;
 
-isotanq:any;
+  /*updateUi(){*/
+    /*console.log('data', this.ocrResponse.data);*/
+    /*console.log('vendor.date:', this.ocrResponse.data["vendor.date"]);*/
+    /*console.log('vendor.isotanq:', this.ocrResponse.data["vendor.isotanq"]);*/
+    /*console.log('vendor.kg:', this.ocrResponse.data["vendor.kg"]);*/
+
+    /*this.form = this.fb.group({*/
+      /*name: this.ocrResponse.data["vendor.name"] ?? null,*/
+      /*date: this.ocrResponse.data["vendor.date"] ?? null,*/
+      /*isotanq: this.ocrResponse.data["vendor.isotanq"] ?? null,*/
+      /*kg: this.ocrResponse.data["vendor.kg"] ?? null,*/
+      /*psi: this.ocrResponse.data["vendor.psi"] ?? null,*/
+      /*rotogate: this.ocrResponse.data["vendor.rotogate"] ?? null,*/
+      /*ticket: this.ocrResponse.data["vendor.ticket"] ?? null,*/
+      /*seal: this.ocrResponse.data["vendor.seal"] ?? []*/
+    /*});*/
+  /*}*/
 
   updateUi(){
-      this.form = this.fb.group({
-      name: this.ocrResponse.data.isotanq ?? null,
+    this.form = this.fb.group({
       date: this.ocrResponse.data.date ?? null,
+      name: this.ocrResponse.data.isotanq ?? null,
       ticket: this.ocrResponse.data.ticket ?? null,
       kg: this.ocrResponse.data.kg ?? null,
       psi: this.ocrResponse.data.psi ?? null ,
       rotogate: this.ocrResponse.data.rotogate ?? null,
     });
-
-
-     this.isotanq = this.validateIsotanqName(this.ocrResponse.data.isotanq, this.ccos);
-
+    this.isotanq = this.validateIsotanqName(this.ocrResponse.data.isotanq, this.ccos);
     if (this.isotanq && this.isotanq.id) {
       console.log("CCO encontrado:", this.isotanq);
     } else {
       console.log("No existe");
     }
-
-
-
   }
-
-  
 
    ccos: any[] = []; 
    loadCco() {                
@@ -383,6 +391,7 @@ isotanq:any;
       ...formData
     };
 
+    console.log('isotanq',this.isotanq)
     // campos calculados
     withdrawn.data.name = this.isotanq.id;
     withdrawn.data.img = this.uploadedUrl;

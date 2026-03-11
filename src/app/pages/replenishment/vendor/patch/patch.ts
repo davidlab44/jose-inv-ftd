@@ -87,9 +87,19 @@ export class PatchPage {
     private ocrService : OcrService,
     private withdrawnService : WithdrawnService,
   ) {
-    const item = this.router.getCurrentNavigation()?.extras.state?.item;
-    console.log("Item recibido:", item);
-    this.movement = item;
+
+    const navigation = this.router.getCurrentNavigation();
+  if (navigation?.extras?.state?.item) {
+    this.movement = navigation.extras.state.item;
+  } else {
+    // Si recargaron la página, puedes cargar el item desde un servicio o API
+    console.warn('No se recibió item por NavigationExtras.state');
+  }
+
+  console.log("Item recibidox:", this.movement);
+    /*    const item = this.router.getCurrentNavigation()?.extras.state?.item;*/
+    /*console.log("Item recibidox:", item);*/
+    /*this.movement = item;*/
   }
 
 
@@ -389,7 +399,7 @@ export class PatchPage {
 
   ocrResponse:any;
   launchOcr(url:string){
-    this.ocrService.uploadFromUrl(url).subscribe({
+    this.ocrService.postVendor(url).subscribe({
       next: (res) => {
         this.ocrResponse=res;
         console.log('OCR Response:', res);
@@ -408,6 +418,7 @@ export class PatchPage {
 
 
   patch(){
+
 
   }
 
