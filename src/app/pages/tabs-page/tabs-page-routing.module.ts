@@ -278,11 +278,11 @@ const routes: Routes = [
       },
 
       {
-        path: 'replenishment-in-post',
+        path: 'replenishment-scale-patch',
         children: [
           {
             path: '',
-            loadChildren: () => import('../replenishment/in/post/post.module').then(m => m.AssetSupplyPostModule)
+            loadChildren: () => import('../replenishment/scale/post/post.module').then(m => m.AssetSupplyPostModule)
           }
         ]
       },
