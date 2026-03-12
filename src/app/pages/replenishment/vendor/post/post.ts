@@ -303,32 +303,14 @@ export class AssetSupplyPostPage {
   }
 
   isotanq:any;
-
-  /*updateUi(){*/
-    /*console.log('data', this.ocrResponse.data);*/
-    /*console.log('vendor.date:', this.ocrResponse.data["vendor.date"]);*/
-    /*console.log('vendor.isotanq:', this.ocrResponse.data["vendor.isotanq"]);*/
-    /*console.log('vendor.kg:', this.ocrResponse.data["vendor.kg"]);*/
-
-    /*this.form = this.fb.group({*/
-      /*name: this.ocrResponse.data["vendor.name"] ?? null,*/
-      /*date: this.ocrResponse.data["vendor.date"] ?? null,*/
-      /*isotanq: this.ocrResponse.data["vendor.isotanq"] ?? null,*/
-      /*kg: this.ocrResponse.data["vendor.kg"] ?? null,*/
-      /*psi: this.ocrResponse.data["vendor.psi"] ?? null,*/
-      /*rotogate: this.ocrResponse.data["vendor.rotogate"] ?? null,*/
-      /*ticket: this.ocrResponse.data["vendor.ticket"] ?? null,*/
-      /*seal: this.ocrResponse.data["vendor.seal"] ?? []*/
-    /*});*/
-  /*}*/
-
   updateUi(){
+    const normalizedDate = this.normalizeOCRDate(this.ocrResponse.data.date);
     this.form = this.fb.group({
-      date: this.ocrResponse.data.date ?? null,
+      date: normalizedDate,
       name: this.ocrResponse.data.isotanq ?? null,
       ticket: this.ocrResponse.data.ticket ?? null,
       kg: this.ocrResponse.data.kg ?? null,
-      psi: this.ocrResponse.data.psi ?? null ,
+      psi: this.ocrResponse.data.psi ?? null,
       rotogate: this.ocrResponse.data.rotogate ?? null,
     });
     this.isotanq = this.validateIsotanqName(this.ocrResponse.data.isotanq, this.ccos);
@@ -385,39 +367,22 @@ export class AssetSupplyPostPage {
 
     const withdrawn: Withdrawn = createDefaultWithdrawn();
 
-    // fusionar defaults + form
     withdrawn.data = {
       ...withdrawn.data,
       ...formData
     };
 
-    console.log('isotanq',this.isotanq)
-    // campos calculados
-    withdrawn.data.name = this.isotanq.id;
+    withdrawn.data.name = this.isotanq?.id ?? null;
     withdrawn.data.img = this.uploadedUrl;
 
-    // eliminar campos que genera la BD
-    const { id, created_at, updated_at, ...payload } = withdrawn;
+    const payload = withdrawn.data;
 
-    console.log('Withdrawn to post =>', payload);
+    console.log("payload to post =>", payload);
 
     this.withdrawnService.post(payload).subscribe({
 
       next: (response) => {
-
         console.log("Withdrawn post response", response);
-
-  /*      if (response && response.length > 0) {*/
-
-          /*this.utilService.presentToast(response.toString());*/
-
-          /*this.router.navigate(*/
-            /*['/app/tabs/replenishment-withdrawn-getall'],*/
-            /*{ replaceUrl: true }*/
-          /*);*/
-
-        /*}*/
-
       },
 
       error: (err) => {
@@ -427,6 +392,82 @@ export class AssetSupplyPostPage {
     });
 
   }
+
+
+
+  /*guardar() {*/
+
+    /*const formData: Partial<WithdrawnData> = this.form.value;*/
+
+    /*const withdrawn: Withdrawn = createDefaultWithdrawn();*/
+
+    /*// fusionar defaults + form*/
+    /*withdrawn.data = {*/
+      /*...withdrawn.data,*/
+      /*...formData*/
+    /*};*/
+
+    /*console.log('isotanq',this.isotanq)*/
+    /*// campos calculados*/
+    /*withdrawn.data.name = this.isotanq.id;*/
+    /*withdrawn.data.img = this.uploadedUrl;*/
+
+    /*// eliminar campos que genera la BD*/
+    /*const { id, created_at, updated_at, ...payload } = withdrawn;*/
+
+    /*console.log('Withdrawn to post =>', payload);*/
+
+    /*this.withdrawnService.post(payload).subscribe({*/
+
+      /*next: (response) => {*/
+
+        /*console.log("Withdrawn post response", response);*/
+
+  /*[>      if (response && response.length > 0) {<]*/
+
+          /*[>this.utilService.presentToast(response.toString());<]*/
+
+          /*[>this.router.navigate(<]*/
+            /*[>['/app/tabs/replenishment-withdrawn-getall'],<]*/
+            /*[>{ replaceUrl: true }<]*/
+          /*[>);<]*/
+
+        /*[>}<]*/
+
+      /*},*/
+
+      /*error: (err) => {*/
+        /*console.error("Withdrawn post error", err);*/
+      /*}*/
+
+    /*});*/
+
+  /*}*/
+
+
+
+  normalizeOCRDate(dateStr: string): string | null {
+
+    if (!dateStr) return null;
+
+    const date = new Date(dateStr);
+
+    if (isNaN(date.getTime())) {
+      console.warn("Fecha OCR inválida:", dateStr);
+      return null;
+    }
+
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mi = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
+
+    return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
+  }
+
 
 
 }

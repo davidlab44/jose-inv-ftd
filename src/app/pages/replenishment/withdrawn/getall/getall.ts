@@ -131,135 +131,8 @@ export class GetallPage implements OnInit {
     });
   }
 
-/*  private groupWithdrawnByRefdate(): void {*/
-
-    /*if (!this.withdrawnList?.length) {*/
-      /*this.groupedWithdrawnList = [];*/
-      /*return;*/
-    /*}*/
-
-    /*const sorted = [...this.withdrawnList].sort(*/
-      /*(a, b) => new Date(a.refdate).getTime() - new Date(b.refdate).getTime()*/
-    /*);*/
-
-    /*const grouped: any[] = [];*/
-    /*let i = 0;*/
-
-    /*while (i < sorted.length) {*/
-
-      /*const current = sorted[i];*/
-      /*const next = sorted[i + 1];*/
-
-      /*if (next && current.refdate === next.refdate) {*/
-
-        /*const group = {*/
-          /*type: 'pair',*/
-          /*refdate: current.refdate,*/
-          /*items: [current, next]*/
-        /*};*/
-
-        /*this.calculateDiff(group);*/
-        /*grouped.push(group);*/
-
-        /*i += 2;*/
-
-      /*} else {*/
-
-        /*const group = {*/
-          /*type: 'single',*/
-          /*refdate: current.refdate,*/
-          /*items: [current]*/
-        /*};*/
-
-        /*this.calculateDiff(group);*/
-        /*grouped.push(group);*/
-
-        /*i += 1;*/
-
-      /*}*/
-
-    /*}*/
-
-    /*this.groupedWithdrawnList = grouped;*/
-  /*}*/
-
-
-  /*private groupWithdrawnByRefdate(): void {*/
-
-    /*if (!this.withdrawnList?.length) {*/
-      /*this.groupedWithdrawnList = [];*/
-      /*return;*/
-    /*}*/
-
-    /*const sorted = [...this.withdrawnList].sort(*/
-      /*(a, b) => new Date(a.refdate).getTime() - new Date(b.refdate).getTime()*/
-    /*);*/
-
-    /*const grouped: any[] = [];*/
-    /*let i = 0;*/
-
-    /*while (i < sorted.length) {*/
-
-      /*const current = sorted[i];*/
-      /*const next = sorted[i + 1];*/
-
-      /*if (next && current.refdate === next.refdate) {*/
-        /*grouped.push({*/
-          /*type: 'pair',*/
-          /*refdate: current.refdate,*/
-          /*items: [current, next]*/
-        /*});*/
-        /*i += 2;*/
-      /*} else {*/
-        /*grouped.push({*/
-          /*type: 'single',*/
-          /*refdate: current.refdate,*/
-          /*items: [current]*/
-        /*});*/
-        /*i += 1;*/
-      /*}*/
-
-    /*}*/
-
-    /*this.groupedWithdrawnList = grouped;*/
-  /*}*/
-
-
   trackByGroup(index: number, group: any): string {
     return group.refdate + '-' + index;
-  }
-
-  /*onSwipeSingle(item: any, slidingItem: IonItemSliding): void {*/
-    /*console.log("swippe item",item)*/
-    /*console.log("swippe sliding item",item)*/
-    /*slidingItem.close();*/
-    /*if (this.ionList) {*/
-      /*this.ionList.closeSlidingItems();*/
-    /*}*/
-  /*}*/
-
-  onSwipeSingle(item: any, slidingItem: IonItemSliding): void {
-
-    console.log("swipe item", item);
-
-    this.withdrawnService.updateStateToErp(item.id)
-      .subscribe({
-        next: (res) => {
-          console.log("Updated OK", res);
-
-          slidingItem.close();
-          if (this.ionList) {
-            this.ionList.closeSlidingItems();
-          }
-
-          // opcional: actualizar localmente
-          item.state = 'erp';
-        },
-        error: (err) => {
-          console.error("Update error", err);
-        }
-      });
-
   }
 
   getTotalKg(): number {
@@ -378,7 +251,6 @@ export class GetallPage implements OnInit {
     return `${fechaTexto} ${String(horas).padStart(2, '0')}:${minutos}:${segundos} ${ampm}`;
   }
 
-
   private calculateDiff(group: any): void {
     if (group.type === 'pair') {
       const kg1 = Number(group.items[0]?.data?.kg) || 0;
@@ -400,22 +272,7 @@ export class GetallPage implements OnInit {
       }
       group.items[0].diff = diff;
     }
-
   }
-
-  /*openUploader(pageName: string) {*/
-      /*this.router.navigate(   */
-        /*['/app/tabs/t'] */
-      /*);*/
-  /*}*/
-
-  /*openUploader(item:any){*/
-    /*console.log("item",item);*/
-    /*this.router.navigate(    */
-      /*['tabs/t'], */
-      /*{ state: { item } }    */
-    /*);      */
-  /*}  */
 
   plexaUploader(item:any){
     console.log("item to patch",item);
@@ -428,16 +285,9 @@ export class GetallPage implements OnInit {
   patch(withdrawn:any,page:any){
     console.log("item to patch",withdrawn);
     this.router.navigate([`/app/tabs/replenishment-${page}-patch`], { state: { item: withdrawn } });
-
-    /*this.router.navigate(    */
-      /*[`/app/tabs/replenishment-${page}-patch`], */
-      /*{ state: { withdrawn } }    */
-    /*);*/
   } 
 
-
 }
-
 
 
 
