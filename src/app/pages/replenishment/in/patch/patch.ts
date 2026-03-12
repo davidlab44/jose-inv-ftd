@@ -23,10 +23,12 @@ import { DateService } from '../../../../services/local/date.service';
 import { RexService } from '../../../../services/rex.service';
 import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
-import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PhotoService } from '../../../../services/asset/photo.service';
 import { OcrService } from '../../../../services/ai/ocr.service';
+import { CcoService } from '../../../../services/cc/cco.service';
+import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
+import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
 
 @Component({
   selector: 'page-patch',
@@ -86,10 +88,18 @@ export class PatchPage {
     private photoService: PhotoService,
     private ocrService : OcrService,
     private withdrawnService : WithdrawnService,
+    private ccoService : CcoService,
   ) {
-    const item = this.router.getCurrentNavigation()?.extras.state?.item;
-    console.log("Item recibido:", item);
-    this.movement = item;
+
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras?.state?.item) {
+      this.movement = navigation.extras.state.item;
+    } else {
+      // Si recargaron la página, puedes cargar el item desde un servicio o API
+      console.warn('No se recibió item por NavigationExtras.state');
+    }
+
+    console.log("Item recibidox:", this.movement);
   }
 
 
@@ -98,35 +108,24 @@ export class PatchPage {
   ngOnInit() {
     this.form = this.fb.group({
       id: [this.movement?.id ?? null],
-      fecha: [this.movement?.data.date ?? ''],
-      name: [this.movement?.data.name ?? ''],
-      ticket: [this.movement?.data.ticket ?? ''],
-      sello1: [this.movement?.data.seal[0] ?? ''],
-      sello2: [this.movement?.data.seal[1] ?? ''],
-      sello3: [this.movement?.data.seal[2] ?? ''],
-      kg: [this.movement?.data?.kg ?? ''],
-      rotogate: [this.movement?.data?.rotogate ?? 0], 
-      psi: [this.movement?.data?.psi ?? 0], 
+      wticket: [this.movement?.data?.wticket ?? 0], 
+      wgross: [this.movement?.data?.wgross ?? 0], 
+      wtare: [this.movement?.data?.wtare ?? 0], 
+      wnet: [this.movement?.data?.wnet ?? 0], 
     });
- 
   }
 
 
   ionViewWillEnter() {
     this.form = this.fb.group({
       id: [this.movement?.id ?? null],
-      fecha: [this.movement?.data.date ?? ''],
-      name: [this.movement?.data.name ?? ''],
-      ticket: [this.movement?.data.ticket ?? ''],
-      sello1: [this.movement?.data.seal[0] ?? ''],
-      sello2: [this.movement?.data.seal[1] ?? ''],
-      sello3: [this.movement?.data.seal[2] ?? ''],
-      kg: [this.movement?.data?.kg ?? ''],
-      rotogate: [this.movement?.data?.rotogate ?? 0], 
-      psi: [this.movement?.data?.psi ?? 0], 
+      wticket: [this.movement?.data?.wticket ?? 0], 
+      wgross: [this.movement?.data?.wgross ?? 0], 
+      wtare: [this.movement?.data?.wtare ?? 0], 
+      wnet: [this.movement?.data?.wnet ?? 0], 
     });
- 
   }
+
 
 
   /*patch() {*/
@@ -167,15 +166,10 @@ export class PatchPage {
   resetForm(): void {
     this.form.reset({
       id: 0,
-      categ: null,
-      name: '',
-      bop: '',
-      barcode: '',
-      qty: 1,
-      um: null,
-      target: 0,
-      reorder: 0,
-      minimum: 0,
+      wticket: 0,
+      wgross: 0,
+      wtare: 0,
+      wnet: 0,
     });
 
     this.uploadProgress = 0; 
@@ -388,27 +382,170 @@ export class PatchPage {
   }
 
   ocrResponse:any;
-  launchOcr(url:string){
-    this.ocrService.postVendor(url).subscribe({
+
+
+
+  launchOcr(url: string) {
+
+    this.ocrService.postScale(url).subscribe({
+
       next: (res) => {
-        this.ocrResponse=res;
+
+        this.ocrResponse = res;
+
         console.log('OCR Response:', res);
-        this.movement.date=res.data.date;
-        this.movement.kg=res.data.kg;
-        this.movement.seal=res.data.seal[0];
-        this.movement.psi=res.data.psi;
-        this.movement.rotogate=res.data.rotogate;
+
+        const normalizedDate = this.normalizeOCRDate(res?.data?.date);
+
+        const seals = res?.data?.seal ?? [];
+
+        // actualizar movement
+        this.movement.data = {
+          ...this.movement.data,
+          wticket: Number(res?.data?.wticket ?? 0),
+          wgross: Number(res?.data?.wgross ?? 0),
+          wtare: Number(res?.data?.wtare ?? 0),
+          wnet: Number(res?.data?.wnet ?? 0),
+        };
+
+        this.form.patchValue({
+          wticket: Number(res?.data?.wticket ?? 0),
+          wgross: Number(res?.data?.wgross ?? 0),
+          wtare: Number(res?.data?.wtare ?? 0),
+          wnet: Number(res?.data?.wnet ?? 0),
+        });
+
+        console.log("movement actualizado:", this.movement);
+
       },
+
       error: (err) => {
         console.error('Error OCR:', err);
       }
-    })
-    ;
+
+    });
+
   }
 
 
-  patch(){
 
+  /*launchOcr(url:string){*/
+    /*this.ocrService.postVendor(url).subscribe({*/
+      /*next: (res) => {*/
+        /*this.ocrResponse=res;*/
+        /*console.log('OCR Response:', res);*/
+        /*this.movement.date=res.data.date;*/
+        /*this.movement.kg=res.data.kg;*/
+        /*this.movement.seal=res.data.seal[0];*/
+        /*this.movement.psi=res.data.psi;*/
+        /*this.movement.rotogate=res.data.rotogate;*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error('Error OCR:', err);*/
+      /*}*/
+    /*})*/
+    /*;*/
+  /*}*/
+
+
+
+
+
+
+
+
+
+  /*updateMovementFromForm() {*/
+
+    /*const f = this.form.value;*/
+
+    /*this.movement.data = {*/
+      /*...this.movement.data,*/
+      /*wticket: Number(f.ticket),*/
+      /*wgross: Number(f.kg),*/
+      /*wtare: Number(f.psi),*/
+      /*wnet: Number(f.rotogate),*/
+      /*//seal: [f.sello1, f.sello2, f.sello3].filter(Boolean)*/
+    /*};*/
+
+  /*}*/
+
+
+
+
+
+
+
+  updateMovementFromForm() {
+
+    const f = this.form.value;
+
+    this.movement.data = {
+      ...this.movement.data,
+      wticket: Number(f.wticket ?? 0),
+      wgross: Number(f.wgross ?? 0),
+      wtare: Number(f.wtare ?? 0),
+      wnet: Number(f.wnet ?? 0),
+    };
+
+  }
+
+
+
+  patch() {
+
+    // 1️⃣ tomar lo editado en el form
+    this.updateMovementFromForm();
+
+    // 2️⃣ enviar SOLO data
+    const payload = { ...this.movement.data };
+
+    console.log("payload to patch =>", payload);
+
+    this.withdrawnService.patch(this.movement.id, payload).subscribe({
+
+      next: (response) => {
+        console.log("Withdrawn patch response", response);
+      },
+
+      error: (err) => {
+        console.error("Withdrawn patch error", err);
+      }
+
+    });
+
+  }
+
+
+
+  /*patch() {*/
+    /*this.updateMovementFromForm();*/
+    /*const payload = this.movement.data;*/
+    /*console.log("payload to patch =>", payload);*/
+    /*this.withdrawnService.patch(this.movement.id, payload).subscribe({*/
+      /*next: (response) => {*/
+        /*console.log("Withdrawn patch response", response);*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error("Withdrawn patch error", err);*/
+      /*}*/
+    /*});*/
+  /*}*/
+
+  normalizeOCRDate(dateStr: string): string | null {
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      console.warn("Fecha OCR inválida:", dateStr);
+      return null;
+    }
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mi = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
 
 
