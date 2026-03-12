@@ -282,7 +282,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../replenishment/scale/post/post.module').then(m => m.AssetSupplyPostModule)
+            loadChildren: () => import('../replenishment/scale/patch/patch.module').then(m => m.PatchModule)
           }
         ]
       },

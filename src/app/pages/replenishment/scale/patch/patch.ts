@@ -30,10 +30,6 @@ import { CcoService } from '../../../../services/cc/cco.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
 
-
-
-
-
 @Component({
   selector: 'page-patch',
   templateUrl: 'patch.html',
@@ -104,9 +100,6 @@ export class PatchPage {
     }
 
     console.log("Item recibidox:", this.movement);
-      /*    const item = this.router.getCurrentNavigation()?.extras.state?.item;*/
-    /*console.log("Item recibidox:", item);*/
-    /*this.movement = item;*/
   }
 
 
@@ -115,35 +108,24 @@ export class PatchPage {
   ngOnInit() {
     this.form = this.fb.group({
       id: [this.movement?.id ?? null],
-      fecha: [this.movement?.data.date ?? ''],
-      name: [this.movement?.data.name ?? ''],
-      ticket: [this.movement?.data.ticket ?? ''],
-      sello1: [this.movement?.data.seal[0] ?? ''],
-      sello2: [this.movement?.data.seal[1] ?? ''],
-      sello3: [this.movement?.data.seal[2] ?? ''],
-      kg: [this.movement?.data?.kg ?? ''],
-      rotogate: [this.movement?.data?.rotogate ?? 0], 
-      psi: [this.movement?.data?.psi ?? 0], 
+      wticket: [this.movement?.data?.wticket ?? 0], 
+      wgross: [this.movement?.data?.wgross ?? 0], 
+      wtare: [this.movement?.data?.wtare ?? 0], 
+      wnet: [this.movement?.data?.wnet ?? 0], 
     });
- 
   }
 
 
   ionViewWillEnter() {
     this.form = this.fb.group({
       id: [this.movement?.id ?? null],
-      fecha: [this.movement?.data.date ?? ''],
-      name: [this.movement?.data.name ?? ''],
-      ticket: [this.movement?.data.ticket ?? ''],
-      sello1: [this.movement?.data.seal[0] ?? ''],
-      sello2: [this.movement?.data.seal[1] ?? ''],
-      sello3: [this.movement?.data.seal[2] ?? ''],
-      kg: [this.movement?.data?.kg ?? ''],
-      rotogate: [this.movement?.data?.rotogate ?? 0], 
-      psi: [this.movement?.data?.psi ?? 0], 
+      wticket: [this.movement?.data?.wticket ?? 0], 
+      wgross: [this.movement?.data?.wgross ?? 0], 
+      wtare: [this.movement?.data?.wtare ?? 0], 
+      wnet: [this.movement?.data?.wnet ?? 0], 
     });
- 
   }
+
 
 
   /*patch() {*/
@@ -184,15 +166,10 @@ export class PatchPage {
   resetForm(): void {
     this.form.reset({
       id: 0,
-      categ: null,
-      name: '',
-      bop: '',
-      barcode: '',
-      qty: 1,
-      um: null,
-      target: 0,
-      reorder: 0,
-      minimum: 0,
+      wticket: 0,
+      wgross: 0,
+      wtare: 0,
+      wnet: 0,
     });
 
     this.uploadProgress = 0; 
@@ -478,6 +455,26 @@ export class PatchPage {
 
 
 
+  /*updateMovementFromForm() {*/
+
+    /*const f = this.form.value;*/
+
+    /*this.movement.data = {*/
+      /*...this.movement.data,*/
+      /*wticket: Number(f.ticket),*/
+      /*wgross: Number(f.kg),*/
+      /*wtare: Number(f.psi),*/
+      /*wnet: Number(f.rotogate),*/
+      /*//seal: [f.sello1, f.sello2, f.sello3].filter(Boolean)*/
+    /*};*/
+
+  /*}*/
+
+
+
+
+
+
 
   updateMovementFromForm() {
 
@@ -485,23 +482,23 @@ export class PatchPage {
 
     this.movement.data = {
       ...this.movement.data,
-      wticket: Number(f.ticket),
-      wgross: Number(f.kg),
-      wtare: Number(f.psi),
-      wnet: Number(f.rotogate),
-      //seal: [f.sello1, f.sello2, f.sello3].filter(Boolean)
+      wticket: Number(f.wticket ?? 0),
+      wgross: Number(f.wgross ?? 0),
+      wtare: Number(f.wtare ?? 0),
+      wnet: Number(f.wnet ?? 0),
     };
 
   }
 
 
 
-
   patch() {
 
+    // 1️⃣ tomar lo editado en el form
     this.updateMovementFromForm();
 
-    const payload = this.movement.data;
+    // 2️⃣ enviar SOLO data
+    const payload = { ...this.movement.data };
 
     console.log("payload to patch =>", payload);
 
@@ -519,27 +516,21 @@ export class PatchPage {
 
   }
 
+
+
   /*patch() {*/
-
     /*this.updateMovementFromForm();*/
-
-    /*this.withdrawnService.patch(this.movement.id, this.movement).subscribe({*/
-
+    /*const payload = this.movement.data;*/
+    /*console.log("payload to patch =>", payload);*/
+    /*this.withdrawnService.patch(this.movement.id, payload).subscribe({*/
       /*next: (response) => {*/
         /*console.log("Withdrawn patch response", response);*/
       /*},*/
-
       /*error: (err) => {*/
-        /*console.error("Withdrawn post error", err);*/
+        /*console.error("Withdrawn patch error", err);*/
       /*}*/
-
     /*});*/
-
   /*}*/
-
-
-
-
 
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;

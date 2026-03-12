@@ -284,8 +284,12 @@ export class GetallPage implements OnInit {
 
   patch(withdrawn:any,page:any){
     console.log("item to patch",withdrawn);
-    this.router.navigate([`/app/tabs/replenishment-${page}-patch`], { state: { item: withdrawn } });
+    console.log("ruta",page);
+    const pageRoute=`/app/tabs/replenishment-${page}-patch`;
+    console.log("pageRoute",pageRoute);
+    this.router.navigate([pageRoute], { state: { item: withdrawn } });
   } 
+
 
 }
 
