@@ -27,6 +27,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PhotoService } from '../../../../services/asset/photo.service';
 import { OcrService } from '../../../../services/ai/ocr.service';
 import { CcoService } from '../../../../services/cc/cco.service';
+import { ShipService } from '../../../../services/logistic/ship.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
 
@@ -58,7 +59,6 @@ export class PatchPage {
   form!: FormGroup;
   replenishmentList: any[] = [];
   replenishment:any;
-  //assetSupplyProduct:any;
   movement:any;
 
   constructor(
@@ -87,98 +87,53 @@ export class PatchPage {
     private fb: FormBuilder ,
     private photoService: PhotoService,
     private ocrService : OcrService,
+    private shipService : ShipService,
     private withdrawnService : WithdrawnService,
     private ccoService : CcoService,
   ) {
-
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state?.item) {
       this.movement = navigation.extras.state.item;
     } else {
-      // Si recargaron la página, puedes cargar el item desde un servicio o API
       console.warn('No se recibió item por NavigationExtras.state');
     }
-
-    console.log("Item recibidox:", this.movement);
+    console.log("Item recibido shipin patch:", this.movement);
   }
-
-
-
 
   ngOnInit() {
     this.form = this.fb.group({
       id: [this.movement?.id ?? null],
-      wticket: [this.movement?.data?.wticket ?? 0], 
-      wgross: [this.movement?.data?.wgross ?? 0], 
-      wtare: [this.movement?.data?.wtare ?? 0], 
-      wnet: [this.movement?.data?.wnet ?? 0], 
+      deliveryin: [this.movement?.data?.deliveryin ?? ''], 
+      datein: [this.movement?.data?.datein ?? ''], 
+      tripin: [this.movement?.data?.tripin ?? ''], 
+      shipin: [this.movement?.data?.shipin ?? 0], 
     });
   }
-
 
   ionViewWillEnter() {
     this.form = this.fb.group({
       id: [this.movement?.id ?? null],
-      wticket: [this.movement?.data?.wticket ?? 0], 
-      wgross: [this.movement?.data?.wgross ?? 0], 
-      wtare: [this.movement?.data?.wtare ?? 0], 
-      wnet: [this.movement?.data?.wnet ?? 0], 
+      deliveryin: [this.movement?.data?.deliveryin ?? ''], 
+      datein: [this.movement?.data?.datein ?? ''], 
+      tripin: [this.movement?.data?.tripin ?? ''], 
+      shipin: [this.movement?.data?.shipin ?? 0], 
     });
+    //shipList solo se utiliza cuando el ocrResponde , opopr eso esta aqui
+    this.getShip();
   }
-
-
-
-  /*patch() {*/
-    /*const payload = this.form.value;*/
-    /*const id = payload.id;*/
-    /*if (!id) {*/
-      /*console.error("No ID found in form");*/
-      /*return;*/
-    /*}*/
-    /*const justData = { ...payload };*/
-/*[>    delete justData.id;      <]*/
-    /*[>delete justData.ext_id;<]*/
-    /*[>delete justData.created_at;     <]*/
-    /*[>delete justData.updated_at; <]    */
-    /*//justData.categ=[justData.categ];*/
-    /*justData.tripin='hardcodedtripin';*/
-    /*justData.tripout='hardcodedtripout';*/
-    /*if(this.uploadedUrl && this.uploadedUrl.length>2){ */
-      /*justData.img=this.uploadedUrl; */
-    /*}else{*/
-      /*if(this.movement.data.img && this.movement.data.img.length>2){*/
-        /*justData.img=this.movement.data.img;*/
-      /*}*/
-    /*}*/
-
-    /*this.withdrawnService.patch(id, justData).subscribe({*/
-      /*next: (r) => {*/
-        /*console.log("PATCH OK:", r);*/
-        /*this.utilService.presentToast("cant: "+r[0].data.qty+" "+r[0].data.name)*/
-        /*this.resetForm();*/
-        /*this.utilService.presentToast('resetForm')*/
-        /*this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });*/
-      /*},*/
-      /*error: (e) => console.error("PATCH ERROR:", e),*/
-    /*});*/
-  /*}*/
 
   resetForm(): void {
     this.form.reset({
       id: 0,
-      wticket: 0,
-      wgross: 0,
-      wtare: 0,
-      wnet: 0,
+      deliveryin: 0,
+      datein: 0,
+      tripin: '',
+      shipin: 0,
     });
-
     this.uploadProgress = 0; 
     this.uploadedUrl= null;
     this.uploading = false;
-
   }
-
-
 
   slideOpts = {
     initialSlide: 0,
@@ -230,31 +185,21 @@ export class PatchPage {
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
-
   uploadProgress = 0;
   uploadedUrl: string | null = null;
   uploading = false;
 
-
-
-
-
   async takePhotoAndUpload() {
-
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
-
     const base64Image = await this.photoService.takePicture();
-
     if (!base64Image) {
       this.uploading = false;
       console.error('No se pudo obtener la imagen');
       return;
     }
-
     const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
-
     progress$.subscribe({
       next: (p) => this.uploadProgress = p,
       error: (err) => {
@@ -262,15 +207,10 @@ export class PatchPage {
         this.uploading = false;
       }
     });
-
     url$.subscribe({
       next: (url) => {
-
         this.uploadedUrl = url;
-
-        // 👇 aquí llamas el OCR
         this.launchOcr(url);
-
       },
       error: (err) => {
         console.error('Error obteniendo URL', err);
@@ -279,96 +219,23 @@ export class PatchPage {
         this.uploading = false;
       }
     });
-
   }
 
-
-
-
-
-
-
-  /*async takePhotoAndUpload() {*/
-    /*this.uploading = true;*/
-    /*this.uploadProgress = 0;*/
-    /*this.uploadedUrl = null;*/
-
-    /*const base64Image = await this.photoService.takePicture();*/
-
-    /*if (!base64Image) {*/
-      /*this.uploading = false;*/
-      /*console.error('No se pudo obtener la imagen');*/
-      /*return;*/
-    /*}*/
-
-    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);*/
-
-    /*progress$.subscribe({*/
-      /*next: (p) => this.uploadProgress = p,*/
-      /*error: (err) => {*/
-        /*console.error('Error subiendo imagen', err);*/
-        /*this.uploading = false;*/
-      /*}*/
-    /*});*/
-
-    /*url$.subscribe({*/
-      /*next: (url) => {*/
-        /*this.uploadedUrl = url;*/
-      /*},*/
-      /*complete: () => this.uploading = false*/
-    /*});*/
-  /*}*/
-
-
-  /*async pickImageAndUpload() {*/
-    /*this.uploading = true;*/
-    /*this.uploadProgress = 0;*/
-    /*this.uploadedUrl = null;*/
-
-    /*const base64Image = await this.photoService.pickImage();*/
-
-    /*if (!base64Image) {*/
-      /*this.uploading = false;*/
-      /*return;*/
-    /*}*/
-
-    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);*/
-
-    /*progress$.subscribe(p => this.uploadProgress = p);*/
-    /*url$.subscribe(url => {*/
-      /*this.uploadedUrl = url;*/
-      /*this.uploading = false;*/
-    /*});*/
-  /*}*/
-
-
-
-
   async pickImageAndUpload() {
-
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
-
     const base64Image = await this.photoService.pickImage();
-
     if (!base64Image) {
       this.uploading = false;
       return;
     }
-
     const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
-
     progress$.subscribe(p => this.uploadProgress = p);
-
     url$.subscribe({
       next: (url) => {
-
         this.uploadedUrl = url;
-
-        // 👇 lanzar OCR cuando la URL esté disponible
         this.launchOcr(url);
-
       },
       error: (err) => {
         console.error('Error upload', err);
@@ -378,149 +245,77 @@ export class PatchPage {
         this.uploading = false;
       }
     });
-
   }
 
-  ocrResponse:any;
-
-
-
+  shipId:any;
+  shipNombreEsp:string | null; 
   launchOcr(url: string) {
-
-    this.ocrService.postScale(url).subscribe({
-
+    this.ocrService.postIn(url).subscribe({
       next: (res) => {
-
-        this.ocrResponse = res;
-
         console.log('OCR Response:', res);
+        this.shipId=this.getShipId(res,this.shipList);
+        if(this.shipId>0){
+          console.log('shipId',this.shipId)
+          this.shipNombreEsp=this.getShipNameById(this.shipId);
 
+          console.log('shipNombreEsp',this.shipNombreEsp)
+          this.shipNombreEsp=this.getShipNameById(this.shipId);
+        }else{
+          this.shipNombreEsp='Seleccionar'
+        }
         const normalizedDate = this.normalizeOCRDate(res?.data?.date);
-
-        const seals = res?.data?.seal ?? [];
-
-        // actualizar movement
         this.movement.data = {
           ...this.movement.data,
-          wticket: Number(res?.data?.wticket ?? 0),
-          wgross: Number(res?.data?.wgross ?? 0),
-          wtare: Number(res?.data?.wtare ?? 0),
-          wnet: Number(res?.data?.wnet ?? 0),
+          deliveryin: this.parseNumber(res?.data?.deliveryin ?? 0),
+          datein: res?.data?.datein ?? '',
+          tripin: res?.data?.tripin ?? '',
+          shipin: this.shipNombreEsp,
         };
-
         this.form.patchValue({
-          wticket: Number(res?.data?.wticket ?? 0),
-          wgross: Number(res?.data?.wgross ?? 0),
-          wtare: Number(res?.data?.wtare ?? 0),
-          wnet: Number(res?.data?.wnet ?? 0),
+          deliveryin: this.parseNumber(res?.data?.deliveryin ?? 0),
+          datein: res?.data?.datein ?? '',
+          tripin: res?.data?.tripin ?? '',
+          shipin: this.shipNombreEsp,
         });
-
         console.log("movement actualizado:", this.movement);
-
       },
-
       error: (err) => {
         console.error('Error OCR:', err);
       }
-
     });
-
   }
-
-
-
-  /*launchOcr(url:string){*/
-    /*this.ocrService.postVendor(url).subscribe({*/
-      /*next: (res) => {*/
-        /*this.ocrResponse=res;*/
-        /*console.log('OCR Response:', res);*/
-        /*this.movement.date=res.data.date;*/
-        /*this.movement.kg=res.data.kg;*/
-        /*this.movement.seal=res.data.seal[0];*/
-        /*this.movement.psi=res.data.psi;*/
-        /*this.movement.rotogate=res.data.rotogate;*/
-      /*},*/
-      /*error: (err) => {*/
-        /*console.error('Error OCR:', err);*/
-      /*}*/
-    /*})*/
-    /*;*/
-  /*}*/
-
-
-
-
-
-
-
-
-
-  /*updateMovementFromForm() {*/
-
-    /*const f = this.form.value;*/
-
-    /*this.movement.data = {*/
-      /*...this.movement.data,*/
-      /*wticket: Number(f.ticket),*/
-      /*wgross: Number(f.kg),*/
-      /*wtare: Number(f.psi),*/
-      /*wnet: Number(f.rotogate),*/
-      /*//seal: [f.sello1, f.sello2, f.sello3].filter(Boolean)*/
-    /*};*/
-
-  /*}*/
-
-
-
-
-
-
 
   updateMovementFromForm() {
-
     const f = this.form.value;
-
     this.movement.data = {
       ...this.movement.data,
-      wticket: Number(f.wticket ?? 0),
-      wgross: Number(f.wgross ?? 0),
-      wtare: Number(f.wtare ?? 0),
-      wnet: Number(f.wnet ?? 0),
+      deliveryin: Number(f.deliveryin ?? ''),
+      datein: f.datein ?? '',
+      tripin: f.tripin ?? '',
+      ship: Number(f.shipin ?? 0),
     };
-
   }
 
-
-
   patch() {
-
-    // 1️⃣ tomar lo editado en el form
     this.updateMovementFromForm();
-
-    // 2️⃣ enviar SOLO data
-    const payload = { ...this.movement.data };
-
+    const payload = {
+      ...this.movement.data,
+      shipin: this.shipId ?? 0
+    };
     console.log("payload to patch =>", payload);
-
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
-
       next: (response) => {
         console.log("Withdrawn patch response", response);
       },
-
       error: (err) => {
         console.error("Withdrawn patch error", err);
       }
-
     });
-
   }
 
-
-
-  /*patch() {*/
+  /*  patch() {*/
     /*this.updateMovementFromForm();*/
-    /*const payload = this.movement.data;*/
+    /*const payload = { ...this.movement.data };*/
     /*console.log("payload to patch =>", payload);*/
     /*this.withdrawnService.patch(this.movement.id, payload).subscribe({*/
       /*next: (response) => {*/
@@ -547,6 +342,134 @@ export class PatchPage {
     const ss = String(date.getSeconds()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
+
+  parseNumber(input: string): number {
+    if (!input) return 0; // por si es null o undefined
+    // Elimina comas (o cualquier otro separador que no sea dígito o punto)
+    const cleaned = input.replace(/,/g, '');
+    // Intenta convertir a número
+    const num = Number(cleaned);
+    // Si no es un número válido, devuelve 0
+    return isNaN(num) ? 0 : num;
+  }
+
+  getShipin(response:any){
+    return response;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ normalizeOCR(str) {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .replace(/[0]/g, 'o')
+    .replace(/[1]/g, 'i')
+    .replace(/[5]/g, 's')
+    .replace(/[8]/g, 'b')
+    .replace(/[^a-z0-9]/g, '')  // elimina espacios, guiones, etc
+    .trim();
+}
+levenshtein(a, b) {
+  const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b[i - 1] === a[j - 1]) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+similarity(a, b) {
+  const dist = this.levenshtein(a, b);
+  const maxLen = Math.max(a.length, b.length);
+  if (maxLen === 0) return 1;
+  return 1 - dist / maxLen;
+}
+fuzzyMatch(a, b, threshold = 0.8) {
+  if (!a || !b) return false;
+  const na = this.normalizeOCR(a);
+  const nb = this.normalizeOCR(b);
+  if (na.includes(nb) || nb.includes(na)) return true;
+  const score = this.similarity(na, nb);
+  return score >= threshold;
+}
+getShipId(objA, objBList) {
+  const shipName = objA?.data?.shipin ?? null;
+  const shipIMO = objA?.data?.shipinimo ?? null;
+  let bestScore = 0;
+  let bestId = 0;
+  // 1️⃣ buscar por nombre
+  if (shipName) {
+    for (const ship of objBList) {
+      const name = ship?.data?.name;
+      if (!name) continue;
+      const score = this.similarity(
+        this.normalizeOCR(shipName),
+        this.normalizeOCR(name)
+      );
+      if (score > bestScore && score > 0.75) {
+        bestScore = score;
+        bestId = ship.id;
+      }
+    }
+    if (bestId !== 0) return bestId;
+  }
+  // 2️⃣ fallback por IMO
+  if (shipIMO) {
+    for (const ship of objBList) {
+      const imo = ship?.data?.imo;
+      if (!imo) continue;
+      if (this.fuzzyMatch(shipIMO, imo, 0.9)) {
+        return ship.id;
+      }
+    }
+  }
+  return 0;
+}
+
+  shipList: any[] = [];
+  getShip() {
+    this.shipService.getAll().subscribe(resp => {
+      this.shipList = resp;
+      console.log('shipList',this.shipList);
+    });
+  }
+
+  getShipNameById(id: number | null | undefined): string {
+    if (id == null) return 'Sin nombre';
+    const cco = this.shipList.find(c => Number(c.id) === Number(id));
+    const nombre = cco?.data?.name;
+    return typeof nombre === 'string' && nombre.trim() !== ''
+      ? nombre
+      : 'Sin Nombre';
+  }
+
+
+
+
 
 
 

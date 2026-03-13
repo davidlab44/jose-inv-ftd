@@ -44,23 +44,21 @@
           <p>{{ uploadedUrl }}</p>
         </ion-card-content>
       </ion-card>
-      <h6>Response:</h6>
-      <pre>{{ocrResponse | json}}</pre>
         <ion-item>
-          <ion-label position="floating">Ticket bascula numero:</ion-label>
-          <ion-input type="number" formControlName="wticket"></ion-input>
+          <ion-label position="floating">Fecha remision (VACIOS):</ion-label>
+          <ion-input formControlName="datein"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-label position="floating">Peso bruto:</ion-label>
-          <ion-input type="number" formControlName="wgross"></ion-input>
+          <ion-label position="floating">Entrega Numero:</ion-label>
+          <ion-input formControlName="deliveryin"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-label position="floating">Peso tara:</ion-label>
-          <ion-input type="number" formControlName="wtare"></ion-input>
+          <ion-label position="floating">Viaje:</ion-label>
+          <ion-input formControlName="tripin"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-label position="floating">Peso neto:</ion-label>
-          <ion-input type="number" formControlName="wnet"></ion-input>
+          <ion-label position="floating">Barco:</ion-label>
+          <ion-input formControlName="shipin"></ion-input>
         </ion-item>
     </ion-list>
     <br>

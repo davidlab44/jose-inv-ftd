@@ -287,6 +287,27 @@ const routes: Routes = [
         ]
       },
 
+      {
+        path: 'replenishment-in-patch',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/in/patch/patch.module').then(m => m.PatchModule)
+          }
+        ]
+      },
+
+
+      {
+        path: 'replenishment-out-patch',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/out/patch/patch.module').then(m => m.PatchModule)
+          }
+        ]
+      },
+
 
 
       {

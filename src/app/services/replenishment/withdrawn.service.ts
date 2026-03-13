@@ -62,6 +62,7 @@ export class WithdrawnService {
     const body = {
       data: updatedElement  
     };
+    console.log('body',body);
     return this.http.patch(url, body, {
       headers: {
         'Content-Type': 'application/json',
@@ -77,12 +78,8 @@ export class WithdrawnService {
     });
   }
 
-
-
-
   updateStateToErp(id: number): Observable<any> {
     const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;
-
     console.log("id peticion", id)
     return this.http.patch(
       url,
