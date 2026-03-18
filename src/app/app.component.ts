@@ -147,6 +147,11 @@ export class AppComponent implements OnInit {
        icon: 'scale'
      },
      {
+       title: 'Kilos retirados',
+       url: '/app/tabs/replenishment-get-getall',
+       icon: 'scale'
+     },
+     {
        title: 'Viajes | Llegadas',
        url: '/app/tabs/logistic-logistic-getall-in',
        icon: 'boat'

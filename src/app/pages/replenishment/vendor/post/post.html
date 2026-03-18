@@ -54,7 +54,7 @@
         <ion-input formControlName="name"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label position="floating">Date</ion-label>
+        <ion-label position="floating">Date | 2026-03-09T15:21:27</ion-label>
         <ion-input formControlName="date"></ion-input>
       </ion-item>
      <ion-item>
@@ -74,6 +74,10 @@
         <ion-input type="number" formControlName="rotogate"></ion-input>
       </ion-item>
 
+      <ion-item *ngFor="let sealCtrl of seals.controls; let i = index">
+        <ion-label position="floating">Seal {{ i + 1 }}</ion-label>
+        <ion-input [formControl]="sealCtrl"></ion-input>
+      </ion-item>
 
     </ion-list>
     <br>

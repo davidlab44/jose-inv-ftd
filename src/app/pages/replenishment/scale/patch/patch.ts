@@ -345,30 +345,21 @@ export class PatchPage {
 
 
   async pickImageAndUpload() {
-
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
-
     const base64Image = await this.photoService.pickImage();
-
     if (!base64Image) {
       this.uploading = false;
       return;
     }
-
     const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
-
     progress$.subscribe(p => this.uploadProgress = p);
-
     url$.subscribe({
       next: (url) => {
-
         this.uploadedUrl = url;
-
         // 👇 lanzar OCR cuando la URL esté disponible
         this.launchOcr(url);
-
       },
       error: (err) => {
         console.error('Error upload', err);
@@ -383,22 +374,13 @@ export class PatchPage {
 
   ocrResponse:any;
 
-
-
   launchOcr(url: string) {
-
     this.ocrService.postScale(url).subscribe({
-
       next: (res) => {
-
         this.ocrResponse = res;
-
         console.log('OCR Response:', res);
-
         const normalizedDate = this.normalizeOCRDate(res?.data?.date);
-
         const seals = res?.data?.seal ?? [];
-
         // actualizar movement
         this.movement.data = {
           ...this.movement.data,
@@ -407,27 +389,19 @@ export class PatchPage {
           wtare: Number(res?.data?.wtare ?? 0),
           wnet: Number(res?.data?.wnet ?? 0),
         };
-
         this.form.patchValue({
           wticket: Number(res?.data?.wticket ?? 0),
           wgross: Number(res?.data?.wgross ?? 0),
           wtare: Number(res?.data?.wtare ?? 0),
           wnet: Number(res?.data?.wnet ?? 0),
         });
-
         console.log("movement actualizado:", this.movement);
-
       },
-
       error: (err) => {
         console.error('Error OCR:', err);
       }
-
     });
-
   }
-
-
 
   /*launchOcr(url:string){*/
     /*this.ocrService.postVendor(url).subscribe({*/
@@ -447,18 +421,8 @@ export class PatchPage {
     /*;*/
   /*}*/
 
-
-
-
-
-
-
-
-
   /*updateMovementFromForm() {*/
-
     /*const f = this.form.value;*/
-
     /*this.movement.data = {*/
       /*...this.movement.data,*/
       /*wticket: Number(f.ticket),*/
@@ -467,19 +431,10 @@ export class PatchPage {
       /*wnet: Number(f.rotogate),*/
       /*//seal: [f.sello1, f.sello2, f.sello3].filter(Boolean)*/
     /*};*/
-
   /*}*/
 
-
-
-
-
-
-
   updateMovementFromForm() {
-
     const f = this.form.value;
-
     this.movement.data = {
       ...this.movement.data,
       wticket: Number(f.wticket ?? 0),
@@ -487,36 +442,24 @@ export class PatchPage {
       wtare: Number(f.wtare ?? 0),
       wnet: Number(f.wnet ?? 0),
     };
-
   }
 
-
-
   patch() {
-
     // 1️⃣ tomar lo editado en el form
     this.updateMovementFromForm();
-
+    this.movement.data.imgscale = this.uploadedUrl;
     // 2️⃣ enviar SOLO data
     const payload = { ...this.movement.data };
-
     console.log("payload to patch =>", payload);
-
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
-
       next: (response) => {
         console.log("Withdrawn patch response", response);
       },
-
       error: (err) => {
         console.error("Withdrawn patch error", err);
       }
-
     });
-
   }
-
-
 
   /*patch() {*/
     /*this.updateMovementFromForm();*/
@@ -547,7 +490,6 @@ export class PatchPage {
     const ss = String(date.getSeconds()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
-
 
 
 }

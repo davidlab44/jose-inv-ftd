@@ -264,20 +264,19 @@ export class PatchPage {
         }else{
           this.shipNombreEsp='Seleccionar'
         }
-
         const normalizedDate = this.normalizeOCRDate(res?.data?.date);
         this.movement.data = {
           ...this.movement.data,
           deliveryout: res?.data?.deliveryout ?? 0,
           dateout: res?.data?.dateout ?? '',
           tripout: res?.data?.tripout ?? '',
-          shipout: this.shipNombreEsp,
+          //shipout: this.shipNombreEsp,
         };
         this.form.patchValue({
           deliveryout: res?.data?.deliveryout ?? 0,
           dateout: res?.data?.dateout ?? '',
           tripout: res?.data?.tripout ?? '',
-          shipout: this.shipNombreEsp,
+          //shipout: this.shipNombreEsp,
         });
         console.log("movement actualizado:", this.movement);
       },
@@ -294,15 +293,17 @@ export class PatchPage {
       deliveryout: f.deliveryout ?? '',
       dateout: f.dateout ?? '',
       tripout: f.tripout ?? '',
-      shipout: (f.shipout ?? 0),
+      //shipout: (f.shipout ?? 0),
     };
   }
 
   patch() {
     this.updateMovementFromForm();
+    this.movement.data.imgout = this.uploadedUrl;
     const payload = {
       ...this.movement.data,
-      shipin: this.shipId ?? 0
+      shipout: Number(this.form.value.shipout) || 0 
+      //shipout: this.shipId ?? 0
     };
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
@@ -314,20 +315,6 @@ export class PatchPage {
       }
     });
   }
-
-  /*  patch() {*/
-    /*this.updateMovementFromForm();*/
-    /*const payload = { ...this.movement.data };*/
-    /*console.log("payload to patch =>", payload);*/
-    /*this.withdrawnService.patch(this.movement.id, payload).subscribe({*/
-      /*next: (response) => {*/
-        /*console.log("Withdrawn patch response", response);*/
-      /*},*/
-      /*error: (err) => {*/
-        /*console.error("Withdrawn patch error", err);*/
-      /*}*/
-    /*});*/
-  /*}*/
 
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;

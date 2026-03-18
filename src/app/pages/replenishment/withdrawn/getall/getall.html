@@ -21,18 +21,18 @@
 </ion-header>
 
 <ion-content>
-  <ion-item class="range-container" lines="none">
-    <div class="date-boxes">
-      <div class="date-box">
-        <span class="label">Desde</span>
-        <span class="value">{{ formatDay(startDay) }}</span>
-      </div>
-      <div class="date-box">
-        <span class="label">Hasta</span>
-        <span class="value">{{ formatDay(endDay) }}</span>
-      </div>
-    </div>
-  </ion-item>
+<!--  <ion-item class="range-container" lines="none">-->
+    <!--<div class="date-boxes">-->
+      <!--<div class="date-box">-->
+        <!--<span class="label">Desde</span>-->
+        <!--<span class="value">{{ formatDay(startDay) }}</span>-->
+      <!--</div>-->
+      <!--<div class="date-box">-->
+        <!--<span class="label">Hasta</span>-->
+        <!--<span class="value">{{ formatDay(endDay) }}</span>-->
+      <!--</div>-->
+    <!--</div>-->
+  <!--</ion-item>-->
 
   <ion-item lines="none">
     <ion-range
@@ -88,7 +88,7 @@
     <ion-label class="total-label">
       <span class="total-title">TOTAL KILOS RETIRADOS</span>
       <span class="total-value">
-        {{ getTotalKg() | number:'1.0-2' }} kg
+        <!--{{ getTotalKg() | number:'1.0-2' }} kg-->
       </span>
     </ion-label>
   </ion-item>
@@ -158,62 +158,6 @@
   </ng-container>
 
 </ng-container>
-  <!--<ng-container-->
-    <!--*ngFor="let group of groupedWithdrawnList; let i = index;">-->
-
-    <!--<br>-->
-    <!--<br>-->
-
-    <!--<div class="group-block">-->
-
-      <!--[> ================= ITEM 1 ================= <]-->
-
-      <!--<ion-item-sliding>-->
-
-        <!--<ion-item class="single-item">-->
-
-          <!--<ng-container-->
-            <!--*ngTemplateOutlet="withdrawnRow; context:{ p: group.items[0] }">-->
-          <!--</ng-container>-->
-
-        <!--</ion-item>-->
-
-        <!--<ion-item-options side="start">-->
-
-          <!--<ion-item-option-->
-            <!--color="primary"-->
-            <!--(click)="onSwipeSingle(group.items[0], slidingItem)">-->
-            <!--Hecho-->
-
-          <!--</ion-item-option>-->
-
-        <!--</ion-item-options>-->
-
-      <!--</ion-item-sliding>-->
-
-
-      <!--[> ================= ITEM 2 ================= <]-->
-
-      <!--<ion-item-sliding>-->
-
-        <!--<ion-item>-->
-        <!--</ion-item>-->
-
-        <!--<ion-item-options side="start">-->
-
-          <!--<ion-item-option-->
-            <!--color="primary"-->
-            <!--(click)="onSwipeSingle(group.items[1], slidingItemB)">-->
-            <!--Hecho-->
-          <!--</ion-item-option>-->
-
-        <!--</ion-item-options>-->
-
-      <!--</ion-item-sliding>-->
-
-    <!--</div>-->
-
-  <!--</ng-container>-->
 
 
   <!-- ================= BOTON NUEVO ================= -->
@@ -250,22 +194,18 @@
       class="withdrawn-row ion-align-items-center"
       [ngClass]="{ 'row-erp': p.state === 'erp' }">
 
-
       <!-- FECHA -->
-      <ion-col size="2">
-        F: {{ formatFechaLatam(p.data.date) }}
-      </ion-col>
-
+<!--      <ion-col size="2">-->
+        <!--{{p.id}} |  {{ formatFechaLatam(p.data.date) }}-->
+      <!--</ion-col>-->
 
       <!-- ISOTANQUE -->
-      <ion-col
-        size="2"
-        [ngStyle]="{ 'background-color': getCcoColorById(p?.data?.name) }"
-        class="isotank-col">
-
-        {{ getCcoNameById(p?.data?.name) }}
-
-      </ion-col>
+<!--      <ion-col-->
+        <!--size="2"-->
+        <!--[ngStyle]="{ 'background-color': getCcoColorById(p?.data?.name) }"-->
+        <!--class="isotank-col">-->
+        <!--{{ getCcoNameById(p?.data?.name) }}-->
+      <!--</ion-col>-->
 
       <!-- TICKET -->
       <ion-col size="1">
@@ -277,29 +217,27 @@
         {{ p.data.kg }}
       </ion-col>
 
-      <!-- VENDOR -->
-      <ion-col size="1">
-        <span *ngIf="p.data.vendor==1">Plexa</span>
-        <span *ngIf="p.data.vendor==2">Plexa port</span>
-        <span *ngIf="p.data.vendor==3">Otro</span>
-      </ion-col>
+      <!--[> VENDOR <]-->
+      <!--<ion-col size="1">-->
+        <!--<span *ngIf="p.data.vendor==1">Plexa</span>-->
+        <!--<span *ngIf="p.data.vendor==2">Plexa port</span>-->
+        <!--<span *ngIf="p.data.vendor==3">Otro</span>-->
+      <!--</ion-col>-->
 
-      <!-- BASCULA -->
-      <ion-col size="2">
-        {{ p.data.wnet }}
-      </ion-col>
+      <!--[> BASCULA <]-->
+      <!--<ion-col size="2">-->
+        <!--{{ p.data.wnet }}-->
+      <!--</ion-col>-->
 
-      <!-- DIF -->
-      <ion-col
-        size="1"
-        [ngClass]="p.diff >= 500 ? 'diff-warning' : 'diff-normal'">
-        {{ p.diff }}
-      </ion-col>
-
+      <!--[> DIF <]-->
+      <!--<ion-col-->
+        <!--size="1"-->
+        <!--[ngClass]="p.diff >= 500 ? 'diff-warning' : 'diff-normal'">-->
+        <!--{{ p.diff }}-->
+      <!--</ion-col>-->
 
       <ion-col size="2" class="actions-col">
-               
-           <ion-button
+        <ion-button
           fill="clear"
           size="small"
           class="btn-compact"
@@ -340,7 +278,6 @@
         </ion-button>
 
       </ion-col>
-
 
     </ion-row>
 

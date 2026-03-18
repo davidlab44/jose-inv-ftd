@@ -1,0 +1,287 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-searchbar
+      placeholder="Buscar"
+      (ionInput)="onSearch($event.target.value)">
+    </ion-searchbar>
+
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+<!--  <ion-item class="range-container" lines="none">-->
+    <!--<div class="date-boxes">-->
+      <!--<div class="date-box">-->
+        <!--<span class="label">Desde</span>-->
+        <!--<span class="value">{{ formatDay(startDay) }}</span>-->
+      <!--</div>-->
+      <!--<div class="date-box">-->
+        <!--<span class="label">Hasta</span>-->
+        <!--<span class="value">{{ formatDay(endDay) }}</span>-->
+      <!--</div>-->
+    <!--</div>-->
+  <!--</ion-item>-->
+
+  <ion-item lines="none">
+    <ion-range
+      class="day-range"
+      min="1"
+      max="365"
+      step="1"
+      dualKnobs="true"
+      snaps="true"
+      ticks="true"
+      [(ngModel)]="dayRange"
+      (ionChange)="onRangeChange($event)">
+    </ion-range>
+  </ion-item>
+
+  <br><br>
+
+  <ion-item lines="none">
+    <div style="display:flex;width:100%;justify-content:center;gap:8px;">
+      <ion-select
+        interface="popover"
+        placeholder="Tipo"
+        style="width:50%;"
+        [(ngModel)]="filterType"
+        (ionChange)="onTypeChange($event)">
+        <ion-select-option
+          *ngFor="let t of types"
+          [value]="t.value">
+          {{ t.name }}
+        </ion-select-option>
+      </ion-select>
+
+      <ion-select
+        interface="popover"
+        placeholder="Vendor"
+        style="width:50%;"
+        [(ngModel)]="filterVendor"
+        (ionChange)="onVendorChange($event)">
+        <ion-select-option
+          *ngFor="let v of vendors"
+          [value]="v.value">
+          {{ v.name }}
+        </ion-select-option>
+      </ion-select>
+    </div>
+  </ion-item>
+
+  <br><br>
+
+  <ion-item-divider class="total-divider"></ion-item-divider>
+
+  <ion-item class="total-item highlighted" lines="none">
+    <ion-label class="total-label">
+      <span class="total-title">TOTAL KILOS RETIRADOS</span>
+      <span class="total-value">
+        <!--{{ getTotalKg() | number:'1.0-2' }} kg-->
+      </span>
+    </ion-label>
+  </ion-item>
+
+  <br><br>
+
+
+
+
+
+
+<!-- ================= HEADER COLUMNAS ================= -->
+
+<ion-grid class="withdrawn-header">
+
+  <ion-row class="ion-align-items-center header-row">
+
+    <ion-col size="2" class="header-col">
+      <ion-label>Fecha</ion-label>
+    </ion-col>
+
+    <ion-col size="2" class="header-col">
+      <ion-label>Isotanq.</ion-label>
+    </ion-col>
+
+    <ion-col size="1" class="header-col">
+      <ion-label>Tkt.</ion-label>
+    </ion-col>
+
+    <ion-col size="1" class="header-col">
+      <ion-label>kg</ion-label>
+    </ion-col>
+
+    <ion-col size="1" class="header-col">
+      <ion-label>Vendor</ion-label>
+    </ion-col>
+
+    <ion-col size="2" class="header-col">
+      <ion-label>Basc</ion-label>
+    </ion-col>
+
+    <ion-col size="1" class="header-col">
+      <ion-label>Dif</ion-label>
+    </ion-col>
+
+    <ion-col size="2" class="header-col">
+      <ion-label></ion-label>
+    </ion-col>
+
+  </ion-row>
+
+</ion-grid>
+
+
+<ion-list>
+
+
+
+
+
+  <!-- LISTA DE REGISTROS -->
+
+<ng-container *ngFor="let item of fullWithdrawnList">
+
+  <ng-container
+    *ngTemplateOutlet="withdrawnRow; context: { p: item }">
+  </ng-container>
+
+</ng-container>
+
+
+  <!-- ================= BOTON NUEVO ================= -->
+
+  <ion-list>
+
+    <ion-item lines="none">
+
+      <ion-button
+        color="primary"
+        slot="end"
+        (click)="plexaUploader('no estoy pasando nada'); $event.stopPropagation()">
+
+        <ion-icon name="add-outline"></ion-icon>
+
+      </ion-button>
+
+      &nbsp;&nbsp;
+
+    </ion-item>
+
+  </ion-list>
+
+</ion-list>
+
+
+<!-- ================= TEMPLATE ROW ================= -->
+
+<ng-template #withdrawnRow let-p="p">
+
+  <ion-grid class="withdrawn-grid">
+
+    <ion-row
+      class="withdrawn-row ion-align-items-center"
+      [ngClass]="{ 'row-erp': p.state === 'erp' }">
+
+      <!-- FECHA -->
+<!--      <ion-col size="2">-->
+        <!--{{p.id}} |  {{ formatFechaLatam(p.data.date) }}-->
+      <!--</ion-col>-->
+
+      <!-- ISOTANQUE -->
+<!--      <ion-col-->
+        <!--size="2"-->
+        <!--[ngStyle]="{ 'background-color': getCcoColorById(p?.data?.name) }"-->
+        <!--class="isotank-col">-->
+        <!--{{ getCcoNameById(p?.data?.name) }}-->
+      <!--</ion-col>-->
+
+      <!-- TICKET -->
+      <ion-col size="1">
+        {{ p.data.ticket }}
+      </ion-col>
+
+      <!-- KG -->
+      <ion-col size="1">
+        {{ p.data.kg }}
+      </ion-col>
+
+      <!--[> VENDOR <]-->
+      <!--<ion-col size="1">-->
+        <!--<span *ngIf="p.data.vendor==1">Plexa</span>-->
+        <!--<span *ngIf="p.data.vendor==2">Plexa port</span>-->
+        <!--<span *ngIf="p.data.vendor==3">Otro</span>-->
+      <!--</ion-col>-->
+
+      <!--[> BASCULA <]-->
+      <!--<ion-col size="2">-->
+        <!--{{ p.data.wnet }}-->
+      <!--</ion-col>-->
+
+      <!--[> DIF <]-->
+      <!--<ion-col-->
+        <!--size="1"-->
+        <!--[ngClass]="p.diff >= 500 ? 'diff-warning' : 'diff-normal'">-->
+        <!--{{ p.diff }}-->
+      <!--</ion-col>-->
+
+      <ion-col size="2" class="actions-col">
+        <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Plexa"
+          [color]="p.data.kg > 0 ? 'primary' : 'dark'"
+          (click)="patch(p,'vendor'); $event.stopPropagation()">
+          <ion-icon name="logo-amplify"></ion-icon>
+        </ion-button>
+
+       <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Bascula"
+          [color]="p.data.wnet > 0 ? 'primary' : 'dark'"
+          (click)="patch(p,'scale'); $event.stopPropagation()">
+          <ion-icon name="scale-outline"></ion-icon>
+        </ion-button>
+
+       <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Viajes | Llegadas"
+          [color]="p.data.shipin > 0 ? 'primary' : 'dark'"
+          (click)="patch(p,'in'); $event.stopPropagation()">
+          <ion-icon name="boat-outline"></ion-icon>
+        </ion-button>
+
+       <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Viajes | Salidas"
+          [color]="p.data.shipout > 0 ? 'primary' : 'dark'"
+          (click)="patch(p,'out'); $event.stopPropagation()">
+          <ion-icon name="basket-outline"></ion-icon>
+        </ion-button>
+
+      </ion-col>
+
+    </ion-row>
+
+  </ion-grid>
+
+</ng-template>
+

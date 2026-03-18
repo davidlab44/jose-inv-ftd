@@ -269,13 +269,13 @@ export class PatchPage {
           deliveryin: this.parseNumber(res?.data?.deliveryin ?? 0),
           datein: res?.data?.datein ?? '',
           tripin: res?.data?.tripin ?? '',
-          shipin: this.shipNombreEsp,
+          //shipin: this.shipNombreEsp,
         };
         this.form.patchValue({
           deliveryin: this.parseNumber(res?.data?.deliveryin ?? 0),
           datein: res?.data?.datein ?? '',
           tripin: res?.data?.tripin ?? '',
-          shipin: this.shipNombreEsp,
+          //shipin: this.shipNombreEsp,
         });
         console.log("movement actualizado:", this.movement);
       },
@@ -292,15 +292,17 @@ export class PatchPage {
       deliveryin: Number(f.deliveryin ?? ''),
       datein: f.datein ?? '',
       tripin: f.tripin ?? '',
-      ship: Number(f.shipin ?? 0),
+      //shipin: Number(f.shipin ?? 0),
     };
   }
 
   patch() {
     this.updateMovementFromForm();
+    this.movement.data.imgin = this.uploadedUrl;
     const payload = {
       ...this.movement.data,
-      shipin: this.shipId ?? 0
+      shipin: Number(this.form.value.shipin) || 0 
+      //shipin: this.shipId ?? 0
     };
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({

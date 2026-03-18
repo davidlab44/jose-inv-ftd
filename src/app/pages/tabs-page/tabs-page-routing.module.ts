@@ -266,7 +266,6 @@ const routes: Routes = [
           }
         ]
       },
-
       {
         path: 'replenishment-vendor-post',
         children: [
@@ -276,7 +275,6 @@ const routes: Routes = [
           }
         ]
       },
-
       {
         path: 'replenishment-scale-patch',
         children: [
@@ -286,7 +284,6 @@ const routes: Routes = [
           }
         ]
       },
-
       {
         path: 'replenishment-in-patch',
         children: [
@@ -296,8 +293,6 @@ const routes: Routes = [
           }
         ]
       },
-
-
       {
         path: 'replenishment-out-patch',
         children: [
@@ -307,9 +302,15 @@ const routes: Routes = [
           }
         ]
       },
-
-
-
+      {
+        path: 'replenishment-get-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/get/getall/getall.module').then(m => m.GetallModule)
+          }
+        ]
+      },
       {
         path: '',
         redirectTo: '/app/tabs/schedule',

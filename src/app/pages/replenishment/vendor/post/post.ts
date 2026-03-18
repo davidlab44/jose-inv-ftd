@@ -1,4 +1,6 @@
+
 import { Component, ViewChild, ElementRef } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
 import { ConferenceData } from '../../../../providers/conference-data';
@@ -24,7 +26,6 @@ import { RexService } from '../../../../services/rex.service';
 import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
 import { ReplenishmentService } from '../../../../services/replenishment/replenishment.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PhotoService } from '../../../../services/asset/photo.service';
 import { OcrService } from '../../../../services/ai/ocr.service';
 import { CcoService } from '../../../../services/cc/cco.service';
@@ -59,34 +60,6 @@ export class AssetSupplyPostPage {
   todayDate:any;
   form!: FormGroup;
   replenishmentList: any[] = [];
-
-   /*columns = [*/
-      /*{ header: 'Fecha V', field: 'fecha_v' },*/
-      /*{ header: 'Cont vacío', field: 'cont_vacio' },*/
-      /*{ header: 'Rem vacío', field: 'rem_vacio' },*/
-      /*{ header: 'Fe ing M', field: 'fe_ing_m' },*/
-      /*{ header: 'Rem M LL', field: 'rem_m_ll' },*/
-      /*{ header: 'Sur', field: 'sur' },*/
-      /*{ header: 'Nort', field: 'nort' },*/
-      /*{ header: 'Fecha', field: 'fecha' },*/
-      /*{ header: 'Ticket', field: 'ticket' },*/
-      /*{ header: 'PSI', field: 'psi' },*/
-      /*{ header: 'OPC', field: 'opc' },*/
-      /*{ header: 'IMPO', field: 'impo' },*/
-      /*{ header: 'P Total', field: 'p_total' },*/
-      /*{ header: 'Rotogate', field: 'rotogate' },*/
-      /*{ header: 'P Vacío B', field: 'p_vacio_b' },*/
-      /*{ header: 'Peso lleno B', field: 'peso_lleno_b' },*/
-      /*{ header: 'P Neto', field: 'p_neto' },*/
-      /*{ header: 'Dif', field: 'dif' },*/
-      /*{ header: 'Precio P', field: 'precio_p' },*/
-      /*{ header: 'Fecha F', field: 'fecha_f' },*/
-      /*{ header: 'Factura', field: 'factura' },*/
-      /*{ header: 'Valor Fact', field: 'valor_fact' },*/
-      /*{ header: 'Sello1', field: 'sello1' },*/
-      /*{ header: 'Sello2', field: 'sello2' },*/
-      /*{ header: 'Sello3', field: 'sello3' },*/
-    /*];*/
   uploadProgress = 0;
   uploadedUrl: string | null = null;
   uploading = false;
@@ -134,12 +107,14 @@ export class AssetSupplyPostPage {
       kg: [0],
       psi: [0],
       rotogate: [0],
+      seal: this.fb.array([]),
     });
     const ahora = new Date();
     this.todayDate=this.formatFechaLatam(ahora);
     this.displayLast();
   }
- 
+
+
   lastAsset:any;
   displayLast() {
     this.productService.getAll().subscribe({
@@ -206,7 +181,6 @@ export class AssetSupplyPostPage {
   }
 
   async takePhotoAndUpload() {
-
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
@@ -228,15 +202,10 @@ export class AssetSupplyPostPage {
         this.uploading = false;
       }
     });
-
     url$.subscribe({
       next: (url) => {
-
         this.uploadedUrl = url;
-
-        // 👇 aquí llamas el OCR
         this.launchOcr(url);
-
       },
       error: (err) => {
         console.error('Error obteniendo URL', err);
@@ -245,9 +214,7 @@ export class AssetSupplyPostPage {
         this.uploading = false;
       }
     });
-
   }
-
 
   async pickImageAndUpload() {
 
@@ -261,18 +228,13 @@ export class AssetSupplyPostPage {
       this.uploading = false;
       return;
     }
-
     const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
-
     progress$.subscribe(p => this.uploadProgress = p);
-
     url$.subscribe({
       next: (url) => {
-
         this.uploadedUrl = url;
         // lanzar OCR cuando la URL esté disponible
         this.launchOcr(url);
-
       },
       error: (err) => {
         console.error('Error upload', err);
@@ -292,7 +254,6 @@ export class AssetSupplyPostPage {
         console.log('OCR Response:', this.ocrResponse);
         console.log('ocrResponse.data:', this.ocrResponse.data);
         console.log('ocrResponse.data.date:', this.ocrResponse.data.date);
-             
         this.updateUi();
       },
       error: (err) => {
@@ -302,24 +263,53 @@ export class AssetSupplyPostPage {
     ;
   }
 
+
+
+
+
+get seals(): FormArray {
+  return this.form.get('seal') as FormArray;
+}
+
   isotanq:any;
   updateUi(){
-    const normalizedDate = this.normalizeOCRDate(this.ocrResponse.data.date);
-    this.form = this.fb.group({
+    const data = this.ocrResponse.data;
+    const normalizedDate = this.normalizeOCRDate(data.date);
+    this.form.patchValue({
       date: normalizedDate,
-      name: this.ocrResponse.data.isotanq ?? null,
-      ticket: this.ocrResponse.data.ticket ?? null,
-      kg: this.ocrResponse.data.kg ?? null,
-      psi: this.ocrResponse.data.psi ?? null,
-      rotogate: this.ocrResponse.data.rotogate ?? null,
+      name: data.isotanq ?? null,
+      ticket: data.ticket ?? null,
+      kg: data.kg ?? null,
+      psi: data.psi ?? null,
+      rotogate: data.rotogate ?? null,
     });
-    this.isotanq = this.validateIsotanqName(this.ocrResponse.data.isotanq, this.ccos);
-    if (this.isotanq && this.isotanq.id) {
-      console.log("CCO encontrado:", this.isotanq);
-    } else {
-      console.log("No existe");
+    this.seals.clear();
+    if (data.seal && Array.isArray(data.seal)) {
+      data.seal.forEach((s: string) => {
+        this.seals.push(this.fb.control(s));
+      });
     }
+    this.isotanq = this.validateIsotanqName(data.isotanq, this.ccos);
   }
+
+
+  /*updateUi(){*/
+    /*const normalizedDate = this.normalizeOCRDate(this.ocrResponse.data.date);*/
+    /*this.form = this.fb.group({*/
+      /*date: normalizedDate,*/
+      /*name: this.ocrResponse.data.isotanq ?? null,*/
+      /*ticket: this.ocrResponse.data.ticket ?? null,*/
+      /*kg: this.ocrResponse.data.kg ?? null,*/
+      /*psi: this.ocrResponse.data.psi ?? null,*/
+      /*rotogate: this.ocrResponse.data.rotogate ?? null,*/
+    /*});*/
+    /*this.isotanq = this.validateIsotanqName(this.ocrResponse.data.isotanq, this.ccos);*/
+    /*if (this.isotanq && this.isotanq.id) {*/
+      /*console.log("CCO encontrado:", this.isotanq);*/
+    /*} else {*/
+      /*console.log("No existe");*/
+    /*}*/
+  /*}*/
 
    ccos: any[] = []; 
    loadCco() {                
@@ -334,42 +324,30 @@ export class AssetSupplyPostPage {
       }); 
    } 
 
-
   validateIsotanqName(hash: string, ccos: any[]): any | null {
-
     if (!hash || !ccos) {
       return null;
     }
-
     const cleanHash = hash.trim();
-
     for (const cco of ccos) {
-
       const name: string = cco?.data?.name || '';
-
-      // extrae ######-#
       const match = name.match(/(\d{6}-\d)/);
-
       if (match && match[1] === cleanHash) {
-        return cco;   // ← devuelve el objeto completo
+        return cco;
       }
-
     }
-
     return null;
   }
 
-
-
   guardar() {
-
     const formData: Partial<WithdrawnData> = this.form.value;
 
     const withdrawn: Withdrawn = createDefaultWithdrawn();
 
     withdrawn.data = {
       ...withdrawn.data,
-      ...formData
+      ...formData,
+      seal: this.seals.value  // 👈 🔥 clave: asegurar array limpio
     };
 
     withdrawn.data.name = this.isotanq?.id ?? null;
@@ -380,91 +358,51 @@ export class AssetSupplyPostPage {
     console.log("payload to post =>", payload);
 
     this.withdrawnService.post(payload).subscribe({
-
       next: (response) => {
         console.log("Withdrawn post response", response);
       },
-
       error: (err) => {
         console.error("Withdrawn post error", err);
       }
-
     });
-
   }
 
 
-
-  /*guardar() {*/
-
+/*  guardar() {*/
     /*const formData: Partial<WithdrawnData> = this.form.value;*/
-
     /*const withdrawn: Withdrawn = createDefaultWithdrawn();*/
-
-    /*// fusionar defaults + form*/
     /*withdrawn.data = {*/
       /*...withdrawn.data,*/
       /*...formData*/
     /*};*/
-
-    /*console.log('isotanq',this.isotanq)*/
-    /*// campos calculados*/
-    /*withdrawn.data.name = this.isotanq.id;*/
+    /*withdrawn.data.name = this.isotanq?.id ?? null;*/
     /*withdrawn.data.img = this.uploadedUrl;*/
-
-    /*// eliminar campos que genera la BD*/
-    /*const { id, created_at, updated_at, ...payload } = withdrawn;*/
-
-    /*console.log('Withdrawn to post =>', payload);*/
-
+    /*const payload = withdrawn.data;*/
+    /*console.log("payload to post =>", payload);*/
     /*this.withdrawnService.post(payload).subscribe({*/
-
       /*next: (response) => {*/
-
-        /*console.log("Withdrawn post response", response);*/
-
-  /*[>      if (response && response.length > 0) {<]*/
-
-          /*[>this.utilService.presentToast(response.toString());<]*/
-
-          /*[>this.router.navigate(<]*/
-            /*[>['/app/tabs/replenishment-withdrawn-getall'],<]*/
-            /*[>{ replaceUrl: true }<]*/
-          /*[>);<]*/
-
-        /*[>}<]*/
-
+        /*console.log("Withdrawn post response  ", response);*/
       /*},*/
 
       /*error: (err) => {*/
         /*console.error("Withdrawn post error", err);*/
       /*}*/
-
     /*});*/
-
   /*}*/
 
-
-
   normalizeOCRDate(dateStr: string): string | null {
-
     if (!dateStr) return null;
-
     const date = new Date(dateStr);
-
     if (isNaN(date.getTime())) {
       console.warn("Fecha OCR inválida:", dateStr);
       return null;
     }
-
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
-
     const hh = String(date.getHours()).padStart(2, '0');
     const mi = String(date.getMinutes()).padStart(2, '0');
     const ss = String(date.getSeconds()).padStart(2, '0');
-
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
 

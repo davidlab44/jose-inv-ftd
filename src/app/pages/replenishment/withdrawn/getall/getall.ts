@@ -1,3 +1,4 @@
+import { ChangeDetectorRef } from '@angular/core';
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
@@ -96,17 +97,22 @@ export class GetallPage implements OnInit {
     private prodrexService: ProdrexService,
     private userService: UserService,
     private withdrawnService: WithdrawnService,
-    private ccoService: CcoService
+    private ccoService: CcoService,
+    private cd: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
     this.syncDays();
-    this.getCco();
+    //this.getCco();
   }
 
   ionViewWillEnter() {
     this.getAll();
   }
+
+  /*ionViewDidEnter() {*/
+    /*this.getAll();*/
+  /*}*/
 
   getAll() {
     const since = this.dayOfYearToISO(this.startDay);
@@ -115,10 +121,13 @@ export class GetallPage implements OnInit {
       next: response => {
         this.withdrawnList = response;
         console.log("withdrawnList response",this.withdrawnList)
-      
         this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList);
         console.log('full',this,this.fullWithdrawnList)
         //this.groupWithdrawnByRefdate();
+        //this.cd.detach();
+        setTimeout(() => {
+          this.cd.detach();
+        }, 10000); // 10000 ms = 10 segundos
       }
     });
   }
@@ -209,29 +218,30 @@ export class GetallPage implements OnInit {
     this.searchSubject.next(text);
   }
 
-  getCco() {
-    this.ccoService.getAll().subscribe(resp => {
-      this.ccoList = resp;
-    });
-  }
+/*  getCco() {*/
+    /*this.ccoService.getAll().subscribe(resp => {*/
+      /*this.ccoList = resp;*/
+      /*console.log('ccoList',this.ccoList)*/
+    /*});*/
+  /*}*/
 
-  getCcoNameById(id: number | null | undefined): string {
-    if (id == null) return 'Sin nombre';
-    const cco = this.ccoList.find(c => Number(c.id) === Number(id));
-    const nombre = cco?.data?.name;
-    return typeof nombre === 'string' && nombre.trim() !== ''
-      ? nombre
-      : 'Sin Nombre';
-  }
+  /*getCcoNameById(id: number | null | undefined): string {*/
+    /*if (id == null) return 'Sin nombre';*/
+    /*const cco = this.ccoList.find(c => Number(c.id) === Number(id));*/
+    /*const nombre = cco?.data?.name;*/
+    /*return typeof nombre === 'string' && nombre.trim() !== ''*/
+      /*? nombre*/
+      /*: 'Sin Nombre';*/
+  /*}*/
 
-  getCcoColorById(id: number | null | undefined): string {
-    if (id == null) return '#ffffff';
-    const cco = this.ccoList.find(c => Number(c.id) === Number(id));
-    const color = cco?.data?.color;
-    return typeof color === 'string' && color.trim() !== ''
-      ? color
-      : '#ffffff';
-  }
+  /*getCcoColorById(id: number | null | undefined): string {*/
+    /*if (id == null) return '#ffffff';*/
+    /*const cco = this.ccoList.find(c => Number(c.id) === Number(id));*/
+    /*const color = cco?.data?.color;*/
+    /*return typeof color === 'string' && color.trim() !== ''*/
+      /*? color*/
+      /*: '#ffffff';*/
+  /*}*/
 
   formatFechaLatam(dateInput: string | Date | number): string {
     if (!dateInput) return '';

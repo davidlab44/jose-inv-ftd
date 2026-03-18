@@ -478,16 +478,8 @@ export class PatchPage {
 
 
 
-
-
-
-
-
-
   updateMovementFromForm() {
-
     const f = this.form.value;
-
     this.movement.data = {
       ...this.movement.data,
       date: f.fecha,
@@ -498,26 +490,19 @@ export class PatchPage {
       rotogate: Number(f.rotogate),
       seal: [f.sello1, f.sello2, f.sello3].filter(Boolean)
     };
-
   }
 
 
 
-
   patch() {
-
     this.updateMovementFromForm();
-
+    this.movement.data.img = this.uploadedUrl;
     const payload = this.movement.data;
-
     console.log("payload to patch =>", payload);
-
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
-
       next: (response) => {
         console.log("Withdrawn patch response", response);
       },
-
       error: (err) => {
         console.error("Withdrawn patch error", err);
       }
