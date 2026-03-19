@@ -20,19 +20,36 @@
   </ion-toolbar>
 </ion-header>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <ion-content>
-<!--  <ion-item class="range-container" lines="none">-->
-    <!--<div class="date-boxes">-->
-      <!--<div class="date-box">-->
-        <!--<span class="label">Desde</span>-->
-        <!--<span class="value">{{ formatDay(startDay) }}</span>-->
-      <!--</div>-->
-      <!--<div class="date-box">-->
-        <!--<span class="label">Hasta</span>-->
-        <!--<span class="value">{{ formatDay(endDay) }}</span>-->
-      <!--</div>-->
-    <!--</div>-->
-  <!--</ion-item>-->
+
+  <ion-item class="range-container" lines="none">
+    <div class="date-boxes">
+      <div class="date-box">
+        <span class="label">Desde</span>
+        <span class="value">{{ formatDay(startDay) }}</span>
+      </div>
+      <div class="date-box">
+        <span class="label">Hasta</span>
+        <span class="value">{{ formatDay(endDay) }}</span>
+      </div>
+    </div>
+  </ion-item>
 
   <ion-item lines="none">
     <ion-range
@@ -100,188 +117,159 @@
 
 
 
-<!-- ================= HEADER COLUMNAS ================= -->
 
-<ion-grid class="withdrawn-header">
+  <!-- 🔍 BUSCADOR -->
+  <div class="toolbar">
+    <input
+      type="text"
+      placeholder="Buscar..."
+      [(ngModel)]="searchTerm"
+    />
+  </div>
 
-  <ion-row class="ion-align-items-center header-row">
+  <div class="table-wrapper">
+    <div class="table-container">
 
-    <ion-col size="2" class="header-col">
-      <ion-label>Fecha</ion-label>
-    </ion-col>
+      <table>
 
-    <ion-col size="2" class="header-col">
-      <ion-label>Isotanq.</ion-label>
-    </ion-col>
+        <thead>
+          <tr>
 
-    <ion-col size="1" class="header-col">
-      <ion-label>Tkt.</ion-label>
-    </ion-col>
+            <th (click)="sortData('data.date')">Date</th>
+            <th (click)="sortData('isotanq_name')">Isotanq</th>
+            <th (click)="sortData('data.kg')">KG</th>
+            <th (click)="sortData('data.psi')">PSI</th>
+            <th (click)="sortData('data.rotogate')">Rotogate</th>
+            <th>Seal</th>
 
-    <ion-col size="1" class="header-col">
-      <ion-label>kg</ion-label>
-    </ion-col>
+            <th (click)="sortData('data.ticket')">Ticket</th>
+            <th (click)="sortData('data.vendor')">Vendor</th>
+            <th (click)="sortData('data.wgross')">Wgross</th>
+            <th (click)="sortData('data.wtare')">Wtare</th>
+            <th (click)="sortData('data.wnet')">Wnet</th>
 
-    <ion-col size="1" class="header-col">
-      <ion-label>Vendor</ion-label>
-    </ion-col>
+            <th (click)="sortData('data.datein')">Date In</th>
+            <th (click)="sortData('data.deliveryin')">Delivery In</th>
+            <th (click)="sortData('data.tripin')">Trip In</th>
+            <th (click)="sortData('shipin_name')">Ship In</th>
 
-    <ion-col size="2" class="header-col">
-      <ion-label>Basc</ion-label>
-    </ion-col>
+            <th (click)="sortData('data.dateout')">Date Out</th>
+            <th (click)="sortData('data.deliveryout')">Delivery Out</th>
+            <th (click)="sortData('data.tripout')">Trip Out</th>
+            <th (click)="sortData('shipout_name')">Ship Out</th>
 
-    <ion-col size="1" class="header-col">
-      <ion-label>Dif</ion-label>
-    </ion-col>
+            <th (click)="sortData('diff')">Diff</th>
 
-    <ion-col size="2" class="header-col">
-      <ion-label></ion-label>
-    </ion-col>
+            <th (click)="sortData('data.isotanq')">Isotanq ID</th>
+            <th (click)="sortData('data.name')">CCO ID</th>
+            <th (click)="sortData('data.shipin')">ShipIn ID</th>
+            <th (click)="sortData('data.shipout')">ShipOut ID</th>
 
-  </ion-row>
+            <th>Img</th>
+            <th>Img Scale</th>
+            <th>Img In</th>
+            <th>Img Out</th>
 
-</ion-grid>
+            <th (click)="sortData('data.price')">Price</th>
+            <th (click)="sortData('data.wticket')">WTicket</th>
+
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of filteredList; trackBy: trackById">
+
+            <!-- ORDEN EXACTO -->
+
+            <!--<td>{{ item.data.date | date:'short' }}</td>-->
+            <td>{{ item.data.date | date:'dd/MM/yyyy' }}</td>
+            <td>{{ item.isotanq_name }}</td>
+            <td>{{ item.data.kg }}</td>
+
+            <td [ngClass]="{
+              'low': item.data.psi < 100,
+              'ok': item.data.psi >= 100
+            }">
+              {{ item.data.psi }}
+            </td>
+
+            <td>{{ item.data.rotogate }}</td>
+
+            <td>
+              {{ item.data.seal?.join(', ') }}
+            </td>
+
+            <td>{{ item.data.ticket }}</td>
+            <td>{{ item.data.vendor }}</td>
+            <td>{{ item.data.wgross | number }}</td>
+            <td>{{ item.data.wtare | number }}</td>
+            <td>{{ item.data.wnet | number }}</td>
+
+            <!--<td>{{ item.data.datein | datelatam }}</td>-->
+            <td>{{ item.data.datein | date:'dd/MM/yyyy' }}</td>
+            <td>{{ item.data.deliveryin }}</td>
+            <td>{{ item.data.tripin }}</td>
+            <td>{{ item.shipin_name }}</td>
+
+            <!--<td>{{ item.data.dateout | date:'shortDate' }}</td>-->
+            <td>{{ item.data.dateout | date:'dd/MM/yyyy' }}</td>
+            <td>{{ item.data.deliveryout }}</td>
+            <td>{{ item.data.tripout }}</td>
+            <td>{{ item.shipout_name }}</td>
+
+            <td>{{ item.diff }}</td>
+
+            <td>{{ item.data.isotanq }}</td>
+            <td>{{ item.data.name }}</td>
+            <!--<td>{{ item.data.shipin }}</td>-->
+            <td>
+              {{ shipMap[item.data.shipin]?.name || 'N/A' }}
+            </td>
+            <td>{{ item.data.shipout }}</td>
+
+            <!-- imágenes (optimizado) -->
+            <td>
+              <a *ngIf="item.data.img" [href]="item.data.img" target="_blank">Ver</a>
+            </td>
+
+            <td>
+              <a *ngIf="item.data.imgscale" [href]="item.data.imgscale" target="_blank">Ver</a>
+            </td>
+
+            <td>
+              <a *ngIf="item.data.imgin" [href]="item.data.imgin" target="_blank">Ver</a>
+            </td>
+
+            <td>
+              <a *ngIf="item.data.imgout" [href]="item.data.imgout" target="_blank">Ver</a>
+            </td>
+
+            <td>{{ item.data.price }}</td>
+            <td>{{ item.data.wticket }}</td>
+
+          </tr>
+        </tbody>
+
+      </table>
+
+    </div>
+  </div>
+
+</ion-content>
 
 
-<ion-list>
 
 
 
 
 
-  <!-- LISTA DE REGISTROS -->
-
-<ng-container *ngFor="let item of fullWithdrawnList">
-
-  <ng-container
-    *ngTemplateOutlet="withdrawnRow; context: { p: item }">
-  </ng-container>
-
-</ng-container>
 
 
-  <!-- ================= BOTON NUEVO ================= -->
-
-  <ion-list>
-
-    <ion-item lines="none">
-
-      <ion-button
-        color="primary"
-        slot="end"
-        (click)="plexaUploader('no estoy pasando nada'); $event.stopPropagation()">
-
-        <ion-icon name="add-outline"></ion-icon>
-
-      </ion-button>
-
-      &nbsp;&nbsp;
-
-    </ion-item>
-
-  </ion-list>
-
-</ion-list>
 
 
-<!-- ================= TEMPLATE ROW ================= -->
 
-<ng-template #withdrawnRow let-p="p">
 
-  <ion-grid class="withdrawn-grid">
 
-    <ion-row
-      class="withdrawn-row ion-align-items-center"
-      [ngClass]="{ 'row-erp': p.state === 'erp' }">
 
-      <!-- FECHA -->
-<!--      <ion-col size="2">-->
-        <!--{{p.id}} |  {{ formatFechaLatam(p.data.date) }}-->
-      <!--</ion-col>-->
 
-      <!-- ISOTANQUE -->
-<!--      <ion-col-->
-        <!--size="2"-->
-        <!--[ngStyle]="{ 'background-color': getCcoColorById(p?.data?.name) }"-->
-        <!--class="isotank-col">-->
-        <!--{{ getCcoNameById(p?.data?.name) }}-->
-      <!--</ion-col>-->
-
-      <!-- TICKET -->
-      <ion-col size="1">
-        {{ p.data.ticket }}
-      </ion-col>
-
-      <!-- KG -->
-      <ion-col size="1">
-        {{ p.data.kg }}
-      </ion-col>
-
-      <!--[> VENDOR <]-->
-      <!--<ion-col size="1">-->
-        <!--<span *ngIf="p.data.vendor==1">Plexa</span>-->
-        <!--<span *ngIf="p.data.vendor==2">Plexa port</span>-->
-        <!--<span *ngIf="p.data.vendor==3">Otro</span>-->
-      <!--</ion-col>-->
-
-      <!--[> BASCULA <]-->
-      <!--<ion-col size="2">-->
-        <!--{{ p.data.wnet }}-->
-      <!--</ion-col>-->
-
-      <!--[> DIF <]-->
-      <!--<ion-col-->
-        <!--size="1"-->
-        <!--[ngClass]="p.diff >= 500 ? 'diff-warning' : 'diff-normal'">-->
-        <!--{{ p.diff }}-->
-      <!--</ion-col>-->
-
-      <ion-col size="2" class="actions-col">
-        <ion-button
-          fill="clear"
-          size="small"
-          class="btn-compact"
-          title="Plexa"
-          [color]="p.data.kg > 0 ? 'primary' : 'dark'"
-          (click)="patch(p,'vendor'); $event.stopPropagation()">
-          <ion-icon name="logo-amplify"></ion-icon>
-        </ion-button>
-
-       <ion-button
-          fill="clear"
-          size="small"
-          class="btn-compact"
-          title="Bascula"
-          [color]="p.data.wnet > 0 ? 'primary' : 'dark'"
-          (click)="patch(p,'scale'); $event.stopPropagation()">
-          <ion-icon name="scale-outline"></ion-icon>
-        </ion-button>
-
-       <ion-button
-          fill="clear"
-          size="small"
-          class="btn-compact"
-          title="Viajes | Llegadas"
-          [color]="p.data.shipin > 0 ? 'primary' : 'dark'"
-          (click)="patch(p,'in'); $event.stopPropagation()">
-          <ion-icon name="boat-outline"></ion-icon>
-        </ion-button>
-
-       <ion-button
-          fill="clear"
-          size="small"
-          class="btn-compact"
-          title="Viajes | Salidas"
-          [color]="p.data.shipout > 0 ? 'primary' : 'dark'"
-          (click)="patch(p,'out'); $event.stopPropagation()">
-          <ion-icon name="basket-outline"></ion-icon>
-        </ion-button>
-
-      </ion-col>
-
-    </ion-row>
-
-  </ion-grid>
-
-</ng-template>
 

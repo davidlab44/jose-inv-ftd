@@ -16,7 +16,7 @@ import { OpportunityService } from '../../../../services/opportunity.service';
 import { PosOrderService } from '../../../../services/pos-order.service';
 import { TableService } from '../../../../services/table.service';
 import { ActivatedRoute } from '@angular/router';
-import { Session } from '../../../../interfaces/session';
+import { Ship,ShipMap } from '../../../../interfaces/ship';
 import { SessionService } from '../../../../services/session.service';
 import { UtilService } from '../../../../services/util.service';
 import { ProductService } from '../../../../services/product.service';
@@ -30,6 +30,8 @@ import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { CcoService } from '../../../../services/cc/cco.service';
+import { ShipService } from '../../../../services/logistic/ship.service';
+
 
 @Component({
   selector: 'page-getall',
@@ -73,6 +75,9 @@ export class GetallPage implements OnInit {
   showSearchbar: boolean;
   searchSubject = new Subject<string>();
   ccoList: any[] = [];
+  shipList: Ship[] = [];
+  shipMap: ShipMap = {};
+
 
   constructor(
     private barcodeService: BarcodeService,
@@ -98,11 +103,13 @@ export class GetallPage implements OnInit {
     private userService: UserService,
     private withdrawnService: WithdrawnService,
     private ccoService: CcoService,
+    private shipService: ShipService,
     private cd: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
     this.syncDays();
+    this.loadShips();
     //this.getCco();
   }
 
@@ -218,7 +225,7 @@ export class GetallPage implements OnInit {
     this.searchSubject.next(text);
   }
 
-/*  getCco() {*/
+  /*  getCco() {*/
     /*this.ccoService.getAll().subscribe(resp => {*/
       /*this.ccoList = resp;*/
       /*console.log('ccoList',this.ccoList)*/
@@ -299,6 +306,73 @@ export class GetallPage implements OnInit {
     console.log("pageRoute",pageRoute);
     this.router.navigate([pageRoute], { state: { item: withdrawn } });
   } 
+
+  trackById(index: number, item: any): number {
+    return item.id;
+  }
+
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
+
+  sortData(column: string) {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+    this.fullWithdrawnList.sort((a: any, b: any) => {
+      const valA = this.getValue(a, column);
+      const valB = this.getValue(b, column);
+      if (valA == null) return -1;
+      if (valB == null) return 1;
+      if (valA < valB) return this.sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  searchTerm: string = '';
+
+  get filteredList() {
+    if (!this.searchTerm) return this.fullWithdrawnList;
+    const term = this.searchTerm.toLowerCase();
+    return this.fullWithdrawnList.filter(item =>
+      Object.values(item.data).some(val =>
+        String(val).toLowerCase().includes(term)
+      )
+    );
+  }
+
+  getValue(item: any, column: string) {
+    return column.includes('data.')
+      ? column.split('.').reduce((o, i) => o?.[i], item)
+      : item[column];
+  }
+
+  private buildShipMap(shipList: Ship[]): ShipMap {
+    return shipList.reduce((acc, ship) => {
+      acc[ship.id] = {
+        name: ship.data?.name ?? 'N/A',
+        imo: ship.data?.imo ?? 'N/A'
+      };
+      return acc;
+    }, {} as ShipMap);
+  }
+
+  loadShips() {
+    this.shipService.getAll().subscribe({
+      next: (ships) => {
+        this.shipList = ships;
+         console.log('shipList',ships);
+        // 🔥 construir el map UNA SOLA VEZ
+        this.shipMap = this.buildShipMap(ships);
+
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
 
 
 }

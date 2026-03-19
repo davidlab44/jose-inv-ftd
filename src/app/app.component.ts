@@ -62,7 +62,6 @@ export class AppComponent implements OnInit {
        url: '/app/tabs/replenishment-withdrawn-post',
        icon: 'add-circle'
      },
-
    ];
    appPages2 = [
      {
