@@ -143,7 +143,7 @@
             <th>Seal</th>
 
             <th (click)="sortData('data.ticket')">Ticket</th>
-            <th (click)="sortData('data.vendor')">Vendor</th>
+            <!--<th (click)="sortData('data.vendor')">Vendor</th>-->
             <th (click)="sortData('data.wgross')">Wgross</th>
             <th (click)="sortData('data.wtare')">Wtare</th>
             <th (click)="sortData('data.wnet')">Wnet</th>
@@ -178,75 +178,58 @@
 
         <tbody>
           <tr *ngFor="let item of filteredList; trackBy: trackById">
-
             <!-- ORDEN EXACTO -->
-
             <!--<td>{{ item.data.date | date:'short' }}</td>-->
             <td>{{ item.data.date | date:'dd/MM/yyyy' }}</td>
             <td>{{ item.isotanq_name }}</td>
             <td>{{ item.data.kg }}</td>
-
             <td [ngClass]="{
               'low': item.data.psi < 100,
               'ok': item.data.psi >= 100
             }">
               {{ item.data.psi }}
             </td>
-
             <td>{{ item.data.rotogate }}</td>
-
             <td>
               {{ item.data.seal?.join(', ') }}
             </td>
-
             <td>{{ item.data.ticket }}</td>
-            <td>{{ item.data.vendor }}</td>
+            <!--<td>{{ item.data.vendor }}</td>-->
             <td>{{ item.data.wgross | number }}</td>
             <td>{{ item.data.wtare | number }}</td>
             <td>{{ item.data.wnet | number }}</td>
-
             <!--<td>{{ item.data.datein | datelatam }}</td>-->
             <td>{{ item.data.datein | date:'dd/MM/yyyy' }}</td>
             <td>{{ item.data.deliveryin }}</td>
             <td>{{ item.data.tripin }}</td>
             <td>{{ item.shipin_name }}</td>
-
             <!--<td>{{ item.data.dateout | date:'shortDate' }}</td>-->
             <td>{{ item.data.dateout | date:'dd/MM/yyyy' }}</td>
             <td>{{ item.data.deliveryout }}</td>
             <td>{{ item.data.tripout }}</td>
             <td>{{ item.shipout_name }}</td>
-
             <td>{{ item.diff }}</td>
-
             <td>{{ item.data.isotanq }}</td>
             <td>{{ item.data.name }}</td>
             <!--<td>{{ item.data.shipin }}</td>-->
-            <td>
-              {{ shipMap[item.data.shipin]?.name || 'N/A' }}
-            </td>
-            <td>{{ item.data.shipout }}</td>
-
+            <td>{{ shipMap[item.data.shipin]?.name || 'N/A' }}</td>
+            <td>{{ shipMap[item.data.shipout]?.name || 'N/A' }}</td>
+            <!--<td>{{ item.data.shipout }}</td>-->
             <!-- imágenes (optimizado) -->
             <td>
               <a *ngIf="item.data.img" [href]="item.data.img" target="_blank">Ver</a>
             </td>
-
             <td>
               <a *ngIf="item.data.imgscale" [href]="item.data.imgscale" target="_blank">Ver</a>
             </td>
-
             <td>
               <a *ngIf="item.data.imgin" [href]="item.data.imgin" target="_blank">Ver</a>
             </td>
-
             <td>
               <a *ngIf="item.data.imgout" [href]="item.data.imgout" target="_blank">Ver</a>
             </td>
-
             <td>{{ item.data.price }}</td>
             <td>{{ item.data.wticket }}</td>
-
           </tr>
         </tbody>
 
