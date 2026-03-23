@@ -17,6 +17,7 @@ import { PosOrderService } from '../../../../services/pos-order.service';
 import { TableService } from '../../../../services/table.service';
 import { ActivatedRoute } from '@angular/router';
 import { Ship,ShipMap } from '../../../../interfaces/ship';
+import { Cco,CcoMap } from '../../../../interfaces/cco';
 import { SessionService } from '../../../../services/session.service';
 import { UtilService } from '../../../../services/util.service';
 import { ProductService } from '../../../../services/product.service';
@@ -74,10 +75,8 @@ export class GetallPage implements OnInit {
   ios: boolean;
   showSearchbar: boolean;
   searchSubject = new Subject<string>();
-  ccoList: any[] = [];
   shipList: Ship[] = [];
   shipMap: ShipMap = {};
-
 
   constructor(
     private barcodeService: BarcodeService,
@@ -104,22 +103,18 @@ export class GetallPage implements OnInit {
     private withdrawnService: WithdrawnService,
     private ccoService: CcoService,
     private shipService: ShipService,
-    private cd: ChangeDetectorRef,
+    //private cd: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
     this.syncDays();
     this.loadShips();
-    //this.getCco();
+    this.loadCcos();
   }
 
   ionViewWillEnter() {
     this.getAll();
   }
-
-  /*ionViewDidEnter() {*/
-    /*this.getAll();*/
-  /*}*/
 
   getAll() {
     const since = this.dayOfYearToISO(this.startDay);
@@ -130,11 +125,6 @@ export class GetallPage implements OnInit {
         console.log("withdrawnList response",this.withdrawnList)
         this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList);
         console.log('full',this,this.fullWithdrawnList)
-        //this.groupWithdrawnByRefdate();
-        //this.cd.detach();
-        setTimeout(() => {
-          this.cd.detach();
-        }, 10000); // 10000 ms = 10 segundos
       }
     });
   }
@@ -151,13 +141,6 @@ export class GetallPage implements OnInit {
     return group.refdate + '-' + index;
   }
 
-  getTotalKg(): number {
-    if (!this.withdrawnList?.length) return 0;
-    return this.withdrawnList.reduce((total, p) => {
-      const kg = Number(p?.data?.kg) || 0;
-      return total + kg;
-    }, 0);
-  }
 
   onRangeChange(event: any) {
     this.startDay = event.detail.value.lower;
@@ -225,31 +208,6 @@ export class GetallPage implements OnInit {
     this.searchSubject.next(text);
   }
 
-  /*  getCco() {*/
-    /*this.ccoService.getAll().subscribe(resp => {*/
-      /*this.ccoList = resp;*/
-      /*console.log('ccoList',this.ccoList)*/
-    /*});*/
-  /*}*/
-
-  /*getCcoNameById(id: number | null | undefined): string {*/
-    /*if (id == null) return 'Sin nombre';*/
-    /*const cco = this.ccoList.find(c => Number(c.id) === Number(id));*/
-    /*const nombre = cco?.data?.name;*/
-    /*return typeof nombre === 'string' && nombre.trim() !== ''*/
-      /*? nombre*/
-      /*: 'Sin Nombre';*/
-  /*}*/
-
-  /*getCcoColorById(id: number | null | undefined): string {*/
-    /*if (id == null) return '#ffffff';*/
-    /*const cco = this.ccoList.find(c => Number(c.id) === Number(id));*/
-    /*const color = cco?.data?.color;*/
-    /*return typeof color === 'string' && color.trim() !== ''*/
-      /*? color*/
-      /*: '#ffffff';*/
-  /*}*/
-
   formatFechaLatam(dateInput: string | Date | number): string {
     if (!dateInput) return '';
     const date = new Date(dateInput);
@@ -258,7 +216,6 @@ export class GetallPage implements OnInit {
       month: 'long',
       year: 'numeric'
     }).format(date);
-
     let horas = date.getHours();
     const minutos = String(date.getMinutes()).padStart(2, '0');
     const segundos = String(date.getSeconds()).padStart(2, '0');
@@ -370,6 +327,82 @@ export class GetallPage implements OnInit {
 
       },
       error: (err) => console.error(err)
+    });
+  }
+
+
+
+
+  private buildCcoMap(ccoList: Cco[]): CcoMap {
+    const map: CcoMap = {};
+    ccoList.forEach((cco, index) => {
+      const id = Number(cco.id); // 🔥 NORMALIZAR
+      console.log(`➡️ cco[${index}] id(normalizado) =>`, id, typeof id);
+      map[id] = {
+        name: cco.data?.name ?? 'N/A',
+        color: cco.data?.color ?? '#ccc'
+      };
+    });
+    return map;
+  }
+
+  ccoList: Cco[] = [];
+  ccoMap: CcoMap = {};
+
+  loadCcos() {
+    this.ccoService.getAll().subscribe({
+      next: (ccos) => {
+        console.log('📦 ccoList RAW =>', ccos);
+
+        this.ccoList = ccos;
+
+        this.ccoMap = this.buildCcoMap(ccos);
+
+        console.log('🧭 ccoMap =>', this.ccoMap);
+        console.log('🔑 ccoMap keys =>', Object.keys(this.ccoMap));
+
+        //this.cd.markForCheck();
+
+        // debug cruzado
+        this.debugCcoMapping();
+      },
+      error: (err) => console.error('❌ Error loading ccos', err)
+    });
+  }
+
+  debugCcoMapping() {
+    console.log('🧪 DEBUG withdrawn -> ccoMap');
+
+    this.filteredList.slice(0, 10).forEach((item, i) => {
+      const ccoId = item?.data?.name;
+
+      console.log(`🔎 item[${i}] ccoId =>`, ccoId, 'tipo:', typeof ccoId);
+
+      const cco = this.ccoMap[ccoId];
+
+      if (!cco) {
+        console.warn(`❌ NO MATCH para ccoId=${ccoId}`, {
+          availableKeys: Object.keys(this.ccoMap)
+        });
+      } else {
+        console.log(`✅ MATCH ccoId=${ccoId} =>`, cco);
+      }
+    });
+  }
+
+
+  toggleState(item: any, ev: any) {
+   console.log('item',item)
+    const checked = ev.detail.checked;
+    item.state = checked ? 'erp' : 'pending';
+    console.log('STATE =>', item.state, item);
+    this.withdrawnService.updateStateToErp(item.id,item.state).subscribe({
+      next: response => {
+        console.log('Response from server:', response);
+      },
+      error: err => {
+        console.error('Error updating state:', err);
+      }
     });
   }
 

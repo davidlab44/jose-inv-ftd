@@ -73,7 +73,6 @@
         <ion-label position="floating">Rotogate</ion-label>
         <ion-input type="number" formControlName="rotogate"></ion-input>
       </ion-item>
-
       <ion-item *ngFor="let sealCtrl of seals.controls; let i = index">
         <ion-label position="floating">Seal {{ i + 1 }}</ion-label>
         <ion-input [formControl]="sealCtrl"></ion-input>

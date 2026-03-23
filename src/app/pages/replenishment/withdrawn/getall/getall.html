@@ -242,7 +242,7 @@
           size="small"
           class="btn-compact"
           title="Plexa"
-          [color]="p.data.kg > 0 ? 'primary' : 'dark'"
+          [color]="p.data.kg > 0 ? 'success' : 'dark'"
           (click)="patch(p,'vendor'); $event.stopPropagation()">
           <ion-icon name="logo-amplify"></ion-icon>
         </ion-button>
@@ -252,7 +252,7 @@
           size="small"
           class="btn-compact"
           title="Bascula"
-          [color]="p.data.wnet > 0 ? 'primary' : 'dark'"
+          [color]="p.data.wnet > 0 ? 'success' : 'dark'"
           (click)="patch(p,'scale'); $event.stopPropagation()">
           <ion-icon name="scale-outline"></ion-icon>
         </ion-button>
@@ -262,7 +262,7 @@
           size="small"
           class="btn-compact"
           title="Viajes | Llegadas"
-          [color]="p.data.shipin > 0 ? 'primary' : 'dark'"
+          [color]="p.data.shipin > 0 ? 'success' : 'dark'"
           (click)="patch(p,'in'); $event.stopPropagation()">
           <ion-icon name="boat-outline"></ion-icon>
         </ion-button>
@@ -272,11 +272,22 @@
           size="small"
           class="btn-compact"
           title="Viajes | Salidas"
-          [color]="p.data.shipout > 0 ? 'primary' : 'dark'"
+          [color]="p.data.shipout > 0 ? 'success' : 'dark'"
           (click)="patch(p,'out'); $event.stopPropagation()">
           <ion-icon name="basket-outline"></ion-icon>
         </ion-button>
 
+       <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Viajes | Salidas"
+          color="primary"
+          (click)="cloneWithdrawn(p)">
+          <ion-icon name="archive-outline"></ion-icon>
+        </ion-button>
+
+     
       </ion-col>
 
     </ion-row>

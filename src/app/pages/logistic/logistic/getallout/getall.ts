@@ -247,7 +247,7 @@ private groupWithdrawnByRefdate(): void {
 
     console.log("swipe item", item);
 
-    this.withdrawnService.updateStateToErp(item.id)
+    this.withdrawnService.updateStateToErp(item.id,'erp')
       .subscribe({
         next: (res) => {
           console.log("Updated OK", res);

@@ -57,6 +57,18 @@ export class WithdrawnService {
     });
   }
 
+  postClone(payload: any): Observable<any> {
+    const url = `${this.apiUrl}/${this.model}?select=*`;
+
+    return this.http.post(url, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      }
+    });
+  }
+
+
   patch(id: number, updatedElement: any): Observable<any> {
     const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;
     const body = {
@@ -78,12 +90,13 @@ export class WithdrawnService {
     });
   }
 
-  updateStateToErp(id: number): Observable<any> {
+  updateStateToErp(id: number,state:string): Observable<any> {
     const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;
     console.log("id peticion", id)
+    console.log("state", state)
     return this.http.patch(
       url,
-      { state: 'erp' },
+      { state: state },
       {
         headers: {
           'Content-Type': 'application/json',

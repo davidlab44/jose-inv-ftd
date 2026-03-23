@@ -293,23 +293,6 @@ get seals(): FormArray {
   }
 
 
-  /*updateUi(){*/
-    /*const normalizedDate = this.normalizeOCRDate(this.ocrResponse.data.date);*/
-    /*this.form = this.fb.group({*/
-      /*date: normalizedDate,*/
-      /*name: this.ocrResponse.data.isotanq ?? null,*/
-      /*ticket: this.ocrResponse.data.ticket ?? null,*/
-      /*kg: this.ocrResponse.data.kg ?? null,*/
-      /*psi: this.ocrResponse.data.psi ?? null,*/
-      /*rotogate: this.ocrResponse.data.rotogate ?? null,*/
-    /*});*/
-    /*this.isotanq = this.validateIsotanqName(this.ocrResponse.data.isotanq, this.ccos);*/
-    /*if (this.isotanq && this.isotanq.id) {*/
-      /*console.log("CCO encontrado:", this.isotanq);*/
-    /*} else {*/
-      /*console.log("No existe");*/
-    /*}*/
-  /*}*/
 
    ccos: any[] = []; 
    loadCco() {                
@@ -347,7 +330,7 @@ get seals(): FormArray {
     withdrawn.data = {
       ...withdrawn.data,
       ...formData,
-      seal: this.seals.value  // 👈 🔥 clave: asegurar array limpio
+      seal: this.seals.value 
     };
 
     withdrawn.data.name = this.isotanq?.id ?? null;
@@ -367,28 +350,6 @@ get seals(): FormArray {
     });
   }
 
-
-/*  guardar() {*/
-    /*const formData: Partial<WithdrawnData> = this.form.value;*/
-    /*const withdrawn: Withdrawn = createDefaultWithdrawn();*/
-    /*withdrawn.data = {*/
-      /*...withdrawn.data,*/
-      /*...formData*/
-    /*};*/
-    /*withdrawn.data.name = this.isotanq?.id ?? null;*/
-    /*withdrawn.data.img = this.uploadedUrl;*/
-    /*const payload = withdrawn.data;*/
-    /*console.log("payload to post =>", payload);*/
-    /*this.withdrawnService.post(payload).subscribe({*/
-      /*next: (response) => {*/
-        /*console.log("Withdrawn post response  ", response);*/
-      /*},*/
-
-      /*error: (err) => {*/
-        /*console.error("Withdrawn post error", err);*/
-      /*}*/
-    /*});*/
-  /*}*/
 
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;

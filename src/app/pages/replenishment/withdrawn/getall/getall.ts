@@ -103,16 +103,11 @@ export class GetallPage implements OnInit {
 
   ngOnInit() {
     this.syncDays();
-    //this.getCco();
   }
 
   ionViewWillEnter() {
     this.getAll();
   }
-
-  /*ionViewDidEnter() {*/
-    /*this.getAll();*/
-  /*}*/
 
   getAll() {
     const since = this.dayOfYearToISO(this.startDay);
@@ -123,11 +118,9 @@ export class GetallPage implements OnInit {
         console.log("withdrawnList response",this.withdrawnList)
         this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList);
         console.log('full',this,this.fullWithdrawnList)
-        //this.groupWithdrawnByRefdate();
-        //this.cd.detach();
-        setTimeout(() => {
-          this.cd.detach();
-        }, 10000); // 10000 ms = 10 segundos
+       /* setTimeout(() => {*/
+          /*this.cd.detach();*/
+        /*}, 10000); // 10000 ms = 10 segundos*/
       }
     });
   }
@@ -218,31 +211,6 @@ export class GetallPage implements OnInit {
     this.searchSubject.next(text);
   }
 
-/*  getCco() {*/
-    /*this.ccoService.getAll().subscribe(resp => {*/
-      /*this.ccoList = resp;*/
-      /*console.log('ccoList',this.ccoList)*/
-    /*});*/
-  /*}*/
-
-  /*getCcoNameById(id: number | null | undefined): string {*/
-    /*if (id == null) return 'Sin nombre';*/
-    /*const cco = this.ccoList.find(c => Number(c.id) === Number(id));*/
-    /*const nombre = cco?.data?.name;*/
-    /*return typeof nombre === 'string' && nombre.trim() !== ''*/
-      /*? nombre*/
-      /*: 'Sin Nombre';*/
-  /*}*/
-
-  /*getCcoColorById(id: number | null | undefined): string {*/
-    /*if (id == null) return '#ffffff';*/
-    /*const cco = this.ccoList.find(c => Number(c.id) === Number(id));*/
-    /*const color = cco?.data?.color;*/
-    /*return typeof color === 'string' && color.trim() !== ''*/
-      /*? color*/
-      /*: '#ffffff';*/
-  /*}*/
-
   formatFechaLatam(dateInput: string | Date | number): string {
     if (!dateInput) return '';
     const date = new Date(dateInput);
@@ -299,6 +267,123 @@ export class GetallPage implements OnInit {
     console.log("pageRoute",pageRoute);
     this.router.navigate([pageRoute], { state: { item: withdrawn } });
   } 
+
+  cloneWithdrawn(item: any) {
+    console.log("item pasado:", item);
+    const payload = this.buildClonePayload(item);
+    console.log("Payload a enviar:", payload);
+    this.withdrawnService.postClone(payload).subscribe({
+      next: (response) => {
+        console.log("Clone creado", response);
+        this.getAll();
+      },
+      error: (err) => {
+        console.error("Error al clonar", err);
+      }
+    });
+  }
+
+
+  buildClonePayload(item: any): any {
+    // 🔥 Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)
+    const d = item?.data?.data ?? item?.data ?? {};
+
+    return {
+      ext_id: null,
+
+      // ⚠️ Puedes cambiar esto a new Date().toISOString() si quieres que sea "nuevo"
+      created_at: item.created_at,
+      updated_at: item.created_at,
+
+      data: {
+        // RESET
+        kg: 0,
+        img: "",
+        psi: 0,
+        date: d.date ?? null,
+        name: 0,
+        seal: [],
+        price: 0,
+        imgin: null,
+        shipin: 0,
+        ticket: "",
+        tripin: "",
+        vendor: 0,
+        datein: "",
+
+        // MANTENER w*
+        wnet: d.wnet ?? 0,
+        wtare: d.wtare ?? 0,
+        wgross: d.wgross ?? 0,
+        wticket: d.wticket ?? 0,
+
+        // MANTENER *out
+        imgout: d.imgout ?? null,
+        dateout: d.dateout ?? null,
+        shipout: d.shipout ?? 0,
+        tripout: d.tripout ?? "",
+        deliveryout: d.deliveryout ?? 0,
+
+        // OTROS
+        imgscale: d.imgscale ?? null,
+        rotogate: 0,
+        deliveryin: 0
+      },
+
+      refdate: null,
+      state: "pending"
+    };
+  }
+
+
+
+
+  /*buildClonePayload(item: any): any {*/
+    /*return {*/
+      /*ext_id: null,*/
+      /*created_at: item.created_at, */
+      /*updated_at: item.created_at, */
+
+      /*data: {*/
+        /*// RESET*/
+        /*kg: 0,*/
+        /*img: "",*/
+        /*psi: 0,*/
+        /*date: item.data.date,*/
+        /*name: 0,*/
+        /*seal: [],*/
+        /*price: 0,*/
+        /*imgin: null,*/
+        /*shipin: 0,*/
+        /*ticket: "",*/
+        /*tripin: "",*/
+        /*vendor: 0,*/
+        /*datein: "",*/
+
+        /*// MANTENER w**/
+        /*wnet: item.data.wnet,*/
+        /*wtare: item.data.wtare,*/
+        /*wgross: item.data.wgross,*/
+        /*wticket: item.data.wticket,*/
+
+        /*// MANTENER *out*/
+        /*imgout: item.data.imgout,*/
+        /*dateout: item.data.dateout,*/
+        /*shipout: item.data.shipout,*/
+        /*tripout: item.data.tripout,*/
+        /*deliveryout: item.data.deliveryout,*/
+
+        /*// OTROS (decide si mantener o no)*/
+        /*imgscale: item.data.imgscale,*/
+        /*rotogate: 0,*/
+        /*deliveryin: 0,*/
+      /*},*/
+
+      /*refdate: null,*/
+      /*state: "pending"*/
+    /*};*/
+  /*}*/
+
 
 
 }
