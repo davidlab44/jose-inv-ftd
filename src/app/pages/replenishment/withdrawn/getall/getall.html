@@ -21,20 +21,52 @@
 </ion-header>
 
 <ion-content>
-<!--  <ion-item class="range-container" lines="none">-->
-    <!--<div class="date-boxes">-->
-      <!--<div class="date-box">-->
-        <!--<span class="label">Desde</span>-->
-        <!--<span class="value">{{ formatDay(startDay) }}</span>-->
-      <!--</div>-->
-      <!--<div class="date-box">-->
-        <!--<span class="label">Hasta</span>-->
-        <!--<span class="value">{{ formatDay(endDay) }}</span>-->
-      <!--</div>-->
-    <!--</div>-->
-  <!--</ion-item>-->
 
-  <ion-item lines="none">
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button class="fab-premium" (click)="plexaUploader('no estoy pasando nada')">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <br>
+
+  <ion-item class="range-container" lines="none">
+    <div class="date-boxes">
+      <!-- DESDE -->
+      <div class="date-box">
+        <div class="controls">
+          <ion-button size="small" fill="clear" (click)="changeStartDay(-1)">
+            ◀
+          </ion-button>
+          <span class="value">{{ formatDay(startDay) }}</span>
+          <ion-button size="small" fill="clear" (click)="changeStartDay(1)">
+            ▶
+          </ion-button>
+        </div>
+      </div>
+      <!-- HASTA -->
+      <div class="date-box">
+        <div class="controls">
+          <ion-button size="small" fill="clear" (click)="changeEndDay(-1)">
+            ◀
+          </ion-button>
+         <span class="value">{{ formatDay(endDay) }}</span> 
+          <ion-button size="small" fill="clear" (click)="changeEndDay(1)">
+            ▶
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </ion-item>
+
+  <ion-segment (ionChange)="quickRange($event)">
+    <ion-segment-button style="font-size:xx-small"  value="month">30 días</ion-segment-button>
+    <ion-segment-button style="font-size:xx-small"  value="week">7 días</ion-segment-button>
+    <ion-segment-button style="font-size:xx-small"  value="today">Hoy</ion-segment-button>
+  </ion-segment>
+
+  <ion-item lines="none" style="margin-top:-5px;"  >
     <ion-range
       class="day-range"
       min="1"
@@ -48,57 +80,16 @@
     </ion-range>
   </ion-item>
 
-  <br><br>
-
-  <ion-item lines="none">
-    <div style="display:flex;width:100%;justify-content:center;gap:8px;">
-      <ion-select
-        interface="popover"
-        placeholder="Tipo"
-        style="width:50%;"
-        [(ngModel)]="filterType"
-        (ionChange)="onTypeChange($event)">
-        <ion-select-option
-          *ngFor="let t of types"
-          [value]="t.value">
-          {{ t.name }}
-        </ion-select-option>
-      </ion-select>
-
-      <ion-select
-        interface="popover"
-        placeholder="Vendor"
-        style="width:50%;"
-        [(ngModel)]="filterVendor"
-        (ionChange)="onVendorChange($event)">
-        <ion-select-option
-          *ngFor="let v of vendors"
-          [value]="v.value">
-          {{ v.name }}
-        </ion-select-option>
-      </ion-select>
-    </div>
-  </ion-item>
-
-  <br><br>
-
-  <ion-item-divider class="total-divider"></ion-item-divider>
-
   <ion-item class="total-item highlighted" lines="none">
     <ion-label class="total-label">
       <span class="total-title">TOTAL KILOS RETIRADOS</span>
       <span class="total-value">
-        <!--{{ getTotalKg() | number:'1.0-2' }} kg-->
+        {{ getTotalKg() | number:'1.0-2' }} kg
       </span>
     </ion-label>
   </ion-item>
 
-  <br><br>
-
-
-
-
-
+ <br>
 
 <!-- ================= HEADER COLUMNAS ================= -->
 
@@ -122,19 +113,7 @@
       <ion-label>kg</ion-label>
     </ion-col>
 
-    <ion-col size="1" class="header-col">
-      <ion-label>Vendor</ion-label>
-    </ion-col>
-
-    <ion-col size="2" class="header-col">
-      <ion-label>Basc</ion-label>
-    </ion-col>
-
-    <ion-col size="1" class="header-col">
-      <ion-label>Dif</ion-label>
-    </ion-col>
-
-    <ion-col size="2" class="header-col">
+    <ion-col size="6" class="header-col">
       <ion-label></ion-label>
     </ion-col>
 
@@ -143,46 +122,13 @@
 </ion-grid>
 
 
-<ion-list>
 
-
-
-
-
-  <!-- LISTA DE REGISTROS -->
-
+<!-- LISTA DE REGISTROS -->
 <ng-container *ngFor="let item of fullWithdrawnList">
-
   <ng-container
     *ngTemplateOutlet="withdrawnRow; context: { p: item }">
   </ng-container>
-
 </ng-container>
-
-
-  <!-- ================= BOTON NUEVO ================= -->
-
-  <ion-list>
-
-    <ion-item lines="none">
-
-      <ion-button
-        color="primary"
-        slot="end"
-        (click)="plexaUploader('no estoy pasando nada'); $event.stopPropagation()">
-
-        <ion-icon name="add-outline"></ion-icon>
-
-      </ion-button>
-
-      &nbsp;&nbsp;
-
-    </ion-item>
-
-  </ion-list>
-
-</ion-list>
-
 
 <!-- ================= TEMPLATE ROW ================= -->
 
@@ -193,6 +139,8 @@
     <ion-row
       class="withdrawn-row ion-align-items-center"
       [ngClass]="{ 'row-erp': p.state === 'erp' }">
+
+       <!--<td>{{ item.data.date | date:'dd/MM/yyyy' }}</td>-->
 
       <!-- FECHA -->
 <!--      <ion-col size="2">-->
@@ -206,6 +154,15 @@
         <!--class="isotank-col">-->
         <!--{{ getCcoNameById(p?.data?.name) }}-->
       <!--</ion-col>-->
+
+      <!-- DATE -->
+      <ion-col size="2">
+        {{ p.data.date | date:'dd/MM/yyyy' }}
+      </ion-col>
+
+
+      <!-- ISOTANQ -->
+      <ion-col size="2" [style.background]="ccoMap[+p.data.name]?.color || '#eee'"> {{ ccoMap[+p.data.name]?.name || 'N/A' }} </ion-col>
 
       <!-- TICKET -->
       <ion-col size="1">
@@ -236,7 +193,10 @@
         <!--{{ p.diff }}-->
       <!--</ion-col>-->
 
-      <ion-col size="2" class="actions-col">
+      <ion-col size="1" class="actions-col">                                                                                                                                        
+      </ion-col>
+
+      <ion-col size="1" class="actions-col">
         <ion-button
           fill="clear"
           size="small"
@@ -246,8 +206,10 @@
           (click)="patch(p,'vendor'); $event.stopPropagation()">
           <ion-icon name="logo-amplify"></ion-icon>
         </ion-button>
+      </ion-col>
 
-       <ion-button
+      <ion-col size="1" class="actions-col">
+        <ion-button
           fill="clear"
           size="small"
           class="btn-compact"
@@ -256,7 +218,9 @@
           (click)="patch(p,'scale'); $event.stopPropagation()">
           <ion-icon name="scale-outline"></ion-icon>
         </ion-button>
-
+      </ion-col>
+      
+      <ion-col size="1" class="actions-col">
        <ion-button
           fill="clear"
           size="small"
@@ -266,7 +230,9 @@
           (click)="patch(p,'in'); $event.stopPropagation()">
           <ion-icon name="boat-outline"></ion-icon>
         </ion-button>
+      </ion-col>
 
+      <ion-col size="1" class="actions-col">
        <ion-button
           fill="clear"
           size="small"
@@ -276,8 +242,10 @@
           (click)="patch(p,'out'); $event.stopPropagation()">
           <ion-icon name="basket-outline"></ion-icon>
         </ion-button>
+      </ion-col>
 
-       <ion-button
+      <ion-col size="1" class="actions-col">
+        <ion-button
           fill="clear"
           size="small"
           class="btn-compact"
@@ -286,13 +254,35 @@
           (click)="cloneWithdrawn(p)">
           <ion-icon name="archive-outline"></ion-icon>
         </ion-button>
-
-     
       </ion-col>
 
     </ion-row>
-
   </ion-grid>
+
+
+
+
+
+
+
+
+<!--<ion-fab vertical="bottom" horizontal="end" slot="fixed">-->
+  <!--<ion-fab-button-->
+    <!--class="fab-clean"-->
+    <!--(click)="plexaUploader('no estoy pasando nada')">-->
+
+    <!--<ion-icon name="add"></ion-icon>-->
+
+  <!--</ion-fab-button>-->
+<!--</ion-fab>-->
+
+
+
+
+
+
+
+
 
 </ng-template>
 

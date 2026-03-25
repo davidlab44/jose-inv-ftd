@@ -17,7 +17,6 @@ import { PosOrderService } from '../../../../services/pos-order.service';
 import { TableService } from '../../../../services/table.service';
 import { ActivatedRoute } from '@angular/router';
 import { Ship,ShipMap } from '../../../../interfaces/ship';
-import { Cco,CcoMap } from '../../../../interfaces/cco';
 import { SessionService } from '../../../../services/session.service';
 import { UtilService } from '../../../../services/util.service';
 import { ProductService } from '../../../../services/product.service';
@@ -30,6 +29,7 @@ import { RexService } from '../../../../services/rex.service';
 import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
+import { Cco,CcoMap } from '../../../../interfaces/cco';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { ShipService } from '../../../../services/logistic/ship.service';
 
@@ -123,7 +123,7 @@ export class GetallPage implements OnInit {
       next: response => {
         this.withdrawnList = response;
         console.log("withdrawnList response",this.withdrawnList)
-        this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList);
+        this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList).reverse();
         console.log('full',this,this.fullWithdrawnList)
       }
     });

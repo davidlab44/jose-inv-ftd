@@ -1,3 +1,214 @@
+/* FAB estilo iOS / premium */
+.fab-premium {
+  /* color limpio (puedes cambiarlo) */
+  --background: #007aff;
+  --background-activated: #0062cc;
+  --background-hover: #1a8cff;
+
+  /* sin sombra negra */
+  --box-shadow: none;
+
+  /* forma perfecta */
+  border-radius: 50%;
+
+  /* 🔥 anti-pixelado (CLAVE) */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  /* suavizado visual */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* tamaño estándar premium */
+  width: 56px;
+  height: 56px;
+
+  /* transición suave tipo Apple */
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+/* icono más limpio */
+.fab-premium ion-icon {
+  font-size: 24px;
+  color: white;
+}
+
+/* micro interacción (tap elegante) */
+.fab-premium:active {
+  transform: scale(0.94);
+  opacity: 0.9;
+}
+
+
+.fab-premium {
+  --background: rgba(0, 122, 255, 0.9);
+  --box-shadow: none;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-radius: 50%;
+
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.day-range {
+  --bar-height: 6px;
+  --bar-border-radius: 10px;
+
+  /* barra completa */
+  --bar-background: #e4e8f5;
+
+  /* barra seleccionada */
+  --bar-background-active: #4052D6;
+
+  /* knobs (los circulitos) */
+  --knob-size: 18px;
+  --knob-background: #ffffff;
+  --knob-border-radius: 50%;
+  --knob-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+  /* ticks */
+  --pin-background: #4052D6;
+  --pin-color: #fff;
+}
+
+.day-range::part(knob) {
+  border: 2px solid #4052D6;
+  transition: transform 0.2s ease;
+}
+
+.day-range::part(knob):active {
+  transform: scale(1.2);
+}
+
+.day-range {
+  --bar-background-active: linear-gradient(
+    90deg,
+    #4052D6,
+    #6c7cff
+  );
+} 
+
+.day-range::part(tick) {
+  width: 2px;
+  height: 8px;
+  background: #ccc;
+}
+
+.day-range::part(tick-active) {
+  background: #4052D6;
+}
+
+.day-range {
+  margin: 10px 0;
+  padding: 10px 5px;
+  border-radius: 12px;
+  background: #f7f9ff;
+}
+
+.day-range::part(pin) {
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***********************************/
+
+
+.range-container {
+  --background: transparent;
+}
+
+.date-boxes {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+}
+
+.date-box {
+  flex: 1;
+  background: #f4f6fb;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  font-size: 12px;
+  color: #666;
+}
+
+.value {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+ion-button {
+  --padding-start: 4px;
+  --padding-end: 4px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Contenedor de botones: usa flex y gap para separar botones de manera uniforme */
 .actions-col {
   display: flex;

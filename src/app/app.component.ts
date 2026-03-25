@@ -18,7 +18,7 @@ import { UserService } from './services/user.service';
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit {
-
+  showSplitPane = true;
   categories: Category[] = [];
   
   appPages = [
@@ -150,16 +150,16 @@ export class AppComponent implements OnInit {
        url: '/app/tabs/replenishment-get-getall',
        icon: 'scale'
      },
-     {
-       title: 'Viajes | Llegadas',
-       url: '/app/tabs/logistic-logistic-getall-in',
-       icon: 'boat'
-     },
-     {
-       title: 'Viajes | Salidas',
-       url: '/app/tabs/logistic-logistic-getall-out',
-       icon: 'basket'
-     },
+/*     {*/
+       /*title: 'Viajes | Llegadas',*/
+       /*url: '/app/tabs/logistic-logistic-getall-in',*/
+       /*icon: 'boat'*/
+     /*},*/
+     /*{*/
+       /*title: 'Viajes | Salidas',*/
+       /*url: '/app/tabs/logistic-logistic-getall-out',*/
+       /*icon: 'basket'*/
+     /*},*/
    ];
 
   loggedIn = false;
@@ -196,12 +196,6 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
-    /*this.showMenu=true;*/
-    /*const host = window.location.hostname;*/
-    /*if (host.startsWith("abs.")) {*/
-      /*this.appPages = this.appPages4;*/
-      /*this.router.navigate(['/app/tabs/replenishment']);*/
-    /*}*/
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.storedObject = this.userService.getStoredUserInfo();  
@@ -214,21 +208,21 @@ export class AppComponent implements OnInit {
         if(this.storedObject && this.storedObject.data && this.storedObject.data.role==7){
           this.appPages=this.appPages7;
         }
-        // Check if the current route is '/login'
         if (event.url === '/login' || event.url === '/signup') {
           this.showMenu = false; // Hide the menu
         } else {
           this.showMenu = true; // Show the menu on other routes
         }
-        /*     if (event.url === '/app/tabs/schedule') {*/
-          /*this.dark = false; // Hide the menu*/
-          /*//this.setSesion();*/
-          /*//this.setSesion()*/
-        /*}else{*/
-          /*this.dark = true;*/
-        /*}*/
-        /*if (event.url === '/app/tabs/client') {*/
-          /*//this.setSesion()*/
+
+    // 👇 páginas donde quieres fullscreen
+    const fullScreenRoutes = [
+      '/app/tabs/replenishment-get-getall'
+    ];
+
+    this.showSplitPane = !fullScreenRoutes.includes(event.url);
+        /*        if (event.url === '/app/tabs/replenishment-get-getall') {*/
+          /*//this.dark = false; // Hide the menu*/
+          /*this.showMenu=false*/
         /*}*/
       }
     });    

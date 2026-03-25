@@ -30,6 +30,7 @@ import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { CcoService } from '../../../../services/cc/cco.service';
+import { Cco,CcoMap } from '../../../../interfaces/cco';
 
 @Component({
   selector: 'page-getall',
@@ -72,7 +73,7 @@ export class GetallPage implements OnInit {
   ios: boolean;
   showSearchbar: boolean;
   searchSubject = new Subject<string>();
-  ccoList: any[] = [];
+  //ccoList: any[] = [];
 
   constructor(
     private barcodeService: BarcodeService,
@@ -98,11 +99,17 @@ export class GetallPage implements OnInit {
     private userService: UserService,
     private withdrawnService: WithdrawnService,
     private ccoService: CcoService,
-    private cd: ChangeDetectorRef,
+    //private cd: ChangeDetectorRef,
   ) {}
 
+  /*ngOnInit() {*/
+    /*this.syncDays();*/
+    /*this.loadCcos();*/
+  /*}*/
+
   ngOnInit() {
-    this.syncDays();
+    this.initDefaultRange(45);
+    this.loadCcos();
   }
 
   ionViewWillEnter() {
@@ -116,9 +123,9 @@ export class GetallPage implements OnInit {
       next: response => {
         this.withdrawnList = response;
         console.log("withdrawnList response",this.withdrawnList)
-        this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList);
+        this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList).reverse();
         console.log('full',this,this.fullWithdrawnList)
-       /* setTimeout(() => {*/
+        /* setTimeout(() => {*/
           /*this.cd.detach();*/
         /*}, 10000); // 10000 ms = 10 segundos*/
       }
@@ -186,6 +193,68 @@ export class GetallPage implements OnInit {
     }
     return date.toISOString().slice(0, 19);
   }
+
+
+
+
+changeStartDay(delta: number) {
+  this.startDay = Math.max(1, Math.min(365, this.startDay + delta));
+  // evitar que supere endDay
+  if (this.startDay > this.endDay) {
+    this.startDay = this.endDay;
+  }
+  this.updateRangeAndFetch();
+}
+
+changeEndDay(delta: number) {
+  this.endDay = Math.max(1, Math.min(365, this.endDay + delta));
+  // evitar que sea menor que startDay
+  if (this.endDay < this.startDay) {
+    this.endDay = this.startDay;
+  }
+  this.updateRangeAndFetch();
+}
+
+
+
+private rangeTimeout: any;
+
+updateRangeAndFetch() {
+  this.dayRange = {
+    lower: this.startDay,
+    upper: this.endDay
+  };
+  clearTimeout(this.rangeTimeout);
+  this.rangeTimeout = setTimeout(() => {
+    this.getAll();
+  }, 1000); // debounce 🔥
+}
+
+quickRange(ev: any) {
+  const today = this.getTodayDayOfYear();
+  if (ev.detail.value === 'today') {
+    this.startDay = today;
+    this.endDay = today;
+  }
+  if (ev.detail.value === 'week') {
+    this.startDay = today - 7;
+    this.endDay = today;
+  }
+  if (ev.detail.value === 'month') {
+    this.startDay = today - 30;
+    this.endDay = today;
+  }
+  this.updateRangeAndFetch();
+}
+
+initDefaultRange(days: number) {
+  const today = this.getTodayDayOfYear();
+  this.dayRange = {
+    lower: Math.max(1, today - days),
+    upper: today
+  };
+  this.syncDays();
+}
 
   calcularResultado(): number {
     return (this.valor1 || 0) * (this.valor2 || 0);
@@ -337,52 +406,80 @@ export class GetallPage implements OnInit {
 
 
 
+  searchTerm: string = ''; 
 
-  /*buildClonePayload(item: any): any {*/
-    /*return {*/
-      /*ext_id: null,*/
-      /*created_at: item.created_at, */
-      /*updated_at: item.created_at, */
+  get filteredList() {
+    if (!this.searchTerm) return this.fullWithdrawnList;
+    const term = this.searchTerm.toLowerCase();
+    return this.fullWithdrawnList.filter(item =>
+      Object.values(item.data).some(val =>
+        String(val).toLowerCase().includes(term)
+      )
+    );
+  }
 
-      /*data: {*/
-        /*// RESET*/
-        /*kg: 0,*/
-        /*img: "",*/
-        /*psi: 0,*/
-        /*date: item.data.date,*/
-        /*name: 0,*/
-        /*seal: [],*/
-        /*price: 0,*/
-        /*imgin: null,*/
-        /*shipin: 0,*/
-        /*ticket: "",*/
-        /*tripin: "",*/
-        /*vendor: 0,*/
-        /*datein: "",*/
 
-        /*// MANTENER w**/
-        /*wnet: item.data.wnet,*/
-        /*wtare: item.data.wtare,*/
-        /*wgross: item.data.wgross,*/
-        /*wticket: item.data.wticket,*/
 
-        /*// MANTENER *out*/
-        /*imgout: item.data.imgout,*/
-        /*dateout: item.data.dateout,*/
-        /*shipout: item.data.shipout,*/
-        /*tripout: item.data.tripout,*/
-        /*deliveryout: item.data.deliveryout,*/
+  private buildCcoMap(ccoList: Cco[]): CcoMap {
+    const map: CcoMap = {};
+    ccoList.forEach((cco, index) => {
+      const id = Number(cco.id); // 🔥 NORMALIZAR
+      console.log(`➡️ cco[${index}] id(normalizado) =>`, id, typeof id);
+      map[id] = {
+        name: cco.data?.name ?? 'N/A',
+        color: cco.data?.color ?? '#ccc'
+      };
+    });
+    return map;
+  }
 
-        /*// OTROS (decide si mantener o no)*/
-        /*imgscale: item.data.imgscale,*/
-        /*rotogate: 0,*/
-        /*deliveryin: 0,*/
-      /*},*/
+  ccoList: Cco[] = [];
+  ccoMap: CcoMap = {};
 
-      /*refdate: null,*/
-      /*state: "pending"*/
-    /*};*/
-  /*}*/
+  loadCcos() {
+    this.ccoService.getAll().subscribe({
+      next: (ccos) => {
+        console.log('📦 ccoList RAW =>', ccos);
+
+        this.ccoList = ccos;
+
+        this.ccoMap = this.buildCcoMap(ccos);
+
+        console.log('🧭 ccoMap =>', this.ccoMap);
+        console.log('🔑 ccoMap keys =>', Object.keys(this.ccoMap));
+
+        //this.cd.markForCheck();
+
+        // debug cruzado
+        this.debugCcoMapping();
+      },
+      error: (err) => console.error('❌ Error loading ccos', err)
+    });
+  }
+
+  debugCcoMapping() {
+    console.log('🧪 DEBUG withdrawn -> ccoMap');
+
+    this.filteredList.slice(0, 10).forEach((item, i) => {
+      const ccoId = item?.data?.name;
+
+      console.log(`🔎 item[${i}] ccoId =>`, ccoId, 'tipo:', typeof ccoId);
+
+      const cco = this.ccoMap[ccoId];
+
+      if (!cco) {
+        console.warn(`❌ NO MATCH para ccoId=${ccoId}`, {
+          availableKeys: Object.keys(this.ccoMap)
+        });
+      } else {
+        console.log(`✅ MATCH ccoId=${ccoId} =>`, cco);
+      }
+    });
+  }
+
+
+
+
 
 
 

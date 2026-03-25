@@ -56,10 +56,25 @@
           <ion-label position="floating">Viaje:</ion-label>
           <ion-input formControlName="tripin"></ion-input>
         </ion-item>
-        <ion-item>
-          <ion-label position="floating">Barco:</ion-label>
-          <ion-input formControlName="shipin"></ion-input>
+<!--        <ion-item>-->
+          <!--<ion-label position="floating">Barco:</ion-label>-->
+          <!--<ion-input formControlName="shipin"></ion-input>-->
+        <!--</ion-item>-->
+        <br><br>
+        <ion-item  *ngIf="shipList?.length"  >
+          <ion-label>Motonave</ion-label>
+          <ion-select
+            interface="popover"
+            formControlName="shipin"
+            (ionChange)="onShipSelect($event)">
+            <ion-select-option
+              *ngFor="let ship of shipList"
+              [value]="ship.id">
+              {{ ship.data?.name | uppercase }}
+            </ion-select-option>
+          </ion-select>
         </ion-item>
+        <br>
     </ion-list>
     <br>
     <ion-button expand="block" (click)="patch()">

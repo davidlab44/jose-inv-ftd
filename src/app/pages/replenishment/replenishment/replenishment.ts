@@ -32,7 +32,7 @@ import { ReplenishmentService } from '../../../services/replenishment/replenishm
 })
 export class ReplenishmentPage implements OnInit {
 
-  replenishmentList: any[] = [];
+replenishmentList: any[] = [];
 
 columns = [
     { header: 'Fecha V', field: 'fecha_v' },

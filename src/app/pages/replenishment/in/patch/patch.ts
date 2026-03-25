@@ -100,25 +100,50 @@ export class PatchPage {
     console.log("Item recibido shipin patch:", this.movement);
   }
 
+  /*ngOnInit() {*/
+    /*this.form = this.fb.group({*/
+      /*id: [this.movement?.id ?? null],*/
+      /*deliveryin: [this.movement?.data?.deliveryin ?? ''], */
+      /*datein: [this.movement?.data?.datein ?? ''], */
+      /*tripin: [this.movement?.data?.tripin ?? ''], */
+      /*shipin: [this.movement?.data?.shipin ?? 0], */
+    /*});*/
+  /*}*/
+
+  /*ionViewWillEnter() {*/
+    /*this.form = this.fb.group({*/
+      /*id: [this.movement?.id ?? null],*/
+      /*deliveryin: [this.movement?.data?.deliveryin ?? ''], */
+      /*datein: [this.movement?.data?.datein ?? ''], */
+      /*tripin: [this.movement?.data?.tripin ?? ''], */
+      /*shipin: [this.movement?.data?.shipin ?? 0], */
+    /*});*/
+    /*//shipList solo se utiliza cuando el ocrResponde , opopr eso esta aqui*/
+    /*this.getShip();*/
+  /*}*/
+
   ngOnInit() {
+    this.initForm();
+  }
+
+  initForm() {
     this.form = this.fb.group({
-      id: [this.movement?.id ?? null],
-      deliveryin: [this.movement?.data?.deliveryin ?? ''], 
-      datein: [this.movement?.data?.datein ?? ''], 
-      tripin: [this.movement?.data?.tripin ?? ''], 
-      shipin: [this.movement?.data?.shipin ?? 0], 
+      id: [null],
+      deliveryin: [''],
+      datein: [''],
+      tripin: [''],
+      shipin: [0],
     });
   }
 
   ionViewWillEnter() {
-    this.form = this.fb.group({
-      id: [this.movement?.id ?? null],
-      deliveryin: [this.movement?.data?.deliveryin ?? ''], 
-      datein: [this.movement?.data?.datein ?? ''], 
-      tripin: [this.movement?.data?.tripin ?? ''], 
-      shipin: [this.movement?.data?.shipin ?? 0], 
+    this.form.patchValue({
+      id: this.movement?.id ?? null,
+      deliveryin: this.movement?.data?.deliveryin ?? '',
+      datein: this.movement?.data?.datein ?? '',
+      tripin: this.movement?.data?.tripin ?? '',
+      shipin: this.movement?.data?.shipin ?? null,
     });
-    //shipList solo se utiliza cuando el ocrResponde , opopr eso esta aqui
     this.getShip();
   }
 
@@ -470,7 +495,16 @@ getShipId(objA, objBList) {
   }
 
 
+  onShipSelect(ev: any) {
+    const selectedId = ev.detail.value;
 
+    const selectedShip = this.shipList.find(s => s.id === selectedId);
+
+    console.log('ID seleccionado =>', selectedId);
+    console.log('Ship seleccionado =>', selectedShip);
+    this.movement.data.ship=selectedId;
+
+  }
 
 
 
