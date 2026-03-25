@@ -170,7 +170,7 @@ export class PatchPage {
     if (!dateInput) return '';
     const date = new Date(dateInput);
     const opciones: Intl.DateTimeFormatOptions = {
-      day: '2-digit',
+     day: '2-digit',
       month: 'long',
       year: 'numeric'
     };

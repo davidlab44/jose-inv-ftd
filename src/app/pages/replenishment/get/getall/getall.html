@@ -21,20 +21,48 @@
 </ion-header>
 
 <ion-content>
+
+
+
+
+
+
   <ion-item class="range-container" lines="none">
     <div class="date-boxes">
+      <!-- DESDE -->
       <div class="date-box">
-        <span class="label">Desde</span>
-        <span class="value">{{ formatDay(startDay) }}</span>
+        <div class="controls">
+          <ion-button size="small" fill="clear" (click)="changeStartDay(-1)">
+            ◀
+          </ion-button>
+          <span class="value">{{ formatDay(startDay) }}</span>
+          <ion-button size="small" fill="clear" (click)="changeStartDay(1)">
+            ▶
+          </ion-button>
+        </div>
       </div>
+      <!-- HASTA -->
       <div class="date-box">
-        <span class="label">Hasta</span>
-        <span class="value">{{ formatDay(endDay) }}</span>
+        <div class="controls">
+          <ion-button size="small" fill="clear" (click)="changeEndDay(-1)">
+            ◀
+          </ion-button>
+         <span class="value">{{ formatDay(endDay) }}</span> 
+          <ion-button size="small" fill="clear" (click)="changeEndDay(1)">
+            ▶
+          </ion-button>
+        </div>
       </div>
     </div>
   </ion-item>
 
-  <ion-item lines="none">
+  <ion-segment (ionChange)="quickRange($event)">
+    <ion-segment-button style="font-size:xx-small"  value="month">30 días</ion-segment-button>
+    <ion-segment-button style="font-size:xx-small"  value="week">7 días</ion-segment-button>
+    <ion-segment-button style="font-size:xx-small"  value="today">Hoy</ion-segment-button>
+  </ion-segment>
+
+  <ion-item lines="none" style="margin-top:-5px;"  >
     <ion-range
       class="day-range"
       min="1"
@@ -48,61 +76,107 @@
     </ion-range>
   </ion-item>
 
-  <br><br>
 
-  <ion-item lines="none">
-    <div style="display:flex;width:100%;justify-content:center;gap:8px;">
-      <ion-select
-        interface="popover"
-        placeholder="Tipo"
-        style="width:50%;"
-        [(ngModel)]="filterType"
-        (ionChange)="onTypeChange($event)">
-        <ion-select-option
-          *ngFor="let t of types"
-          [value]="t.value">
-          {{ t.name }}
-        </ion-select-option>
-      </ion-select>
+ <br>
 
-      <ion-select
-        interface="popover"
-        placeholder="Vendor"
-        style="width:50%;"
-        [(ngModel)]="filterVendor"
-        (ionChange)="onVendorChange($event)">
-        <ion-select-option
-          *ngFor="let v of vendors"
-          [value]="v.value">
-          {{ v.name }}
-        </ion-select-option>
-      </ion-select>
-    </div>
-  </ion-item>
 
-  <br><br>
 
-  <ion-item-divider class="total-divider"></ion-item-divider>
 
-  <ion-item class="total-item highlighted" lines="none">
-    <ion-label class="total-label">
-      <span class="total-title">TOTAL KILOS RETIRADOS</span>
-      <span class="total-value">
-        <!--{{ getTotalKg() | number:'1.0-2' }} kg-->
-      </span>
-    </ion-label>
-  </ion-item>
 
-  <br><br>
 
-  <!-- 🔍 BUSCADOR -->
-  <div class="toolbar">
-    <input
-      type="text"
-      placeholder="Buscar..."
-      [(ngModel)]="searchTerm"
-    />
-  </div>
+
+
+
+
+
+
+
+
+
+
+
+  <!--<ion-item class="range-container" lines="none">-->
+    <!--<div class="date-boxes">-->
+      <!--<div class="date-box">-->
+        <!--<span class="label">Desde</span>-->
+        <!--<span class="value">{{ formatDay(startDay) }}</span>-->
+      <!--</div>-->
+      <!--<div class="date-box">-->
+        <!--<span class="label">Hasta</span>-->
+        <!--<span class="value">{{ formatDay(endDay) }}</span>-->
+      <!--</div>-->
+    <!--</div>-->
+  <!--</ion-item>-->
+
+  <!--<ion-item lines="none">-->
+    <!--<ion-range-->
+      <!--class="day-range"-->
+      <!--min="1"-->
+      <!--max="365"-->
+      <!--step="1"-->
+      <!--dualKnobs="true"-->
+      <!--snaps="true"-->
+      <!--ticks="true"-->
+      <!--[(ngModel)]="dayRange"-->
+      <!--(ionChange)="onRangeChange($event)">-->
+    <!--</ion-range>-->
+  <!--</ion-item>-->
+
+  <!--<br><br>-->
+
+  <!--<ion-item lines="none">-->
+    <!--<div style="display:flex;width:100%;justify-content:center;gap:8px;">-->
+      <!--<ion-select-->
+        <!--interface="popover"-->
+        <!--placeholder="Tipo"-->
+        <!--style="width:50%;"-->
+        <!--[(ngModel)]="filterType"-->
+        <!--(ionChange)="onTypeChange($event)">-->
+        <!--<ion-select-option-->
+          <!--*ngFor="let t of types"-->
+          <!--[value]="t.value">-->
+          <!--{{ t.name }}-->
+        <!--</ion-select-option>-->
+      <!--</ion-select>-->
+
+      <!--<ion-select-->
+        <!--interface="popover"-->
+        <!--placeholder="Vendor"-->
+        <!--style="width:50%;"-->
+        <!--[(ngModel)]="filterVendor"-->
+        <!--(ionChange)="onVendorChange($event)">-->
+        <!--<ion-select-option-->
+          <!--*ngFor="let v of vendors"-->
+          <!--[value]="v.value">-->
+          <!--{{ v.name }}-->
+        <!--</ion-select-option>-->
+      <!--</ion-select>-->
+    <!--</div>-->
+  <!--</ion-item>-->
+
+  <!--<br><br>-->
+
+  <!--<ion-item-divider class="total-divider"></ion-item-divider>-->
+
+  <!--  <ion-item class="total-item highlighted" lines="none">-->
+    <!--<ion-label class="total-label">-->
+      <!--<span class="total-title">TOTAL KILOS RETIRADOS</span>-->
+      <!--<span class="total-value">-->
+        <!--[>{{ getTotalKg() | number:'1.0-2' }} kg<]-->
+      <!--</span>-->
+    <!--</ion-label>-->
+  <!--</ion-item>-->
+
+  <!--<br><br>-->
+
+  <!--[> 🔍 BUSCADOR <]-->
+  <!--<div class="toolbar">-->
+    <!--<input-->
+      <!--type="text"-->
+      <!--placeholder="Buscar..."-->
+      <!--[(ngModel)]="searchTerm"-->
+    <!--/>-->
+  <!--</div>-->
 
   <div class="table-wrapper">
     <div class="table-container">
@@ -115,7 +189,7 @@
             <th (click)="sortData('data.date')">ERP</th>
             <th (click)="sortData('data.date')">Date</th>
             <th (click)="sortData('isotanq_name')">Isotanq</th>
-            <th (click)="sortData('data.kg')">KG</th>
+            <th (click)="sortData('data.kg')"><span style="font-size:x-small;" >{{totalKg | number:'1.0-2' }} kg </span></th>
             <th (click)="sortData('data.psi')">PSI</th>
             <th (click)="sortData('data.rotogate')">Rotogate</th>
             <th>Seal</th>

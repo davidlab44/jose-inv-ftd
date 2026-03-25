@@ -1,3 +1,88 @@
+
+
+.day-range {
+  --bar-height: 6px;
+  --bar-border-radius: 10px;
+
+  /* barra completa */
+  --bar-background: #e4e8f5;
+
+  /* barra seleccionada */
+  --bar-background-active: #4052D6;
+
+  /* knobs (los circulitos) */
+  --knob-size: 18px;
+  --knob-background: #ffffff;
+  --knob-border-radius: 50%;
+  --knob-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+  /* ticks */
+  --pin-background: #4052D6;
+  --pin-color: #fff;
+}
+
+.day-range::part(knob) {
+  border: 2px solid #4052D6;
+  transition: transform 0.2s ease;
+}
+
+.day-range::part(knob):active {
+  transform: scale(1.2);
+}
+
+.day-range {
+  --bar-background-active: linear-gradient(
+    90deg,
+    #4052D6,
+    #6c7cff
+  );
+} 
+
+.day-range::part(tick) {
+  width: 2px;
+  height: 8px;
+  background: #ccc;
+}
+
+.day-range::part(tick-active) {
+  background: #4052D6;
+}
+
+.day-range {
+  margin: 10px 0;
+  padding: 10px 5px;
+  border-radius: 12px;
+  background: #f7f9ff;
+}
+
+.day-range::part(pin) {
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .row-erp td {
   background-color: #D0DBFC;
   color: #555555;
@@ -136,51 +221,50 @@ thead th:first-child {
 
 
 
-/*date controlls*/
+/***********************************/
+
 
 .range-container {
-  --padding-start: 0;
-  --padding-end: 0;
+  --background: transparent;
 }
 
 .date-boxes {
   display: flex;
+  justify-content: space-between;
   width: 100%;
-  gap: 6px;
+  gap: 12px;
 }
 
 .date-box {
   flex: 1;
-  padding: 10px;
+  background: #f4f6fb;
+  border-radius: 12px;
+  padding: 20px;
   text-align: center;
-  border: 1px solid var(--ion-color-light);
-  background: var(--ion-color-light);
-  border-radius: 8px;
 }
 
-.date-box .label {
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  font-size: 12px;
+  color: #666;
+}
+
+.value {
   display: block;
-  font-size: 10px;
-  color: var(--ion-color-medium);
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 4px;
 }
 
-.date-box .value {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ion-color-dark);
+ion-button {
+  --padding-start: 4px;
+  --padding-end: 4px;
 }
-
-.day-range {
-  width: 100%;
-  padding: 0 8px;
-}
-
-
-
-
-
-
 
 
 

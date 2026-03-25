@@ -389,93 +389,82 @@ export class PatchPage {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
- normalizeOCR(str) {
-  if (!str) return '';
-  return str
-    .toLowerCase()
-    .replace(/[0]/g, 'o')
-    .replace(/[1]/g, 'i')
-    .replace(/[5]/g, 's')
-    .replace(/[8]/g, 'b')
-    .replace(/[^a-z0-9]/g, '')  // elimina espacios, guiones, etc
-    .trim();
-}
-levenshtein(a, b) {
-  const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);
-  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-  for (let i = 1; i <= b.length; i++) {
-    for (let j = 1; j <= a.length; j++) {
-      if (b[i - 1] === a[j - 1]) {
-        matrix[i][j] = matrix[i - 1][j - 1];
-      } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j] + 1
+   normalizeOCR(str) {
+    if (!str) return '';
+    return str
+      .toLowerCase()
+      .replace(/[0]/g, 'o')
+      .replace(/[1]/g, 'i')
+      .replace(/[5]/g, 's')
+      .replace(/[8]/g, 'b')
+      .replace(/[^a-z0-9]/g, '')  // elimina espacios, guiones, etc
+      .trim();
+  }
+  levenshtein(a, b) {
+    const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);
+    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        if (b[i - 1] === a[j - 1]) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    return matrix[b.length][a.length];
+  }
+  similarity(a, b) {
+    const dist = this.levenshtein(a, b);
+    const maxLen = Math.max(a.length, b.length);
+    if (maxLen === 0) return 1;
+    return 1 - dist / maxLen;
+  }
+  fuzzyMatch(a, b, threshold = 0.8) {
+    if (!a || !b) return false;
+    const na = this.normalizeOCR(a);
+    const nb = this.normalizeOCR(b);
+    if (na.includes(nb) || nb.includes(na)) return true;
+    const score = this.similarity(na, nb);
+    return score >= threshold;
+  }
+  getShipId(objA, objBList) {
+    const shipName = objA?.data?.shipin ?? null;
+    const shipIMO = objA?.data?.shipinimo ?? null;
+    let bestScore = 0;
+    let bestId = 0;
+    // 1️⃣ buscar por nombre
+    if (shipName) {
+      for (const ship of objBList) {
+        const name = ship?.data?.name;
+        if (!name) continue;
+        const score = this.similarity(
+          this.normalizeOCR(shipName),
+          this.normalizeOCR(name)
         );
+        if (score > bestScore && score > 0.75) {
+          bestScore = score;
+          bestId = ship.id;
+        }
+      }
+      if (bestId !== 0) return bestId;
+    }
+    // 2️⃣ fallback por IMO
+    if (shipIMO) {
+      for (const ship of objBList) {
+        const imo = ship?.data?.imo;
+        if (!imo) continue;
+        if (this.fuzzyMatch(shipIMO, imo, 0.9)) {
+          return ship.id;
+        }
       }
     }
+    return 0;
   }
-  return matrix[b.length][a.length];
-}
-similarity(a, b) {
-  const dist = this.levenshtein(a, b);
-  const maxLen = Math.max(a.length, b.length);
-  if (maxLen === 0) return 1;
-  return 1 - dist / maxLen;
-}
-fuzzyMatch(a, b, threshold = 0.8) {
-  if (!a || !b) return false;
-  const na = this.normalizeOCR(a);
-  const nb = this.normalizeOCR(b);
-  if (na.includes(nb) || nb.includes(na)) return true;
-  const score = this.similarity(na, nb);
-  return score >= threshold;
-}
-getShipId(objA, objBList) {
-  const shipName = objA?.data?.shipin ?? null;
-  const shipIMO = objA?.data?.shipinimo ?? null;
-  let bestScore = 0;
-  let bestId = 0;
-  // 1️⃣ buscar por nombre
-  if (shipName) {
-    for (const ship of objBList) {
-      const name = ship?.data?.name;
-      if (!name) continue;
-      const score = this.similarity(
-        this.normalizeOCR(shipName),
-        this.normalizeOCR(name)
-      );
-      if (score > bestScore && score > 0.75) {
-        bestScore = score;
-        bestId = ship.id;
-      }
-    }
-    if (bestId !== 0) return bestId;
-  }
-  // 2️⃣ fallback por IMO
-  if (shipIMO) {
-    for (const ship of objBList) {
-      const imo = ship?.data?.imo;
-      if (!imo) continue;
-      if (this.fuzzyMatch(shipIMO, imo, 0.9)) {
-        return ship.id;
-      }
-    }
-  }
-  return 0;
-}
 
   shipList: any[] = [];
   getShip() {
@@ -494,16 +483,12 @@ getShipId(objA, objBList) {
       : 'Sin Nombre';
   }
 
-
   onShipSelect(ev: any) {
     const selectedId = ev.detail.value;
-
     const selectedShip = this.shipList.find(s => s.id === selectedId);
-
     console.log('ID seleccionado =>', selectedId);
     console.log('Ship seleccionado =>', selectedShip);
     this.movement.data.ship=selectedId;
-
   }
 
 

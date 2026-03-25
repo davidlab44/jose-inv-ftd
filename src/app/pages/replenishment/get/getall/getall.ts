@@ -33,7 +33,6 @@ import { Cco,CcoMap } from '../../../../interfaces/cco';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { ShipService } from '../../../../services/logistic/ship.service';
 
-
 @Component({
   selector: 'page-getall',
   templateUrl: 'getall.html',
@@ -107,14 +106,29 @@ export class GetallPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.syncDays();
+    this.initDefaultRange(45);
     this.loadShips();
     this.loadCcos();
   }
 
+
+      
+  initDefaultRange(days: number) {                                                                                                                                                  
+    const today = this.getTodayDayOfYear();
+    this.dayRange = {
+      lower: Math.max(1, today - days),
+      upper: today             
+    };    
+    this.syncDays();
+  }           
+        
+
+
   ionViewWillEnter() {
     this.getAll();
   }
+
+  totalKg=0;
 
   getAll() {
     const since = this.dayOfYearToISO(this.startDay);
@@ -123,19 +137,45 @@ export class GetallPage implements OnInit {
       next: response => {
         this.withdrawnList = response;
         console.log("withdrawnList response",this.withdrawnList)
-        this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList).reverse();
+        this.fullWithdrawnList=this.sortWithdrawnByDateAndSum(this.withdrawnList).reverse();
         console.log('full',this,this.fullWithdrawnList)
       }
     });
   }
 
-  sortWithdrawnByDate(withdrawnList: any[]): any[] {
-    return withdrawnList.sort((a, b) => {
-      const dateA = new Date(a.data.date).getTime();
-      const dateB = new Date(b.data.date).getTime();
-      return dateA - dateB;
-    });
+  sortWithdrawnByDateAndSum(withdrawnList: any[]): any[] {
+    let total = 0;
+    for (let i = 0; i < withdrawnList.length; i++) {
+      total += withdrawnList[i]?.data?.kg || 0;
+      withdrawnList[i]._ts = Date.parse(withdrawnList[i].data.date);
+    }
+    withdrawnList.sort((a, b) => a._ts - b._ts);
+    this.totalKg = total;
+    return withdrawnList;
   }
+
+
+  /*sortWithdrawnByDateAndSum(withdrawnList: any[]): any[] {*/
+    /*console.log("totalKg antes",this.totalKg)*/
+    /*let total = 0;*/
+    /*const sorted = withdrawnList.sort((a, b) => {*/
+
+      /*total += a?.data?.kg || 0;*/
+      /*return new Date(a.data.date).getTime() - new Date(b.data.date).getTime();*/
+    /*});*/
+    /*this.totalKg = total;*/
+
+    /*console.log("totalKg despues",this.totalKg)*/
+    /*return sorted;*/
+  /*}*/
+
+  /*sortWithdrawnByDate(withdrawnList: any[]): any[] {*/
+    /*return withdrawnList.sort((a, b) => {*/
+      /*const dateA = new Date(a.data.date).getTime();*/
+      /*const dateB = new Date(b.data.date).getTime();*/
+      /*return dateA - dateB;*/
+    /*});*/
+  /*}*/
 
   trackByGroup(index: number, group: any): string {
     return group.refdate + '-' + index;
@@ -405,6 +445,79 @@ export class GetallPage implements OnInit {
       }
     });
   }
+
+
+
+
+
+
+
+
+
+
+
+
+changeStartDay(delta: number) {
+  this.startDay = Math.max(1, Math.min(365, this.startDay + delta));
+  // evitar que supere endDay
+  if (this.startDay > this.endDay) {
+    this.startDay = this.endDay;
+  }
+  this.updateRangeAndFetch();
+}
+
+changeEndDay(delta: number) {
+  this.endDay = Math.max(1, Math.min(365, this.endDay + delta));
+  // evitar que sea menor que startDay
+  if (this.endDay < this.startDay) {
+    this.endDay = this.startDay;
+  }
+  this.updateRangeAndFetch();
+}
+
+
+
+private rangeTimeout: any;
+
+updateRangeAndFetch() {
+  this.dayRange = {
+    lower: this.startDay,
+    upper: this.endDay
+  };
+  clearTimeout(this.rangeTimeout);
+  this.rangeTimeout = setTimeout(() => {
+    this.getAll();
+  }, 1000); // debounce 🔥
+}
+
+quickRange(ev: any) {
+  const today = this.getTodayDayOfYear();
+  if (ev.detail.value === 'today') {
+    this.startDay = today;
+    this.endDay = today;
+  }
+  if (ev.detail.value === 'week') {
+    this.startDay = today - 7;
+    this.endDay = today;
+  }
+  if (ev.detail.value === 'month') {
+    this.startDay = today - 30;
+    this.endDay = today;
+  }
+  this.updateRangeAndFetch();
+}
+
+
+/*initDefaultRange(days: number) {*/
+  /*const today = this.getTodayDayOfYear();*/
+  /*this.dayRange = {*/
+    /*lower: Math.max(1, today - days),*/
+    /*upper: today*/
+  /*};*/
+  /*this.syncDays();*/
+/*}*/
+
+
 
 
 
