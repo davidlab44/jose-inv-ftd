@@ -143,16 +143,70 @@ export class GetallPage implements OnInit {
     });
   }
 
+
+
   sortWithdrawnByDateAndSum(withdrawnList: any[]): any[] {
     let total = 0;
+
+    const map = new Map<string, any>();
+
     for (let i = 0; i < withdrawnList.length; i++) {
-      total += withdrawnList[i]?.data?.kg || 0;
-      withdrawnList[i]._ts = Date.parse(withdrawnList[i].data.date);
+      const item = withdrawnList[i];
+      const data = item.data;
+      // asegurar objeto data
+      if (!item.data) item.data = {};
+
+      // 🔥 SIEMPRE inicializar diff
+      item.data.diff = 0;
+      // suma total kg
+      total += Number(data?.kg) || 0;
+      // timestamp optimizado
+      // validación base
+      const wticket = data?.wticket;
+      if (
+        wticket !== undefined &&
+        Number(data?.wnet) > 0 &&
+        Number(data?.wgross) > 0 &&
+        Number(data?.wtare) > 0
+      ) {
+        const key = String(wticket);
+        if (map.has(key)) {
+          const other = map.get(key);
+          const match =
+            Number(other.data?.wnet) === Number(data?.wnet) &&
+            Number(other.data?.wgross) === Number(data?.wgross) &&
+            Number(other.data?.wtare) === Number(data?.wtare);
+          if (match) {
+            const diff =
+              (Number(other.data?.kg) || 0) +
+              (Number(data?.kg) || 0) -
+              Number(data?.wnet);
+            // 🔥 asignar a ambos (Angular friendly)
+            item.data = { ...item.data, diff };
+            other.data = { ...other.data, diff };
+          }
+        } else {
+          map.set(key, item);
+        }
+      }
     }
+    // sort optimizado
     withdrawnList.sort((a, b) => a._ts - b._ts);
     this.totalKg = total;
     return withdrawnList;
   }
+
+
+  /*sortWithdrawnByDateAndSum(withdrawnList: any[]): any[] {*/
+    /*let total = 0;*/
+    /*for (let i = 0; i < withdrawnList.length; i++) {*/
+      /*total += withdrawnList[i]?.data?.kg || 0;*/
+      /*withdrawnList[i]._ts = Date.parse(withdrawnList[i].data.date);*/
+    /*}*/
+    /*withdrawnList.sort((a, b) => a._ts - b._ts);*/
+    /*this.totalKg = total;*/
+    /*return withdrawnList;*/
+  /*}*/
 
 
   /*sortWithdrawnByDateAndSum(withdrawnList: any[]): any[] {*/
