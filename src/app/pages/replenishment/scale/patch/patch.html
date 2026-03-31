@@ -41,7 +41,13 @@
         </ion-card-header>
         <ion-card-content>
           <img [src]="uploadedUrl" />
-          <p>{{ uploadedUrl }}</p>
+          <p>
+            imgUrl:
+            <a [href]="uploadedUrl" target="_blank">
+              {{ uploadedUrl }}
+            </a>
+          </p>
+          <!--<p>{{ uploadedUrl }}</p>-->
         </ion-card-content>
       </ion-card>
         <ion-input type="hidden" formControlName="wticket"></ion-input>

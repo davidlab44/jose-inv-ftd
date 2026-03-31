@@ -53,9 +53,15 @@
           <p>{{ uploadedUrl }}</p>
         </ion-card-content>
       </ion-card>
-      
-      <p>ImageUrl: {{movement.data.img}}</p>
 
+      <p>
+        imgUrl:
+        <a [href]="movement.data.img" target="_blank">
+          {{ movement.data.img }}
+        </a>
+      </p>
+
+      <!--<p>ImageUrl: {{movement.data.img}}</p>-->
 
       <h6>Response:</h6>
       <pre>{{ocrResponse | json}}</pre>
@@ -81,7 +87,7 @@
         </ion-item>
 
         <ion-item>
-        <ion-label position="floating">Sello1</ion-label>
+        <ion-label position="floating">Sello2</ion-label>
           <ion-input formControlName="sello2"></ion-input>
         </ion-item>
 

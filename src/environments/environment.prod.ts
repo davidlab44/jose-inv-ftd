@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
-  //apiHost: 'https://invapiprod.inbemetal.com',
-  apiHost: 'https://invapidev.inbemetal.com',
+  apiHost: 'https://invapiprod.inbemetal.com',
+  //apiHost: 'https://invapidev.inbemetal.com',
 
   ocrUrl: 'https://ocr.inbemetal.com',
   //apiHost: '/jsonrpc',
@@ -10,3 +10,5 @@ export const environment = {
   i:38,
   p:"tumae"
 };
+
+
