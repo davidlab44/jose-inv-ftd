@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { SwUpdate } from '@angular/service-worker';
 import { MenuController, Platform, ToastController } from '@ionic/angular';
 import { StatusBar } from '@capacitor/status-bar';
@@ -182,6 +183,13 @@ export class AppComponent implements OnInit {
   ) {
     this.checkForUpdates();
     console.log("constructor")
+    this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe((event: any) => {
+      if (event.url === '/app/tabs/replenishment-get-getall') {
+        this.showMenu = false; // 🔥 ocultar menú
+      } else {
+        this.showMenu = true;
+      }
+    });
   }
 
   async checkForUpdates() {
