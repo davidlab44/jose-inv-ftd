@@ -3,9 +3,7 @@
     <ion-buttons *ngIf="!showSearchbar" slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-searchbar
-      placeholder="Buscar"
-      (ionInput)="onSearch($event.target.value)">
+    <ion-searchbar  placeholder="Buscar" (ionInput)="onSearch($event.target.value)">
     </ion-searchbar>
     <ion-buttons slot="end">
       <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
@@ -52,14 +50,41 @@
           <ion-label position="floating">Entrega Numero:</ion-label>
           <ion-input formControlName="deliveryout"></ion-input>
         </ion-item>
+
+
+
+
         <ion-item>
           <ion-label position="floating">Viaje:</ion-label>
           <ion-input formControlName="tripout"></ion-input>
         </ion-item>
-        <ion-item>
-          <ion-label position="floating">Barco:</ion-label>
-          <ion-input formControlName="shipout"></ion-input>
+       
+
+
+        <br><br>
+        <ion-item  *ngIf="shipList?.length"  >
+          <ion-label>Motonave</ion-label>
+          <ion-select
+            interface="popover"
+            formControlName="shipout"
+            (ionChange)="onShipSelect($event)">
+            <ion-select-option
+              *ngFor="let ship of shipList"
+              [value]="ship.id">
+              {{ ship.data?.name | uppercase }}
+            </ion-select-option>
+          </ion-select>
         </ion-item>
+        <br>
+
+
+
+
+
+        <!--<ion-item>-->
+          <!--<ion-label position="floating">Barco:</ion-label>-->
+          <!--<ion-input formControlName="shipout"></ion-input>-->
+        <!--</ion-item>-->
     </ion-list>
     <br>
     <ion-button expand="block" (click)="patch()">

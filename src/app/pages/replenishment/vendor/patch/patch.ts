@@ -64,6 +64,8 @@ export class PatchPage {
   replenishment:any;
   //assetSupplyProduct:any;
   movement:any;
+  cco:any;
+
 
   constructor(
     private barcodeService: BarcodeService,
@@ -102,15 +104,8 @@ export class PatchPage {
       // Si recargaron la página, puedes cargar el item desde un servicio o API
       console.warn('No se recibió item por NavigationExtras.state');
     }
-
     console.log("Item recibidox:", this.movement);
-      /*    const item = this.router.getCurrentNavigation()?.extras.state?.item;*/
-    /*console.log("Item recibidox:", item);*/
-    /*this.movement = item;*/
   }
-
-
-
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -125,7 +120,14 @@ export class PatchPage {
       rotogate: [this.movement?.data?.rotogate ?? 0], 
       psi: [this.movement?.data?.psi ?? 0], 
     });
- 
+
+    this.searchSubject.pipe(
+        debounceTime(300),
+        distinctUntilChanged()
+      ).subscribe(text => {
+        this.applyFilter(text);
+      });
+
   }
 
 
@@ -144,43 +146,7 @@ export class PatchPage {
     });
  
   }
-
-
-  /*patch() {*/
-    /*const payload = this.form.value;*/
-    /*const id = payload.id;*/
-    /*if (!id) {*/
-      /*console.error("No ID found in form");*/
-      /*return;*/
-    /*}*/
-    /*const justData = { ...payload };*/
-/*[>    delete justData.id;      <]*/
-    /*[>delete justData.ext_id;<]*/
-    /*[>delete justData.created_at;     <]*/
-    /*[>delete justData.updated_at; <]    */
-    /*//justData.categ=[justData.categ];*/
-    /*justData.tripin='hardcodedtripin';*/
-    /*justData.tripout='hardcodedtripout';*/
-    /*if(this.uploadedUrl && this.uploadedUrl.length>2){ */
-      /*justData.img=this.uploadedUrl; */
-    /*}else{*/
-      /*if(this.movement.data.img && this.movement.data.img.length>2){*/
-        /*justData.img=this.movement.data.img;*/
-      /*}*/
-    /*}*/
-
-    /*this.withdrawnService.patch(id, justData).subscribe({*/
-      /*next: (r) => {*/
-        /*console.log("PATCH OK:", r);*/
-        /*this.utilService.presentToast("cant: "+r[0].data.qty+" "+r[0].data.name)*/
-        /*this.resetForm();*/
-        /*this.utilService.presentToast('resetForm')*/
-        /*this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });*/
-      /*},*/
-      /*error: (e) => console.error("PATCH ERROR:", e),*/
-    /*});*/
-  /*}*/
-
+  
   resetForm(): void {
     this.form.reset({
       id: 0,
@@ -194,14 +160,10 @@ export class PatchPage {
       reorder: 0,
       minimum: 0,
     });
-
     this.uploadProgress = 0; 
     this.uploadedUrl= null;
     this.uploading = false;
-
   }
-
-
 
   slideOpts = {
     initialSlide: 0,
@@ -213,26 +175,80 @@ export class PatchPage {
      
   }
 
-  prodrexList:any[]=[];
+  ccoList:any[]=[];
   ionViewDidEnter() {
-    this.prodrexService.getAll().subscribe({
-      next: response=>{
-        this.prodrexList=response;
-        console.log("getProdRexList",response)
+ 
+this.ccoService.getAll().subscribe({
+      next: (response: any[]) => {
+        console.log('cco List', response);
+        this.ccoList = response;
+        //this.filteredList = response; // 🔥 inicializar
+        this.resolveInitialCco();
+
+
+      },
+      error: (err: any) => {
+        console.error('Error cargando CCO', err);
       }
-    })
+    });
+
+
+
+/*    this.ccoService.getAll().subscribe({*/
+      /*next: response=>{*/
+        /*this.ccoList=response;*/
+        /*console.log("cco List",response)*/
+        /*this.filteredList = response; // 🔥 importante*/
+      /*}*/
+    /*})*/
   }
 
-  searchProducts(hash: string, productList: any[]): any[] {
-    if (!hash || hash.trim() === '') return productList;
-    return productList.filter(product =>
-      product.name.toLowerCase().includes(hash.toLowerCase())
-    );
-  }
+  /*searchProducts(hash: string, ccoList: any[]): any[] {*/
+    /*if (!hash || hash.trim() === '') return ccoList;*/
+    /*return ccoList.filter(product =>*/
+      /*product.name.toLowerCase().includes(hash.toLowerCase())*/
+    /*);*/
+  /*}*/
+
+  /*onSearch(text: string) {*/
+    /*this.searchSubject.next(text);*/
+  /*}*/
+
+
+
+
 
   onSearch(text: string) {
-    this.searchSubject.next(text);
+    this.applyFilter(text);
   }
+
+  applyFilter(text: string) {
+
+    if (!text || text.trim() === '') {
+      this.filteredList = this.ccoList;
+      return;
+    }
+
+    const search = this.normalize(text);
+
+    this.filteredList = this.ccoList.filter(item => {
+      const name = item?.data?.name || '';
+      const normalizedName = this.normalize(name);
+      return normalizedName.includes(search);
+    });
+  }
+
+  normalize(value: string): string {
+    return value
+      .toLowerCase()
+      .replace(/\s+/g, '')        // quitar espacios
+      .replace(/[^a-z0-9]/g, '')  // quitar símbolos
+      .replace(/0/g, 'o')         // OCR fix
+      .replace(/1/g, 'i');        // OCR fix
+  }
+
+
+
 
   formatFechaLatam(dateInput: string | Date | number): string {
     if (!dateInput) return '';
@@ -258,26 +274,17 @@ export class PatchPage {
   uploadedUrl: string | null = null;
   uploading = false;
 
-
-
-
-
   async takePhotoAndUpload() {
-
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
-
     const base64Image = await this.photoService.takePicture();
-
     if (!base64Image) {
       this.uploading = false;
       console.error('No se pudo obtener la imagen');
       return;
     }
-
     const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
-
     progress$.subscribe({
       next: (p) => this.uploadProgress = p,
       error: (err) => {
@@ -285,12 +292,9 @@ export class PatchPage {
         this.uploading = false;
       }
     });
-
     url$.subscribe({
       next: (url) => {
-
         this.uploadedUrl = url;
-
         // 👇 aquí llamas el OCR
         this.launchOcr(url);
 
@@ -304,67 +308,6 @@ export class PatchPage {
     });
 
   }
-
-
-
-
-
-
-
-  /*async takePhotoAndUpload() {*/
-    /*this.uploading = true;*/
-    /*this.uploadProgress = 0;*/
-    /*this.uploadedUrl = null;*/
-
-    /*const base64Image = await this.photoService.takePicture();*/
-
-    /*if (!base64Image) {*/
-      /*this.uploading = false;*/
-      /*console.error('No se pudo obtener la imagen');*/
-      /*return;*/
-    /*}*/
-
-    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);*/
-
-    /*progress$.subscribe({*/
-      /*next: (p) => this.uploadProgress = p,*/
-      /*error: (err) => {*/
-        /*console.error('Error subiendo imagen', err);*/
-        /*this.uploading = false;*/
-      /*}*/
-    /*});*/
-
-    /*url$.subscribe({*/
-      /*next: (url) => {*/
-        /*this.uploadedUrl = url;*/
-      /*},*/
-      /*complete: () => this.uploading = false*/
-    /*});*/
-  /*}*/
-
-
-  /*async pickImageAndUpload() {*/
-    /*this.uploading = true;*/
-    /*this.uploadProgress = 0;*/
-    /*this.uploadedUrl = null;*/
-
-    /*const base64Image = await this.photoService.pickImage();*/
-
-    /*if (!base64Image) {*/
-      /*this.uploading = false;*/
-      /*return;*/
-    /*}*/
-
-    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);*/
-
-    /*progress$.subscribe(p => this.uploadProgress = p);*/
-    /*url$.subscribe(url => {*/
-      /*this.uploadedUrl = url;*/
-      /*this.uploading = false;*/
-    /*});*/
-  /*}*/
-
-
 
 
   async pickImageAndUpload() {
@@ -475,9 +418,6 @@ export class PatchPage {
     /*;*/
   /*}*/
 
-
-
-
   updateMovementFromForm() {
     const f = this.form.value;
     this.movement.data = {
@@ -492,21 +432,17 @@ export class PatchPage {
     };
   }
 
-
-
   patch() {
     this.updateMovementFromForm();
     this.movement.data.img = this.uploadedUrl;
+    this.movement.data.name = this.cco.id;
     const payload = this.movement.data;
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
-   
           this.utilService.presentToast("registro actualizado exitosamente","success",1000);
           this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
-
-
       },
       error: (err) => {
         console.error("Withdrawn patch error", err);
@@ -553,6 +489,77 @@ export class PatchPage {
     const ss = String(date.getSeconds()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
+
+
+
+/*  onShipSelect(ev: any) {*/
+    /*const selectedId = ev.detail.value;*/
+    /*const selectedShip = this.ccoList.find(s => s.id === selectedId);*/
+    /*console.log('ID seleccionado =>', ev);*/
+    /*console.log('Ship seleccionado =>', selectedShip);*/
+    /*this.movement.data.ship=selectedId;*/
+  /*}*/
+
+
+
+
+
+
+
+  filteredList: any[] = [];     // lista filtrada
+
+
+  /*selectCco(cco:any){*/
+    /*console.log("selected cco",cco)*/
+    /*this.cco = cco;*/
+  /*}*/
+
+
+selectCco(item: any) {
+
+  this.cco = item;
+  this.ccoName = item.data.name;
+
+  // 🔥 actualizar movement (muy importante en tu flujo)
+  if (this.movement?.data) {
+    this.movement.data.name = item.id;
+  }
+
+  console.log('CCO seleccionado:', this.ccoName);
+}
+
+
+
+ccoName: string = '';   // nombre a mostrar
+
+resolveInitialCco() {
+
+  // validar que haya lista
+  if (!this.ccoList || this.ccoList.length === 0) return;
+
+  // obtener ID desde router
+  const ccoId = this.movement?.data?.name;
+
+  if (!ccoId) {
+    console.warn('No hay ccoId en movement');
+    return;
+  }
+
+  // buscar en lista
+  const found = this.ccoList.find(item => item.id == ccoId);
+
+  if (found) {
+    this.cco = found;
+    this.ccoName = found.data.name;
+
+    console.log('CCO encontrado:', this.ccoName);
+  } else {
+    console.warn('CCO no encontrado para id:', ccoId);
+  }
+}
+
+
+
 
 
 

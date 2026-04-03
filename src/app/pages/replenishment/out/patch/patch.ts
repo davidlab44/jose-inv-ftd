@@ -100,25 +100,35 @@ export class PatchPage {
     console.log("Item recibido shipout patch:", this.movement);
   }
 
+
+
+
+
+
+
+
   ngOnInit() {
+    this.initForm();
+  }
+
+  initForm() {
     this.form = this.fb.group({
-      id: [this.movement?.id ?? null],
-      deliveryout: [this.movement?.data?.deliveryout ?? ''], 
-      dateout: [this.movement?.data?.dateout ?? ''], 
-      tripout: [this.movement?.data?.tripout ?? ''], 
-      shipout: [this.movement?.data?.shipout ?? 0], 
+      id: [null],
+      deliveryout: [''],
+      dateout: [''],
+      tripout: [''],
+      shipout: [0],
     });
   }
 
   ionViewWillEnter() {
-    this.form = this.fb.group({
-      id: [this.movement?.id ?? null],
-      deliveryout: [this.movement?.data?.deliveryout ?? ''], 
-      dateout: [this.movement?.data?.dateout ?? ''], 
-      tripout: [this.movement?.data?.tripout ?? ''], 
-      shipout: [this.movement?.data?.shipout ?? 0], 
+    this.form.patchValue({
+      id: this.movement?.id ?? null,
+      deliveryout: this.movement?.data?.deliveryout ?? '',
+      dateout: this.movement?.data?.dateout ?? '',
+      tripout: this.movement?.data?.tripout ?? '',
+      shipout: this.movement?.data?.shipout ?? null,
     });
-    //shipList solo se utiliza cuando el ocrResponde , opopr eso esta aqui
     this.getShip();
   }
 
@@ -135,6 +145,68 @@ export class PatchPage {
     this.uploading = false;
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /*ngOnInit() {*/
+    /*this.form = this.fb.group({*/
+      /*id: [this.movement?.id ?? null],*/
+      /*deliveryout: [this.movement?.data?.deliveryout ?? ''], */
+      /*dateout: [this.movement?.data?.dateout ?? ''], */
+      /*tripout: [this.movement?.data?.tripout ?? ''], */
+      /*shipout: [this.movement?.data?.shipout ?? 0], */
+    /*});*/
+  /*}*/
+
+  /*ionViewWillEnter() {*/
+    /*this.form = this.fb.group({*/
+      /*id: [this.movement?.id ?? null],*/
+      /*deliveryout: [this.movement?.data?.deliveryout ?? ''], */
+      /*dateout: [this.movement?.data?.dateout ?? ''], */
+      /*tripout: [this.movement?.data?.tripout ?? ''], */
+      /*shipout: [this.movement?.data?.shipout ?? 0], */
+    /*});*/
+    /*//shipList solo se utiliza cuando el ocrResponde , opopr eso esta aqui*/
+    /*this.getShip();*/
+  /*}*/
+
+  /*resetForm(): void {*/
+    /*this.form.reset({*/
+      /*id: 0,*/
+      /*deliveryout: 0,*/
+      /*dateout: 0,*/
+      /*tripout: '',*/
+      /*shipout: 0,*/
+    /*});*/
+    /*this.uploadProgress = 0; */
+    /*this.uploadedUrl= null;*/
+    /*this.uploading = false;*/
+  /*}*/
+
   slideOpts = {
     initialSlide: 0,
     slidesPerView: 1,
@@ -147,23 +219,23 @@ export class PatchPage {
 
   prodrexList:any[]=[];
   ionViewDidEnter() {
-    this.prodrexService.getAll().subscribe({
-      next: response=>{
-        this.prodrexList=response;
-        console.log("getProdRexList",response)
-      }
-    })
+/*    this.prodrexService.getAll().subscribe({*/
+      /*next: response=>{*/
+        /*this.prodrexList=response;*/
+        /*console.log("getProdRexList",response)*/
+      /*}*/
+    /*})*/
   }
 
-  searchProducts(hash: string, productList: any[]): any[] {
-    if (!hash || hash.trim() === '') return productList;
-    return productList.filter(product =>
-      product.name.toLowerCase().includes(hash.toLowerCase())
-    );
-  }
+  /*searchProducts(hash: string, productList: any[]): any[] {*/
+    /*if (!hash || hash.trim() === '') return productList;*/
+    /*return productList.filter(product =>*/
+      /*product.name.toLowerCase().includes(hash.toLowerCase())*/
+    /*);*/
+  /*}*/
 
   onSearch(text: string) {
-    this.searchSubject.next(text);
+    /*this.searchSubject.next(text);*/
   }
 
   formatFechaLatam(dateInput: string | Date | number): string {
@@ -456,7 +528,13 @@ getShipId(objA, objBList) {
       : 'Sin Nombre';
   }
 
-
+  onShipSelect(ev: any) {
+    const selectedId = ev.detail.value;
+    const selectedShip = this.shipList.find(s => s.id === selectedId);
+    console.log('ID seleccionado =>', selectedId);
+    console.log('Ship seleccionado =>', selectedShip);
+    this.movement.data.ship=selectedId;
+  }
 
 
 
