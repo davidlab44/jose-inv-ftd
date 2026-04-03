@@ -50,7 +50,10 @@
           <!--<p>{{ uploadedUrl }}</p>-->
         </ion-card-content>
       </ion-card>
-        <ion-input type="hidden" formControlName="wticket"></ion-input>
+        <ion-item>
+          <ion-label position="floating">Ticket Nro: <span style="font-size:xx-small;" > (sin comas ni puntos)</span> </ion-label>
+            <ion-input type="number" formControlName="wticket"></ion-input>
+        </ion-item>   
         <ion-item>
           <ion-label position="floating">Peso bruto:</ion-label>
           <ion-input type="number" formControlName="wgross"></ion-input>
