@@ -58,8 +58,11 @@ export class PatchPage {
   form!: FormGroup;
   replenishmentList: any[] = [];
   replenishment:any;
-  //assetSupplyProduct:any;
+  bucket:string | null = environment.s3aws;
   movement:any;
+  uploadProgress = 0;
+  uploadedUrl: string | null = null;
+  uploading = false;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -90,20 +93,16 @@ export class PatchPage {
     private withdrawnService : WithdrawnService,
     private ccoService : CcoService,
   ) {
-
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state?.item) {
       this.movement = navigation.extras.state.item;
+      this.uploadedUrl=this.movement.data.imgscale;
     } else {
       // Si recargaron la página, puedes cargar el item desde un servicio o API
       console.warn('No se recibió item por NavigationExtras.state');
     }
-
     console.log("Item recibidox:", this.movement);
   }
-
-
-
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -115,7 +114,6 @@ export class PatchPage {
     });
   }
 
-
   ionViewWillEnter() {
     this.form = this.fb.group({
       id: [this.movement?.id ?? null],
@@ -126,43 +124,6 @@ export class PatchPage {
     });
   }
 
-
-
-  /*patch() {*/
-    /*const payload = this.form.value;*/
-    /*const id = payload.id;*/
-    /*if (!id) {*/
-      /*console.error("No ID found in form");*/
-      /*return;*/
-    /*}*/
-    /*const justData = { ...payload };*/
-/*[>    delete justData.id;      <]*/
-    /*[>delete justData.ext_id;<]*/
-    /*[>delete justData.created_at;     <]*/
-    /*[>delete justData.updated_at; <]    */
-    /*//justData.categ=[justData.categ];*/
-    /*justData.tripin='hardcodedtripin';*/
-    /*justData.tripout='hardcodedtripout';*/
-    /*if(this.uploadedUrl && this.uploadedUrl.length>2){ */
-      /*justData.img=this.uploadedUrl; */
-    /*}else{*/
-      /*if(this.movement.data.img && this.movement.data.img.length>2){*/
-        /*justData.img=this.movement.data.img;*/
-      /*}*/
-    /*}*/
-
-    /*this.withdrawnService.patch(id, justData).subscribe({*/
-      /*next: (r) => {*/
-        /*console.log("PATCH OK:", r);*/
-        /*this.utilService.presentToast("cant: "+r[0].data.qty+" "+r[0].data.name)*/
-        /*this.resetForm();*/
-        /*this.utilService.presentToast('resetForm')*/
-        /*this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });*/
-      /*},*/
-      /*error: (e) => console.error("PATCH ERROR:", e),*/
-    /*});*/
-  /*}*/
-
   resetForm(): void {
     this.form.reset({
       id: 0,
@@ -171,14 +132,10 @@ export class PatchPage {
       wtare: 0,
       wnet: 0,
     });
-
     this.uploadProgress = 0; 
     this.uploadedUrl= null;
     this.uploading = false;
-
   }
-
-
 
   slideOpts = {
     initialSlide: 0,
@@ -230,31 +187,17 @@ export class PatchPage {
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
-
-  uploadProgress = 0;
-  uploadedUrl: string | null = null;
-  uploading = false;
-
-
-
-
-
   async takePhotoAndUpload() {
-
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
-
     const base64Image = await this.photoService.takePicture();
-
     if (!base64Image) {
       this.uploading = false;
       console.error('No se pudo obtener la imagen');
       return;
     }
-
     const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
-
     progress$.subscribe({
       next: (p) => this.uploadProgress = p,
       error: (err) => {
@@ -262,15 +205,10 @@ export class PatchPage {
         this.uploading = false;
       }
     });
-
     url$.subscribe({
       next: (url) => {
-
         this.uploadedUrl = url;
-
-        // 👇 aquí llamas el OCR
         this.launchOcr(url);
-
       },
       error: (err) => {
         console.error('Error obteniendo URL', err);
@@ -279,70 +217,7 @@ export class PatchPage {
         this.uploading = false;
       }
     });
-
   }
-
-
-
-
-
-
-
-  /*async takePhotoAndUpload() {*/
-    /*this.uploading = true;*/
-    /*this.uploadProgress = 0;*/
-    /*this.uploadedUrl = null;*/
-
-    /*const base64Image = await this.photoService.takePicture();*/
-
-    /*if (!base64Image) {*/
-      /*this.uploading = false;*/
-      /*console.error('No se pudo obtener la imagen');*/
-      /*return;*/
-    /*}*/
-
-    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);*/
-
-    /*progress$.subscribe({*/
-      /*next: (p) => this.uploadProgress = p,*/
-      /*error: (err) => {*/
-        /*console.error('Error subiendo imagen', err);*/
-        /*this.uploading = false;*/
-      /*}*/
-    /*});*/
-
-    /*url$.subscribe({*/
-      /*next: (url) => {*/
-        /*this.uploadedUrl = url;*/
-      /*},*/
-      /*complete: () => this.uploading = false*/
-    /*});*/
-  /*}*/
-
-
-  /*async pickImageAndUpload() {*/
-    /*this.uploading = true;*/
-    /*this.uploadProgress = 0;*/
-    /*this.uploadedUrl = null;*/
-
-    /*const base64Image = await this.photoService.pickImage();*/
-
-    /*if (!base64Image) {*/
-      /*this.uploading = false;*/
-      /*return;*/
-    /*}*/
-
-    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);*/
-
-    /*progress$.subscribe(p => this.uploadProgress = p);*/
-    /*url$.subscribe(url => {*/
-      /*this.uploadedUrl = url;*/
-      /*this.uploading = false;*/
-    /*});*/
-  /*}*/
-
-
-
 
   async pickImageAndUpload() {
     this.uploading = true;
@@ -369,7 +244,6 @@ export class PatchPage {
         this.uploading = false;
       }
     });
-
   }
 
   ocrResponse:any;
@@ -403,36 +277,6 @@ export class PatchPage {
     });
   }
 
-  /*launchOcr(url:string){*/
-    /*this.ocrService.postVendor(url).subscribe({*/
-      /*next: (res) => {*/
-        /*this.ocrResponse=res;*/
-        /*console.log('OCR Response:', res);*/
-        /*this.movement.date=res.data.date;*/
-        /*this.movement.kg=res.data.kg;*/
-        /*this.movement.seal=res.data.seal[0];*/
-        /*this.movement.psi=res.data.psi;*/
-        /*this.movement.rotogate=res.data.rotogate;*/
-      /*},*/
-      /*error: (err) => {*/
-        /*console.error('Error OCR:', err);*/
-      /*}*/
-    /*})*/
-    /*;*/
-  /*}*/
-
-  /*updateMovementFromForm() {*/
-    /*const f = this.form.value;*/
-    /*this.movement.data = {*/
-      /*...this.movement.data,*/
-      /*wticket: Number(f.ticket),*/
-      /*wgross: Number(f.kg),*/
-      /*wtare: Number(f.psi),*/
-      /*wnet: Number(f.rotogate),*/
-      /*//seal: [f.sello1, f.sello2, f.sello3].filter(Boolean)*/
-    /*};*/
-  /*}*/
-
   updateMovementFromForm() {
     const f = this.form.value;
     this.movement.data = {
@@ -460,20 +304,6 @@ export class PatchPage {
       }
     });
   }
-
-  /*patch() {*/
-    /*this.updateMovementFromForm();*/
-    /*const payload = this.movement.data;*/
-    /*console.log("payload to patch =>", payload);*/
-    /*this.withdrawnService.patch(this.movement.id, payload).subscribe({*/
-      /*next: (response) => {*/
-        /*console.log("Withdrawn patch response", response);*/
-      /*},*/
-      /*error: (err) => {*/
-        /*console.error("Withdrawn patch error", err);*/
-      /*}*/
-    /*});*/
-  /*}*/
 
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;

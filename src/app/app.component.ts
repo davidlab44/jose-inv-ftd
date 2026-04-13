@@ -94,7 +94,7 @@ export class AppComponent implements OnInit {
        icon: 'layers'
      },
    ];
-  
+   
    appPages7 = [
      {
        title: 'Inicio',
@@ -163,6 +163,14 @@ export class AppComponent implements OnInit {
      /*},*/
    ];
 
+   appPages8 = [
+     {
+       title: 'Plexa',
+       url: '/app/tabs/replenishment-withdrawn-getall',
+       icon: 'scale'
+     },
+   ];
+
   loggedIn = false;
   dark = false;
   public showMenu = true; 
@@ -215,6 +223,7 @@ export class AppComponent implements OnInit {
         }
         if(this.storedObject && this.storedObject.data && this.storedObject.data.role==7){
           this.appPages=this.appPages7;
+          this.router.navigateByUrl('replenishment-withdrawn-getall');
         }
         if (event.url === '/login' || event.url === '/signup') {
           this.showMenu = false; // Hide the menu
@@ -234,7 +243,6 @@ export class AppComponent implements OnInit {
         /*}*/
       }
     });    
-    console.log("ionviewdidenter1")
   }
 
   ionViewDidEnter() {

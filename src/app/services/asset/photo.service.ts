@@ -4,7 +4,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'; // I
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Upload } from "@aws-sdk/lib-storage";
-
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,7 @@ private s3: S3Client;
   constructor() {
     this.s3 = new S3Client({
       region: "us-east-1", // MinIO lo ignora pero es requerido // endpoint: "http://192.168.40.47:9000", // ⚠️ Ojo, quité el espacio final
-      endpoint: "https://s3aws.axap.org", // ⚠️ Ojo, quité el espacio final
+      endpoint: environment.s3aws, // ⚠️ Ojo, quité el espacio final
       credentials: {
         accessKeyId: "miusuarioseguro",
         secretAccessKey: "mipasswordsuperseguro",
@@ -65,7 +65,7 @@ private s3: S3Client;
         });
         await parallelUploads3.done();
         progressSubject.next(100);
-        urlSubject.next(`https://s3aws.axap.org/fotos/${key}`);
+        urlSubject.next(`${environment.s3aws}fotos/${key}`);
         progressSubject.complete();
         urlSubject.complete();
       } catch (err) {
@@ -111,7 +111,7 @@ private s3: S3Client;
         })
       );
       console.log("✅ Imagen subida correctamente");
-      return `https://s3aws.axap.org/fotos/${key}`;
+      return `${environment.s3aws}fotos/${key}`;
     } catch (err: any) {
       console.error("❌ Error en testUploadImage");
       console.error("📝 Mensaje:", err.message);

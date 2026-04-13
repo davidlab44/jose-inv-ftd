@@ -23,7 +23,7 @@
     <input type="hidden" formControlName="id">
     <ion-list>
       <ion-button expand="block" (click)="takePhotoAndUpload()">
-        📸 Tomar foto
+        📸 Tomar fotox
       </ion-button>
       <ion-button expand="block" color="secondary" (click)="pickImageAndUpload()">
         🖼 Elegir de galería
@@ -40,11 +40,12 @@
           <ion-card-title>Imagen subida</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <img [src]="uploadedUrl" />
+          <h6>Imagen</h6>
+          <img [src]="bucket+uploadedUrl" />
           <p>
             imgUrl:
-            <a [href]="uploadedUrl" target="_blank">
-              {{ uploadedUrl }}
+            <a [href]="bucket+uploadedUrl" target="_blank">
+              {{ bucket+uploadedUrl }}
             </a>
           </p>
           <!--<p>{{ uploadedUrl }}</p>-->

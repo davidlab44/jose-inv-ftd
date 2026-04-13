@@ -94,6 +94,7 @@ export class PatchPage {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state?.item) {
       this.movement = navigation.extras.state.item;
+      this.uploadedUrl = this.movement.data.imgout;
     } else {
       console.warn('No se recibió item por NavigationExtras.state');
     }

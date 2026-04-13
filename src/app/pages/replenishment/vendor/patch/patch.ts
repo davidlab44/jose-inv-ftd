@@ -100,6 +100,7 @@ export class PatchPage {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state?.item) {
       this.movement = navigation.extras.state.item;
+      this.uploadedUrl = this.movement.data.img;
     } else {
       // Si recargaron la página, puedes cargar el item desde un servicio o API
       console.warn('No se recibió item por NavigationExtras.state');

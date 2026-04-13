@@ -136,7 +136,7 @@ export class GetallPage implements OnInit {
     this.withdrawnService.getIntervalByAdate(since, until).subscribe({
       next: response => {
         this.withdrawnList = response;
-        console.log("withdrawnList response",this.withdrawnList)
+        console.log("withdrawnList response2",this.withdrawnList)
         this.fullWithdrawnList=this.sortWithdrawnByDateAndSum(this.withdrawnList).reverse();
         console.log('full',this,this.fullWithdrawnList)
       }

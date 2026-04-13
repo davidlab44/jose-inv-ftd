@@ -94,33 +94,12 @@ export class PatchPage {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state?.item) {
       this.movement = navigation.extras.state.item;
+      this.uploadedUrl = this.movement.data.imgin;
     } else {
       console.warn('No se recibió item por NavigationExtras.state');
     }
     console.log("Item recibido shipin patch:", this.movement);
   }
-
-  /*ngOnInit() {*/
-    /*this.form = this.fb.group({*/
-      /*id: [this.movement?.id ?? null],*/
-      /*deliveryin: [this.movement?.data?.deliveryin ?? ''], */
-      /*datein: [this.movement?.data?.datein ?? ''], */
-      /*tripin: [this.movement?.data?.tripin ?? ''], */
-      /*shipin: [this.movement?.data?.shipin ?? 0], */
-    /*});*/
-  /*}*/
-
-  /*ionViewWillEnter() {*/
-    /*this.form = this.fb.group({*/
-      /*id: [this.movement?.id ?? null],*/
-      /*deliveryin: [this.movement?.data?.deliveryin ?? ''], */
-      /*datein: [this.movement?.data?.datein ?? ''], */
-      /*tripin: [this.movement?.data?.tripin ?? ''], */
-      /*shipin: [this.movement?.data?.shipin ?? 0], */
-    /*});*/
-    /*//shipList solo se utiliza cuando el ocrResponde , opopr eso esta aqui*/
-    /*this.getShip();*/
-  /*}*/
 
   ngOnInit() {
     this.initForm();
@@ -327,7 +306,6 @@ export class PatchPage {
     const payload = {
       ...this.movement.data,
       shipin: Number(this.form.value.shipin) || 0 
-      //shipin: this.shipId ?? 0
     };
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
@@ -339,21 +317,7 @@ export class PatchPage {
       }
     });
   }
-
-  /*  patch() {*/
-    /*this.updateMovementFromForm();*/
-    /*const payload = { ...this.movement.data };*/
-    /*console.log("payload to patch =>", payload);*/
-    /*this.withdrawnService.patch(this.movement.id, payload).subscribe({*/
-      /*next: (response) => {*/
-        /*console.log("Withdrawn patch response", response);*/
-      /*},*/
-      /*error: (err) => {*/
-        /*console.error("Withdrawn patch error", err);*/
-      /*}*/
-    /*});*/
-  /*}*/
-
+  
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;
     const date = new Date(dateStr);
