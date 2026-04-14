@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CalendarOptions } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { Subject } from 'rxjs';
-import { GlppricesService } from '../../../services/replenishment/glpprices.service';
+import { AllocService } from '../../../services/replenishment/alloc.service';
 
 @Component({
   selector: 'page-alloc',
@@ -47,7 +47,7 @@ export class AllocPage {
   dateTimeEnd!: string;
 
   constructor(
-    private glpricesService: GlppricesService
+    private allocService: AllocService
   ) {}
 
   /* ================= INIT ================= */
@@ -60,7 +60,7 @@ export class AllocPage {
   /* ================= LOAD ================= */
 
   loadYearPrices() {
-    this.glpricesService
+    this.allocService
       .getCurrentYearPrices()
       .subscribe(results => {
         this.yearPrices = results || [];
@@ -69,7 +69,7 @@ export class AllocPage {
   }
 
   getAllPrices() {
-    this.glpricesService.getAll().subscribe({
+    this.allocService.getAll().subscribe({
       next: (response) => {
         this.glppricesList = response.slice().reverse();
         this.getMaxIdItem(this.glppricesList);
@@ -153,7 +153,7 @@ export class AllocPage {
       id_replenishment_product: this.importado ? 2 : 1
     };
 
-    this.glpricesService
+    this.allocService
       .patch(this.selectedPrice.id, updatedData)
       .subscribe(() => {
         this.showEditForm = false;
@@ -174,7 +174,7 @@ export class AllocPage {
 
     const productId = this.importado ? 2 : 1;
 
-    this.glpricesService
+    this.allocService
       .addGlpprice(price, cents, this.dateTimeStart, this.dateTimeEnd, productId)
       .subscribe(() => {
         this.loadYearPrices();
@@ -226,91 +226,6 @@ export class AllocPage {
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*import { Component, ViewChild, ElementRef } from '@angular/core';*/
-/*import { Router } from '@angular/router';*/
-/*import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';*/
-/*import { ConferenceData } from '../../../providers/conference-data';*/
-/*import { UserData } from '../../../providers/user-data';*/
-/*import { OpportunityService } from '../../../services/opportunity.service';*/
-/*import { PosOrderService } from '../../../services/pos-order.service';*/
-/*import { TableService } from '../../../services/table.service';*/
-/*import { environment } from '../../../../environments/environment';*/
-/*import { ActivatedRoute } from '@angular/router'*/
-/*import { Session } from '../../../interfaces/session';*/
-/*import { SessionService } from '../../../services/session.service';*/
-/*import { UtilService } from '../../../services/util.service';*/
-/*import { ProductService } from '../../../services/product.service';*/
-/*import { BarcodeService } from '../../../services/barcode.service';*/
-/*import { CategoryService } from '../../../services/category.service';*/
-/*import { UmService } from '../../../services/um.service';*/
-/*import { Product } from '../../../interfaces/product';*/
-/*import { BrowserMultiFormatReader } from '@zxing/browser';*/
-/*import { Subject } from 'rxjs';*/
-/*import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';*/
-/*import { DateService } from '../../../services/local/date.service';*/
-/*import { RexService } from '../../../services/rex.service';*/
-/*import { ProdrexService } from '../../../services/prodrex.service';*/
-/*import { UserService } from '../../../services/user.service';*/
-/*import { GlppricesService } from '../../../services/replenishment/glpprices.service';*/
-/*import dayGridPlugin from '@fullcalendar/daygrid';*/
-/*import { CalendarOptions } from '@fullcalendar/core';*/
-
-
-/*@Component({*/
-  /*selector: 'page-price',*/
-  /*templateUrl: 'price.html',*/
-  /*styleUrls: ['./price.scss'],*/
-/*})*/
 
 
 
