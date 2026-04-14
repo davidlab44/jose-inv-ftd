@@ -9,7 +9,7 @@ import { map } from 'rxjs/operators';
 })
 export class AllocService {
  
-  private model = 'replenishment_glp_prices';  
+  private model = 'replenishment_alloc';  
   private apiUrl = environment.apiHost; 
       
   constructor(private http: HttpClient) {

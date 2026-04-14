@@ -95,6 +95,7 @@ export class AppComponent implements OnInit {
      },
    ];
     
+
    appPages7 = [
      {
        title: 'Inicio',
@@ -127,9 +128,14 @@ export class AppComponent implements OnInit {
        icon: 'document-text'
      },
      {
-       title: 'Glp precio',
+       title: 'Glp precios',
        url: '/app/tabs/glpprices',
        icon: 'cash'
+     },
+     {
+       title: 'Bolsas | Cupo | Quota',
+       url: '/app/tabs/replenishment-allocated',
+       icon: 'pie-chart'
      },
      {
        title: 'Registrar producto',
@@ -139,31 +145,21 @@ export class AppComponent implements OnInit {
      {
        title: 'Registrar retiro',
        url: '/app/tabs/replenishment-withdrawn-post',
-       icon: 'scale'
+       icon: 'swap-horizontal'
      },
      {
        title: 'Plexa',
        url: '/app/tabs/replenishment-withdrawn-getall',
-       icon: 'scale'
+       icon: 'git-commit'
      },
      {
        title: 'Kilos retirados',
        url: '/app/tabs/replenishment-get-getall',
        icon: 'scale'
      },
-/*     {*/
-       /*title: 'Viajes | Llegadas',*/
-       /*url: '/app/tabs/logistic-logistic-getall-in',*/
-       /*icon: 'boat'*/
-     /*},*/
-     /*{*/
-       /*title: 'Viajes | Salidas',*/
-       /*url: '/app/tabs/logistic-logistic-getall-out',*/
-       /*icon: 'basket'*/
-     /*},*/
    ];
 
-  
+
    appPages8 = [
      {
        title: 'Plexa',
@@ -212,7 +208,7 @@ export class AppComponent implements OnInit {
      {
        title: 'Bolsas | Cupo | Quota',
        url: '/app/tabs/replenishment-allocated',
-       icon: 'clipboard'
+       icon: 'pie-chart'
      },
      {
        title: 'Registrar producto',
@@ -222,28 +218,18 @@ export class AppComponent implements OnInit {
      {
        title: 'Registrar retiro',
        url: '/app/tabs/replenishment-withdrawn-post',
-       icon: 'scale'
+       icon: 'swap-horizontal'
      },
      {
        title: 'Plexa',
        url: '/app/tabs/replenishment-withdrawn-getall',
-       icon: 'scale'
+       icon: 'git-commit'
      },
      {
        title: 'Kilos retirados',
        url: '/app/tabs/replenishment-get-getall',
        icon: 'scale'
      },
-/*     {*/
-       /*title: 'Viajes | Llegadas',*/
-       /*url: '/app/tabs/logistic-logistic-getall-in',*/
-       /*icon: 'boat'*/
-     /*},*/
-     /*{*/
-       /*title: 'Viajes | Salidas',*/
-       /*url: '/app/tabs/logistic-logistic-getall-out',*/
-       /*icon: 'basket'*/
-     /*},*/
    ];
 
 
