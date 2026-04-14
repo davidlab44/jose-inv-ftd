@@ -75,7 +75,7 @@ export class SchedulePage{
 
   storedObject:any;
   async ngOnInit(){
-    //this.refreshView();
+
   }
   
   async setSession() {
@@ -85,44 +85,18 @@ export class SchedulePage{
       this.router.navigateByUrl('/login');
       return;
     }
+    else{
+       console.log("navigate to plexa")
+       if(this.storedObject && this.storedObject.data && this.storedObject.data.role==7){
+         console.log("navigate to plexa1")
+         this.router.navigate(['/app/tabs/replenishment-get-getall']);
+        }
+    }
   }
 
-  /*  storedObject:any*/
-  /*p:any;*/
-  /*async setSesion(){*/
-    /*this.u=localStorage.getItem('u');*/
-    /*this.p=localStorage.getItem('p');*/
-    /*this.storedObject = await this.userService.login(u,p);*/
-    /*console.log("userInfo",this.storedObject)*/
-    /*console.log("p",this.p)*/
-    /*console.log("userInfo",this.storedObject)*/
-    /*if (!this.storedObject.im_hr) {*/
-      /*this.router.navigateByUrl('/app/tabs/client');*/
-    /*} else {*/
-      /*try {*/
-        /*await this.validateUserInfo(this.storedObject);*/
-        /*await this.retrieveAllData();*/
-        /*this.startTimer();*/
-      /*} catch (error) {*/
-        /*console.error('Error validating user info or retrieving data', error);*/
-      /*}*/
-    /*}*/
-  /*}*/
 
   refreshView() {
     this.setSession();
-    //const id_product_route= this.route.snapshot.paramMap.get('id');
-    //const myUrl = window.location.href;
-    //console.log('URL actual:', myUrl);
-      /*    const urlsPermitidas = [*/
-      /*'http://10.100.100.4:8505',*/
-      /*'http://10.100.100.4:8505/',*/
-      /*'adt.chrisantemogourmet.com',*/
-      /*'https://adt.chrisantemogourmet.com'*/
-    /*];*/
-    /*if (urlsPermitidas.some(url => myUrl.includes(url))) {*/
-      /*this.router.navigate(['/app/tabs/scnbrcd']);*/
-    /*}*/
     const ahora = new Date();
     this.todayDate=this.formatFechaLatam(ahora);
     this.productService.refreshFromServer().subscribe(data => {
@@ -130,15 +104,6 @@ export class SchedulePage{
     });
     this.loadCategories();
     this.loadUms();
-/*    this.barcodeRouted = this.router.getCurrentNavigation()?.extras.state?.item;*/
-    
-    /*console.log('routed',this.barcodeRouted)*/
-    /*if(Number(this.barcodeRouted.data.barcode) && Number(this.barcodeRouted.data.barcode)>0 ){*/
-      /*this.getProductById(Number(this.barcodeRouted.data.barcode))*/
-    /*}else{*/
-      /*//this.getProductById(87); */
-    /*}*/
-
 
   const state = history.state;
 
@@ -154,7 +119,6 @@ export class SchedulePage{
       this.getProductById(Number(this.barcodeRouted.data.barcode));
     }
   }
-    //this.getProductById(87);
     this.loadProdrex();
     this.rexService.getLast().subscribe({
       next: (response) => {
@@ -293,12 +257,9 @@ export class SchedulePage{
     this.rexService.getProdrexList(1).subscribe({
       next: (res) => {
         this.prodrexList = res;
-        //this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage
-        //console.log("res",res)
       },
       error: (err) => {
         console.error('❌ Error al cargar categorías:', err);
-        //this.categories = this.categoryService.getCategoriesFromLocal();
       }
     });
   }
@@ -367,8 +328,6 @@ export class SchedulePage{
             console.log("res",res)
             this.prodrexService.getAll().subscribe({
               next: (r)=>{
-                //console.log('prodService refresh response',r)
-                //this.getProductById(87);
                 this.prdct=defaultProduct;
                 this.scannedValue='';
               }

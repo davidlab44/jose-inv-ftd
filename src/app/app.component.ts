@@ -94,7 +94,7 @@ export class AppComponent implements OnInit {
        icon: 'layers'
      },
    ];
-   
+    
    appPages7 = [
      {
        title: 'Inicio',
@@ -163,6 +163,7 @@ export class AppComponent implements OnInit {
      /*},*/
    ];
 
+  
    appPages8 = [
      {
        title: 'Plexa',
@@ -170,6 +171,84 @@ export class AppComponent implements OnInit {
        icon: 'scale'
      },
    ];
+
+
+   appPages9 = [
+     {
+       title: 'Inicio',
+       url: '/app/tabs/schedule',
+       icon: 'calendar'
+     },
+     {
+       title: 'Productos',   
+       url: '/app/tabs/readprd',       
+       icon: 'cube'
+     },
+     {
+       title: 'Reabastecimiento',
+       url: '/app/tabs/asset-supply-reorder',
+       icon: 'layers'
+     },
+     {
+       title: 'Entrada',
+       url: '/app/tabs/kitchen',
+       icon: 'arrow-down'
+     },
+     {
+       title: 'Ingresos de mercancia',
+       url: '/app/tabs/readren',
+       icon: 'chevron-forward-circle'
+     },
+     {
+       title: 'Listar productos ',
+       url: '/app/tabs/asset-supply-readprdct',
+       icon: 'document-text'
+     },
+     {
+       title: 'Glp precios',
+       url: '/app/tabs/glpprices',
+       icon: 'cash'
+     },
+     {
+       title: 'Bolsas | Cupo | Quota',
+       url: '/app/tabs/replenishment-allocated',
+       icon: 'clipboard'
+     },
+     {
+       title: 'Registrar producto',
+       url: '/app/tabs/asset-supply-post',
+       icon: 'add-circle'
+     },
+     {
+       title: 'Registrar retiro',
+       url: '/app/tabs/replenishment-withdrawn-post',
+       icon: 'scale'
+     },
+     {
+       title: 'Plexa',
+       url: '/app/tabs/replenishment-withdrawn-getall',
+       icon: 'scale'
+     },
+     {
+       title: 'Kilos retirados',
+       url: '/app/tabs/replenishment-get-getall',
+       icon: 'scale'
+     },
+/*     {*/
+       /*title: 'Viajes | Llegadas',*/
+       /*url: '/app/tabs/logistic-logistic-getall-in',*/
+       /*icon: 'boat'*/
+     /*},*/
+     /*{*/
+       /*title: 'Viajes | Salidas',*/
+       /*url: '/app/tabs/logistic-logistic-getall-out',*/
+       /*icon: 'basket'*/
+     /*},*/
+   ];
+
+
+
+
 
   loggedIn = false;
   dark = false;
@@ -223,7 +302,14 @@ export class AppComponent implements OnInit {
         }
         if(this.storedObject && this.storedObject.data && this.storedObject.data.role==7){
           this.appPages=this.appPages7;
-          this.router.navigateByUrl('replenishment-withdrawn-getall');
+          //this.router.navigate(['/app/tabs/prodrex']);
+          //this.router.navigateByUrl('/app/tabs/replenishment-withdrawn-getall');
+        }
+        if(this.storedObject && this.storedObject.data && this.storedObject.data.role==8){
+          this.appPages=this.appPages8;
+        }
+        if(this.storedObject && this.storedObject.data && this.storedObject.data.role==9){
+          this.appPages=this.appPages9;
         }
         if (event.url === '/login' || event.url === '/signup') {
           this.showMenu = false; // Hide the menu

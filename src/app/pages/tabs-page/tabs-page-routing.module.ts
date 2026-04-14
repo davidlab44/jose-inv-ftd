@@ -137,6 +137,15 @@ const routes: Routes = [
             loadChildren: () => import('../replenishment/price/price.module').then(m => m.PriceModule)
           }
         ]
+      },     
+      {
+        path: 'replenishment-allocated',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/alloc/alloc.module').then(m => m.AllocModule)
+          }
+        ]
       },
       {
         path: 'replenishment-post',
