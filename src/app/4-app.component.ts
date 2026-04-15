@@ -21,8 +21,6 @@ export class AppComponent implements OnInit {
   categories: Category[] = [];
 
 
-//appPages=[];
-
  appPages = [
     {
       title: 'Schedule',
@@ -130,94 +128,6 @@ export class AppComponent implements OnInit {
       complete: () => {}
     });
   }
-
-
-
-  // getPosCategories() {
-  //   this.opportunityService.getPosCategories(environment.i, environment.p).subscribe({
-  //     next: response => {
-  //       this.posCategories = response.result;
-  //       console.log("response", response);
-  //       console.log("pos category", this.posCategories);
-
-  //       if (this.posCategories?.length) {
-  //         this.appPages = this.posCategories.map((cat: any) => ({
-  //           title: cat.name,
-  //           url: `/app/tabs/map?id=${cat.id}`,  // ✅ id como query param
-  //           icon: 'log-in',
-  //           id: cat.id
-  //         }));
-  //       }
-  //     },
-  //     error: error => console.error('Error:', error),
-  //     complete: () => {}
-  //   });
-  // }
-
-
-
-  // getPosCategories() {
-  //   this.opportunityService.getPosCategories(environment.i, environment.p).subscribe({
-  //     next: response => {
-  //       this.posCategories = response.result;
-  //       console.log("response", response);
-  //       console.log("pos category", this.posCategories);
-
-  //       if (this.posCategories?.length) {
-  //         this.appPages = this.posCategories.map((cat: any) => ({
-  //           title: cat.name,
-  //           url: '/app/tabs/map',
-  //           icon: 'log-in',
-  //           id: cat.id
-  //         }));
-  //       }
-  //     },
-  //     error: error => console.error('Error:', error),
-  //     complete: () => {}
-  //   });
-  // }
-
-
-
-  // getPosCategories() {
-  //   this.opportunityService.getPosCategories(environment.i, environment.p).subscribe({
-  //     next: response => {
-  //       this.posCategories = response.result;
-  //       console.log("response",response)
-  //       console.log("pos category",this.posCategories)
-  //       if(this.posCategories && this.posCategories.length && this.posCategories.length>0){
-  //         this.appPages = [
-  //           {
-  //             title: this.posCategories[0].name,
-  //             url: '/app/tabs/map',
-  //             icon: 'log-in',
-  //             id: this.posCategories[0].id
-  //           },
-  //           {
-  //             title: this.posCategories[1].name,
-  //             url: '/app/tabs/map',
-  //             icon: 'log-in',
-  //             id: this.posCategories[1].id
-  //           },
-  //           {
-  //             title: this.posCategories[2].name,
-  //             url: '/app/tabs/map',
-  //             icon: 'log-in',
-  //             id: this.posCategories[2].id
-  //           },
-  //           {
-  //             title: this.posCategories[3].name,
-  //             url: '/app/tabs/map',
-  //             icon: 'log-in',
-  //             id: this.posCategories[3].id
-  //           },
-  //         ];
-  //       }
-  //     },
-  //     error: error => console.error('Error:', error),
-  //     complete: () => {}
-  //   });
-  // }
 
   initializeApp() {
     this.platform.ready().then(() => {

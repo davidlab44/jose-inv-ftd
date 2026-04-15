@@ -1,7 +1,6 @@
 export const environment = {
   production: true,
-  apiHost: 'https://invapiprod.inbemetal.com',
-  //apiHost: 'https://invapidev.inbemetal.com',
+  apiHost: 'https://invapidev.inbemetal.com',
 
   ocrUrl: 'https://ocr.inbemetal.com',
 
@@ -11,6 +10,47 @@ export const environment = {
   db:"na",
   i:38,
   p:"tumae"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //apiHost: 'https://invapiprod.inbemetal.com',
 };
 
 

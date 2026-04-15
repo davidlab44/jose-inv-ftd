@@ -30,8 +30,9 @@ import { PhotoService } from '../../../../services/asset/photo.service';
 import { OcrService } from '../../../../services/ai/ocr.service';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
+import { GlppricesService } from '../../../../services/replenishment/glpprices.service';
+import { AllocService } from '../../../../services/replenishment/alloc.service';
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
-
 
 @Component({
   selector: 'page-post',
@@ -92,6 +93,8 @@ export class AssetSupplyPostPage {
     private photoService: PhotoService,
     private ocrService: OcrService,
     private ccoService: CcoService,
+    private allocService: AllocService,
+    private glpPricesService: GlppricesService,
     private withdrawnService: WithdrawnService
   ) {}
 
@@ -138,6 +141,8 @@ export class AssetSupplyPostPage {
 
   ionViewWillEnter() {
     this.loadCco();
+    this.loadGlpAlloc();
+    this.loadGlpPrice()
   }
 
   prodrexList:any[]=[];
@@ -292,8 +297,6 @@ get seals(): FormArray {
     this.isotanq = this.validateIsotanqName(data.isotanq, this.ccos);
   }
 
-
-
    ccos: any[] = []; 
    loadCco() {                
      this.ccoService.getAll().subscribe({ 
@@ -303,6 +306,32 @@ get seals(): FormArray {
         }, 
         error: (err) => {      
           console.error(' Error al cargar cco:', err); 
+        } 
+      }); 
+   } 
+
+   glpPriceList: any[] = []; 
+   loadGlpPrice() {                
+     this.glpPricesService.getAll().subscribe({ 
+        next: (res) => {       
+          console.log('✅glpPrices');    
+          this.glpPriceList = res;
+        }, 
+        error: (err) => {      
+          console.error(' Error al cargar glpPrices:', err); 
+        } 
+      }); 
+   } 
+
+   glpAllocList: any[] = []; 
+   loadGlpAlloc() {                
+     this.allocService.getAll().subscribe({ 
+        next: (res) => {       
+          console.log('✅ Glp Alloc:', res);    
+          this.glpAllocList = res;
+        }, 
+        error: (err) => {      
+          console.error(' Error al cargar glp alloc:', err); 
         } 
       }); 
    } 
@@ -322,24 +351,19 @@ get seals(): FormArray {
     return null;
   }
 
+
   guardar() {
     const formData: Partial<WithdrawnData> = this.form.value;
-
     const withdrawn: Withdrawn = createDefaultWithdrawn();
-
     withdrawn.data = {
       ...withdrawn.data,
       ...formData,
       seal: this.seals.value 
     };
-
     withdrawn.data.name = this.isotanq?.id ?? null;
     withdrawn.data.img = this.uploadedUrl;
-
     const payload = withdrawn.data;
-
     console.log("payload to post =>", payload);
-
     this.withdrawnService.post(payload).subscribe({
       next: (response) => {
         console.log("Withdrawn post response", response);
