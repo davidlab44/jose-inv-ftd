@@ -16,12 +16,12 @@ export class AllocService {
   }   
        
   getAll(): Observable<any[]> {   
-    return this.http.get<any[]>(`${this.apiUrl}/replenishment_glp_prices`);
+    return this.http.get<any[]>(`${this.apiUrl}/${this.model}`);
   }   
       
   getLast(): Observable<any> {
     return this.http
-      .get<any[]>(`${this.apiUrl}/replenishment_glp_prices?order=id.desc&limit=1`)
+      .get<any[]>(`${this.apiUrl}/${this.model}?order=id.desc&limit=1`)
       .pipe(
         map(results => results[0] ?? null)
       );
@@ -29,14 +29,14 @@ export class AllocService {
 
   getLast20(): Observable<any> {
     return this.http
-      .get<any[]>(`${this.apiUrl}/replenishment_glp_prices?order=id.desc&limit=20`)
+      .get<any[]>(`${this.apiUrl}/${this.model}?order=id.desc&limit=20`)
       .pipe(
         map(results => results[0] ?? null)
       );
   }
 
   addGlpprice(price: number,cents:number,init:string,end:string,id_replenishment_product:number): Observable<any> {
-    const url = `${this.apiUrl}/replenishment_glp_prices?select=*`;
+    const url = `${this.apiUrl}/${this.model}?select=*`;
     const item = {
       data: {
         price: price,
@@ -58,7 +58,7 @@ export class AllocService {
 
   getByDate(dateIso: string): Observable<any> {
     const url =
-      `${this.apiUrl}/replenishment_glp_prices` +
+      `${this.apiUrl}/${this.model}` +
       `?valid_range=cs.${dateIso}` +
       `&order=id.desc` +
       `&limit=1`;
@@ -75,7 +75,7 @@ export class AllocService {
     const iso = date.toISOString(); // genera UTC
 
     const url =
-      `${this.apiUrl}/replenishment_glp_prices` +
+      `${this.apiUrl}/${this.model}` +
       `?valid_range=cs.${iso}` +
       `&order=id.desc` +
       `&limit=1`;
@@ -93,7 +93,7 @@ export class AllocService {
     const iso = date.toISOString();
 
     const url =
-      `${this.apiUrl}/replenishment_glp_prices` +
+      `${this.apiUrl}/${this.model}` +
       `?data->>id_replenishment_product=eq.${productId}` +
       `&valid_range=cs.${iso}` +
       `&order=id.desc` +
@@ -115,7 +115,7 @@ export class AllocService {
     const end   = `${year}-12-31T23:59:59-05:00`;
 
     const url =
-      `${this.apiUrl}/replenishment_glp_prices` +
+      `${this.apiUrl}/${this.model}` +
       `?valid_range=ov.[${start},${end}]` +   
       `&order=id.asc`;
 
@@ -129,7 +129,7 @@ export class AllocService {
   ) {
     const range = `[${start},${end}]`;
     const url =
-      `${this.apiUrl}/replenishment_glp_prices` +
+      `${this.apiUrl}/${this.model}` +
       `?data->>id_replenishment_product=eq.${productId}` +
       `&valid_range=ov.${range}`;
 

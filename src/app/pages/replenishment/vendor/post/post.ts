@@ -1,4 +1,3 @@
-
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -64,6 +63,9 @@ export class AssetSupplyPostPage {
   uploadProgress = 0;
   uploadedUrl: string | null = null;
   uploading = false;
+  glpPrice:number = 0;
+  glpAlloc:number = 0;
+  glpType:number = 0;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -113,7 +115,7 @@ export class AssetSupplyPostPage {
       seal: this.fb.array([]),
     });
     const ahora = new Date();
-    this.todayDate=this.formatFechaLatam(ahora);
+    //this.todayDate=this.formatFechaLatam(ahora);
     this.displayLast();
   }
 
@@ -135,9 +137,7 @@ export class AssetSupplyPostPage {
     speed: 300
   };
 
-  updateSchedule(){
-     
-  }
+  updateSchedule(){}
 
   ionViewWillEnter() {
     this.loadCco();
@@ -145,15 +145,7 @@ export class AssetSupplyPostPage {
     this.loadGlpPrice()
   }
 
-  prodrexList:any[]=[];
-  ionViewDidEnter() {
-    this.prodrexService.getAll().subscribe({
-      next: response=>{
-        this.prodrexList=response;
-        console.log("getProdRexList",response)
-      }
-    })
-  }
+  ionViewDidEnter() {}
 
   searchProducts(hash: string, productList: any[]): any[] {
     if (!hash || hash.trim() === '') return productList;
@@ -166,40 +158,36 @@ export class AssetSupplyPostPage {
     this.searchSubject.next(text);
   }
 
-  formatFechaLatam(dateInput: string | Date | number): string {
-    if (!dateInput) return '';
-    const date = new Date(dateInput);
-    const opciones: Intl.DateTimeFormatOptions = {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    };
-    const fechaTexto = new Intl.DateTimeFormat('es-ES', opciones).format(date);
-    let horas = date.getHours();
-    const minutos = String(date.getMinutes()).padStart(2, '0');
-    const segundos = String(date.getSeconds()).padStart(2, '0');
-    const ampm = horas >= 12 ? 'PM' : 'AM';
-    horas = horas % 12;
-    if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
-    const horasTexto = String(horas).padStart(2, '0');
-    return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
-  }
+/*  formatFechaLatam(dateInput: string | Date | number): string {*/
+    /*if (!dateInput) return '';*/
+    /*const date = new Date(dateInput);*/
+    /*const opciones: Intl.DateTimeFormatOptions = {*/
+      /*day: '2-digit',*/
+      /*month: 'long',*/
+      /*year: 'numeric'*/
+    /*};*/
+    /*const fechaTexto = new Intl.DateTimeFormat('es-ES', opciones).format(date);*/
+    /*let horas = date.getHours();*/
+    /*const minutos = String(date.getMinutes()).padStart(2, '0');*/
+    /*const segundos = String(date.getSeconds()).padStart(2, '0');*/
+    /*const ampm = horas >= 12 ? 'PM' : 'AM';*/
+    /*horas = horas % 12;*/
+    /*if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0*/
+    /*const horasTexto = String(horas).padStart(2, '0');*/
+    /*return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;*/
+  /*}*/
 
   async takePhotoAndUpload() {
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
-
     const base64Image = await this.photoService.takePicture();
-
     if (!base64Image) {
       this.uploading = false;
       console.error('No se pudo obtener la imagen');
       return;
     }
-
     const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
-
     progress$.subscribe({
       next: (p) => this.uploadProgress = p,
       error: (err) => {
@@ -222,13 +210,10 @@ export class AssetSupplyPostPage {
   }
 
   async pickImageAndUpload() {
-
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
-
     const base64Image = await this.photoService.pickImage();
-
     if (!base64Image) {
       this.uploading = false;
       return;
@@ -268,13 +253,9 @@ export class AssetSupplyPostPage {
     ;
   }
 
-
-
-
-
-get seals(): FormArray {
-  return this.form.get('seal') as FormArray;
-}
+  get seals(): FormArray {
+    return this.form.get('seal') as FormArray;
+  }
 
   isotanq:any;
   updateUi(){
@@ -311,11 +292,12 @@ get seals(): FormArray {
    } 
 
    glpPriceList: any[] = []; 
-   loadGlpPrice() {                
+   loadGlpPrice() {              
      this.glpPricesService.getAll().subscribe({ 
         next: (res) => {       
-          console.log('✅glpPrices');    
+          console.log('✅glpPrices',res);    
           this.glpPriceList = res;
+
         }, 
         error: (err) => {      
           console.error(' Error al cargar glpPrices:', err); 
@@ -324,11 +306,18 @@ get seals(): FormArray {
    } 
 
    glpAllocList: any[] = []; 
+   glpAllocPureList: any[] = []; 
    loadGlpAlloc() {                
      this.allocService.getAll().subscribe({ 
         next: (res) => {       
           console.log('✅ Glp Alloc:', res);    
           this.glpAllocList = res;
+          this.glpAllocPureList = this.obtenerGlpAllocVigentes(this.glpAllocList);
+          // luego haces lo que quieras:
+          console.log("pure Alooc List",this.glpAllocPureList);
+          const nacional = this.glpAllocPureList[0];
+          const importado = this.glpAllocPureList[1];
+
         }, 
         error: (err) => {      
           console.error(' Error al cargar glp alloc:', err); 
@@ -336,7 +325,7 @@ get seals(): FormArray {
       }); 
    } 
 
-  validateIsotanqName(hash: string, ccos: any[]): any | null {
+   validateIsotanqName(hash: string, ccos: any[]): any | null {
     if (!hash || !ccos) {
       return null;
     }
@@ -351,7 +340,6 @@ get seals(): FormArray {
     return null;
   }
 
-
   guardar() {
     const formData: Partial<WithdrawnData> = this.form.value;
     const withdrawn: Withdrawn = createDefaultWithdrawn();
@@ -362,6 +350,7 @@ get seals(): FormArray {
     };
     withdrawn.data.name = this.isotanq?.id ?? null;
     withdrawn.data.img = this.uploadedUrl;
+    withdrawn.data.id_replenishment_product = this.procesarRetiroGLP(this.glpAllocPureList,withdrawn.data.kg)
     const payload = withdrawn.data;
     console.log("payload to post =>", payload);
     this.withdrawnService.post(payload).subscribe({
@@ -390,6 +379,98 @@ get seals(): FormArray {
     const ss = String(date.getSeconds()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
+
+  obtenerGlpAllocVigentes(glpAllocList: any[]): any[] {
+    const now = new Date();
+    // 1. Filtrar vigentes
+    const vigentes = glpAllocList.filter((glpAlloc) => {
+      const init = new Date(glpAlloc.data.init);
+      const end = new Date(glpAlloc.data.end);
+      return now >= init && now <= end;
+    });
+    // 2. Validación de cantidad
+    if (vigentes.length !== 2) {
+      console.log('⚠️ ERROR: deben existir exactamente 2 registros vigentes', {
+        cantidad: vigentes.length,
+        vigentes,
+      });
+    }
+    // 3. Separar por tipo
+    const nacionales = vigentes.filter(
+      (g) => g.data.id_replenishment_product === 1
+    );
+    const importados = vigentes.filter(
+      (g) => g.data.id_replenishment_product === 2
+    );
+    // 4. Validaciones de integridad
+    if (nacionales.length === 0) {
+      console.log('⚠️ ERROR: no existe registro NACIONAL (id=1)', vigentes);
+    }
+    if (importados.length === 0) {
+      console.log('⚠️ ERROR: no existe registro IMPORTADO (id=2)', vigentes);
+    }
+    if (nacionales.length > 1) {
+      console.log('⚠️ ERROR: hay múltiples registros NACIONALES duplicados', nacionales);
+    }
+    if (importados.length > 1) {
+      console.log('⚠️ ERROR: hay múltiples registros IMPORTADOS duplicados', importados);
+    }
+    // 5. Selección segura (primer válido de cada tipo)
+    const nacional = nacionales[0];
+    const importado = importados[0];
+    // 6. Retorno limpio y ordenado
+    const resultado: any[] = [];
+    if (nacional) resultado.push(nacional);
+    if (importado) resultado.push(importado);
+    return resultado;
+  }
+
+  procesarRetiroGLP(glpAllocPureList: any[], kg: number): number {
+    if (!Array.isArray(glpAllocPureList) || glpAllocPureList.length === 0) {
+      console.log('⚠️ ERROR: lista glpAllocPureList inválida');
+      return 0;
+    }
+
+    const itemNacional = glpAllocPureList.find(
+      (g) => g.data.id_replenishment_product === 1
+    );
+
+    const itemImportado = glpAllocPureList.find(
+      (g) => g.data.id_replenishment_product === 2
+    );
+    if (!itemNacional) console.log('⚠️ ERROR: no existe item nacional');
+    if (!itemImportado) console.log('⚠️ ERROR: no existe item importado');
+    // ====== 1. NACIONAL ======
+    if (itemNacional) {
+      const resultadoNacional =
+        (itemNacional.data.acum + itemNacional.data.alloc) - kg;
+      itemNacional.data.acumnext = resultadoNacional;
+      if (resultadoNacional >= -10000) {
+        return 1; // ✅ usar nacional
+      }
+      console.log(
+        '⚠️ Nacional fuera de rango (< -10000), se pasa a importado',
+        resultadoNacional
+      );
+    }
+    // ====== 2. IMPORTADO ======
+    if (itemImportado) {
+      const resultadoImportado =
+        (itemImportado.data.acum + itemImportado.data.alloc) - kg;
+      itemImportado.data.acumnext = resultadoImportado;
+      if (resultadoImportado < -100000) {
+        console.log(
+          '⚠️ Importado fuera de rango (< -100000), pero se permite continuar',
+          resultadoImportado
+        );
+      }
+      return 2; // 🔥 SIEMPRE usar importado en fallback
+    }
+    console.log('⚠️ ERROR CRÍTICO: no existe fuente válida');
+    return 0;
+  }
+
+
 
 
 
