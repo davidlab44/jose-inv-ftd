@@ -1,56 +1,11 @@
 export const environment = {
   production: true,
   apiHost: 'https://invapidev.inbemetal.com',
-
   ocrUrl: 'https://ocr.inbemetal.com',
-
   s3aws: 'https://s3aws.inbemetal.com/',
-  //apiHost: '/jsonrpc',
-  //  ocrUrl: 'http://10.100.100.3:8000',
   db:"na",
   i:38,
-  p:"tumae"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  //apiHost: 'https://invapiprod.inbemetal.com',
+  p:"tumae",
 };
 
 
