@@ -17,7 +17,6 @@
     </ion-buttons>
   </ion-toolbar>
 
-
   <ion-toolbar>
     <ion-segment (ionChange)="onSegmentChange($event)">
       <ion-segment-button value="all">NACIONAL</ion-segment-button>
@@ -26,64 +25,43 @@
   </ion-toolbar>
 </ion-header>
 
-
-
 <ion-content [ngClass]="{ 'bg-nacional': !importado, 'bg-importado': importado }" class="ion-padding">
 
   <full-calendar [options]="calendarOptions"></full-calendar>
 
   <div *ngIf="showEditForm" class="edit-form">
-
     <ion-card>
-
       <ion-card-header>
         <ion-card-title>Editar cantidad</ion-card-title>
       </ion-card-header>
-
       <ion-card-content>
-
         <ion-item>
-          <ion-label position="stacked">Precio</ion-label>
+          <ion-label position="stacked">Alloc</ion-label>
           <ion-input type="number" [(ngModel)]="selectedPrice.price"></ion-input>
         </ion-item>
-
         <ion-item>
           <ion-label position="stacked">Cents</ion-label>
           <ion-input type="number" [(ngModel)]="selectedPrice.cents"></ion-input>
         </ion-item>
-
         <ion-item>
           <ion-label position="stacked">Fecha Inicio</ion-label>
           <ion-input type="datetime-local" [(ngModel)]="selectedPrice.init"></ion-input>
         </ion-item>
-
         <ion-item>
           <ion-label position="stacked">Fecha Fin</ion-label>
           <ion-input type="datetime-local" [(ngModel)]="selectedPrice.end"></ion-input>
         </ion-item>
-
         <ion-button expand="block" color="primary" (click)="updatePrice()">
           Guardar Cambios
         </ion-button>
-
         <ion-button expand="block" fill="outline" (click)="cancelEdit()">
           Cancelar
         </ion-button>
-
       </ion-card-content>
-
     </ion-card>
-
   </div>
-
-  <!--<full-calendar [options]="calendarOptions"></full-calendar>-->
-
   <br>
-
-  <p>divider</p>
-
   <br>
-
   <div>
     <div class="datetime-center">
       <ion-item>
@@ -109,41 +87,40 @@
     </div>
     <br>
 
-    <br>
-     <ion-item>
-      <ion-label position="stacked">Nuevo precio</ion-label>
-      <ion-input
-        type="number"
-        inputmode="numeric"
-        placeholder="0"
-        [(ngModel)]="numero">
-      </ion-input>
-    </ion-item>
-    <br>   <ion-item>
-      <ion-label position="stacked">Cent</ion-label>
-      <ion-input
-        type="number"
-        inputmode="numeric"
-        placeholder="0"
-        [(ngModel)]="cents">
-      </ion-input>
-    </ion-item>
-    <br>
-    <ion-button expand="block" (click)="addGlpprice(numero,cents)">
-      Actualizar precio
-    </ion-button>
+  <!--  <br>-->
+     <!--<ion-item>-->
+      <!--<ion-label position="stacked">Nuevo precio</ion-label>-->
+      <!--<ion-input-->
+        <!--type="number"-->
+        <!--inputmode="numeric"-->
+        <!--placeholder="0"-->
+        <!--[(ngModel)]="numero">-->
+      <!--</ion-input>-->
+    <!--</ion-item>-->
+   <!-- <br>   <ion-item>-->
+      <!--<ion-label position="stacked">Cent</ion-label>-->
+      <!--<ion-input-->
+        <!--type="number"-->
+        <!--inputmode="numeric"-->
+        <!--placeholder="0"-->
+        <!--[(ngModel)]="cents">-->
+      <!--</ion-input>-->
+    <!--</ion-item>-->
+   <!--    <br>-->
+    <!--<ion-button expand="block" (click)="addGlpprice(numero,cents)">-->
+      <!--Actualizar precio-->
+    <!--</ion-button>-->
     <br>
 
     <table style="width: 100%;">
       <tr [ngClass]="importado ? 'row-importado' : 'row-nacional'">
         <td style="width: 70%;">
           <span style="font-size:small;">
-            &nbsp;&nbsp;Precio actual {{formatFechaLatam(currentPrice?.data.init) }}-{{formatFechaLatam(currentPrice?.data.end)}}&nbsp;&nbsp;
+            &nbsp;&nbsp;CUPO | QUOTA ACTUAL: &nbsp;&nbsp; {{formatFechaLatam(currentAlloc?.data.init) }}&nbsp;&nbsp;-&nbsp;&nbsp;{{formatFechaLatam(currentAlloc?.data.end)}}&nbsp;&nbsp;
           </span>
         </td>
          <td style="padding:8px;width:20%;">
-           <h5>{{ currentPrice?.data?.price }}.{{currentPrice?.data?.cents}}&nbsp;</h5>
-          <!--<h5>{{ currentPrice?.data?.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}&nbsp;</h5>-->
+           <h5>{{ currentAlloc?.data?.alloc | number:'1.0-0':'es-CO'}}&nbsp;</h5>
         </td>
       </tr>
     </table>
@@ -154,23 +131,20 @@
       <ion-item class="titulo-historico">
         <span>Histórico</span>
       </ion-item>
-      <ng-container *ngFor="let p of glppricesList">
+      <ng-container *ngFor="let p of glpAllocList">
         <ion-item
           *ngIf="p.data.id_replenishment_product === 1"
           class="item-historico">
           <div style="display: flex; width: 100%; align-items: center;">
             <div style="flex: 0 0 66%; text-align:left;">
               <span style="font-size: x-small;">
-                {{ formatFechaLatam(p.data.init) }}
+                &nbsp;&nbsp;&nbsp; {{formatFechaLatam(currentAlloc?.data.init) }}&nbsp;&nbsp;-&nbsp;&nbsp;{{formatFechaLatam(currentAlloc?.data.end)}}&nbsp;&nbsp;
               </span>
             </div>
             <div style="flex: 0 0 33%; text-align:right; font-size: small;">
               <span>
-                {{ p.data.price }}
+                {{ p.data.alloc+p.data.acumprev  | number:'1.0-0':'es-CO' }}
               </span>
-   <!--           <span>-->
-                <!--{{ p.data.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}-->
-              <!--</span>-->
             </div>
           </div>
         </ion-item>
@@ -181,23 +155,20 @@
       <ion-item class="titulo-historico">
         <span>Histórico</span>
       </ion-item>
-      <ng-container *ngFor="let p of glppricesList">
+      <ng-container *ngFor="let p of glpAllocList">
         <ion-item
           *ngIf="p.data.id_replenishment_product === 2"
           class="item-historico">
           <div style="display: flex; width: 100%; align-items: center;">
             <div style="flex: 0 0 66%; text-align:left;">
               <span style="font-size: x-small;">
-                {{ formatFechaLatam(p.created_at) }}
+                &nbsp;&nbsp;&nbsp; {{formatFechaLatam(currentAlloc?.data.init) }}&nbsp;&nbsp;-&nbsp;&nbsp;{{formatFechaLatam(currentAlloc?.data.end)}}&nbsp;&nbsp;
               </span>
             </div>
             <div style="flex: 0 0 33%; text-align:right; font-size: small;">
               <span>
-                {{ p.data.price }}
+                {{ p.data.alloc | number:'1.0-0':'es-CO' }}
               </span>
-<!--              <span>-->
-                <!--{{ p.data.price | currency:'COP':'symbol':'1.0-0':'es-CO' }}-->
-              <!--</span>-->
             </div>
           </div>
         </ion-item>
