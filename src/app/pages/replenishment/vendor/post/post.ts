@@ -104,7 +104,12 @@ export class AssetSupplyPostPage {
   table:any
   rexDocument:any;
 
+  item:any;
+  withdrawnList:any[]=[];
   ngOnInit() {
+    const nav = history.state;
+    this.item = nav.item;
+    this.withdrawnList = nav.list;
     this.form = this.fb.group({
       name: [''],
       date: [''],
@@ -469,6 +474,43 @@ export class AssetSupplyPostPage {
     console.log('⚠️ ERROR CRÍTICO: no existe fuente válida');
     return 0;
   }
+
+  sumKgMesActual(withdrawnList: any[]): number {
+    try {
+      if (!Array.isArray(withdrawnList) || withdrawnList.length === 0) {
+        return 0;
+      }
+
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+
+      let total = 0;
+
+      for (let i = 0; i < withdrawnList.length; i++) {
+        const data = withdrawnList[i]?.data;
+
+        if (!data?.date) continue;
+
+        const d = new Date(data.date);
+        if (isNaN(d.getTime())) continue;
+
+        if (
+          d.getMonth() === currentMonth &&
+          d.getFullYear() === currentYear
+        ) {
+          total += Number(data.kg) || 0;
+        }
+      }
+
+      return total;
+
+    } catch (error) {
+      console.error('sumKgMesActual error:', error);
+      return 0;
+    }
+  }
+
 
 
 }

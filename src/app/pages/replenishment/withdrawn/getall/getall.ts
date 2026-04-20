@@ -329,13 +329,26 @@ initDefaultRange(days: number) {
     );
   } 
 
-  patch(withdrawn:any,page:any){
-    console.log("item to patch",withdrawn);
-    console.log("ruta",page);
-    const pageRoute=`/app/tabs/replenishment-${page}-patch`;
-    console.log("pageRoute",pageRoute);
-    this.router.navigate([pageRoute], { state: { item: withdrawn } });
-  } 
+  patch(withdrawn: any, page: any) {
+    const pageRoute = `/app/tabs/replenishment-${page}-patch`;
+    this.router.navigate([pageRoute], {
+      state: {
+        item: withdrawn,
+        list: this.withdrawnList
+      }
+    });
+  }
+
+  /*  patch(withdrawn:any,page:any){*/
+    /*console.log("item to patch",withdrawn);*/
+    /*console.log("ruta",page);*/
+    /*const pageRoute=`/app/tabs/replenishment-${page}-patch`;*/
+    /*console.log("pageRoute",pageRoute);*/
+    /*this.router.navigate([pageRoute], { state:*/
+                         /*{ item: withdrawn,*/
+                    /*list: this.withdrawnList*/
+    /*} });*/
+  /*} */
 
   cloneWithdrawn(item: any) {
     console.log("item pasado:", item);
@@ -476,9 +489,6 @@ initDefaultRange(days: number) {
       }
     });
   }
-
-
-
 
 
 
