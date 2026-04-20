@@ -120,15 +120,6 @@ const routes: Routes = [
           }
         ]
       },
-/*      {*/
-        /*path: 'replenishment',*/
-        /*children: [*/
-          /*{*/
-            /*path: '',*/
-            /*loadChildren: () => import('../replenishment/replenishment/replenishment.module').then(m => m.ReplenishmentModule)*/
-          /*}*/
-        /*]*/
-      /*},*/
       {
         path: 'glpprices',
         children: [
@@ -147,24 +138,6 @@ const routes: Routes = [
           }
         ]
       },
-/*      {*/
-        /*path: 'replenishment-post',*/
-        /*children: [*/
-          /*{*/
-            /*path: '',*/
-            /*loadChildren: () => import('../replenishment/post/post.module').then(m => m.PostModule)*/
-          /*}*/
-        /*]*/
-      /*},*/
-      /*{*/
-        /*path: 'replenishment-patch',*/
-        /*children: [*/
-          /*{*/
-            /*path: '',*/
-            /*loadChildren: () => import('../replenishment/patch/patch.module').then(m => m.PatchModule)*/
-          /*}*/
-        /*]*/
-      /*},*/
       {
         path: 'asset-supply-post',
         children: [
@@ -210,24 +183,6 @@ const routes: Routes = [
           }
         ]
       },
-/*      {*/
-        /*path: 'replenishment-withdrawn-post',*/
-        /*children: [*/
-          /*{*/
-            /*path: '',*/
-            /*loadChildren: () => import('../replenishment/withdrawn/post/post.module').then(m => m.PostModule)*/
-          /*}*/
-        /*]*/
-      /*},*/
-      /*{*/
-        /*path: 'replenishment-withdrawn-postaut',*/
-        /*children: [*/
-          /*{*/
-            /*path: '',*/
-            /*loadChildren: () => import('../replenishment/withdrawn/postaut/post.module').then(m => m.PostModule)*/
-          /*}*/
-        /*]*/
-      /*},*/
       {
         path: 'replenishment-withdrawn-getall',
         children: [
@@ -237,35 +192,6 @@ const routes: Routes = [
           }
         ]
       },
-/*      {*/
-        /*path: 'logistic-logistic-getall-in',*/
-        /*children: [*/
-          /*{*/
-            /*path: '',*/
-            /*loadChildren: () => import('../logistic/logistic/getallin/getall.module').then(m => m.GetallModule)*/
-          /*}*/
-        /*]*/
-      /*},*/
-
-      /*{*/
-        /*path: 'logistic-logistic-getall-out',*/
-        /*children: [*/
-          /*{*/
-            /*path: '',*/
-            /*loadChildren: () => import('../logistic/logistic/getallout/getall.module').then(m => m.GetallModule)*/
-          /*}*/
-        /*]*/
-      /*},*/
-
-      /*{*/
-        /*path: 'ass',*/
-        /*children: [*/
-          /*{*/
-            /*path: '',*/
-            /*loadChildren: () => import('../replenishment/vendor/post/post.module').then(m => m.PostModule)*/
-          /*}*/
-        /*]*/
-      /*},*/
       {
         path: 'replenishment-vendor-patch',
         children: [
