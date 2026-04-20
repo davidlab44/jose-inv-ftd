@@ -52,13 +52,11 @@ export class GetallPage implements OnInit {
 
   startDay = 1;
   endDay = this.dayRange.upper;
-
-  types = [
+types = [
     { value: 1, name: 'Nacional' },
     { value: 2, name: 'Importado' }
   ];
-
-  vendors = [
+vendors = [
     { value: 1, name: 'Plexa' },
     { value: 2, name: 'Plexa port' }
   ];
@@ -105,22 +103,27 @@ export class GetallPage implements OnInit {
     //private cd: ChangeDetectorRef,
   ) {}
 
-  ngOnInit() {
-    this.initDefaultRange(45);
-    this.loadShips();
-    this.loadCcos();
-  }
+ngOnInit() {
+  this.initCurrentMonthRange(); // ← cambio aquí
+  this.loadShips();
+  this.loadCcos();
+}
 
-
+ //mostrar ultimos n dias
+  /*ngOnInit() {*/
+    /*this.initDefaultRange(45);*/
+    /*this.loadShips();*/
+    /*this.loadCcos();*/
+  /*}*/
       
-  initDefaultRange(days: number) {                                                                                                                                                  
-    const today = this.getTodayDayOfYear();
-    this.dayRange = {
-      lower: Math.max(1, today - days),
-      upper: today             
-    };    
-    this.syncDays();
-  }           
+  /*initDefaultRange(days: number) {                                                                                                                                                  */
+    /*const today = this.getTodayDayOfYear();*/
+    /*this.dayRange = {*/
+      /*lower: Math.max(1, today - days),*/
+      /*upper: today             */
+    /*};    */
+    /*this.syncDays();*/
+  /*}           */
         
 
 
@@ -447,16 +450,11 @@ export class GetallPage implements OnInit {
     this.ccoService.getAll().subscribe({
       next: (ccos) => {
         console.log('📦 ccoList RAW =>', ccos);
-
         this.ccoList = ccos;
-
         this.ccoMap = this.buildCcoMap(ccos);
-
         console.log('🧭 ccoMap =>', this.ccoMap);
         console.log('🔑 ccoMap keys =>', Object.keys(this.ccoMap));
-
         //this.cd.markForCheck();
-
         // debug cruzado
         this.debugCcoMapping();
       },
@@ -466,14 +464,10 @@ export class GetallPage implements OnInit {
 
   debugCcoMapping() {
     console.log('🧪 DEBUG withdrawn -> ccoMap');
-
     this.filteredList.slice(0, 10).forEach((item, i) => {
       const ccoId = item?.data?.name;
-
       console.log(`🔎 item[${i}] ccoId =>`, ccoId, 'tipo:', typeof ccoId);
-
       const cco = this.ccoMap[ccoId];
-
       if (!cco) {
         console.warn(`❌ NO MATCH para ccoId=${ccoId}`, {
           availableKeys: Object.keys(this.ccoMap)
@@ -483,7 +477,6 @@ export class GetallPage implements OnInit {
       }
     });
   }
-
 
   toggleState(item: any, ev: any) {
    console.log('item',item)
@@ -500,76 +493,138 @@ export class GetallPage implements OnInit {
     });
   }
 
-
-
-
-
-
-
-
-
-
-
-
-changeStartDay(delta: number) {
-  this.startDay = Math.max(1, Math.min(365, this.startDay + delta));
-  // evitar que supere endDay
-  if (this.startDay > this.endDay) {
-    this.startDay = this.endDay;
+  changeStartDay(delta: number) {
+    this.startDay = Math.max(1, Math.min(365, this.startDay + delta));
+    // evitar que supere endDay
+    if (this.startDay > this.endDay) {
+      this.startDay = this.endDay;
+    }
+    this.updateRangeAndFetch();
   }
-  this.updateRangeAndFetch();
-}
 
-changeEndDay(delta: number) {
-  this.endDay = Math.max(1, Math.min(365, this.endDay + delta));
-  // evitar que sea menor que startDay
-  if (this.endDay < this.startDay) {
-    this.endDay = this.startDay;
+  changeEndDay(delta: number) {
+    this.endDay = Math.max(1, Math.min(365, this.endDay + delta));
+    // evitar que sea menor que startDay
+    if (this.endDay < this.startDay) {
+      this.endDay = this.startDay;
+    }
+    this.updateRangeAndFetch();
   }
-  this.updateRangeAndFetch();
-}
 
 
 
-private rangeTimeout: any;
+  private rangeTimeout: any;
 
-updateRangeAndFetch() {
-  this.dayRange = {
-    lower: this.startDay,
-    upper: this.endDay
-  };
-  clearTimeout(this.rangeTimeout);
-  this.rangeTimeout = setTimeout(() => {
-    this.getAll();
-  }, 1000); // debounce 🔥
-}
-
-quickRange(ev: any) {
-  const today = this.getTodayDayOfYear();
-  if (ev.detail.value === 'today') {
-    this.startDay = today;
-    this.endDay = today;
+  updateRangeAndFetch() {
+    this.dayRange = {
+      lower: this.startDay,
+      upper: this.endDay
+    };
+    clearTimeout(this.rangeTimeout);
+    this.rangeTimeout = setTimeout(() => {
+      this.getAll();
+    }, 1000); // debounce 🔥
   }
-  if (ev.detail.value === 'week') {
-    this.startDay = today - 7;
-    this.endDay = today;
-  }
-  if (ev.detail.value === 'month') {
-    this.startDay = today - 30;
-    this.endDay = today;
-  }
-  this.updateRangeAndFetch();
-}
 
+  quickRange(ev: any) {
+    const today = this.getTodayDayOfYear();
+    if (ev.detail.value === 'today') {
+      this.startDay = today;
+      this.endDay = today;
+    }
+    if (ev.detail.value === 'week') {
+      this.startDay = today - 7;
+      this.endDay = today;
+    }
+    if (ev.detail.value === 'month') {
+      this.startDay = today - 30;
+      this.endDay = today;
+    }
+    this.updateRangeAndFetch();
+  }
 
-/*initDefaultRange(days: number) {*/
-  /*const today = this.getTodayDayOfYear();*/
-  /*this.dayRange = {*/
-    /*lower: Math.max(1, today - days),*/
-    /*upper: today*/
-  /*};*/
-  /*this.syncDays();*/
-/*}*/
+  exportToExcel() {
+    try {
+      if (!this.filteredList || this.filteredList.length === 0) return;
+      const rows = this.filteredList.map(item => ({
+        // ❌ ERP eliminado
+        "Fecha V": this.formatDate(item.data.date),
+        "Isotanq": this.ccoMap[+item.data.name]?.name || 'N/A',
+        "Ticket": item.data.ticket,
+        "Kg": item.data.kg,
+        "PSI": item.data.psi,
+        "Rotogate": item.data.rotogate,
+        "Seal": item.data.seal?.join(', ') || '',
+        "Wgross": item.data.wgross,
+        "Wtare": item.data.wtare,
+        "Wnet": item.data.wnet,
+        "Fecha Ing": this.formatDate(item.data.datein),
+        "Rem vacío": item.data.deliveryin,
+        "Trip In": item.data.tripin,
+        "Ship In": this.shipMap[item.data.shipin]?.name || 'N/A',
+        "Date Out": this.formatDate(item.data.dateout),
+        "Rem M LL": item.data.deliveryout,
+        "Trip Out": item.data.tripout,
+        "Ship Out": this.shipMap[item.data.shipout]?.name || 'N/A',
+        "Diff": item.data.diff || '',
+        "Img": item.data.img || '',
+        "Img Scale": item.data.imgscale || '',
+        "Img In": item.data.imgin || '',
+        "Img Out": item.data.imgout || '',
+        "Price": item.data.price,
+        "WTicket": item.data.wticket
+      }));
+      // convertir a CSV
+      const csv = this.convertToCSV(rows);
+      // descargar
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', 'replenishment_export.csv');
+      link.click();
+    } catch (err) {
+      console.error('Error exportToExcel:', err);
+    }
+  }
+
+  convertToCSV(data: any[]): string {
+    if (!data.length) return '';
+    const headers = Object.keys(data[0]);
+    const rows = data.map(row =>
+      headers.map(field => `"${(row[field] ?? '').toString().replace(/"/g, '""')}"`).join(',')
+    );
+    return [headers.join(','), ...rows].join('\n');
+  }
+
+  formatDate(date: any): string {
+    if (!date) return '';
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('es-CO');
+  }
+
+  initCurrentMonthRange() {
+    const today = new Date();
+    const todayDayOfYear = this.getTodayDayOfYear();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const startDayOfYear = this.getDayOfYear(firstDayOfMonth);
+    this.dayRange = {
+      lower: startDayOfYear,
+      upper: todayDayOfYear
+    };
+    this.syncDays();
+  }
+
+  getDayOfYear(date: Date): number {
+    const start = new Date(date.getFullYear(), 0, 0);
+    const diff =
+      date.getTime() -
+      start.getTime() +
+      (start.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000;
+
+    return Math.floor(diff / (1000 * 60 * 60 * 24));
+  }
+
 
 
 

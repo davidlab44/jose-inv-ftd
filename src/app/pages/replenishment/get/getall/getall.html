@@ -80,22 +80,22 @@
         <thead>
           <tr>
             <th (click)="sortData('data.date')">ERP</th>
-            <th (click)="sortData('data.date')">Date</th>
+            <th (click)="sortData('data.date')">Fecha V</th>
             <th (click)="sortData('isotanq_name')">Isotanq</th>
+            <th (click)="sortData('data.ticket')">Ticket</th>
             <th (click)="sortData('data.kg')"><span style="font-size:x-small;" >{{totalKg | number:'1.0-2' }} kg </span></th>
             <th (click)="sortData('data.psi')">PSI</th>
             <th (click)="sortData('data.rotogate')">Rotogate</th>
             <th>Seal</th>
-            <th (click)="sortData('data.ticket')">Ticket</th>
             <th (click)="sortData('data.wgross')">Wgross</th>
             <th (click)="sortData('data.wtare')">Wtare</th>
             <th (click)="sortData('data.wnet')">Wnet</th>
-            <th (click)="sortData('data.datein')">Date In</th>
-            <th (click)="sortData('data.deliveryin')">Delivery In</th>
+            <th (click)="sortData('data.datein')">Fe ing M</th>
+            <th (click)="sortData('data.deliveryin')">Rem vacío</th>
             <th (click)="sortData('data.tripin')">Trip In</th>
             <th (click)="sortData('shipin_name')">Ship In</th>
             <th (click)="sortData('data.dateout')">Date Out</th>
-            <th (click)="sortData('data.deliveryout')">Delivery Out</th>
+            <th (click)="sortData('data.deliveryout')">Rem M LL</th>
             <th (click)="sortData('data.tripout')">Trip Out</th>
             <th (click)="sortData('shipout_name')">Ship Out</th>
             <th (click)="sortData('diff')">Diff</th>
@@ -116,9 +116,8 @@
               </ion-toggle>
             </td>
             <td>{{ item.data.date | date:'dd/MM/yyyy' }}</td>
-
             <td [style.background]="ccoMap[+item.data.name]?.color || '#eee'"> {{ ccoMap[+item.data.name]?.name || 'N/A' }} </td>
-
+            <td>{{ item.data.ticket }}</td>
             <td>{{ item.data.kg }}</td>
             <td [ngClass]="{
               'low': item.data.psi < 100,
@@ -130,7 +129,6 @@
             <td>
               {{ item.data.seal?.join(', ') }}
             </td>
-            <td>{{ item.data.ticket }}</td>
             <td>{{ item.data.wgross | number }}</td>
             <td>{{ item.data.wtare | number }}</td>
             <td>{{ item.data.wnet | number }}</td>
@@ -162,6 +160,11 @@
         </tbody>
       </table>
     </div>
+  </div>
+  <div>
+    <ion-button (click)="exportToExcel()" size="small">
+      Exportar Excel
+    </ion-button>
   </div>
 </ion-content>
 
