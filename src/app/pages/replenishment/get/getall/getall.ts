@@ -103,29 +103,11 @@ vendors = [
     //private cd: ChangeDetectorRef,
   ) {}
 
-ngOnInit() {
-  this.initCurrentMonthRange(); // ← cambio aquí
-  this.loadShips();
-  this.loadCcos();
-}
-
- //mostrar ultimos n dias
-  /*ngOnInit() {*/
-    /*this.initDefaultRange(45);*/
-    /*this.loadShips();*/
-    /*this.loadCcos();*/
-  /*}*/
-      
-  /*initDefaultRange(days: number) {                                                                                                                                                  */
-    /*const today = this.getTodayDayOfYear();*/
-    /*this.dayRange = {*/
-      /*lower: Math.max(1, today - days),*/
-      /*upper: today             */
-    /*};    */
-    /*this.syncDays();*/
-  /*}           */
-        
-
+  ngOnInit() {
+    this.initCurrentMonthRange(); // ← cambio aquí
+    this.loadShips();
+    this.loadCcos();
+  }
 
   ionViewWillEnter() {
     this.getAll();
@@ -146,19 +128,14 @@ ngOnInit() {
     });
   }
 
-
-
   sortWithdrawnByDateAndSum(withdrawnList: any[]): any[] {
     let total = 0;
-
     const map = new Map<string, any>();
-
     for (let i = 0; i < withdrawnList.length; i++) {
       const item = withdrawnList[i];
       const data = item.data;
       // asegurar objeto data
       if (!item.data) item.data = {};
-
       // 🔥 SIEMPRE inicializar diff
       item.data.diff = 0;
       // suma total kg
@@ -198,41 +175,6 @@ ngOnInit() {
     this.totalKg = total;
     return withdrawnList;
   }
-
-
-  /*sortWithdrawnByDateAndSum(withdrawnList: any[]): any[] {*/
-    /*let total = 0;*/
-    /*for (let i = 0; i < withdrawnList.length; i++) {*/
-      /*total += withdrawnList[i]?.data?.kg || 0;*/
-      /*withdrawnList[i]._ts = Date.parse(withdrawnList[i].data.date);*/
-    /*}*/
-    /*withdrawnList.sort((a, b) => a._ts - b._ts);*/
-    /*this.totalKg = total;*/
-    /*return withdrawnList;*/
-  /*}*/
-
-
-  /*sortWithdrawnByDateAndSum(withdrawnList: any[]): any[] {*/
-    /*console.log("totalKg antes",this.totalKg)*/
-    /*let total = 0;*/
-    /*const sorted = withdrawnList.sort((a, b) => {*/
-
-      /*total += a?.data?.kg || 0;*/
-      /*return new Date(a.data.date).getTime() - new Date(b.data.date).getTime();*/
-    /*});*/
-    /*this.totalKg = total;*/
-
-    /*console.log("totalKg despues",this.totalKg)*/
-    /*return sorted;*/
-  /*}*/
-
-  /*sortWithdrawnByDate(withdrawnList: any[]): any[] {*/
-    /*return withdrawnList.sort((a, b) => {*/
-      /*const dateA = new Date(a.data.date).getTime();*/
-      /*const dateB = new Date(b.data.date).getTime();*/
-      /*return dateA - dateB;*/
-    /*});*/
-  /*}*/
 
   trackByGroup(index: number, group: any): string {
     return group.refdate + '-' + index;

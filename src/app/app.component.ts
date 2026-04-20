@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
      {
        title: 'Productos',
        url: '/app/tabs/readprdct',
-       icon: 'cube'
+       icon: 'construct'
      },
      {
        title: 'Entrada',
@@ -73,7 +73,7 @@ export class AppComponent implements OnInit {
       {
        title: 'Productos',
        url: '/app/tabs/readprd',
-       icon: 'cube'
+       icon: 'construct'
      },
    ];
 
@@ -86,7 +86,7 @@ export class AppComponent implements OnInit {
       {
        title: 'Productos',
        url: '/app/tabs/readprd',
-       icon: 'cube'
+       icon: 'construct'
      },
      {
        title: 'Reabastecimiento',
@@ -105,7 +105,7 @@ export class AppComponent implements OnInit {
      {
        title: 'Productos',   
        url: '/app/tabs/readprd',       
-       icon: 'cube'
+       icon: 'construct'
      },
      {
        title: 'Reabastecimiento',
@@ -178,7 +178,7 @@ export class AppComponent implements OnInit {
      {
        title: 'Productos',   
        url: '/app/tabs/readprd',       
-       icon: 'cube'
+       icon: 'construct'
      },
      {
        title: 'Reabastecimiento',
