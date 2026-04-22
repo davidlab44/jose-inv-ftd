@@ -116,7 +116,15 @@
               </ion-toggle>
             </td>
             <td>{{ item.data.date | date:'dd/MM/yyyy' }}</td>
-            <td [style.background]="ccoMap[+item.data.name]?.color || '#eee'"> {{ ccoMap[+item.data.name]?.name || 'N/A' }} </td>
+
+<td
+  [style.background]="ccoMap[+item.data.name]?.color || '#eee'"
+  (click)="copyToClipboard(ccoMap[+item.data.name]?.name)"
+>
+  {{ ccoMap[+item.data.name]?.name || 'N/A' }}
+</td>
+
+  <!--\cc          <td [style.background]="ccoMap[+item.data.name]?.color || '#eee'"> {{ ccoMap[+item.data.name]?.name || 'N/A' }} </td>-->
             <td>{{ item.data.ticket }}</td>
             <td>{{ item.data.kg }}</td>
             <td [ngClass]="{

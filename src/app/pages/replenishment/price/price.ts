@@ -11,26 +11,11 @@ import { GlppricesService } from '../../../services/replenishment/glpprices.serv
 })
 export class PricePage {
 
-  /* ================= CALENDAR ================= */
-
-  calendarOptions: CalendarOptions = {
-    initialView: 'dayGridMonth',
-    plugins: [dayGridPlugin],
-    height: 'auto',
-    eventDisplay: 'block',
-    displayEventTime: false,
-    eventClick: (info) => this.onEventClick(info)
-  };
-
-  /* ================= UI STATE ================= */
-
   importado: boolean = false;
   showSearchbar: boolean = false;
 
   selectedPrice: any = null;
   showEditForm: boolean = false;
-
-  /* ================= DATA ================= */
 
   yearPrices: any[] = [];
   glppricesList: any[] = [];
@@ -50,14 +35,10 @@ export class PricePage {
     private glpricesService: GlppricesService
   ) {}
 
-  /* ================= INIT ================= */
-
   ngOnInit() {
     this.loadYearPrices();
     this.getAllPrices();
   }
-
-  /* ================= LOAD ================= */
 
   loadYearPrices() {
     this.glpricesService
@@ -74,76 +55,265 @@ export class PricePage {
         this.glppricesList = response.slice().reverse();
         this.getMaxIdItem(this.glppricesList);
         this.getMaxImportedItem(this.glppricesList);
+        console.log('response',response);
       }
     });
   }
 
-  /* ================= BUILD EVENTS ================= */
+
+
+
+
+
+/*events: any[] = [];*/
+/*priceMap: Record<string, any> = {};*/
+
+/*// estado explícito del segmento*/
+/*selectedProductId: 1 | 2 = 1;*/
+
+/*calendarOptions: CalendarOptions = {*/
+  /*initialView: 'dayGridMonth',*/
+  /*plugins: [dayGridPlugin],*/
+  /*timeZone: 'America/Bogota',*/
+  /*height: 'auto',*/
+  /*events: [],*/
+
+  /*dayCellDidMount: (info) => {*/
+    /*const dateStr =*/
+      /*info.date.getFullYear() + '-' +*/
+      /*String(info.date.getMonth() + 1).padStart(2, '0') + '-' +*/
+      /*String(info.date.getDate()).padStart(2, '0');*/
+
+    /*const data = this.priceMap[dateStr];*/
+    /*if (!data) return;*/
+
+    /*info.el.style.backgroundColor =*/
+      /*data.id_replenishment_product === 2 ? '#7b2cbf' : '#2e7d32';*/
+
+    /*info.el.style.color = 'white';*/
+    /*info.el.style.position = 'relative';*/
+
+    /*const label = document.createElement('div');*/
+    /*label.innerText = `$${data.price}.${Number(data.cents || 0).toString().padStart(2, '0')}`;*/
+    /*label.style.position = 'absolute';*/
+    /*label.style.bottom = '2px';*/
+    /*label.style.left = '2px';*/
+    /*label.style.fontSize = '10px';*/
+    /*label.style.fontWeight = 'bold';*/
+
+    /*info.el.appendChild(label);*/
+  /*}*/
+/*};*/
+
+/*buildFullCalendarEvents() {*/
+  /*console.log('==== BUILD PRICE MAP ====');*/
+  /*console.log('selectedProductId:', this.selectedProductId);*/
+  /*console.log('yearPrices length:', this.yearPrices?.length || 0);*/
+
+  /*const map: Record<string, any> = {};*/
+
+  /*if (!Array.isArray(this.yearPrices)) {*/
+    /*console.warn('yearPrices no es un array');*/
+    /*this.priceMap = {};*/
+    /*this.refreshCalendar();*/
+    /*return;*/
+  /*}*/
+
+  /*for (const p of this.yearPrices) {*/
+    /*const d = p?.data;*/
+    /*if (!d) continue;*/
+
+    /*if (Number(d.id_replenishment_product) !== this.selectedProductId) {*/
+      /*continue;*/
+    /*}*/
+
+    /*const start = new Date(d.init);*/
+    /*const end = new Date(d.end);*/
+
+    /*if (isNaN(start.getTime()) || isNaN(end.getTime())) {*/
+      /*console.warn('❌ fechas inválidas:', d);*/
+      /*continue;*/
+    /*}*/
+
+    /*const price = Number(d.price);*/
+    /*const cents = Number(d.cents);*/
+
+    /*if (isNaN(price) || isNaN(cents)) {*/
+      /*console.warn('❌ price/cents inválidos:', d);*/
+      /*continue;*/
+    /*}*/
+
+    /*const current = new Date(start);*/
+
+    /*while (current <= end) {*/
+      /*const key =*/
+        /*current.getFullYear() + '-' +*/
+        /*String(current.getMonth() + 1).padStart(2, '0') + '-' +*/
+        /*String(current.getDate()).padStart(2, '0');*/
+
+      /*map[key] = d;*/
+      /*current.setDate(current.getDate() + 1);*/
+    /*}*/
+
+    /*console.log(`✔ rango cargado: ${d.init} → ${d.end} | product=${d.id_replenishment_product}`);*/
+  /*}*/
+
+  /*this.priceMap = map;*/
+
+  /*console.log('==== MAP SIZE ====', Object.keys(this.priceMap).length);*/
+
+  /*this.refreshCalendar();*/
+/*}*/
+
+/*onSegmentChange(ev: any) {*/
+  /*const value = ev?.detail?.value;*/
+
+  /*console.log('==== SEGMENT CHANGE ====');*/
+  /*console.log('value:', value);*/
+
+  /*// Ajusta aquí según los values reales del ion-segment*/
+  /*if (value === 'all') {*/
+    /*this.selectedProductId = 1; // NACIONAL*/
+  /*} else if (value === 'favorites') {*/
+    /*this.selectedProductId = 2; // IMPORTADO*/
+  /*} else {*/
+    /*console.warn('segment value no reconocido:', value);*/
+    /*return;*/
+  /*}*/
+
+  /*this.buildFullCalendarEvents();*/
+/*}*/
+
+/*refreshCalendar() {*/
+  /*// fuerza re-render limpio del calendario*/
+  /*this.calendarOptions = {*/
+    /*...this.calendarOptions*/
+  /*};*/
+/*}*/
+
+/*getPriceForDate(dateStr: string) {*/
+  /*return this.priceMap[dateStr] || null;*/
+/*}*/
+
+
+
+
+
+
+
+  events: any[] = [];
+
+  priceMap: Record<string, any> = {}; // 🔥 lookup O(1)
+
+  calendarOptions: CalendarOptions = {
+    initialView: 'dayGridMonth',
+    plugins: [dayGridPlugin],
+    timeZone: 'America/Bogota',
+    height: 'auto',
+
+    // 🔥 NO usamos events para pintar rangos
+    events: [],
+
+    dayCellDidMount: (info) => {
+
+      const dateStr =
+        info.date.getFullYear() + '-' +
+        String(info.date.getMonth() + 1).padStart(2, '0') + '-' +
+        String(info.date.getDate()).padStart(2, '0');
+
+      const data = this.priceMap[dateStr];
+
+      if (!data) return;
+
+      // 🎨 pintar fondo
+      info.el.style.backgroundColor =
+        data.id_replenishment_product === 2 ? '#7b2cbf' : '#2e7d32';
+
+      info.el.style.color = 'white';
+      info.el.style.position = 'relative';
+
+      // 🏷 label precio
+      const label = document.createElement('div');
+      label.innerText = `$${data.price}.${data.cents.toString().padStart(2, '0')}`;
+
+      label.style.position = 'absolute';
+      label.style.bottom = '2px';
+      label.style.left = '2px';
+      label.style.fontSize = '10px';
+      label.style.fontWeight = 'bold';
+
+      info.el.appendChild(label);
+
+      // 🧪 DEBUG opcional
+      // console.log('painted:', dateStr, data.price);
+    }
+  };
 
   buildFullCalendarEvents() {
 
     const productId = this.importado ? 2 : 1;
 
-    const filtered = this.yearPrices
-      .filter(p => p.data?.id_replenishment_product === productId);
+    console.log('==== BUILD PRICE MAP ====');
 
-    const events: any[] = [];
+    const map: Record<string, any> = {};
 
-    filtered.forEach(p => {
+    for (const p of this.yearPrices) {
 
-      const startDate = new Date(p.data.init);
-      const endDate   = new Date(p.data.end);
+      const d = p.data;
 
-      let current = new Date(startDate);
+      if (!d || d.id_replenishment_product !== productId) continue;
 
-      while (current <= endDate) {
+      const start = new Date(d.init);
+      const end = new Date(d.end);
 
-        const dateStr = current.toISOString().substring(0, 10);
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        console.warn('❌ fechas inválidas:', d);
+        continue;
+      }
 
-        events.push({
-          title: `$${p.data.price}`,
-          start: dateStr,
-          allDay: true,
-          display: 'block',
-          backgroundColor: this.importado ? '#7b2cbf' : '#2e7d32',
-          borderColor: this.importado ? '#7b2cbf' : '#2e7d32',
-          extendedProps: {
-            id: p.id,
-            fullData: p.data
-          }
-        });
+      let current = new Date(start);
+
+      while (current <= end) {
+
+        const key =
+          current.getFullYear() + '-' +
+          String(current.getMonth() + 1).padStart(2, '0') + '-' +
+          String(current.getDate()).padStart(2, '0');
+
+        map[key] = d;
 
         current.setDate(current.getDate() + 1);
       }
-    });
 
-    this.calendarOptions = {
-      ...this.calendarOptions,
-      events
-    };
+      console.log(`✔ rango cargado: ${d.init} → ${d.end}`);
+    }
+
+    this.priceMap = map;
+
+    console.log('==== MAP SIZE ====', Object.keys(this.priceMap).length);
   }
 
-  /* ================= CLICK EVENT ================= */
+  getPriceForDate(dateStr: string) {
+    return this.priceMap[dateStr] || null;
+  }
+
+
+
+
 
   onEventClick(info: any) {
-
     const data = info.event.extendedProps.fullData;
-
     this.selectedPrice = {
       id: info.event.extendedProps.id,
       price: data.price,
-      cents: data.cents || 0,
+      cents: data.cents.toString() || 0,
       init: data.init,
       end: data.end
     };
-
     this.showEditForm = true;
   }
 
-  /* ================= PATCH ================= */
-
   updatePrice() {
-
     const updatedData = {
       price: this.selectedPrice.price,
       cents: this.selectedPrice.cents,
@@ -152,7 +322,6 @@ export class PricePage {
       currency: 57,
       id_replenishment_product: this.importado ? 2 : 1
     };
-
     this.glpricesService
       .patch(this.selectedPrice.id, updatedData)
       .subscribe(() => {
@@ -168,12 +337,8 @@ export class PricePage {
     this.selectedPrice = null;
   }
 
-  /* ================= ADD PRICE ================= */
-
   addGlpprice(price: number, cents: number) {
-
     const productId = this.importado ? 2 : 1;
-
     this.glpricesService
       .addGlpprice(price, cents, this.dateTimeStart, this.dateTimeEnd, productId)
       .subscribe(() => {
@@ -182,14 +347,10 @@ export class PricePage {
       });
   }
 
-  /* ================= SEGMENT ================= */
-
   onSegmentChange(event: any) {
     this.importado = event.detail.value === 'favorites';
     this.buildFullCalendarEvents();
   }
-
-  /* ================= HELPERS ================= */
 
   get currentPrice() {
     return this.importado ? this.lastImportedPrice : this.lastGlpprice;
@@ -225,459 +386,11 @@ export class PricePage {
     console.log(this.dateTimeStart, this.dateTimeEnd);
   }
 
+
+
+
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*import { Component, ViewChild, ElementRef } from '@angular/core';*/
-/*import { Router } from '@angular/router';*/
-/*import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';*/
-/*import { ConferenceData } from '../../../providers/conference-data';*/
-/*import { UserData } from '../../../providers/user-data';*/
-/*import { OpportunityService } from '../../../services/opportunity.service';*/
-/*import { PosOrderService } from '../../../services/pos-order.service';*/
-/*import { TableService } from '../../../services/table.service';*/
-/*import { environment } from '../../../../environments/environment';*/
-/*import { ActivatedRoute } from '@angular/router'*/
-/*import { Session } from '../../../interfaces/session';*/
-/*import { SessionService } from '../../../services/session.service';*/
-/*import { UtilService } from '../../../services/util.service';*/
-/*import { ProductService } from '../../../services/product.service';*/
-/*import { BarcodeService } from '../../../services/barcode.service';*/
-/*import { CategoryService } from '../../../services/category.service';*/
-/*import { UmService } from '../../../services/um.service';*/
-/*import { Product } from '../../../interfaces/product';*/
-/*import { BrowserMultiFormatReader } from '@zxing/browser';*/
-/*import { Subject } from 'rxjs';*/
-/*import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';*/
-/*import { DateService } from '../../../services/local/date.service';*/
-/*import { RexService } from '../../../services/rex.service';*/
-/*import { ProdrexService } from '../../../services/prodrex.service';*/
-/*import { UserService } from '../../../services/user.service';*/
-/*import { GlppricesService } from '../../../services/replenishment/glpprices.service';*/
-/*import dayGridPlugin from '@fullcalendar/daygrid';*/
-/*import { CalendarOptions } from '@fullcalendar/core';*/
-
-
-/*@Component({*/
-  /*selector: 'page-price',*/
-  /*templateUrl: 'price.html',*/
-  /*styleUrls: ['./price.scss'],*/
-/*})*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*export class PricePage {*/
-
-  /*calendarOptions: CalendarOptions = {*/
-    /*initialView: 'dayGridMonth',*/
-    /*plugins: [dayGridPlugin],*/
-    /*height: 'auto',*/
-    /*eventDisplay: 'block',*/
-    /*displayEventTime: false,*/
-    /*eventClick: (info) => {*/
-      /*this.onEventClick(info);*/
-    /*}*/
-  /*};*/
-  
-  /*selectedPrice: any = null;*/
-  /*showEditForm = false;*/
-
-  /*onEventClick(info: any) {*/
-
-    /*const priceData = info.event.extendedProps.fullData;*/
-
-    /*this.selectedPrice = {*/
-      /*id: info.event.extendedProps.id,*/
-      /*price: priceData.price,*/
-      /*cents: priceData.cents,*/
-      /*init: priceData.init,*/
-      /*end: priceData.end*/
-    /*};*/
-
-    /*this.showEditForm = true;*/
-
-    /*console.log("Evento seleccionado:", this.selectedPrice);*/
-  /*}*/
-
-  /*ios: boolean;*/
-  /*importado: boolean = false;*/
-  /*hasOwner: boolean = false;*/
-  /*showSearchbar: boolean;*/
-  /*queryText: any;*/
-  /*searchSubject = new Subject<string>();*/
-  /*todayDate: any;*/
-
-  /*hash: string = '';*/
-  /*table: any;*/
-  /*rexDocument: any;*/
-  /*glppricesList: any[] = [];*/
-
-  /*yearPrices: any[] = [];*/
-  /*occupiedDatesSet: Set<string> = new Set();*/
-
-  /*dateTimeStart!: string;*/
-  /*dateTimeEnd!: string;*/
-
-  /*numero!: number;*/
-  /*cents!: number;*/
-  /*valor: number = 0;*/
-
-  /*lastGlpprice: any = null;*/
-  /*lastImportedPrice: any = null;*/
-
-  /*constructor(*/
-    /*private barcodeService: BarcodeService,*/
-    /*public alertCtrl: AlertController,*/
-    /*public confData: ConferenceData,*/
-    /*public loadingCtrl: LoadingController,*/
-    /*public modalCtrl: ModalController,*/
-    /*public router: Router,*/
-    /*public toastCtrl: ToastController,*/
-    /*public user: UserData,*/
-    /*public config: Config,*/
-    /*private opportunityService: OpportunityService,*/
-    /*private posOrderService: PosOrderService,*/
-    /*private tableService: TableService,*/
-    /*private route: ActivatedRoute,*/
-    /*private sessionService: SessionService,*/
-    /*private utilService: UtilService,*/
-    /*private productService: ProductService,*/
-    /*private categoryService: CategoryService,*/
-    /*private umService: UmService,*/
-    /*private dateService: DateService,*/
-    /*private rexService: RexService,*/
-    /*private prodrexService: ProdrexService,*/
-    /*private userService: UserService,*/
-    /*private glpricesService: GlppricesService*/
-  /*) {}*/
-
-
-  /*async ngOnInit() {*/
-
-    /*const ahora = new Date();*/
-    /*this.todayDate = this.formatFechaLatam(ahora);*/
-    /*this.getAllPrices();*/
-    /*const now = new Date();*/
-    /*const startOfDay = new Date(*/
-      /*now.getFullYear(),*/
-      /*now.getMonth(),*/
-      /*now.getDate(),*/
-      /*0, 0, 0*/
-    /*);*/
-    /*const endOfDay = new Date(*/
-      /*now.getFullYear(),*/
-      /*now.getMonth(),*/
-      /*now.getDate(),*/
-      /*23, 59, 0*/
-    /*);*/
-    /*this.dateTimeStart = this.toLocalDateTime(startOfDay);*/
-    /*this.dateTimeEnd = this.toLocalDateTime(endOfDay);*/
-    /*this.loadYearPrices(); */
-  /*}*/
-
-  /*highlightedDates = (isoString: string) => {*/
-    /*const date = isoString.substring(0, 10);*/
-    /*if (this.occupiedDatesSet.has(date)) {*/
-      /*return {*/
-        /*textColor: '#ffffff',*/
-        /*backgroundColor: this.importado ? '#7b2cbf' : '#2e7d32'*/
-      /*};*/
-    /*}*/
-    /*return undefined;*/
-  /*};*/
-
-  /*loadYearPrices() {*/
-    /*this.glpricesService*/
-      /*.getCurrentYearPrices()*/
-      /*.subscribe(results => {*/
-        /*console.log("RESULTS FROM BACKEND:", results);*/
-        /*this.yearPrices = results || [];*/
-        /*//this.buildCalendar();*/
-        /*this.buildFullCalendarEvents();*/
-      /*});*/
-  /*}*/
-
-  /*calendarReady = false;*/
-  /*buildCalendar() {*/
-    /*const productId = this.importado ? 2 : 1;*/
-    /*const filtered = this.yearPrices*/
-      /*.filter(p => p.data?.id_replenishment_product === productId);*/
-    /*this.occupiedDatesSet.clear();*/
-    /*filtered.forEach(p => {*/
-      /*const initDate = new Date(p.data.init);*/
-      /*const endDate  = new Date(p.data.end);*/
-      /*let current = new Date(initDate);*/
-      /*while (current <= endDate) {*/
-        /*const year  = current.getFullYear();*/
-        /*const month = String(current.getMonth() + 1).padStart(2, '0');*/
-        /*const day   = String(current.getDate()).padStart(2, '0');*/
-        /*const dateOnly = `${year}-${month}-${day}`;*/
-        /*this.occupiedDatesSet.add(dateOnly);*/
-        /*current.setDate(current.getDate() + 1);*/
-      /*}*/
-    /*});*/
-    /*this.calendarReady = false;*/
-    /*setTimeout(() => {*/
-      /*this.calendarReady = true;*/
-    /*}, 0);*/
-  /*}*/
-
-  /*onSegmentChange(event: any) {*/
-    /*this.importado = event.detail.value === 'favorites';*/
-    /*this.buildFullCalendarEvents();*/
-  /*}*/
-
-  /*getAllPrices() {*/
-    /*this.glpricesService.getAll().subscribe({*/
-      /*next: (response) => {*/
-        /*this.glppricesList = response.slice().reverse();*/
-        /*this.getMaxIdItem(this.glppricesList);*/
-        /*this.getMaxImportedItem(this.glppricesList);*/
-      /*}*/
-    /*});*/
-  /*}*/
-
-  /*addGlpprice(price: number, cents: number) {*/
-    /*const productId = this.importado ? 2 : 1;*/
-    /*const newStart = new Date(this.dateTimeStart);*/
-    /*const newEnd   = new Date(this.dateTimeEnd);*/
-    /*const overlap = this.hasOverlap(productId, newStart, newEnd);*/
-    /*if (overlap) {*/
-      /*alert("⚠ Ya existe un rango que se solapa con este.");*/
-      /*return;*/
-    /*}*/
-    /*this.glpricesService*/
-      /*.addGlpprice(price, cents, this.dateTimeStart, this.dateTimeEnd, productId)*/
-      /*.subscribe(() => {*/
-        /*this.getAllPrices();*/
-        /*this.loadYearPrices();*/
-      /*});*/
-  /*}*/
-
-  /*get currentPrice() {*/
-    /*return this.importado ? this.lastImportedPrice : this.lastGlpprice;*/
-  /*}*/
-
-  /*getMaxIdItem(items: any[]) {*/
-    /*const filtered = items.filter(i => i.data?.id_replenishment_product === 1);*/
-    /*if (!filtered.length) return;*/
-    /*this.lastGlpprice = filtered.reduce((max, item) =>*/
-      /*item.id > max.id ? item : max*/
-    /*);*/
-  /*}*/
-
-  /*getMaxImportedItem(items: any[]) {*/
-    /*const filtered = items.filter(i => i.data?.id_replenishment_product === 2);*/
-    /*if (!filtered.length) return;*/
-    /*this.lastImportedPrice = filtered.reduce((max, item) =>*/
-      /*item.id > max.id ? item : max*/
-    /*);*/
-  /*}*/
-
-  /*toLocalDateTime(date: Date): string {*/
-    /*const pad = (n: number) => n.toString().padStart(2, '0');*/
-    /*return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T` +*/
-      /*`${pad(date.getHours())}:${pad(date.getMinutes())}:00`;*/
-  /*}*/
-
-  /*formatForBackend(value: string): string {*/
-    /*const d = new Date(value);*/
-    /*const pad = (n: number) => n.toString().padStart(2, '0');*/
-    /*return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +*/
-      /*`${pad(d.getHours())}:${pad(d.getMinutes())}:00`;*/
-  /*}*/
-
-  /*formatFechaLatam(dateInput: string | Date | number): string {*/
-    /*if (!dateInput) return '';*/
-    /*const date = new Date(dateInput);*/
-    /*const opciones: Intl.DateTimeFormatOptions = {*/
-      /*day: '2-digit',*/
-      /*month: 'long',*/
-      /*year: 'numeric'*/
-    /*};*/
-    /*const fechaTexto = new Intl.DateTimeFormat('es-ES', opciones).format(date);*/
-    /*let horas = date.getHours();*/
-    /*const minutos = String(date.getMinutes()).padStart(2, '0');*/
-    /*const segundos = String(date.getSeconds()).padStart(2, '0');*/
-    /*const ampm = horas >= 12 ? 'PM' : 'AM';*/
-    /*horas = horas % 12;*/
-    /*if (horas === 0) horas = 12;*/
-    /*const horasTexto = String(horas).padStart(2, '0');*/
-    /*return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;*/
-  /*}*/
-
-  /*onSearch(text: string) {*/
-    /*this.searchSubject.next(text);*/
-  /*}*/
-
-  /*onDateTimeChange() {*/
-    /*const payload = {*/
-      /*start_datetime: this.formatForBackend(this.dateTimeStart),*/
-      /*end_datetime: this.formatForBackend(this.dateTimeEnd)*/
-    /*};*/
-    /*console.log('Inicio (raw):', this.dateTimeStart);*/
-    /*console.log('Fin (raw):', this.dateTimeEnd);*/
-    /*console.log('Payload backend:', payload);*/
-  /*}*/
-
-  /*hasOverlap(*/
-    /*productId: number,*/
-    /*newStart: Date,*/
-    /*newEnd: Date*/
-  /*): boolean {*/
-
-    /*const filtered = this.yearPrices*/
-      /*.filter(p => p.data?.id_replenishment_product === productId);*/
-
-    /*for (const p of filtered) {*/
-
-      /*const existingStart = new Date(p.data.init);*/
-      /*const existingEnd   = new Date(p.data.end);*/
-
-      /*const overlap =*/
-        /*newStart <= existingEnd &&*/
-        /*newEnd   >= existingStart;*/
-
-      /*if (overlap) {*/
-        /*console.log("Overlap detectado con ID:", p.id);*/
-        /*return true;*/
-      /*}*/
-    /*}*/
-
-    /*return false;*/
-  /*}*/
-
-
-
-  /*buildFullCalendarEvents() {*/
-    /*const productId = this.importado ? 2 : 1;*/
-    /*const filtered = this.yearPrices*/
-      /*.filter(p => p.data?.id_replenishment_product === productId);*/
-    /*const events: any[] = [];*/
-    /*filtered.forEach(p => {*/
-      /*const startDate = new Date(p.data.init);*/
-      /*const endDate   = new Date(p.data.end);*/
-      /*let current = new Date(startDate);*/
-      /*while (current <= endDate) {*/
-        /*const dateStr = current.toISOString().substring(0, 10);*/
-        /*events.push({*/
-          /*title: `$${p.data.price}`,*/
-          /*start: dateStr,*/
-          /*allDay: true,*/
-          /*display: 'block',*/
-          /*backgroundColor: this.importado ? '#7b2cbf' : '#2e7d32',*/
-          /*borderColor: this.importado ? '#7b2cbf' : '#2e7d32'*/
-        /*});*/
-
-        /*current.setDate(current.getDate() + 1);*/
-      /*}*/
-    /*});*/
-    /*this.calendarOptions = {*/
-      /*...this.calendarOptions,*/
-      /*events: events*/
-    /*};*/
-  /*}*/
-
-
-/*}*/
-
 
 
 

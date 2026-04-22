@@ -136,7 +136,6 @@ vendors = [
       const data = item.data;
       // asegurar objeto data
       if (!item.data) item.data = {};
-      // 🔥 SIEMPRE inicializar diff
       item.data.diff = 0;
       // suma total kg
       total += Number(data?.kg) || 0;
@@ -391,11 +390,11 @@ vendors = [
   loadCcos() {
     this.ccoService.getAll().subscribe({
       next: (ccos) => {
-        console.log('📦 ccoList RAW =>', ccos);
+        console.log('iccoList RAW =>', ccos);
         this.ccoList = ccos;
         this.ccoMap = this.buildCcoMap(ccos);
-        console.log('🧭 ccoMap =>', this.ccoMap);
-        console.log('🔑 ccoMap keys =>', Object.keys(this.ccoMap));
+        console.log('ccoMap =>', this.ccoMap);
+        console.log('ccoMap keys =>', Object.keys(this.ccoMap));
         //this.cd.markForCheck();
         // debug cruzado
         this.debugCcoMapping();
@@ -465,7 +464,7 @@ vendors = [
     clearTimeout(this.rangeTimeout);
     this.rangeTimeout = setTimeout(() => {
       this.getAll();
-    }, 1000); // debounce 🔥
+    }, 1000); // debounce
   }
 
   quickRange(ev: any) {
@@ -489,7 +488,7 @@ vendors = [
     try {
       if (!this.filteredList || this.filteredList.length === 0) return;
       const rows = this.filteredList.map(item => ({
-        // ❌ ERP eliminado
+        //  ERP eliminado
         "Fecha V": this.formatDate(item.data.date),
         "Isotanq": this.ccoMap[+item.data.name]?.name || 'N/A',
         "Ticket": item.data.ticket,
@@ -567,9 +566,17 @@ vendors = [
     return Math.floor(diff / (1000 * 60 * 60 * 24));
   }
 
-
-
-
+  copyToClipboard(text: string | undefined) {
+    if (!text) return;
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        console.log('Copiado:', text);
+        this.utilService.presentToast("copied: "+text,"default",400)
+      })
+      .catch(err => {
+        console.error('Error al copiar:', err);
+      });
+  }
 
 
 }
