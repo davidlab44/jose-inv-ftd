@@ -60,147 +60,6 @@ export class PricePage {
     });
   }
 
-
-
-
-
-
-/*events: any[] = [];*/
-/*priceMap: Record<string, any> = {};*/
-
-/*// estado explícito del segmento*/
-/*selectedProductId: 1 | 2 = 1;*/
-
-/*calendarOptions: CalendarOptions = {*/
-  /*initialView: 'dayGridMonth',*/
-  /*plugins: [dayGridPlugin],*/
-  /*timeZone: 'America/Bogota',*/
-  /*height: 'auto',*/
-  /*events: [],*/
-
-  /*dayCellDidMount: (info) => {*/
-    /*const dateStr =*/
-      /*info.date.getFullYear() + '-' +*/
-      /*String(info.date.getMonth() + 1).padStart(2, '0') + '-' +*/
-      /*String(info.date.getDate()).padStart(2, '0');*/
-
-    /*const data = this.priceMap[dateStr];*/
-    /*if (!data) return;*/
-
-    /*info.el.style.backgroundColor =*/
-      /*data.id_replenishment_product === 2 ? '#7b2cbf' : '#2e7d32';*/
-
-    /*info.el.style.color = 'white';*/
-    /*info.el.style.position = 'relative';*/
-
-    /*const label = document.createElement('div');*/
-    /*label.innerText = `$${data.price}.${Number(data.cents || 0).toString().padStart(2, '0')}`;*/
-    /*label.style.position = 'absolute';*/
-    /*label.style.bottom = '2px';*/
-    /*label.style.left = '2px';*/
-    /*label.style.fontSize = '10px';*/
-    /*label.style.fontWeight = 'bold';*/
-
-    /*info.el.appendChild(label);*/
-  /*}*/
-/*};*/
-
-/*buildFullCalendarEvents() {*/
-  /*console.log('==== BUILD PRICE MAP ====');*/
-  /*console.log('selectedProductId:', this.selectedProductId);*/
-  /*console.log('yearPrices length:', this.yearPrices?.length || 0);*/
-
-  /*const map: Record<string, any> = {};*/
-
-  /*if (!Array.isArray(this.yearPrices)) {*/
-    /*console.warn('yearPrices no es un array');*/
-    /*this.priceMap = {};*/
-    /*this.refreshCalendar();*/
-    /*return;*/
-  /*}*/
-
-  /*for (const p of this.yearPrices) {*/
-    /*const d = p?.data;*/
-    /*if (!d) continue;*/
-
-    /*if (Number(d.id_replenishment_product) !== this.selectedProductId) {*/
-      /*continue;*/
-    /*}*/
-
-    /*const start = new Date(d.init);*/
-    /*const end = new Date(d.end);*/
-
-    /*if (isNaN(start.getTime()) || isNaN(end.getTime())) {*/
-      /*console.warn('❌ fechas inválidas:', d);*/
-      /*continue;*/
-    /*}*/
-
-    /*const price = Number(d.price);*/
-    /*const cents = Number(d.cents);*/
-
-    /*if (isNaN(price) || isNaN(cents)) {*/
-      /*console.warn('❌ price/cents inválidos:', d);*/
-      /*continue;*/
-    /*}*/
-
-    /*const current = new Date(start);*/
-
-    /*while (current <= end) {*/
-      /*const key =*/
-        /*current.getFullYear() + '-' +*/
-        /*String(current.getMonth() + 1).padStart(2, '0') + '-' +*/
-        /*String(current.getDate()).padStart(2, '0');*/
-
-      /*map[key] = d;*/
-      /*current.setDate(current.getDate() + 1);*/
-    /*}*/
-
-    /*console.log(`✔ rango cargado: ${d.init} → ${d.end} | product=${d.id_replenishment_product}`);*/
-  /*}*/
-
-  /*this.priceMap = map;*/
-
-  /*console.log('==== MAP SIZE ====', Object.keys(this.priceMap).length);*/
-
-  /*this.refreshCalendar();*/
-/*}*/
-
-/*onSegmentChange(ev: any) {*/
-  /*const value = ev?.detail?.value;*/
-
-  /*console.log('==== SEGMENT CHANGE ====');*/
-  /*console.log('value:', value);*/
-
-  /*// Ajusta aquí según los values reales del ion-segment*/
-  /*if (value === 'all') {*/
-    /*this.selectedProductId = 1; // NACIONAL*/
-  /*} else if (value === 'favorites') {*/
-    /*this.selectedProductId = 2; // IMPORTADO*/
-  /*} else {*/
-    /*console.warn('segment value no reconocido:', value);*/
-    /*return;*/
-  /*}*/
-
-  /*this.buildFullCalendarEvents();*/
-/*}*/
-
-/*refreshCalendar() {*/
-  /*// fuerza re-render limpio del calendario*/
-  /*this.calendarOptions = {*/
-    /*...this.calendarOptions*/
-  /*};*/
-/*}*/
-
-/*getPriceForDate(dateStr: string) {*/
-  /*return this.priceMap[dateStr] || null;*/
-/*}*/
-
-
-
-
-
-
-
   events: any[] = [];
 
   priceMap: Record<string, any> = {}; // 🔥 lookup O(1)
@@ -243,22 +102,14 @@ export class PricePage {
       label.style.fontWeight = 'bold';
 
       info.el.appendChild(label);
-
-      // 🧪 DEBUG opcional
-      // console.log('painted:', dateStr, data.price);
     }
   };
 
   buildFullCalendarEvents() {
-
     const productId = this.importado ? 2 : 1;
-
     console.log('==== BUILD PRICE MAP ====');
-
     const map: Record<string, any> = {};
-
     for (const p of this.yearPrices) {
-
       const d = p.data;
 
       if (!d || d.id_replenishment_product !== productId) continue;
@@ -296,10 +147,6 @@ export class PricePage {
   getPriceForDate(dateStr: string) {
     return this.priceMap[dateStr] || null;
   }
-
-
-
-
 
   onEventClick(info: any) {
     const data = info.event.extendedProps.fullData;
@@ -385,9 +232,6 @@ export class PricePage {
   onDateTimeChange() {
     console.log(this.dateTimeStart, this.dateTimeEnd);
   }
-
-
-
 
 
 }
