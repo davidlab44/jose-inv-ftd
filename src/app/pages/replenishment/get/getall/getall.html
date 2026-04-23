@@ -43,15 +43,12 @@
           <ion-button fill="clear" class="nav-btn" (click)="changeEndDay(-1)">
             <ion-icon name="chevron-back-outline"></ion-icon>
           </ion-button>
-
           <span class="value">{{ formatDay(endDay) }}</span>
-
           <ion-button fill="clear" class="nav-btn" (click)="changeEndDay(1)">
             <ion-icon name="chevron-forward-outline"></ion-icon>
           </ion-button>
         </div>
       </div>
-
     </div>
   </ion-item>
 
@@ -117,14 +114,14 @@
             </td>
             <td>{{ item.data.date | date:'dd/MM/yyyy' }}</td>
 
-<td
-  [style.background]="ccoMap[+item.data.name]?.color || '#eee'"
-  (click)="copyToClipboard(ccoMap[+item.data.name]?.name)"
->
-  {{ ccoMap[+item.data.name]?.name || 'N/A' }}
-</td>
+            <td
+              [style.background]="ccoMap[+item.data.name]?.color || '#eee'"
+              (click)="copyToClipboard(ccoMap[+item.data.name]?.name)"
+            >
+              {{ ccoMap[+item.data.name]?.name || 'N/A' }}
+            </td>
 
-  <!--\cc          <td [style.background]="ccoMap[+item.data.name]?.color || '#eee'"> {{ ccoMap[+item.data.name]?.name || 'N/A' }} </td>-->
+  <!--      <td [style.background]="ccoMap[+item.data.name]?.color || '#eee'"> {{ ccoMap[+item.data.name]?.name || 'N/A' }} </td>-->
             <td>{{ item.data.ticket }}</td>
             <td>{{ item.data.kg }}</td>
             <td [ngClass]="{
@@ -169,6 +166,12 @@
       </table>
     </div>
   </div>
+
+  <div>  
+    <h6>total nacional: {{ totalGlpOpc }}</h6>
+    <h6>total importado: {{ totalGlpImportado }}</h6>
+  </div>
+
   <div>
     <ion-button (click)="exportToExcel()" size="small">
       Exportar Excel

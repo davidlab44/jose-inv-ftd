@@ -41,34 +41,28 @@ import { ShipService } from '../../../../services/logistic/ship.service';
 export class GetallPage implements OnInit {
 
   @ViewChild(IonList, { static: false }) ionList!: IonList;
-
   withdrawnList: any[] = [];
   fullWithdrawnList: any[] = [];
-
   dayRange = {
     lower: 1,
     upper: this.getTodayDayOfYear()
   };
-
   startDay = 1;
   endDay = this.dayRange.upper;
-types = [
-    { value: 1, name: 'Nacional' },
-    { value: 2, name: 'Importado' }
-  ];
-vendors = [
-    { value: 1, name: 'Plexa' },
-    { value: 2, name: 'Plexa port' }
-  ];
-
+  types = [
+      { value: 1, name: 'Nacional' },
+      { value: 2, name: 'Importado' }
+    ];
+  vendors = [
+      { value: 1, name: 'Plexa' },
+      { value: 2, name: 'Plexa port' }
+    ];
   filterType: number = this.types[0].value;
   filterVendor: number = this.vendors[0].value;
-
   valor1 = 0;
   valor2 = 0;
   valor3 = 0;
   valor4 = 0;
-
   ios: boolean;
   showSearchbar: boolean;
   searchSubject = new Subject<string>();
@@ -104,7 +98,7 @@ vendors = [
   ) {}
 
   ngOnInit() {
-    this.initCurrentMonthRange(); // ← cambio aquí
+    this.initCurrentMonthRange();
     this.loadShips();
     this.loadCcos();
   }
@@ -360,16 +354,13 @@ vendors = [
       next: (ships) => {
         this.shipList = ships;
          console.log('shipList',ships);
-        // 🔥 construir el map UNA SOLA VEZ
+        //construir el map UNA SOLA VEZ
         this.shipMap = this.buildShipMap(ships);
 
       },
       error: (err) => console.error(err)
     });
   }
-
-
-
 
   private buildCcoMap(ccoList: Cco[]): CcoMap {
     const map: CcoMap = {};
@@ -452,8 +443,6 @@ vendors = [
     this.updateRangeAndFetch();
   }
 
-
-
   private rangeTimeout: any;
 
   updateRangeAndFetch() {
@@ -488,7 +477,7 @@ vendors = [
     try {
       if (!this.filteredList || this.filteredList.length === 0) return;
       const rows = this.filteredList.map(item => ({
-        //  ERP eliminado
+        //ERP eliminado
         "Fecha V": this.formatDate(item.data.date),
         "Isotanq": this.ccoMap[+item.data.name]?.name || 'N/A',
         "Ticket": item.data.ticket,
