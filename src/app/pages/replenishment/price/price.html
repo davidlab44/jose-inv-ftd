@@ -18,17 +18,24 @@
   </ion-toolbar>
   <ion-toolbar>
     <ion-segment (ionChange)="onSegmentChange($event)">
-      <ion-segment-button value="all">NACIO</ion-segment-button>
+      <ion-segment-button value="all">NACIONAL</ion-segment-button>
       <ion-segment-button value="favorites">IMPORTADO</ion-segment-button>
     </ion-segment>
   </ion-toolbar>
 </ion-header>
 <ion-content [ngClass]="{ 'bg-nacional': !importado, 'bg-importado': importado }" class="ion-padding">
 
-  <full-calendar
-    [options]="calendarOptions"
-    [events]="events">
-  </full-calendar>
+<full-calendar #calendar  [options]="calendarOptions"></full-calendar>
+
+<!--<full-calendar-->
+  <!--calendar-->
+  <!--[options]="calendarOptions">-->
+<!--</full-calendar>-->
+
+  <!--<full-calendar-->
+    <!--[options]="calendarOptions"-->
+    <!--[events]="events">-->
+  <!--</full-calendar>-->
 
   <div *ngIf="showEditForm" class="edit-form">
     <ion-card>
@@ -85,7 +92,7 @@
     <br>
     <br>
      <ion-item>
-      <ion-label position="stacked">Nuevo precio</ion-label>
+      <ion-label position="stacked">Nuevo precioo</ion-label>
       <ion-input
         type="number"
         inputmode="numeric"
@@ -115,7 +122,8 @@
           </span>
         </td>
          <td style="padding:8px;width:20%;">
-           <h5>{{ currentPrice?.data?.price }}.{{currentPrice?.data?.cents.toString()}}&nbsp;</h5>
+           <!--<h5>{{ currentPrice?.data?.price }}.{{currentPrice?.data?.cents.toString()}}&nbsp;</h5>-->
+           <h5>{{ currentPrice?.data?.price }}.{{   ((currentPrice?.data?.cents ?? 0) + '').padStart(2, '0') }}&nbsp;</h5>
         </td>
       </tr>
     </table>
@@ -136,7 +144,8 @@
             </div>
             <div style="flex: 0 0 33%; text-align:right; font-size: small;">
               <span>
-                {{ p?.data?.price }}.{{p?.data?.cents.toString()}}
+                {{ p?.data?.price }}.{{ ((p?.data?.cents ?? 0) + '').padStart(2, '0') }}
+                <!--\cc{{ p?.data?.price }}.{{p?.data?.cents.toString()}}-->
               </span>
             </div>
           </div>
@@ -159,7 +168,7 @@
             </div>
             <div style="flex: 0 0 33%; text-align:right; font-size: small;">
               <span>
-                {{ p?.data?.price }}.{{p?.data?.cents.toString()}}
+                {{ p?.data?.price }}.{{ ((p?.data?.cents ?? 0) + '').padStart(2, '0') }}
               </span>
             </div>
           </div>

@@ -1,3 +1,5 @@
+import { FullCalendarComponent } from '@fullcalendar/angular';
+import { ViewChild } from '@angular/core';
 import { Component } from '@angular/core';
 import { CalendarOptions } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -11,25 +13,25 @@ import { GlppricesService } from '../../../services/replenishment/glpprices.serv
 })
 export class PricePage {
 
+@ViewChild('calendar') calendarComponent!: FullCalendarComponent;
+
+  calendarApi: any;
   importado: boolean = false;
   showSearchbar: boolean = false;
-
   selectedPrice: any = null;
   showEditForm: boolean = false;
-
   yearPrices: any[] = [];
   glppricesList: any[] = [];
-
   numero!: number;
   cents!: number;
-
   lastGlpprice: any = null;
   lastImportedPrice: any = null;
-
   searchSubject = new Subject<string>();
-
   dateTimeStart!: string;
   dateTimeEnd!: string;
+  handleCalendarInit(arg: any) {
+    this.calendarApi = arg.view.calendar;
+  }
 
   constructor(
     private glpricesService: GlppricesService
@@ -62,86 +64,98 @@ export class PricePage {
 
   events: any[] = [];
 
-  priceMap: Record<string, any> = {}; // 🔥 lookup O(1)
+  priceMap: Record<string, any> = {};
+
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     plugins: [dayGridPlugin],
-    timeZone: 'America/Bogota',
     height: 'auto',
-
-    // 🔥 NO usamos events para pintar rangos
-    events: [],
-
-    dayCellDidMount: (info) => {
-
-      const dateStr =
-        info.date.getFullYear() + '-' +
-        String(info.date.getMonth() + 1).padStart(2, '0') + '-' +
-        String(info.date.getDate()).padStart(2, '0');
-
-      const data = this.priceMap[dateStr];
-
-      if (!data) return;
-
-      // 🎨 pintar fondo
-      info.el.style.backgroundColor =
-        data.id_replenishment_product === 2 ? '#7b2cbf' : '#2e7d32';
-
-      info.el.style.color = 'white';
-      info.el.style.position = 'relative';
-
-      // 🏷 label precio
-      const label = document.createElement('div');
-      label.innerText = `$${data.price}.${data.cents.toString().padStart(2, '0')}`;
-
-      label.style.position = 'absolute';
-      label.style.bottom = '2px';
-      label.style.left = '2px';
-      label.style.fontSize = '10px';
-      label.style.fontWeight = 'bold';
-
-      info.el.appendChild(label);
-    }
+    eventDisplay: 'block',
+    displayEventTime: false,
+    eventClick: (info) => this.onEventClick(info)
   };
+
+
+  /*calendarOptions: CalendarOptions = {*/
+    /*initialView: 'dayGridMonth',*/
+    /*plugins: [dayGridPlugin],*/
+    /*timeZone: 'America/Bogota',*/
+    /*height: 'auto',*/
+    /*events: [],*/
+    /*dayCellDidMount: (info) => {*/
+      /*const old = info.el.querySelector('.price-label');*/
+      /*if (old) old.remove();*/
+      /*const dateStr =*/
+        /*info.date.getFullYear() + '-' +*/
+        /*String(info.date.getMonth() + 1).padStart(2, '0') + '-' +*/
+        /*String(info.date.getDate()).padStart(2, '0');*/
+
+      /*const data = this.priceMap[dateStr];*/
+      /*if (!data) {*/
+        /*info.el.style.backgroundColor = '';*/
+        /*info.el.style.color = '';*/
+        /*return;*/
+      /*}*/
+      /*const isImportado = data.id_replenishment_product === 2;*/
+      /*info.el.style.backgroundColor = isImportado*/
+        /*? '#7b2cbf'*/
+        /*: '#2e7d32';*/
+      /*info.el.style.color = 'white';*/
+      /*info.el.style.position = 'relative';*/
+      /*const label = document.createElement('div');*/
+      /*label.className = 'price-label';*/
+      /*label.innerText = `$ojo${data.price}.${data.cents*/
+        /*.toString()*/
+        /*.padStart(2, '0')}`;*/
+      /*label.style.position = 'absolute';*/
+      /*label.style.bottom = '2px';*/
+      /*label.style.left = '2px';*/
+      /*label.style.fontSize = '10px';*/
+      /*label.style.fontWeight = 'bold';*/
+      /*label.style.pointerEvents = 'none';*/
+      /*info.el.appendChild(label);*/
+    /*}*/
+  /*};*/
+
+  formatDateKey(date: Date): string {
+    return date.getFullYear() + '-' +
+      String(date.getMonth() + 1).padStart(2, '0') + '-' +
+      String(date.getDate()).padStart(2, '0');
+  }
+
+  /* ================= BUILD EVENTS ================= */
 
   buildFullCalendarEvents() {
     const productId = this.importado ? 2 : 1;
-    console.log('==== BUILD PRICE MAP ====');
-    const map: Record<string, any> = {};
-    for (const p of this.yearPrices) {
-      const d = p.data;
-
-      if (!d || d.id_replenishment_product !== productId) continue;
-
-      const start = new Date(d.init);
-      const end = new Date(d.end);
-
-      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-        console.warn('❌ fechas inválidas:', d);
-        continue;
-      }
-
-      let current = new Date(start);
-
-      while (current <= end) {
-
-        const key =
-          current.getFullYear() + '-' +
-          String(current.getMonth() + 1).padStart(2, '0') + '-' +
-          String(current.getDate()).padStart(2, '0');
-
-        map[key] = d;
-
+    const filtered = this.yearPrices
+      .filter(p => p.data?.id_replenishment_product === productId);
+    const events: any[] = [];
+    filtered.forEach(p => {
+      const startDate = new Date(p.data.init);
+      const endDate   = new Date(p.data.end);
+      let current = new Date(startDate);
+      while (current <= endDate) {
+        const dateStr = current.toISOString().substring(0, 10);
+        events.push({
+          title: `$${p.data.price}.${p.data.cents.toString().padStart(2, '0')}`,
+          start: dateStr,
+          allDay: true,
+          display: 'block',
+          backgroundColor: this.importado ? '#7b2cbf' : '#2e7d32',
+          borderColor: this.importado ? '#7b2cbf' : '#2e7d32',
+          extendedProps: {
+            id: p.id,
+            fullData: p.data
+          }
+        });
         current.setDate(current.getDate() + 1);
       }
-
-      console.log(`✔ rango cargado: ${d.init} → ${d.end}`);
-    }
-
-    this.priceMap = map;
-
-    console.log('==== MAP SIZE ====', Object.keys(this.priceMap).length);
+    });
+    this.calendarOptions = {
+      ...this.calendarOptions,
+      events
+    };
   }
 
   getPriceForDate(dateStr: string) {
@@ -153,7 +167,7 @@ export class PricePage {
     this.selectedPrice = {
       id: info.event.extendedProps.id,
       price: data.price,
-      cents: data.cents.toString() || 0,
+      cents: data.cents || 0,
       init: data.init,
       end: data.end
     };
@@ -222,8 +236,19 @@ export class PricePage {
   formatFechaLatam(dateInput: string | Date | number): string {
     if (!dateInput) return '';
     const date = new Date(dateInput);
-    return date.toLocaleString('es-ES');
+
+    return date.toLocaleDateString('es-CO', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
   }
+
+  /*formatFechaLatam(dateInput: string | Date | number): string {*/
+    /*if (!dateInput) return '';*/
+    /*const date = new Date(dateInput);*/
+    /*return date.toLocaleString('es-ES');*/
+  /*}*/
 
   onSearch(text: string) {
     this.searchSubject.next(text);
