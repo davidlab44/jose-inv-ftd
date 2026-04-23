@@ -3,16 +3,10 @@
     <ion-buttons *ngIf="!showSearchbar" slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-searchbar
-      placeholder="Buscar"
-      (ionInput)="onSearch($event.target.value)">
-    </ion-searchbar>
+    <ion-searchbar placeholder="Buscar" (ionInput)="onSearch($event.target.value)"></ion-searchbar>
     <ion-buttons slot="end">
       <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
-        <span *ngIf="ios">Filter</span>
-        <span *ngIf="!ios">
-          <ion-icon slot="icon-only" name="options"></ion-icon>
-        </span>
+        <ion-icon slot="icon-only" name="options"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -23,19 +17,10 @@
     </ion-segment>
   </ion-toolbar>
 </ion-header>
+
 <ion-content [ngClass]="{ 'bg-nacional': !importado, 'bg-importado': importado }" class="ion-padding">
 
-<full-calendar #calendar  [options]="calendarOptions"></full-calendar>
-
-<!--<full-calendar-->
-  <!--calendar-->
-  <!--[options]="calendarOptions">-->
-<!--</full-calendar>-->
-
-  <!--<full-calendar-->
-    <!--[options]="calendarOptions"-->
-    <!--[events]="events">-->
-  <!--</full-calendar>-->
+  <full-calendar [options]="calendarOptions"></full-calendar>
 
   <div *ngIf="showEditForm" class="edit-form">
     <ion-card>
@@ -43,138 +28,210 @@
         <ion-card-title>Editar Precio</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <ion-item>
-          <ion-label position="stacked">Precio</ion-label>
-          <ion-input type="number" [(ngModel)]="selectedPrice.price"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="stacked">Cents</ion-label>
-          <ion-input type="number" [(ngModel)]="selectedPrice.cents"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="stacked">Fecha Inicio</ion-label>
-          <ion-input type="datetime-local" [(ngModel)]="selectedPrice.init"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="stacked">Fecha Fin</ion-label>
-          <ion-input type="datetime-local" [(ngModel)]="selectedPrice.end"></ion-input>
-        </ion-item>
-        <ion-button expand="block" color="primary" (click)="updatePrice()">
-          Guardar Cambios
-        </ion-button>
-        <ion-button expand="block" fill="outline" (click)="cancelEdit()">
-          Cancelar
-        </ion-button>
+        <ion-item><ion-label position="stacked">Precio</ion-label><ion-input type="number" [(ngModel)]="selectedPrice.price"></ion-input></ion-item>
+        <ion-item><ion-label position="stacked">Cents</ion-label><ion-input type="number" [(ngModel)]="selectedPrice.cents"></ion-input></ion-item>
+        <ion-item><ion-label position="stacked">Fecha Inicio</ion-label><ion-input type="datetime-local" [(ngModel)]="selectedPrice.init"></ion-input></ion-item>
+        <ion-item><ion-label position="stacked">Fecha Fin</ion-label><ion-input type="datetime-local" [(ngModel)]="selectedPrice.end"></ion-input></ion-item>
+        <ion-button expand="block" (click)="updatePrice()">Guardar</ion-button>
+        <ion-button expand="block" fill="outline" (click)="cancelEdit()">Cancelar</ion-button>
       </ion-card-content>
     </ion-card>
   </div>
-  <br>
-  <div>
-    <div class="datetime-center">
-      <ion-item>
-        <ion-label position="stacked">Fecha / Hora inicio</ion-label>
-        <ion-datetime
-          presentation="date-time"
-          [(ngModel)]="dateTimeStart"
-          (ionChange)="onDateTimeChange()">
-        </ion-datetime>
-      </ion-item>
-      <br>
-      <ion-item>
-        <ion-label position="stacked">Fecha / Hora fin</ion-label>
-        <ion-datetime
-          presentation="date-time"
-          [(ngModel)]="dateTimeEnd"
-          (ionChange)="onDateTimeChange()">
-        </ion-datetime>
-      </ion-item>
-    </div>
-    <br>
-    <br>
-     <ion-item>
-      <ion-label position="stacked">Nuevo precioo</ion-label>
-      <ion-input
-        type="number"
-        inputmode="numeric"
-        placeholder="0"
-        [(ngModel)]="numero">
-      </ion-input>
-    </ion-item>
-    <br>   <ion-item>
-      <ion-label position="stacked">Cent</ion-label>
-      <ion-input
-        type="number"
-        inputmode="numeric"
-        placeholder="0"
-        [(ngModel)]="cents">
-      </ion-input>
-    </ion-item>
-    <br>
-    <ion-button expand="block" (click)="addGlpprice(numero,cents)">
-      Actualizar precio
-    </ion-button>
-    <br>
-    <table style="width: 100%;">
-      <tr [ngClass]="importado ? 'row-importado' : 'row-nacional'">
-        <td style="width: 70%;">
-          <span style="font-size:small;">
-            &nbsp;&nbsp;Precio actual {{formatFechaLatam(currentPrice?.data.init) }}-{{formatFechaLatam(currentPrice?.data.end)}}&nbsp;&nbsp;
-          </span>
-        </td>
-         <td style="padding:8px;width:20%;">
-           <!--<h5>{{ currentPrice?.data?.price }}.{{currentPrice?.data?.cents.toString()}}&nbsp;</h5>-->
-           <h5>{{ currentPrice?.data?.price }}.{{   ((currentPrice?.data?.cents ?? 0) + '').padStart(2, '0') }}&nbsp;</h5>
-        </td>
-      </tr>
-    </table>
-    <br><br>
-    <ion-list *ngIf="!importado">
-      <ion-item class="titulo-historico">
-        <span>Histórico</span>
-      </ion-item>
-      <ng-container *ngFor="let p of glppricesList">
-        <ion-item
-          *ngIf="p.data.id_replenishment_product === 1"
-          class="item-historico">
-          <div style="display: flex; width: 100%; align-items: center;">
-            <div style="flex: 0 0 66%; text-align:left;">
-              <span style="font-size: x-small;">
-                {{ formatFechaLatam(p.data.init) }}
-              </span>
-            </div>
-            <div style="flex: 0 0 33%; text-align:right; font-size: small;">
-              <span>
-                {{ p?.data?.price }}.{{ ((p?.data?.cents ?? 0) + '').padStart(2, '0') }}
-                <!--\cc{{ p?.data?.price }}.{{p?.data?.cents.toString()}}-->
-              </span>
-            </div>
-          </div>
-        </ion-item>
-      </ng-container>
-    </ion-list>
-    <ion-list *ngIf="importado">
-      <ion-item class="titulo-historico">
-        <span>Histórico</span>
-      </ion-item>
-      <ng-container *ngFor="let p of glppricesList">
-        <ion-item
-          *ngIf="p.data.id_replenishment_product === 2"
-          class="item-historico">
-          <div style="display: flex; width: 100%; align-items: center;">
-            <div style="flex: 0 0 66%; text-align:left;">
-              <span style="font-size: x-small;">
-                {{ formatFechaLatam(p.created_at) }}
-              </span>
-            </div>
-            <div style="flex: 0 0 33%; text-align:right; font-size: small;">
-              <span>
-                {{ p?.data?.price }}.{{ ((p?.data?.cents ?? 0) + '').padStart(2, '0') }}
-              </span>
-            </div>
-          </div>
-        </ion-item>
-      </ng-container>
-    </ion-list>
+
+  <div class="datetime-center">
+    <ion-item><ion-label position="stacked">Inicio</ion-label><ion-datetime presentation="date-time" [(ngModel)]="dateTimeStart"></ion-datetime></ion-item>
+    <ion-item><ion-label position="stacked">Fin</ion-label><ion-datetime presentation="date-time" [(ngModel)]="dateTimeEnd"></ion-datetime></ion-item>
+    <ion-item><ion-label position="stacked">Precio</ion-label><ion-input type="number" [(ngModel)]="numero"></ion-input></ion-item>
+    <ion-item><ion-label position="stacked">Cents</ion-label><ion-input type="number" [(ngModel)]="cents"></ion-input></ion-item>
+    <ion-button expand="block" (click)="addGlpprice(numero,cents)">Actualizar precio</ion-button>
   </div>
+
+  <table style="width:100%;">
+    <tr [ngClass]="importado ? 'row-importado' : 'row-nacional'">
+      <td style="width:70%;"><span style="font-size:small;">Precio actual {{ currentRangeLabel }}</span></td>
+      <td style="padding:8px;width:20%;"><h5>{{ currentPrice?.data?.price }}.{{ formatCents(currentPrice?.data?.cents) }}</h5></td>
+    </tr>
+  </table>
+
+  <ion-list>
+    <ion-item class="titulo-historico"><span>Histórico</span></ion-item>
+    <ng-container *ngFor="let p of glppricesList">
+      <ion-item *ngIf="p.data.id_replenishment_product === (importado ? 2 : 1)" class="item-historico">
+        <div style="display:flex;width:100%;align-items:center;">
+          <div style="flex:0 0 66%;"><span style="font-size:x-small;">{{ formatFechaLatam(p.data.init || p.created_at) }}</span></div>
+          <div style="flex:0 0 33%;text-align:right;"><span>{{ p.data.price }}.{{ formatCents(p.data.cents) }}</span></div>
+        </div>
+      </ion-item>
+    </ng-container>
+  </ion-list>
+
 </ion-content>
+
+<!--<ion-header translucent="true">-->
+  <!--<ion-toolbar>-->
+    <!--<ion-buttons *ngIf="!showSearchbar" slot="start">-->
+      <!--<ion-menu-button></ion-menu-button>-->
+    <!--</ion-buttons>-->
+    <!--<ion-searchbar-->
+      <!--placeholder="Buscar"-->
+      <!--(ionInput)="onSearch($event.target.value)">-->
+    <!--</ion-searchbar>-->
+    <!--<ion-buttons slot="end">-->
+      <!--<ion-button *ngIf="!showSearchbar" (click)="presentFilter()">-->
+        <!--<span *ngIf="ios">Filter</span>-->
+        <!--<span *ngIf="!ios">-->
+          <!--<ion-icon slot="icon-only" name="options"></ion-icon>-->
+        <!--</span>-->
+      <!--</ion-button>-->
+    <!--</ion-buttons>-->
+  <!--</ion-toolbar>-->
+  <!--<ion-toolbar>-->
+    <!--<ion-segment (ionChange)="onSegmentChange($event)">-->
+      <!--<ion-segment-button value="all">NACIONAL</ion-segment-button>-->
+      <!--<ion-segment-button value="favorites">IMPORTADO</ion-segment-button>-->
+    <!--</ion-segment>-->
+  <!--</ion-toolbar>-->
+<!--</ion-header>-->
+<!--<ion-content [ngClass]="{ 'bg-nacional': !importado, 'bg-importado': importado }" class="ion-padding">-->
+
+<!--<full-calendar #calendar  [options]="calendarOptions"></full-calendar>-->
+
+  <!--<div *ngIf="showEditForm" class="edit-form">-->
+    <!--<ion-card>-->
+      <!--<ion-card-header>-->
+        <!--<ion-card-title>Editar Precio</ion-card-title>-->
+      <!--</ion-card-header>-->
+      <!--<ion-card-content>-->
+        <!--<ion-item>-->
+          <!--<ion-label position="stacked">Precio</ion-label>-->
+          <!--<ion-input type="number" [(ngModel)]="selectedPrice.price"></ion-input>-->
+        <!--</ion-item>-->
+        <!--<ion-item>-->
+          <!--<ion-label position="stacked">Cents</ion-label>-->
+          <!--<ion-input type="number" [(ngModel)]="selectedPrice.cents"></ion-input>-->
+        <!--</ion-item>-->
+        <!--<ion-item>-->
+          <!--<ion-label position="stacked">Fecha Inicio</ion-label>-->
+          <!--<ion-input type="datetime-local" [(ngModel)]="selectedPrice.init"></ion-input>-->
+        <!--</ion-item>-->
+        <!--<ion-item>-->
+          <!--<ion-label position="stacked">Fecha Fin</ion-label>-->
+          <!--<ion-input type="datetime-local" [(ngModel)]="selectedPrice.end"></ion-input>-->
+        <!--</ion-item>-->
+        <!--<ion-button expand="block" color="primary" (click)="updatePrice()">-->
+          <!--Guardar Cambios-->
+        <!--</ion-button>-->
+        <!--<ion-button expand="block" fill="outline" (click)="cancelEdit()">-->
+          <!--Cancelar-->
+        <!--</ion-button>-->
+      <!--</ion-card-content>-->
+    <!--</ion-card>-->
+  <!--</div>-->
+  <!--<br>-->
+  <!--<div>-->
+    <!--<div class="datetime-center">-->
+      <!--<ion-item>-->
+        <!--<ion-label position="stacked">Fecha / Hora inicio</ion-label>-->
+        <!--<ion-datetime-->
+          <!--presentation="date-time"-->
+          <!--[(ngModel)]="dateTimeStart"-->
+          <!--(ionChange)="onDateTimeChange()">-->
+        <!--</ion-datetime>-->
+      <!--</ion-item>-->
+      <!--<br>-->
+      <!--<ion-item>-->
+        <!--<ion-label position="stacked">Fecha / Hora fin</ion-label>-->
+        <!--<ion-datetime-->
+          <!--presentation="date-time"-->
+          <!--[(ngModel)]="dateTimeEnd"-->
+          <!--(ionChange)="onDateTimeChange()">-->
+        <!--</ion-datetime>-->
+      <!--</ion-item>-->
+    <!--</div>-->
+    <!--<br>-->
+    <!--<br>-->
+     <!--<ion-item>-->
+      <!--<ion-label position="stacked">Nuevo precioo</ion-label>-->
+      <!--<ion-input-->
+        <!--type="number"-->
+        <!--inputmode="numeric"-->
+        <!--placeholder="0"-->
+        <!--[(ngModel)]="numero">-->
+      <!--</ion-input>-->
+    <!--</ion-item>-->
+    <!--<br>   <ion-item>-->
+      <!--<ion-label position="stacked">Cent</ion-label>-->
+      <!--<ion-input-->
+        <!--type="number"-->
+        <!--inputmode="numeric"-->
+        <!--placeholder="0"-->
+        <!--[(ngModel)]="cents">-->
+      <!--</ion-input>-->
+    <!--</ion-item>-->
+    <!--<br>-->
+    <!--<ion-button expand="block" (click)="addGlpprice(numero,cents)">-->
+      <!--Actualizar precio-->
+    <!--</ion-button>-->
+    <!--<br>-->
+    <!--<table style="width: 100%;">-->
+      <!--<tr [ngClass]="importado ? 'row-importado' : 'row-nacional'">-->
+        <!--<td style="width: 70%;">-->
+          <!--<span style="font-size:small;">-->
+            <!--&nbsp;&nbsp;Precio actual {{formatFechaLatam(currentPrice?.data.init) }}-{{formatFechaLatam(currentPrice?.data.end)}}&nbsp;&nbsp;-->
+          <!--</span>-->
+        <!--</td>-->
+         <!--<td style="padding:8px;width:20%;">-->
+           <!--<h5>{{ currentPrice?.data?.price }}.{{   ((currentPrice?.data?.cents ?? 0) + '').padStart(2, '0') }}&nbsp;</h5>-->
+        <!--</td>-->
+      <!--</tr>-->
+    <!--</table>-->
+    <!--<br><br>-->
+    <!--<ion-list *ngIf="!importado">-->
+      <!--<ion-item class="titulo-historico">-->
+        <!--<span>Histórico</span>-->
+      <!--</ion-item>-->
+      <!--<ng-container *ngFor="let p of glppricesList">-->
+        <!--<ion-item-->
+          <!--*ngIf="p.data.id_replenishment_product === 1"-->
+          <!--class="item-historico">-->
+          <!--<div style="display: flex; width: 100%; align-items: center;">-->
+            <!--<div style="flex: 0 0 66%; text-align:left;">-->
+              <!--<span style="font-size: x-small;">-->
+                <!--{{ formatFechaLatam(p.data.init) }}-->
+              <!--</span>-->
+            <!--</div>-->
+            <!--<div style="flex: 0 0 33%; text-align:right; font-size: small;">-->
+              <!--<span>-->
+                <!--{{ p?.data?.price }}.{{ ((p?.data?.cents ?? 0) + '').padStart(2, '0') }}-->
+              <!--</span>-->
+            <!--</div>-->
+          <!--</div>-->
+        <!--</ion-item>-->
+      <!--</ng-container>-->
+    <!--</ion-list>-->
+    <!--<ion-list *ngIf="importado">-->
+      <!--<ion-item class="titulo-historico">-->
+        <!--<span>Histórico</span>-->
+      <!--</ion-item>-->
+      <!--<ng-container *ngFor="let p of glppricesList">-->
+        <!--<ion-item-->
+          <!--*ngIf="p.data.id_replenishment_product === 2"-->
+          <!--class="item-historico">-->
+          <!--<div style="display: flex; width: 100%; align-items: center;">-->
+            <!--<div style="flex: 0 0 66%; text-align:left;">-->
+              <!--<span style="font-size: x-small;">-->
+                <!--{{ formatFechaLatam(p.created_at) }}-->
+              <!--</span>-->
+            <!--</div>-->
+            <!--<div style="flex: 0 0 33%; text-align:right; font-size: small;">-->
+              <!--<span>-->
+                <!--{{ p?.data?.price }}.{{ ((p?.data?.cents ?? 0) + '').padStart(2, '0') }}-->
+              <!--</span>-->
+            <!--</div>-->
+          <!--</div>-->
+        <!--</ion-item>-->
+      <!--</ng-container>-->
+    <!--</ion-list>-->
+  <!--</div>-->
+<!--</ion-content>-->
 
