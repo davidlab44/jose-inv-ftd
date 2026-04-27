@@ -29,6 +29,9 @@ import { OcrService } from '../../../../services/ai/ocr.service';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
+import { GlppricesService } from '../../../../services/replenishment/glpprices.service';
+
+
 
 
 @Component({
@@ -63,6 +66,12 @@ export class PatchPage {
   movement:any;
   cco:any;
   //imported:any;
+  glppricesList: any[] = [];
+  numero!: number;
+  cents!: number;
+  lastGlpprice: any = null;
+  lastImportedPrice: any = null;
+
 
   constructor(
     private barcodeService: BarcodeService,
@@ -92,6 +101,7 @@ export class PatchPage {
     private ocrService : OcrService,
     private withdrawnService : WithdrawnService,
     private ccoService : CcoService,
+    private glpricesService: GlppricesService
   ) {
 
     const navigation = this.router.getCurrentNavigation();
@@ -188,6 +198,7 @@ export class PatchPage {
         console.error('Error cargando CCO', err);
       }
     });
+    this.getAllPrices();
   }
 
   onSearch(text: string) {
@@ -427,6 +438,41 @@ export class PatchPage {
     console.log('id_replenishment_product nuevo =>', this.movement.data.id_replenishment_product);
   }
 
+  getAllPrices() {
+    this.glpricesService.getAll().subscribe({
+      next: (response) => {
+        this.glppricesList = response.slice().reverse();
+        console.log("pricelist",this.glppricesList)
+        this.getMaxIdItem(this.glppricesList);
+        this.getMaxImportedItem(this.glppricesList);
+      }
+    });
+  }
+
+  getMaxIdItem(items: any[]) {
+    const filtered = items.filter(i => i.data?.id_replenishment_product === 1);
+    if (!filtered.length) return;
+    this.lastGlpprice = filtered.reduce((max, item) => item.id > max.id ? item : max);
+    if(this.movement?.data?.id_replenishment_product==1){
+      console.log("opc price last glpprice",this.lastGlpprice)
+      console.log("opc price last glpprice2",this.lastGlpprice.data)
+      console.log("opc price last glpprice3",this.lastGlpprice.data.price)
+      this.form.patchValue({
+        price: this.lastGlpprice.data.price
+      });
+
+    }
+  }
+
+  getMaxImportedItem(items: any[]) {
+    const filtered = items.filter(i => i.data?.id_replenishment_product === 2);
+    if (!filtered.length) return;
+    this.lastImportedPrice = filtered.reduce((max, item) => item.id > max.id ? item : max);
+    console.log("getMaxImportedPrice",this.movement.data.id_replenishment_product)
+    if(this.movement?.data?.id_replenishment_product==2){
+      this.movement.data.price=this.lastImportedPrice.data.price  ;
+    }
+  }
 
 
 }
