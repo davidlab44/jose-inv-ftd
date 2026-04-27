@@ -80,28 +80,28 @@
             <th (click)="sortData('data.date')">Fecha V</th>
             <th (click)="sortData('isotanq_name')">Isotanq</th>
             <th (click)="sortData('data.ticket')">Ticket</th>
+            <th class="link"></th>
             <th (click)="sortData('data.kg')"><span style="font-size:x-small;" >{{totalKg | number:'1.0-2' }} kg </span></th>
+            <th (click)="sortData('data.price')">Price</th>
             <th (click)="sortData('data.psi')">PSI</th>
             <th (click)="sortData('data.rotogate')">Rotogate</th>
-            <th>Seal</th>
-            <th (click)="sortData('data.wgross')">Wgross</th>
-            <th (click)="sortData('data.wtare')">Wtare</th>
-            <th (click)="sortData('data.wnet')">Wnet</th>
+            <th class="link">Seal</th>
             <th (click)="sortData('data.datein')">Fe ing M</th>
             <th (click)="sortData('data.deliveryin')">Rem vacío</th>
+            <th class="link"></th>
             <th (click)="sortData('data.tripin')">Trip In</th>
             <th (click)="sortData('shipin_name')">Ship In</th>
             <th (click)="sortData('data.dateout')">Date Out</th>
             <th (click)="sortData('data.deliveryout')">Rem M LL</th>
+            <th class="link"></th>
             <th (click)="sortData('data.tripout')">Trip Out</th>
             <th (click)="sortData('shipout_name')">Ship Out</th>
             <th (click)="sortData('diff')">Diff</th>
-            <th>Img</th>
-            <th>Img Scale</th>
-            <th>Img In</th>
-            <th>Img Out</th>
-            <th (click)="sortData('data.price')">Price</th>
+            <th (click)="sortData('data.wgross')">Wgross</th>
+            <th (click)="sortData('data.wtare')">Wtare</th>
+            <th (click)="sortData('data.wnet')">Wnet</th>
             <th (click)="sortData('data.wticket')">WTicket</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -113,17 +113,18 @@
               </ion-toggle>
             </td>
             <td>{{ item.data.date | date:'dd/MM/yyyy' }}</td>
-
             <td
               [style.background]="ccoMap[+item.data.name]?.color || '#eee'"
               (click)="copyToClipboard(ccoMap[+item.data.name]?.name)"
             >
               {{ ccoMap[+item.data.name]?.name || 'N/A' }}
             </td>
-
-  <!--      <td [style.background]="ccoMap[+item.data.name]?.color || '#eee'"> {{ ccoMap[+item.data.name]?.name || 'N/A' }} </td>-->
             <td>{{ item.data.ticket }}</td>
+            <td>
+              <a *ngIf="item.data.img" [href]="item.data.img" target="_blank">Ver</a>
+            </td>
             <td>{{ item.data.kg }}</td>
+            <td>{{ item.data.price }}</td>
             <td [ngClass]="{
               'low': item.data.psi < 100,
               'ok': item.data.psi >= 100
@@ -134,33 +135,29 @@
             <td>
               {{ item.data.seal?.join(', ') }}
             </td>
-            <td>{{ item.data.wgross | number }}</td>
-            <td>{{ item.data.wtare | number }}</td>
-            <td>{{ item.data.wnet | number }}</td>
             <td>{{ item.data.datein | date:'dd/MM/yyyy' }}</td>
             <td>{{ item.data.deliveryin }}</td>
+            <td>
+              <a *ngIf="item.data.imgin" [href]="item.data.imgin" target="_blank">Ver</a>
+            </td>
             <td>{{ item.data.tripin }}</td>
             <td>{{ shipMap[item.data.shipin]?.name || 'N/A' }}</td>
             <td>{{ item.data.dateout | date:'dd/MM/yyyy' }}</td>
             <td>{{ item.data.deliveryout }}</td>
+            <td>
+              <a *ngIf="item.data.imgout" [href]="item.data.imgout" target="_blank">Ver</a>
+            </td>
             <td>{{ item.data.tripout }}</td>
             <td>{{ shipMap[item.data.shipout]?.name || 'N/A' }}</td>
             <td *ngIf="item.data.diff!=0">{{ item.data.diff }}</td>
             <td *ngIf="item.data.diff==0"></td>
-            <td>
-              <a *ngIf="item.data.img" [href]="item.data.img" target="_blank">Ver</a>
-            </td>
+            <td>{{ item.data.wgross | number }}</td>
+            <td>{{ item.data.wtare | number }}</td>
+            <td>{{ item.data.wnet | number }}</td>
+            <td>{{ item.data.wticket }}</td>
             <td>
               <a *ngIf="item.data.imgscale" [href]="item.data.imgscale" target="_blank">Ver</a>
-            </td>
-            <td>
-              <a *ngIf="item.data.imgin" [href]="item.data.imgin" target="_blank">Ver</a>
-            </td>
-            <td>
-              <a *ngIf="item.data.imgout" [href]="item.data.imgout" target="_blank">Ver</a>
-            </td>
-            <td>{{ item.data.price }}</td>
-            <td>{{ item.data.wticket }}</td>
+            </td>           
           </tr>
         </tbody>
       </table>

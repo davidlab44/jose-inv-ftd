@@ -31,9 +31,6 @@ import { WithdrawnService } from '../../../../services/replenishment/withdrawn.s
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
 
 
-
-
-
 @Component({
   selector: 'page-patch',
   templateUrl: 'patch.html',
@@ -65,7 +62,7 @@ export class PatchPage {
   //assetSupplyProduct:any;
   movement:any;
   cco:any;
-
+  imported:any;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -120,17 +117,15 @@ export class PatchPage {
       kg: [this.movement?.data?.kg ?? ''],
       rotogate: [this.movement?.data?.rotogate ?? 0], 
       psi: [this.movement?.data?.psi ?? 0], 
+      price: [3250], 
     });
-
     this.searchSubject.pipe(
         debounceTime(300),
         distinctUntilChanged()
       ).subscribe(text => {
         this.applyFilter(text);
       });
-
   }
-
 
   ionViewWillEnter() {
     this.form = this.fb.group({
@@ -144,10 +139,10 @@ export class PatchPage {
       kg: [this.movement?.data?.kg ?? ''],
       rotogate: [this.movement?.data?.rotogate ?? 0], 
       psi: [this.movement?.data?.psi ?? 0], 
+      price: [3250], 
     });
- 
   }
-  
+    
   resetForm(): void {
     this.form.reset({
       id: 0,
@@ -179,59 +174,29 @@ export class PatchPage {
   ccoList:any[]=[];
   ionViewDidEnter() {
  
-this.ccoService.getAll().subscribe({
+  this.ccoService.getAll().subscribe({
       next: (response: any[]) => {
         console.log('cco List', response);
         this.ccoList = response;
-        //this.filteredList = response; // 🔥 inicializar
+        //this.filteredList = response; // inicializar
         this.resolveInitialCco();
-
-
       },
       error: (err: any) => {
         console.error('Error cargando CCO', err);
       }
     });
-
-
-
-/*    this.ccoService.getAll().subscribe({*/
-      /*next: response=>{*/
-        /*this.ccoList=response;*/
-        /*console.log("cco List",response)*/
-        /*this.filteredList = response; // 🔥 importante*/
-      /*}*/
-    /*})*/
   }
-
-  /*searchProducts(hash: string, ccoList: any[]): any[] {*/
-    /*if (!hash || hash.trim() === '') return ccoList;*/
-    /*return ccoList.filter(product =>*/
-      /*product.name.toLowerCase().includes(hash.toLowerCase())*/
-    /*);*/
-  /*}*/
-
-  /*onSearch(text: string) {*/
-    /*this.searchSubject.next(text);*/
-  /*}*/
-
-
-
-
 
   onSearch(text: string) {
     this.applyFilter(text);
   }
 
   applyFilter(text: string) {
-
     if (!text || text.trim() === '') {
       this.filteredList = this.ccoList;
       return;
     }
-
     const search = this.normalize(text);
-
     this.filteredList = this.ccoList.filter(item => {
       const name = item?.data?.name || '';
       const normalizedName = this.normalize(name);
@@ -247,9 +212,6 @@ this.ccoService.getAll().subscribe({
       .replace(/0/g, 'o')         // OCR fix
       .replace(/1/g, 'i');        // OCR fix
   }
-
-
-
 
   formatFechaLatam(dateInput: string | Date | number): string {
     if (!dateInput) return '';
@@ -269,7 +231,6 @@ this.ccoService.getAll().subscribe({
     const horasTexto = String(horas).padStart(2, '0');
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
-
 
   uploadProgress = 0;
   uploadedUrl: string | null = null;
@@ -296,9 +257,8 @@ this.ccoService.getAll().subscribe({
     url$.subscribe({
       next: (url) => {
         this.uploadedUrl = url;
-        // 👇 aquí llamas el OCR
+        // aquí llamas el OCR
         this.launchOcr(url);
-
       },
       error: (err) => {
         console.error('Error obteniendo URL', err);
@@ -307,35 +267,24 @@ this.ccoService.getAll().subscribe({
         this.uploading = false;
       }
     });
-
   }
 
-
   async pickImageAndUpload() {
-
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadedUrl = null;
-
     const base64Image = await this.photoService.pickImage();
-
     if (!base64Image) {
       this.uploading = false;
       return;
     }
-
     const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
-
     progress$.subscribe(p => this.uploadProgress = p);
-
     url$.subscribe({
       next: (url) => {
-
         this.uploadedUrl = url;
-
-        // 👇 lanzar OCR cuando la URL esté disponible
+        // lanzar OCR cuando la URL esté disponible
         this.launchOcr(url);
-
       },
       error: (err) => {
         console.error('Error upload', err);
@@ -345,27 +294,17 @@ this.ccoService.getAll().subscribe({
         this.uploading = false;
       }
     });
-
   }
 
   ocrResponse:any;
 
-
-
   launchOcr(url: string) {
-
     this.ocrService.postVendor(url).subscribe({
-
       next: (res) => {
-
         this.ocrResponse = res;
-
         console.log('OCR Response:', res);
-
         const normalizedDate = this.normalizeOCRDate(res?.data?.date);
-
         const seals = res?.data?.seal ?? [];
-
         // actualizar movement
         this.movement.data = {
           ...this.movement.data,
@@ -375,8 +314,7 @@ this.ccoService.getAll().subscribe({
           rotogate: Number(res?.data?.rotogate ?? 0),
           seal: seals
         };
-
-        // actualizar form para que UI refleje los cambios
+        //actualizar form para que UI refleje los cambios
         this.form.patchValue({
           fecha: normalizedDate,
           kg: Number(res?.data?.kg ?? 0),
@@ -386,39 +324,14 @@ this.ccoService.getAll().subscribe({
           sello2: seals[1] ?? '',
           sello3: seals[2] ?? ''
         });
-
         console.log("movement actualizado:", this.movement);
-
       },
-
       error: (err) => {
         console.error('Error OCR:', err);
       }
-
     });
-
   }
-
-
-
-  /*launchOcr(url:string){*/
-    /*this.ocrService.postVendor(url).subscribe({*/
-      /*next: (res) => {*/
-        /*this.ocrResponse=res;*/
-        /*console.log('OCR Response:', res);*/
-        /*this.movement.date=res.data.date;*/
-        /*this.movement.kg=res.data.kg;*/
-        /*this.movement.seal=res.data.seal[0];*/
-        /*this.movement.psi=res.data.psi;*/
-        /*this.movement.rotogate=res.data.rotogate;*/
-      /*},*/
-      /*error: (err) => {*/
-        /*console.error('Error OCR:', err);*/
-      /*}*/
-    /*})*/
-    /*;*/
-  /*}*/
-
+  
   updateMovementFromForm() {
     const f = this.form.value;
     this.movement.data = {
@@ -448,33 +361,9 @@ this.ccoService.getAll().subscribe({
       error: (err) => {
         console.error("Withdrawn patch error", err);
       }
-
     });
-
   }
-
-  /*patch() {*/
-
-    /*this.updateMovementFromForm();*/
-
-    /*this.withdrawnService.patch(this.movement.id, this.movement).subscribe({*/
-
-      /*next: (response) => {*/
-        /*console.log("Withdrawn patch response", response);*/
-      /*},*/
-
-      /*error: (err) => {*/
-        /*console.error("Withdrawn post error", err);*/
-      /*}*/
-
-    /*});*/
-
-  /*}*/
-
-
-
-
-
+  
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;
     const date = new Date(dateStr);
@@ -491,76 +380,47 @@ this.ccoService.getAll().subscribe({
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
 
-
-
-/*  onShipSelect(ev: any) {*/
-    /*const selectedId = ev.detail.value;*/
-    /*const selectedShip = this.ccoList.find(s => s.id === selectedId);*/
-    /*console.log('ID seleccionado =>', ev);*/
-    /*console.log('Ship seleccionado =>', selectedShip);*/
-    /*this.movement.data.ship=selectedId;*/
-  /*}*/
-
-
-
-
-
-
-
-  filteredList: any[] = [];     // lista filtrada
-
-
-  /*selectCco(cco:any){*/
-    /*console.log("selected cco",cco)*/
-    /*this.cco = cco;*/
-  /*}*/
-
-
-selectCco(item: any) {
-
-  this.cco = item;
-  this.ccoName = item.data.name;
-
-  // 🔥 actualizar movement (muy importante en tu flujo)
-  if (this.movement?.data) {
-    this.movement.data.name = item.id;
+  filteredList: any[] = [];     //lista filtrada
+  
+  selectCco(item: any) {
+    this.cco = item;
+    this.ccoName = item.data.name;
+    //actualizar movement (muy importante en tu flujo)
+    if (this.movement?.data) {
+      this.movement.data.name = item.id;
+    }
+    console.log('CCO seleccionado:', this.ccoName);
   }
 
-  console.log('CCO seleccionado:', this.ccoName);
-}
+  ccoName: string = '';   // nombre a mostrar
 
-
-
-ccoName: string = '';   // nombre a mostrar
-
-resolveInitialCco() {
-
-  // validar que haya lista
-  if (!this.ccoList || this.ccoList.length === 0) return;
-
-  // obtener ID desde router
-  const ccoId = this.movement?.data?.name;
-
-  if (!ccoId) {
-    console.warn('No hay ccoId en movement');
-    return;
+  resolveInitialCco() {
+    //validar que haya lista
+    if (!this.ccoList || this.ccoList.length === 0) return;
+    //obtener ID desde router
+    const ccoId = this.movement?.data?.name;
+    if (!ccoId) {
+      console.warn('No hay ccoId en movement');
+      return;
+    }
+    //buscar en lista
+    const found = this.ccoList.find(item => item.id == ccoId);
+    if (found) {
+      this.cco = found;
+      this.ccoName = found.data.name;
+      console.log('CCO encontrado:', this.ccoName);
+    } else {
+      console.warn('CCO no encontrado para id:', ccoId);
+    }
   }
 
-  // buscar en lista
-  const found = this.ccoList.find(item => item.id == ccoId);
-
-  if (found) {
-    this.cco = found;
-    this.ccoName = found.data.name;
-
-    console.log('CCO encontrado:', this.ccoName);
-  } else {
-    console.warn('CCO no encontrado para id:', ccoId);
+  isImportedGlp(ev: any) {
+    const checked = ev.detail.checked;
+    if(checked>0){
+      this.movement.data.id_replenishment_product = checked ? 2 : 1;
+    }
+    console.log('id_replenishment_product nuevo =>', this.movement.data.id_replenishment_product);
   }
-}
-
-
-
 
 
 

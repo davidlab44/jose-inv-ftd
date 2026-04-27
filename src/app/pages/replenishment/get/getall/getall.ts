@@ -68,6 +68,8 @@ export class GetallPage implements OnInit {
   searchSubject = new Subject<string>();
   shipList: Ship[] = [];
   shipMap: ShipMap = {};
+  totalGlpOpc:number=0;
+  totalGlpImportado:number=0;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -122,20 +124,32 @@ export class GetallPage implements OnInit {
     });
   }
 
+
   sortWithdrawnByDateAndSum(withdrawnList: any[]): any[] {
     let total = 0;
+    let totalOpc = 0;
+    let totalImportado = 0;
+
     const map = new Map<string, any>();
+
     for (let i = 0; i < withdrawnList.length; i++) {
       const item = withdrawnList[i];
       const data = item.data;
-      // asegurar objeto data
+
       if (!item.data) item.data = {};
       item.data.diff = 0;
-      // suma total kg
-      total += Number(data?.kg) || 0;
-      // timestamp optimizado
-      // validación base
+
+      const kg = Number(data?.kg) || 0;
+
+      // total general
+      total += kg;
+
+      // NUEVO: acumuladores por tipo
+      if (data?.id_replenishment_product === 1) totalOpc += kg;
+      else if (data?.id_replenishment_product === 2) totalImportado += kg;
+
       const wticket = data?.wticket;
+
       if (
         wticket !== undefined &&
         Number(data?.wnet) > 0 &&
@@ -143,36 +157,46 @@ export class GetallPage implements OnInit {
         Number(data?.wtare) > 0
       ) {
         const key = String(wticket);
+
         if (map.has(key)) {
           const other = map.get(key);
+
           const match =
             Number(other.data?.wnet) === Number(data?.wnet) &&
             Number(other.data?.wgross) === Number(data?.wgross) &&
             Number(other.data?.wtare) === Number(data?.wtare);
+
           if (match) {
             const diff =
               (Number(other.data?.kg) || 0) +
               (Number(data?.kg) || 0) -
               Number(data?.wnet);
-            // 🔥 asignar a ambos (Angular friendly)
+
             item.data = { ...item.data, diff };
             other.data = { ...other.data, diff };
           }
+
         } else {
           map.set(key, item);
         }
       }
     }
-    // sort optimizado
+
     withdrawnList.sort((a, b) => a._ts - b._ts);
+
+    //  asignación final (una sola vez)
     this.totalKg = total;
+    this.totalGlpOpc = totalOpc;
+    this.totalGlpImportado = totalImportado;
+
     return withdrawnList;
   }
+
+
 
   trackByGroup(index: number, group: any): string {
     return group.refdate + '-' + index;
   }
-
 
   onRangeChange(event: any) {
     this.startDay = event.detail.value.lower;

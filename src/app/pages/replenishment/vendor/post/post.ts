@@ -512,7 +512,6 @@ export class AssetSupplyPostPage {
   }
 
 
-
 }
 
 
