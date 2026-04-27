@@ -62,7 +62,7 @@ export class PatchPage {
   //assetSupplyProduct:any;
   movement:any;
   cco:any;
-  imported:any;
+  //imported:any;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -98,6 +98,7 @@ export class PatchPage {
     if (navigation?.extras?.state?.item) {
       this.movement = navigation.extras.state.item;
       this.uploadedUrl = this.movement.data.img;
+      //this.imported=this.movement.id_replenishment_product;
     } else {
       // Si recargaron la página, puedes cargar el item desde un servicio o API
       console.warn('No se recibió item por NavigationExtras.state');
@@ -105,7 +106,7 @@ export class PatchPage {
     console.log("Item recibidox:", this.movement);
   }
 
-  ngOnInit() {
+  ngOnInit(){
     this.form = this.fb.group({
       id: [this.movement?.id ?? null],
       fecha: [this.movement?.data.date ?? ''],
@@ -117,7 +118,8 @@ export class PatchPage {
       kg: [this.movement?.data?.kg ?? ''],
       rotogate: [this.movement?.data?.rotogate ?? 0], 
       psi: [this.movement?.data?.psi ?? 0], 
-      price: [3250], 
+      imported: [this.movement?.data?.id_replenishment_product ?? 0], 
+      price: [this.movement?.data?.price ?? 0], 
     });
     this.searchSubject.pipe(
         debounceTime(300),
@@ -139,7 +141,8 @@ export class PatchPage {
       kg: [this.movement?.data?.kg ?? ''],
       rotogate: [this.movement?.data?.rotogate ?? 0], 
       psi: [this.movement?.data?.psi ?? 0], 
-      price: [3250], 
+      imported: [this.movement?.data?.id_replenishment_product ?? 0], 
+      price: [this.movement?.data?.price ?? 0], 
     });
   }
     
@@ -347,9 +350,11 @@ export class PatchPage {
   }
 
   patch() {
+    console.log("patch price",this.form.value.price);
     this.updateMovementFromForm();
     this.movement.data.img = this.uploadedUrl;
     this.movement.data.name = this.cco.id;
+    this.movement.data.price = Number(this.form.value.price) || 0;
     const payload = this.movement.data;
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
