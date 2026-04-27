@@ -72,7 +72,6 @@ export class PatchPage {
   lastGlpprice: any = null;
   lastImportedPrice: any = null;
 
-
   constructor(
     private barcodeService: BarcodeService,
     public alertCtrl: AlertController,
@@ -139,22 +138,40 @@ export class PatchPage {
       });
   }
 
-  ionViewWillEnter() {
-    this.form = this.fb.group({
-      id: [this.movement?.id ?? null],
-      fecha: [this.movement?.data.date ?? ''],
-      name: [this.movement?.data.name ?? ''],
-      ticket: [this.movement?.data.ticket ?? ''],
-      sello1: [this.movement?.data.seal[0] ?? ''],
-      sello2: [this.movement?.data.seal[1] ?? ''],
-      sello3: [this.movement?.data.seal[2] ?? ''],
-      kg: [this.movement?.data?.kg ?? ''],
-      rotogate: [this.movement?.data?.rotogate ?? 0], 
-      psi: [this.movement?.data?.psi ?? 0], 
-      imported: [this.movement?.data?.id_replenishment_product ?? 0], 
-      price: [this.movement?.data?.price ?? 0], 
-    });
-  }
+ionViewWillEnter() {
+  this.form.patchValue({
+    id: this.movement?.id ?? null,
+    fecha: this.movement?.data?.date ?? '',
+    name: this.movement?.data?.name ?? '',
+    ticket: this.movement?.data?.ticket ?? '',
+    sello1: this.movement?.data?.seal?.[0] ?? '',
+    sello2: this.movement?.data?.seal?.[1] ?? '',
+    sello3: this.movement?.data?.seal?.[2] ?? '',
+    kg: this.movement?.data?.kg ?? '',
+    rotogate: this.movement?.data?.rotogate ?? 0,
+    psi: this.movement?.data?.psi ?? 0,
+    imported: this.movement?.data?.id_replenishment_product ?? 0,
+    price: this.movement?.data?.price ?? 0
+  });
+}
+
+
+  /*ionViewWillEnter() {*/
+    /*this.form = this.fb.group({*/
+      /*id: [this.movement?.id ?? null],*/
+      /*fecha: [this.movement?.data.date ?? ''],*/
+      /*name: [this.movement?.data.name ?? ''],*/
+      /*ticket: [this.movement?.data.ticket ?? ''],*/
+      /*sello1: [this.movement?.data.seal[0] ?? ''],*/
+      /*sello2: [this.movement?.data.seal[1] ?? ''],*/
+      /*sello3: [this.movement?.data.seal[2] ?? ''],*/
+      /*kg: [this.movement?.data?.kg ?? ''],*/
+      /*rotogate: [this.movement?.data?.rotogate ?? 0], */
+      /*psi: [this.movement?.data?.psi ?? 0], */
+      /*imported: [this.movement?.data?.id_replenishment_product ?? 0], */
+      /*price: [this.movement?.data?.price ?? 0], */
+    /*});*/
+  /*}*/
     
   resetForm(): void {
     this.form.reset({
@@ -452,15 +469,16 @@ export class PatchPage {
   getMaxIdItem(items: any[]) {
     const filtered = items.filter(i => i.data?.id_replenishment_product === 1);
     if (!filtered.length) return;
-    this.lastGlpprice = filtered.reduce((max, item) => item.id > max.id ? item : max);
-    if(this.movement?.data?.id_replenishment_product==1){
-      console.log("opc price last glpprice",this.lastGlpprice)
-      console.log("opc price last glpprice2",this.lastGlpprice.data)
-      console.log("opc price last glpprice3",this.lastGlpprice.data.price)
-      this.form.patchValue({
-        price: this.lastGlpprice.data.price
-      });
+    this.lastGlpprice = filtered.reduce((max, item) =>
+      item.id > max.id ? item : max
+    );
+    if (this.movement?.data?.id_replenishment_product == 1) {
+      const price = Number(this.lastGlpprice.data.price) || 0;
+      const cents = String(this.lastGlpprice.data.cents ?? 0).padStart(2, '0');
 
+      this.form.patchValue({
+        price: `${price}.${cents}`
+      });
     }
   }
 
@@ -469,8 +487,12 @@ export class PatchPage {
     if (!filtered.length) return;
     this.lastImportedPrice = filtered.reduce((max, item) => item.id > max.id ? item : max);
     console.log("getMaxImportedPrice",this.movement.data.id_replenishment_product)
-    if(this.movement?.data?.id_replenishment_product==2){
-      this.movement.data.price=this.lastImportedPrice.data.price  ;
+    if (this.movement?.data?.id_replenishment_product == 2) {
+        const price = Number(this.lastImportedPrice.data.price) || 0;
+        const cents = String(this.lastImportedPrice.data.cents ?? 0).padStart(2, '0');
+        this.form.patchValue({
+          price: `${price}.${cents}`
+        });
     }
   }
 
