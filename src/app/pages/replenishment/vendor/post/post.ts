@@ -361,6 +361,8 @@ export class AssetSupplyPostPage {
     this.withdrawnService.post(payload).subscribe({
       next: (response) => {
         console.log("Withdrawn post response", response);
+        this.utilService.presentToast("registro actualizado exitosamente","success",1000);
+        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
       },
       error: (err) => {
         console.error("Withdrawn post error", err);

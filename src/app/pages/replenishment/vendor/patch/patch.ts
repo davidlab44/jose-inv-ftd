@@ -31,7 +31,6 @@ import { WithdrawnService } from '../../../../services/replenishment/withdrawn.s
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
 import { GlppricesService } from '../../../../services/replenishment/glpprices.service';
 
-
 @Component({
   selector: 'page-patch',
   templateUrl: 'patch.html',

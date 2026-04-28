@@ -101,13 +101,6 @@ export class PatchPage {
     console.log("Item recibido shipout patch:", this.movement);
   }
 
-
-
-
-
-
-
-
   ngOnInit() {
     this.initForm();
   }
@@ -145,33 +138,6 @@ export class PatchPage {
     this.uploadedUrl= null;
     this.uploading = false;
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   /*ngOnInit() {*/
     /*this.form = this.fb.group({*/
@@ -382,6 +348,8 @@ export class PatchPage {
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
+        this.utilService.presentToast("registro actualizado exitosamente","success",1000);
+        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
       },
       error: (err) => {
         console.error("Withdrawn patch error", err);
