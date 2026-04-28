@@ -32,8 +32,6 @@ import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../in
 import { GlppricesService } from '../../../../services/replenishment/glpprices.service';
 
 
-
-
 @Component({
   selector: 'page-patch',
   templateUrl: 'patch.html',
@@ -102,7 +100,6 @@ export class PatchPage {
     private ccoService : CcoService,
     private glpricesService: GlppricesService
   ) {
-
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state?.item) {
       this.movement = navigation.extras.state.item;
@@ -138,41 +135,23 @@ export class PatchPage {
       });
   }
 
-ionViewWillEnter() {
-  this.form.patchValue({
-    id: this.movement?.id ?? null,
-    fecha: this.movement?.data?.date ?? '',
-    name: this.movement?.data?.name ?? '',
-    ticket: this.movement?.data?.ticket ?? '',
-    sello1: this.movement?.data?.seal?.[0] ?? '',
-    sello2: this.movement?.data?.seal?.[1] ?? '',
-    sello3: this.movement?.data?.seal?.[2] ?? '',
-    kg: this.movement?.data?.kg ?? '',
-    rotogate: this.movement?.data?.rotogate ?? 0,
-    psi: this.movement?.data?.psi ?? 0,
-    imported: this.movement?.data?.id_replenishment_product ?? 0,
-    price: this.movement?.data?.price ?? 0
-  });
-}
+  ionViewWillEnter() {
+    this.form.patchValue({
+      id: this.movement?.id ?? null,
+      fecha: this.movement?.data?.date ?? '',
+      name: this.movement?.data?.name ?? '',
+      ticket: this.movement?.data?.ticket ?? '',
+      sello1: this.movement?.data?.seal?.[0] ?? '',
+      sello2: this.movement?.data?.seal?.[1] ?? '',
+      sello3: this.movement?.data?.seal?.[2] ?? '',
+      kg: this.movement?.data?.kg ?? '',
+      rotogate: this.movement?.data?.rotogate ?? 0,
+      psi: this.movement?.data?.psi ?? 0,
+      imported: this.movement?.data?.id_replenishment_product ?? 0,
+      price: this.movement?.data?.price ?? 0
+    });
+  }
 
-
-  /*ionViewWillEnter() {*/
-    /*this.form = this.fb.group({*/
-      /*id: [this.movement?.id ?? null],*/
-      /*fecha: [this.movement?.data.date ?? ''],*/
-      /*name: [this.movement?.data.name ?? ''],*/
-      /*ticket: [this.movement?.data.ticket ?? ''],*/
-      /*sello1: [this.movement?.data.seal[0] ?? ''],*/
-      /*sello2: [this.movement?.data.seal[1] ?? ''],*/
-      /*sello3: [this.movement?.data.seal[2] ?? ''],*/
-      /*kg: [this.movement?.data?.kg ?? ''],*/
-      /*rotogate: [this.movement?.data?.rotogate ?? 0], */
-      /*psi: [this.movement?.data?.psi ?? 0], */
-      /*imported: [this.movement?.data?.id_replenishment_product ?? 0], */
-      /*price: [this.movement?.data?.price ?? 0], */
-    /*});*/
-  /*}*/
-    
   resetForm(): void {
     this.form.reset({
       id: 0,
@@ -333,6 +312,7 @@ ionViewWillEnter() {
     this.ocrService.postVendor(url).subscribe({
       next: (res) => {
         this.ocrResponse = res;
+        this.ccoName="TCSU "+res?.data?.isotanq;
         console.log('OCR Response:', res);
         const normalizedDate = this.normalizeOCRDate(res?.data?.date);
         const seals = res?.data?.seal ?? [];
@@ -341,6 +321,7 @@ ionViewWillEnter() {
           ...this.movement.data,
           date: normalizedDate,
           kg: Number(res?.data?.kg ?? 0),
+          ticket: res?.data?.ticket ?? 0,
           psi: Number(res?.data?.psi ?? 0),
           rotogate: Number(res?.data?.rotogate ?? 0),
           seal: seals
@@ -349,6 +330,7 @@ ionViewWillEnter() {
         this.form.patchValue({
           fecha: normalizedDate,
           kg: Number(res?.data?.kg ?? 0),
+          ticket: res?.data?.ticket ?? 0,
           psi: Number(res?.data?.psi ?? 0),
           rotogate: Number(res?.data?.rotogate ?? 0),
           sello1: seals[0] ?? '',

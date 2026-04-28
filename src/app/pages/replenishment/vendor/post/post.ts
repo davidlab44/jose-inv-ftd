@@ -268,7 +268,7 @@ export class AssetSupplyPostPage {
     const normalizedDate = this.normalizeOCRDate(data.date);
     this.form.patchValue({
       date: normalizedDate,
-      name: data.isotanq ?? null,
+      name: "TCSU "+data.isotanq ?? null,
       ticket: data.ticket ?? null,
       kg: data.kg ?? null,
       psi: data.psi ?? null,
