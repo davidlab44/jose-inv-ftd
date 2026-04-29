@@ -289,10 +289,10 @@ export class PatchPage {
   }
 
   patch() {
-    // 1️⃣ tomar lo editado en el form
+    // tomar lo editado en el form
     this.updateMovementFromForm();
     this.movement.data.imgscale = this.uploadedUrl;
-    // 2️⃣ enviar SOLO data
+    // enviar SOLO data
     const payload = { ...this.movement.data };
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
