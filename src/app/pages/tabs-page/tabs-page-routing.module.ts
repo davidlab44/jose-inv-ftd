@@ -229,6 +229,15 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'replenishment-in-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/in/post/post.module').then(m => m.AssetSupplyPostModule)
+          }
+        ]
+      },
+      {
         path: 'replenishment-out-patch',
         children: [
           {

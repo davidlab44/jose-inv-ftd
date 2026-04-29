@@ -324,7 +324,7 @@ initDefaultRange(days: number) {
   plexaUploader(item:any){
     console.log("item to patch",item);
     this.router.navigate(    
-      ['/app/tabs/replenishment-vendor-post'], 
+      ['/app/tabs/replenishment-in-post'], 
       { state: { item } }    
     );
   } 
