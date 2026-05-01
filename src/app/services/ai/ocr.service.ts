@@ -16,7 +16,6 @@ export class OcrService {
    * OCR Vendor document
    */
   postVendor(imageUrl: string): Observable<any> {
-
     const body = {
       url: imageUrl
     };
@@ -24,19 +23,16 @@ export class OcrService {
     return this.http.post(`${this.ocrUrl}/post-vendor`, body);
   }
 
-
   /**
    * OCR IN document
    */
   postIn(imageUrl: string): Observable<any> {
-
     const body = {
       url: imageUrl
     };
 
     return this.http.post(`${this.ocrUrl}/post-in`, body);
   }
-
 
   /**
    * OCR OUT document
@@ -49,7 +45,6 @@ export class OcrService {
 
     return this.http.post(`${this.ocrUrl}/post-out`, body);
   }
-
 
   /**
    * OCR SCALE document
@@ -64,145 +59,6 @@ export class OcrService {
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*import { Injectable } from '@angular/core';*/
-/*import { HttpClient } from '@angular/common/http';*/
-/*import { Observable } from 'rxjs';*/
-/*import { environment } from '../../../environments/environment';*/
-/*import { map } from 'rxjs/operators';*/
-
-/*@Injectable({*/
-  /*providedIn: 'root'*/
-/*})*/
-/*export class OcrService {*/
-  
-  /*private ocrUrl = environment.ocrUrl; */
-  
-  
-  /*//private apiUrl = environment.apiHost; */
-  /*//private model = 'withdrawn';*/
-
-  /*constructor(private http: HttpClient) {}   */
-     
-
-
-  /*uploadFromUrl(imageUrl: string): Observable<any> {*/
-
-    /*const body = {*/
-      /*url: imageUrl*/
-    /*};*/
-
-    /*return this.http.post(`${this.ocrUrl}/upload`, body);*/
-  /*}*/
-
-
-
-
-
-
-
-
-  /*getAll(): Observable<any[]> {   */
-    /*return this.http.get<any[]>(`${this.apiUrl}/${this.model}`);*/
-  /*}   */
-
-  /*getInterval(since: string, until: string): Observable<any[]> {*/
-    /*const params = [*/
-      /*`created_at=gte.${since}`,*/
-      /*`created_at=lte.${until}`*/
-    /*].join('&');*/
-
-    /*return this.http*/
-      /*.get<any[]>(`${this.apiUrl}/${this.model}?${params}`)*/
-      /*.pipe(*/
-        /*map(response => response ?? []) // si no hay registros → []*/
-      /*);*/
-  /*}*/
-
-  /*getIntervalByAdate(since: string, until: string): Observable<any[]> {*/
-    /*const params = [*/
-      /*`data->>date=gte.${since}`,*/
-      /*`data->>date=lte.${until}`*/
-    /*].join('&');*/
-
-    /*return this.http*/
-      /*.get<any[]>(`${this.apiUrl}/${this.model}?${params}`)*/
-      /*.pipe(*/
-        /*map(response => response ?? [])*/
-      /*);*/
-  /*}*/
-
-  /*post(data:any): Observable<any> {*/
-    /*const url = `${this.apiUrl}/${this.model}?select=*`;*/
-    /*const item = {*/
-      /*data: data*/
-    /*};*/
-    /*return this.http.post(url, item, {*/
-      /*headers: {*/
-        /*'Content-Type': 'application/json',*/
-        /*'Prefer': 'return=representation'*/
-      /*}*/
-    /*});*/
-  /*}*/
-
-  /*patch(id: number, updatedElement: any): Observable<any> {*/
-    /*const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;*/
-    /*const body = {*/
-      /*data: updatedElement  */
-    /*};*/
-    /*return this.http.patch(url, body, {*/
-      /*headers: {*/
-        /*'Content-Type': 'application/json',*/
-        /*'Prefer': 'return=representation'*/
-      /*}*/
-    /*});*/
-  /*}*/
-
-  /*delete(id: number): Observable<any> {*/
-    /*const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;*/
-    /*return this.http.delete(url, {*/
-      /*headers: { 'Content-Type': 'application/json' }*/
-    /*});*/
-  /*}*/
-
-
-
-
-  /*updateStateToErp(id: number): Observable<any> {*/
-    /*const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;*/
-
-    /*console.log("id peticion", id)*/
-    /*return this.http.patch(*/
-      /*url,*/
-      /*{ state: 'erp' },*/
-      /*{*/
-        /*headers: {*/
-          /*'Content-Type': 'application/json',*/
-          /*'Prefer': 'return=representation'*/
-        /*}*/
-      /*}*/
-    /*);*/
-  /*}*/
-
-//}
-
 
 
 

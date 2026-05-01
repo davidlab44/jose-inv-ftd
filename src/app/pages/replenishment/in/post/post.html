@@ -1,3 +1,4 @@
+
 <ion-header translucent="true">
   <ion-toolbar>
     <ion-buttons *ngIf="!showSearchbar" slot="start">
@@ -19,26 +20,23 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="form">
-    <ion-list>
 
+  <form [formGroup]="form">    
+    <!--<input type="hidden" formControlName="id">-->
+    <ion-list>
       <ion-button expand="block" (click)="takePhotoAndUpload()">
         📸 Tomar foto
       </ion-button>
-
       <ion-button expand="block" color="secondary" (click)="pickImageAndUpload()">
         🖼 Elegir de galería
       </ion-button>
-
       <ion-progress-bar
         *ngIf="uploading"
         [value]="uploadProgress / 100">
       </ion-progress-bar>
-
       <p *ngIf="uploading">
         Subiendo: {{ uploadProgress }} %
       </p>
-
       <ion-card *ngIf="uploadedUrl">
         <ion-card-header>
           <ion-card-title>Imagen subida</ion-card-title>
@@ -48,49 +46,39 @@
           <p>{{ uploadedUrl }}</p>
         </ion-card-content>
       </ion-card>
-      <ion-item>
-        <ion-label position="floating">Name</ion-label>
-        <ion-input formControlName="name"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Date | 2026-03-09T15:21:27</ion-label>
-        <ion-input formControlName="date"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Ticket</ion-label>
-        <ion-input formControlName="ticket"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Kg</ion-label>
-        <ion-input type="number" formControlName="kg"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Psi</ion-label>
-        <ion-input type="number" formControlName="psi"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Rotogate</ion-label>
-        <ion-input type="number" formControlName="rotogate"></ion-input>
-      </ion-item>
-      <ion-item *ngFor="let sealCtrl of seals.controls; let i = index">
-        <ion-label position="floating">Seal {{ i + 1 }}</ion-label>
-        <ion-input [formControl]="sealCtrl"></ion-input>
-      </ion-item>
-
+        <ion-item>
+          <ion-label position="floating">Fecha remision (VACIOS) | 2026-02-25T00:00:00</ion-label>
+          <ion-input formControlName="datein"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Entrega Numero:</ion-label>
+          <ion-input formControlName="deliveryin"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Viaje:</ion-label>
+          <ion-input formControlName="tripin"></ion-input>
+        </ion-item>
+        <br><br>
+        <ion-item  *ngIf="shipList?.length"  >
+          <ion-label>Motonave</ion-label>
+          <ion-select
+            interface="popover"
+            formControlName="shipin"
+            (ionChange)="onShipSelect($event)">
+            <ion-select-option
+              *ngFor="let ship of shipList"
+              [value]="ship.id">
+              {{ ship.data?.name | uppercase }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <br>
     </ion-list>
     <br>
-    <pre>{{ocrResponse | json}}</pre>
-    <br>
-    <ion-button expand="block" (click)="guardar()">
+    <ion-button expand="block" (click)="post()">
       Guardar
     </ion-button>
   </form>
-
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
 
 </ion-content>
 

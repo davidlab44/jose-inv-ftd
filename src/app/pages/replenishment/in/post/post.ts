@@ -32,12 +32,14 @@ import { WithdrawnService } from '../../../../services/replenishment/withdrawn.s
 import { GlppricesService } from '../../../../services/replenishment/glpprices.service';
 import { AllocService } from '../../../../services/replenishment/alloc.service';
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
+import { ShipService } from '../../../../services/logistic/ship.service';
 
 @Component({
   selector: 'page-post',
   templateUrl: 'post.html',
   styleUrls: ['./post.scss'],
 })
+
 export class AssetSupplyPostPage {
 
   ios: boolean;
@@ -63,9 +65,7 @@ export class AssetSupplyPostPage {
   uploadProgress = 0;
   uploadedUrl: string | null = null;
   uploading = false;
-  glpPrice:number = 0;
-  glpAlloc:number = 0;
-  glpType:number = 0;
+  shipId:any;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -97,13 +97,13 @@ export class AssetSupplyPostPage {
     private ccoService: CcoService,
     private allocService: AllocService,
     private glpPricesService: GlppricesService,
+    private shipService : ShipService,
     private withdrawnService: WithdrawnService
   ) {}
 
   hash:string='';
   table:any
   rexDocument:any;
-
   item:any;
   withdrawnList:any[]=[];
   ngOnInit() {
@@ -111,30 +111,26 @@ export class AssetSupplyPostPage {
     this.item = nav.item;
     this.withdrawnList = nav.list;
     this.form = this.fb.group({
-      name: [''],
-      date: [''],
-      ticket: [''],
-      kg: [0],
-      psi: [0],
-      rotogate: [0],
-      seal: this.fb.array([]),
+      datein: [''],
+      deliveryin: [''],
+      tripin: [''],
+      shipin: [''],
     });
     const ahora = new Date();
     //this.todayDate=this.formatFechaLatam(ahora);
-    this.displayLast();
+    //this.displayLast();
   }
 
-
-  lastAsset:any;
-  displayLast() {
-    this.productService.getAll().subscribe({
-      next: (response) => {
-        this.lastAsset = response.reduce((max, item) =>
-          item.id > max.id ? item : max
-        );
-      }
-    });
-  }
+/*  lastAsset:any;*/
+  /*displayLast() {*/
+    /*this.productService.getAll().subscribe({*/
+      /*next: (response) => {*/
+        /*this.lastAsset = response.reduce((max, item) =>*/
+          /*item.id > max.id ? item : max*/
+        /*);*/
+      /*}*/
+    /*});*/
+  /*}*/
 
   slideOpts = {
     initialSlide: 0,
@@ -146,41 +142,10 @@ export class AssetSupplyPostPage {
 
   ionViewWillEnter() {
     this.loadCco();
-    this.loadGlpAlloc();
-    this.loadGlpPrice()
+    this.getShip(); 
   }
 
   ionViewDidEnter() {}
-
-  searchProducts(hash: string, productList: any[]): any[] {
-    if (!hash || hash.trim() === '') return productList;
-    return productList.filter(product =>
-      product.name.toLowerCase().includes(hash.toLowerCase())
-    );
-  }
-
-  onSearch(text: string) {
-    this.searchSubject.next(text);
-  }
-
-/*  formatFechaLatam(dateInput: string | Date | number): string {*/
-    /*if (!dateInput) return '';*/
-    /*const date = new Date(dateInput);*/
-    /*const opciones: Intl.DateTimeFormatOptions = {*/
-      /*day: '2-digit',*/
-      /*month: 'long',*/
-      /*year: 'numeric'*/
-    /*};*/
-    /*const fechaTexto = new Intl.DateTimeFormat('es-ES', opciones).format(date);*/
-    /*let horas = date.getHours();*/
-    /*const minutos = String(date.getMinutes()).padStart(2, '0');*/
-    /*const segundos = String(date.getSeconds()).padStart(2, '0');*/
-    /*const ampm = horas >= 12 ? 'PM' : 'AM';*/
-    /*horas = horas % 12;*/
-    /*if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0*/
-    /*const horasTexto = String(horas).padStart(2, '0');*/
-    /*return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;*/
-  /*}*/
 
   async takePhotoAndUpload() {
     this.uploading = true;
@@ -243,12 +208,13 @@ export class AssetSupplyPostPage {
 
   ocrResponse:any;
   launchOcr(url:string){
-    this.ocrService.postVendor(url).subscribe({
+    this.ocrService.postIn(url).subscribe({
       next: (res) => {
         this.ocrResponse=res;
+        this.shipId=this.getShipId(res);
         console.log('OCR Response:', this.ocrResponse);
         console.log('ocrResponse.data:', this.ocrResponse.data);
-        console.log('ocrResponse.data.date:', this.ocrResponse.data.date);
+        console.log('shipId:', this.shipId);
         this.updateUi();
       },
       error: (err) => {
@@ -258,74 +224,32 @@ export class AssetSupplyPostPage {
     ;
   }
 
-  get seals(): FormArray {
-    return this.form.get('seal') as FormArray;
-  }
+  /*get seals(): FormArray {*/
+    /*return this.form.get('seal') as FormArray;*/
+  /*}*/
 
   isotanq:any;
   updateUi(){
     const data = this.ocrResponse.data;
     const normalizedDate = this.normalizeOCRDate(data.date);
     this.form.patchValue({
-      date: normalizedDate,
-      name: "TCSU "+data.isotanq ?? null,
-      ticket: data.ticket ?? null,
-      kg: data.kg ?? null,
-      psi: data.psi ?? null,
-      rotogate: data.rotogate ?? null,
+      datein: data.datein ?? null,
+      deliveryin: data.deliveryin ?? null,
+      tripin: data.tripin ?? null,
+      shipin: data.shipin ?? null,
     });
-    this.seals.clear();
-    if (data.seal && Array.isArray(data.seal)) {
-      data.seal.forEach((s: string) => {
-        this.seals.push(this.fb.control(s));
-      });
-    }
-    this.isotanq = this.validateIsotanqName(data.isotanq, this.ccos);
-  }
+    //this.isotanq = this.validateIsotanqName(data.isotanq, this.ccos);
+   }
 
    ccos: any[] = []; 
    loadCco() {                
      this.ccoService.getAll().subscribe({ 
         next: (res) => {       
-          console.log('✅ Cco:', res);    
+          console.log('Cco:', res);    
           this.ccos = res;
         }, 
         error: (err) => {      
           console.error(' Error al cargar cco:', err); 
-        } 
-      }); 
-   } 
-
-   glpPriceList: any[] = []; 
-   loadGlpPrice() {              
-     this.glpPricesService.getAll().subscribe({ 
-        next: (res) => {       
-          console.log('✅glpPrices',res);    
-          this.glpPriceList = res;
-
-        }, 
-        error: (err) => {      
-          console.error(' Error al cargar glpPrices:', err); 
-        } 
-      }); 
-   } 
-
-   glpAllocList: any[] = []; 
-   glpAllocPureList: any[] = []; 
-   loadGlpAlloc() {                
-     this.allocService.getAll().subscribe({ 
-        next: (res) => {       
-          console.log('✅ Glp Alloc:', res);    
-          this.glpAllocList = res;
-          this.glpAllocPureList = this.obtenerGlpAllocVigentes(this.glpAllocList);
-          // luego haces lo que quieras:
-          console.log("pure Alooc List",this.glpAllocPureList);
-          const nacional = this.glpAllocPureList[0];
-          const importado = this.glpAllocPureList[1];
-
-        }, 
-        error: (err) => {      
-          console.error(' Error al cargar glp alloc:', err); 
         } 
       }); 
    } 
@@ -345,31 +269,26 @@ export class AssetSupplyPostPage {
     return null;
   }
 
-  guardar() {
+  post() {
     const formData: Partial<WithdrawnData> = this.form.value;
     const withdrawn: Withdrawn = createDefaultWithdrawn();
     withdrawn.data = {
       ...withdrawn.data,
       ...formData,
-      seal: this.seals.value 
     };
-    withdrawn.data.name = this.isotanq?.id ?? null;
-    withdrawn.data.img = this.uploadedUrl;
-    withdrawn.data.id_replenishment_product = this.procesarRetiroGLP(this.glpAllocPureList,withdrawn.data.kg)
     const payload = withdrawn.data;
     console.log("payload to post =>", payload);
     this.withdrawnService.post(payload).subscribe({
       next: (response) => {
         console.log("Withdrawn post response", response);
         this.utilService.presentToast("registro actualizado exitosamente","success",1000);
-        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
+        //this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true });  
       },
       error: (err) => {
         console.error("Withdrawn post error", err);
       }
     });
   }
-
 
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;
@@ -387,131 +306,292 @@ export class AssetSupplyPostPage {
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
 
-  obtenerGlpAllocVigentes(glpAllocList: any[]): any[] {
-    const now = new Date();
-    // 1. Filtrar vigentes
-    const vigentes = glpAllocList.filter((glpAlloc) => {
-      const init = new Date(glpAlloc.data.init);
-      const end = new Date(glpAlloc.data.end);
-      return now >= init && now <= end;
-    });
-    // 2. Validación de cantidad
-    if (vigentes.length !== 2) {
-      console.log('⚠️ ERROR: deben existir exactamente 2 registros vigentes', {
-        cantidad: vigentes.length,
-        vigentes,
-      });
+  normalizeOCR(str) {
+    if (!str) return '';
+    return str
+      .toLowerCase()
+      .replace(/[0]/g, 'o')
+      .replace(/[1]/g, 'i')
+      .replace(/[5]/g, 's')
+      .replace(/[8]/g, 'b')
+      .replace(/[^a-z0-9]/g, '')  // elimina espacios, guiones, etc
+      .trim();
+  }
+  levenshtein(a, b) {
+    const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);
+    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        if (b[i - 1] === a[j - 1]) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
     }
-    // 3. Separar por tipo
-    const nacionales = vigentes.filter(
-      (g) => g.data.id_replenishment_product === 1
-    );
-    const importados = vigentes.filter(
-      (g) => g.data.id_replenishment_product === 2
-    );
-    // 4. Validaciones de integridad
-    if (nacionales.length === 0) {
-      console.log('⚠️ ERROR: no existe registro NACIONAL (id=1)', vigentes);
-    }
-    if (importados.length === 0) {
-      console.log('⚠️ ERROR: no existe registro IMPORTADO (id=2)', vigentes);
-    }
-    if (nacionales.length > 1) {
-      console.log('⚠️ ERROR: hay múltiples registros NACIONALES duplicados', nacionales);
-    }
-    if (importados.length > 1) {
-      console.log('⚠️ ERROR: hay múltiples registros IMPORTADOS duplicados', importados);
-    }
-    // 5. Selección segura (primer válido de cada tipo)
-    const nacional = nacionales[0];
-    const importado = importados[0];
-    // 6. Retorno limpio y ordenado
-    const resultado: any[] = [];
-    if (nacional) resultado.push(nacional);
-    if (importado) resultado.push(importado);
-    return resultado;
+    return matrix[b.length][a.length];
+  }
+  similarity(a, b) {
+    const dist = this.levenshtein(a, b);
+    const maxLen = Math.max(a.length, b.length);
+    if (maxLen === 0) return 1;
+    return 1 - dist / maxLen;
+  }
+  fuzzyMatch(a, b, threshold = 0.8) {
+    if (!a || !b) return false;
+    const na = this.normalizeOCR(a);
+    const nb = this.normalizeOCR(b);
+    if (na.includes(nb) || nb.includes(na)) return true;
+    const score = this.similarity(na, nb);
+    return score >= threshold;
   }
 
-  procesarRetiroGLP(glpAllocPureList: any[], kg: number): number {
-    if (!Array.isArray(glpAllocPureList) || glpAllocPureList.length === 0) {
-      console.log('⚠️ ERROR: lista glpAllocPureList inválida');
-      return 0;
-    }
 
-    const itemNacional = glpAllocPureList.find(
-      (g) => g.data.id_replenishment_product === 1
-    );
 
-    const itemImportado = glpAllocPureList.find(
-      (g) => g.data.id_replenishment_product === 2
-    );
-    if (!itemNacional) console.log('⚠️ ERROR: no existe item nacional');
-    if (!itemImportado) console.log('⚠️ ERROR: no existe item importado');
-    // ====== 1. NACIONAL ======
-    if (itemNacional) {
-      const resultadoNacional =
-        (itemNacional.data.acum + itemNacional.data.alloc) - kg;
-      itemNacional.data.acumnext = resultadoNacional;
-      if (resultadoNacional >= -10000) {
-        return 1; // ✅ usar nacional
-      }
-      console.log(
-        '⚠️ Nacional fuera de rango (< -10000), se pasa a importado',
-        resultadoNacional
-      );
+/*  getShipId(objA, objBList) {*/
+    /*const shipName = objA?.data?.shipin ?? null;*/
+    /*const shipIMO = objA?.data?.shipinimo ?? null;*/
+    /*let bestScore = 0;*/
+    /*let bestId = 0;*/
+    /*//  buscar por nombre*/
+    /*if (shipName) {*/
+      /*for (const ship of objBList) {*/
+        /*const name = ship?.data?.name;*/
+        /*if (!name) continue;*/
+        /*const score = this.similarity(*/
+          /*this.normalizeOCR(shipName),*/
+          /*this.normalizeOCR(name)*/
+        /*);*/
+        /*if (score > bestScore && score > 0.75) {*/
+          /*bestScore = score;*/
+          /*bestId = ship.id;*/
+        /*}*/
+      /*}*/
+      /*if (bestId !== 0) return bestId;*/
+    /*}*/
+    /*//  fallback por IMO*/
+    /*if (shipIMO) {*/
+      /*for (const ship of objBList) {*/
+        /*const imo = ship?.data?.imo;*/
+        /*if (!imo) continue;*/
+        /*if (this.fuzzyMatch(shipIMO, imo, 0.9)) {*/
+          /*return ship.id;*/
+        /*}*/
+      /*}*/
+    /*}*/
+    /*return 0;*/
+  /*}*/
+
+
+
+
+
+  shipList: any[] = [];
+  
+
+  shipMap: Record<string, number> = {};
+  imoMap: Record<string, number> = {};
+  idMap: Record<number, any> = {};
+
+
+
+
+
+  getShip() {
+  this.shipService.getAll().subscribe(res => {
+    console.log("respouesta res",res)
+    this.shipList=res;
+    this.buildShipMaps(res); // 🔥 usa esto
+    console.log('shipMap', this.shipMap);
+    console.log('imoMap', this.imoMap);
+  });
+}
+/*  getShip() {*/
+    /*this.shipService.getAll().subscribe(res => {*/
+      /*this.shipMap = this.buildShipMap(res);*/
+      /*console.log('shipMap',this.shipMap);*/
+    /*});*/
+  /*}*/
+
+  buildShipMap(shipList: any[]): Record<string, number> {
+    const map: Record<string, number> = {};
+    for (let i = 0; i < shipList.length; i++) {
+      const s = shipList[i];
+      const name = s?.data?.name;
+      if (name) map[name.trim().toUpperCase()] = s.id;
     }
-    // ====== 2. IMPORTADO ======
-    if (itemImportado) {
-      const resultadoImportado =
-        (itemImportado.data.acum + itemImportado.data.alloc) - kg;
-      itemImportado.data.acumnext = resultadoImportado;
-      if (resultadoImportado < -100000) {
-        console.log(
-          '⚠️ Importado fuera de rango (< -100000), pero se permite continuar',
-          resultadoImportado
-        );
+    return map;
+  }
+
+
+buildShipMaps(shipList: any[]) {
+  const nameMap: Record<string, number> = {};
+  const imoMap: Record<string, number> = {};
+  const idMap: Record<number, any> = {};
+
+  for (let i = 0; i < shipList.length; i++) {
+    const s = shipList[i];
+    const name = s?.data?.name;
+    const imo  = s?.data?.imo;
+if (name) nameMap[this.normalize(name)] = s.id;
+    //if (name) nameMap[this.normalize(name)] = s.id;
+    if (imo)  imoMap[this.normalize(imo)]   = s.id;
+
+    idMap[s.id] = s; // 🔥 clave
+  }
+
+  this.shipMap = nameMap;
+  this.imoMap  = imoMap;
+  this.idMap   = idMap;
+  this.shipList = shipList; // 👈 opcional mantener
+}
+
+
+
+normalize(v: string): string {
+  return v
+    ?.toUpperCase()
+    .replace(/\s+/g, '')   // quita espacios
+    .replace(/[^A-Z0-9]/g, '') // limpia ruido OCR
+    .trim();
+}
+
+  /*normalize(v: string): string {*/
+    /*return v?.trim().toUpperCase();*/
+  /*}*/
+
+
+  /*buildShipMaps(shipList: any[]) {*/
+    /*const nameMap: Record<string, number> = {};*/
+    /*const imoMap: Record<string, number> = {};*/
+    /*for (let i = 0; i < shipList.length; i++) {*/
+      /*const s = shipList[i];*/
+      /*const name = s?.data?.name;*/
+      /*const imo  = s?.data?.imo;*/
+      /*if (name) nameMap[this.normalize(name)] = s.id;*/
+      /*if (imo)  imoMap[this.normalize(imo)]   = s.id;*/
+    /*}*/
+    /*this.shipMap = nameMap;*/
+    /*this.imoMap  = imoMap;*/
+  /*}*/
+
+
+
+
+
+  getShipId(res: any): number {
+    console.log("🔎 getShipId input:", res);
+    const shipName = res?.data?.shipin ?? null;
+    const shipIMO  = res?.data?.shipinimo ?? null;
+    console.log("➡️ shipName:", shipName, "shipIMO:", shipIMO);
+    // 🚀 1. O(1) por nombre
+    if (shipName) {
+
+      const normName = this.normalize(shipName);
+      //\ccconst normName = this.normalize(shipName);
+      const id = this.shipMap[normName];
+      console.log("🔹 O(1) name lookup:", normName, "=>", id);
+      if (id) {
+        console.log("✅ return by name O(1):", id);
+        return id;
       }
-      return 2; // 🔥 SIEMPRE usar importado en fallback
     }
-    console.log('⚠️ ERROR CRÍTICO: no existe fuente válida');
+    // 🚀 2. O(1) por IMO
+    if (shipIMO) {
+      const normIMO = this.normalize(shipIMO);
+      const id = this.imoMap[normIMO];
+      console.log("🔹 O(1) IMO lookup:", normIMO, "=>", id);
+      if (id) {
+        console.log("✅ return by IMO O(1):", id);
+        return id;
+      }
+    }
+    // 3. Fuzzy SOLO si falla
+    let bestScore = 0;
+    let bestId = 0;
+    if (shipName) {
+      const normA = this.normalizeOCR(shipName);
+      console.log("🔸 Fuzzy name start:", normA);
+      for (const ship of this.shipList) {
+        const name = ship?.data?.name;
+        if (!name) continue;
+        const score = this.similarity(normA, this.normalizeOCR(name));
+        if (score > bestScore && score > 0.75) {
+          bestScore = score;
+          bestId = ship.id;
+        }
+      }
+      console.log("🔸 best fuzzy name:", bestId, "score:", bestScore);
+      if (bestId !== 0) {
+        console.log("✅ return by fuzzy name:", bestId);
+        return bestId;
+      }
+    }
+    // 4. Fallback fuzzy IMO
+    if (shipIMO) {
+      console.log("🔸 Fuzzy IMO start:", shipIMO);
+      let foundId = 0;
+      for (const ship of this.shipList) {
+        const imo = ship?.data?.imo;
+        if (!imo) continue;
+        if (this.fuzzyMatch(shipIMO, imo, 0.9)) {
+          foundId = ship.id;
+          break;
+        }
+      }
+      console.log("🔸 fuzzy IMO result:", foundId);
+      if (foundId) {
+        console.log("✅ return by fuzzy IMO:", foundId);
+        return foundId;
+      }
+    }
+    console.log("❌ no match, return 0");
     return 0;
   }
 
-  sumKgMesActual(withdrawnList: any[]): number {
-    try {
-      if (!Array.isArray(withdrawnList) || withdrawnList.length === 0) {
-        return 0;
-      }
 
-      const now = new Date();
-      const currentMonth = now.getMonth();
-      const currentYear = now.getFullYear();
 
-      let total = 0;
 
-      for (let i = 0; i < withdrawnList.length; i++) {
-        const data = withdrawnList[i]?.data;
 
-        if (!data?.date) continue;
-
-        const d = new Date(data.date);
-        if (isNaN(d.getTime())) continue;
-
-        if (
-          d.getMonth() === currentMonth &&
-          d.getFullYear() === currentYear
-        ) {
-          total += Number(data.kg) || 0;
-        }
-      }
-
-      return total;
-
-    } catch (error) {
-      console.error('sumKgMesActual error:', error);
-      return 0;
-    }
+  getShipNameById(id: number | null | undefined): string {
+    if (id == null) return 'Sin nombre';
+    const ship = this.idMap[id];
+    const name = ship?.data?.name;
+    return name?.trim() ? name : 'Sin Nombre';
   }
+
+
+
+  onShipSelect(ev: any) {
+    const selectedId = ev.detail.value;
+    const selectedShip = this.idMap[selectedId];
+    console.log('ID seleccionado =>', selectedId);
+    console.log('Ship seleccionado =>', selectedShip);
+  }
+
+  /*getShipNameById(id: number | null | undefined): string {*/
+    /*if (id == null) return 'Sin nombre';*/
+    /*const cco = this.shipList.find(c => Number(c.id) === Number(id));*/
+    /*const nombre = cco?.data?.name;*/
+    /*return typeof nombre === 'string' && nombre.trim() !== ''*/
+      /*? nombre*/
+      /*: 'Sin Nombre';*/
+  /*}*/
+
+/*  onShipSelect(ev: any) {*/
+    /*const selectedId = ev.detail.value;*/
+    /*const selectedShip = this.shipList.find(s => s.id === selectedId);*/
+    /*console.log('ID seleccionado =>', selectedId);*/
+    /*console.log('Ship seleccionado =>', selectedShip);*/
+  /*}*/
+
+  onSearch(text: string) { 
+    this.searchSubject.next(text);  
+  } 
 
 
 }
