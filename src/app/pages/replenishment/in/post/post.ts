@@ -121,17 +121,6 @@ export class AssetSupplyPostPage {
     //this.displayLast();
   }
 
-/*  lastAsset:any;*/
-  /*displayLast() {*/
-    /*this.productService.getAll().subscribe({*/
-      /*next: (response) => {*/
-        /*this.lastAsset = response.reduce((max, item) =>*/
-          /*item.id > max.id ? item : max*/
-        /*);*/
-      /*}*/
-    /*});*/
-  /*}*/
-
   slideOpts = {
     initialSlide: 0,
     slidesPerView: 1,
@@ -223,10 +212,6 @@ export class AssetSupplyPostPage {
     })
     ;
   }
-
-  /*get seals(): FormArray {*/
-    /*return this.form.get('seal') as FormArray;*/
-  /*}*/
 
   isotanq:any;
   updateUi(){
@@ -350,72 +335,21 @@ export class AssetSupplyPostPage {
     return score >= threshold;
   }
 
-
-
-/*  getShipId(objA, objBList) {*/
-    /*const shipName = objA?.data?.shipin ?? null;*/
-    /*const shipIMO = objA?.data?.shipinimo ?? null;*/
-    /*let bestScore = 0;*/
-    /*let bestId = 0;*/
-    /*//  buscar por nombre*/
-    /*if (shipName) {*/
-      /*for (const ship of objBList) {*/
-        /*const name = ship?.data?.name;*/
-        /*if (!name) continue;*/
-        /*const score = this.similarity(*/
-          /*this.normalizeOCR(shipName),*/
-          /*this.normalizeOCR(name)*/
-        /*);*/
-        /*if (score > bestScore && score > 0.75) {*/
-          /*bestScore = score;*/
-          /*bestId = ship.id;*/
-        /*}*/
-      /*}*/
-      /*if (bestId !== 0) return bestId;*/
-    /*}*/
-    /*//  fallback por IMO*/
-    /*if (shipIMO) {*/
-      /*for (const ship of objBList) {*/
-        /*const imo = ship?.data?.imo;*/
-        /*if (!imo) continue;*/
-        /*if (this.fuzzyMatch(shipIMO, imo, 0.9)) {*/
-          /*return ship.id;*/
-        /*}*/
-      /*}*/
-    /*}*/
-    /*return 0;*/
-  /*}*/
-
-
-
-
-
   shipList: any[] = [];
-  
 
   shipMap: Record<string, number> = {};
   imoMap: Record<string, number> = {};
   idMap: Record<number, any> = {};
 
-
-
-
-
   getShip() {
   this.shipService.getAll().subscribe(res => {
     console.log("respouesta res",res)
     this.shipList=res;
-    this.buildShipMaps(res); // 🔥 usa esto
+    this.buildShipMaps(res);
     console.log('shipMap', this.shipMap);
     console.log('imoMap', this.imoMap);
   });
 }
-/*  getShip() {*/
-    /*this.shipService.getAll().subscribe(res => {*/
-      /*this.shipMap = this.buildShipMap(res);*/
-      /*console.log('shipMap',this.shipMap);*/
-    /*});*/
-  /*}*/
 
   buildShipMap(shipList: any[]): Record<string, number> {
     const map: Record<string, number> = {};
@@ -437,58 +371,31 @@ buildShipMaps(shipList: any[]) {
     const s = shipList[i];
     const name = s?.data?.name;
     const imo  = s?.data?.imo;
-if (name) nameMap[this.normalize(name)] = s.id;
-    //if (name) nameMap[this.normalize(name)] = s.id;
+    if (name) nameMap[this.normalize(name)] = s.id;
     if (imo)  imoMap[this.normalize(imo)]   = s.id;
-
-    idMap[s.id] = s; // 🔥 clave
+    idMap[s.id] = s;
   }
 
   this.shipMap = nameMap;
   this.imoMap  = imoMap;
   this.idMap   = idMap;
-  this.shipList = shipList; // 👈 opcional mantener
+  this.shipList = shipList; 
 }
-
-
 
 normalize(v: string): string {
   return v
     ?.toUpperCase()
-    .replace(/\s+/g, '')   // quita espacios
-    .replace(/[^A-Z0-9]/g, '') // limpia ruido OCR
+    .replace(/\s+/g, '')   // quitarespacios
+    .replace(/[^A-Z0-9]/g, '') // limpiar ruido OCR
     .trim();
 }
-
-  /*normalize(v: string): string {*/
-    /*return v?.trim().toUpperCase();*/
-  /*}*/
-
-
-  /*buildShipMaps(shipList: any[]) {*/
-    /*const nameMap: Record<string, number> = {};*/
-    /*const imoMap: Record<string, number> = {};*/
-    /*for (let i = 0; i < shipList.length; i++) {*/
-      /*const s = shipList[i];*/
-      /*const name = s?.data?.name;*/
-      /*const imo  = s?.data?.imo;*/
-      /*if (name) nameMap[this.normalize(name)] = s.id;*/
-      /*if (imo)  imoMap[this.normalize(imo)]   = s.id;*/
-    /*}*/
-    /*this.shipMap = nameMap;*/
-    /*this.imoMap  = imoMap;*/
-  /*}*/
-
-
-
-
 
   getShipId(res: any): number {
     console.log("🔎 getShipId input:", res);
     const shipName = res?.data?.shipin ?? null;
     const shipIMO  = res?.data?.shipinimo ?? null;
     console.log("➡️ shipName:", shipName, "shipIMO:", shipIMO);
-    // 🚀 1. O(1) por nombre
+    //  1. O(1) por nombre
     if (shipName) {
 
       const normName = this.normalize(shipName);
@@ -496,17 +403,17 @@ normalize(v: string): string {
       const id = this.shipMap[normName];
       console.log("🔹 O(1) name lookup:", normName, "=>", id);
       if (id) {
-        console.log("✅ return by name O(1):", id);
+        console.log(" return by name O(1):", id);
         return id;
       }
     }
-    // 🚀 2. O(1) por IMO
+    //  2. O(1) por IMO
     if (shipIMO) {
       const normIMO = this.normalize(shipIMO);
       const id = this.imoMap[normIMO];
       console.log("🔹 O(1) IMO lookup:", normIMO, "=>", id);
       if (id) {
-        console.log("✅ return by IMO O(1):", id);
+        console.log(" return by IMO O(1):", id);
         return id;
       }
     }
@@ -515,7 +422,7 @@ normalize(v: string): string {
     let bestId = 0;
     if (shipName) {
       const normA = this.normalizeOCR(shipName);
-      console.log("🔸 Fuzzy name start:", normA);
+      console.log("Fuzzy name start:", normA);
       for (const ship of this.shipList) {
         const name = ship?.data?.name;
         if (!name) continue;
@@ -527,7 +434,7 @@ normalize(v: string): string {
       }
       console.log("🔸 best fuzzy name:", bestId, "score:", bestScore);
       if (bestId !== 0) {
-        console.log("✅ return by fuzzy name:", bestId);
+        console.log(" return by fuzzy name:", bestId);
         return bestId;
       }
     }
@@ -545,17 +452,13 @@ normalize(v: string): string {
       }
       console.log("🔸 fuzzy IMO result:", foundId);
       if (foundId) {
-        console.log("✅ return by fuzzy IMO:", foundId);
+        console.log("return by fuzzy IMO:", foundId);
         return foundId;
       }
     }
-    console.log("❌ no match, return 0");
+    console.log("no match, return 0");
     return 0;
   }
-
-
-
-
 
   getShipNameById(id: number | null | undefined): string {
     if (id == null) return 'Sin nombre';
@@ -564,31 +467,13 @@ normalize(v: string): string {
     return name?.trim() ? name : 'Sin Nombre';
   }
 
-
-
   onShipSelect(ev: any) {
     const selectedId = ev.detail.value;
     const selectedShip = this.idMap[selectedId];
     console.log('ID seleccionado =>', selectedId);
     console.log('Ship seleccionado =>', selectedShip);
   }
-
-  /*getShipNameById(id: number | null | undefined): string {*/
-    /*if (id == null) return 'Sin nombre';*/
-    /*const cco = this.shipList.find(c => Number(c.id) === Number(id));*/
-    /*const nombre = cco?.data?.name;*/
-    /*return typeof nombre === 'string' && nombre.trim() !== ''*/
-      /*? nombre*/
-      /*: 'Sin Nombre';*/
-  /*}*/
-
-/*  onShipSelect(ev: any) {*/
-    /*const selectedId = ev.detail.value;*/
-    /*const selectedShip = this.shipList.find(s => s.id === selectedId);*/
-    /*console.log('ID seleccionado =>', selectedId);*/
-    /*console.log('Ship seleccionado =>', selectedShip);*/
-  /*}*/
-
+  
   onSearch(text: string) { 
     this.searchSubject.next(text);  
   } 

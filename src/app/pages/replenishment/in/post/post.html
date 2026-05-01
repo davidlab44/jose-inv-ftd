@@ -60,7 +60,9 @@
         </ion-item>
         <br><br>
         <ion-item  *ngIf="shipList?.length"  >
-          <ion-label>Motonave</ion-label>
+          <ion-label>
+            <p>Motonave: {{ getShipNameById(shipId) }}</p>              
+          </ion-label>
           <ion-select
             interface="popover"
             formControlName="shipin"
