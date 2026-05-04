@@ -90,7 +90,7 @@ export class WithdrawnService {
     });
   }
 
-  updateStateToErp(id: number,state:string): Observable<any> {
+  updateWithdrawnState(id: number,state:string): Observable<any> {
     const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;
     console.log("id peticion", id)
     console.log("state", state)

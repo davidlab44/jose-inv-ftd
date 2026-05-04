@@ -251,7 +251,7 @@ export class AppComponent implements OnInit {
     private swUpdate: SwUpdate,
     private toastCtrl: ToastController,
     private opportunityService:OpportunityService,
-    private updates: SwUpdate,
+    //private updates: SwUpdate,
     private userService:UserService
   ) {
     this.checkForUpdates();

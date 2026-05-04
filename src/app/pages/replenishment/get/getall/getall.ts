@@ -439,7 +439,7 @@ export class GetallPage implements OnInit {
     const checked = ev.detail.checked;
     item.state = checked ? 'erp' : 'pending';
     console.log('STATE =>', item.state, item);
-    this.withdrawnService.updateStateToErp(item.id,item.state).subscribe({
+    this.withdrawnService.updateWithdrawnState(item.id,item.state).subscribe({
       next: response => {
         console.log('Response from server:', response);
       },

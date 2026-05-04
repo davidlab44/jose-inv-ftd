@@ -77,6 +77,8 @@ export class AssetSupplyPostPage {
     public toastCtrl: ToastController,
     public user: UserData,
     public config: Config,
+  
+
     private opportunityService: OpportunityService,
     private posOrderService: PosOrderService,
     private tableService: TableService,
@@ -267,10 +269,22 @@ export class AssetSupplyPostPage {
       next: (response) => {
         console.log("Withdrawn post response", response);
         this.utilService.presentToast("registro actualizado exitosamente","success",1000);
-        //this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true });  
+        this.setWithdrawnState(response[0]?.id,'in');
       },
       error: (err) => {
         console.error("Withdrawn post error", err);
+      }
+    });
+  }
+
+  setWithdrawnState(id:number,state:string){
+    this.withdrawnService.updateWithdrawnState(id,state).subscribe({
+      next: response => {
+        console.log('Response from server:',response);
+        //this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true });  
+      },
+      error: err => {
+        console.error('Error updating state:', err);
       }
     });
   }
