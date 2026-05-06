@@ -40,36 +40,28 @@ import { Cco,CcoMap } from '../../../../interfaces/cco';
 export class GetallPage implements OnInit {
 
   @ViewChild(IonList, { static: false }) ionList!: IonList;
-
   withdrawnList: any[] = [];
   fullWithdrawnList: any[] = [];
-
   dayRange = {
     lower: 1,
     upper: this.getTodayDayOfYear()
   };
-
   startDay = 1;
   endDay = this.dayRange.upper;
-
   types = [
     { value: 1, name: 'Nacional' },
     { value: 2, name: 'Importado' }
   ];
-
   vendors = [
     { value: 1, name: 'Plexa' },
     { value: 2, name: 'Plexa port' }
   ];
-
   filterType: number = this.types[0].value;
   filterVendor: number = this.vendors[0].value;
-
   valor1 = 0;
   valor2 = 0;
   valor3 = 0;
   valor4 = 0;
-
   ios: boolean;
   showSearchbar: boolean;
   searchSubject = new Subject<string>();
@@ -122,7 +114,7 @@ export class GetallPage implements OnInit {
     this.withdrawnService.getIntervalByAdate(since, until).subscribe({
       next: response => {
         this.withdrawnList = response;
-        console.log("withdrawnList response",this.withdrawnList)
+        //console.log("withdrawnList response",this.withdrawnList)
         this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList).reverse();
         console.log('full',this,this.fullWithdrawnList)
         /* setTimeout(() => {*/
@@ -322,7 +314,7 @@ initDefaultRange(days: number) {
   }
 
   plexaUploader(item:any){
-    console.log("item to patch",item);
+    //console.log("item to patch",item);
     this.router.navigate(    
       ['/app/tabs/replenishment-in-post'], 
       { state: { item } }    
@@ -352,11 +344,13 @@ initDefaultRange(days: number) {
 
   cloneWithdrawn(item: any) {
     console.log("item pasado:", item);
+    //chatgpt => agregar al payload en data.twin el item.id
     const payload = this.buildClonePayload(item);
     console.log("Payload a enviar:", payload);
     this.withdrawnService.postClone(payload).subscribe({
       next: (response) => {
         console.log("Clone creado", response);
+        //chatgpt => hacer un patch a este "withdrawnItem" data.twin el que se creo
         this.getAll();
       },
       error: (err) => {
@@ -367,7 +361,7 @@ initDefaultRange(days: number) {
 
 
   buildClonePayload(item: any): any {
-    // 🔥 Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)
+    //  Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)
     const d = item?.data?.data ?? item?.data ?? {};
 
     return {
@@ -385,6 +379,7 @@ initDefaultRange(days: number) {
         date: d.date ?? null,
         name: 0,
         seal: [],
+        twin: 0,
         price: 0,
         imgin: null,
         shipin: 0,
@@ -437,7 +432,7 @@ initDefaultRange(days: number) {
     const map: CcoMap = {};
     ccoList.forEach((cco, index) => {
       const id = Number(cco.id); // 🔥 NORMALIZAR
-      console.log(`➡️ cco[${index}] id(normalizado) =>`, id, typeof id);
+      //console.log(`➡️ cco[${index}] id(normalizado) =>`, id, typeof id);
       map[id] = {
         name: cco.data?.name ?? 'N/A',
         color: cco.data?.color ?? '#ccc'
@@ -452,18 +447,11 @@ initDefaultRange(days: number) {
   loadCcos() {
     this.ccoService.getAll().subscribe({
       next: (ccos) => {
-        console.log('📦 ccoList RAW =>', ccos);
-
+        //console.log('📦 ccoList RAW =>', ccos);
         this.ccoList = ccos;
-
         this.ccoMap = this.buildCcoMap(ccos);
-
-        console.log('🧭 ccoMap =>', this.ccoMap);
-        console.log('🔑 ccoMap keys =>', Object.keys(this.ccoMap));
-
-        //this.cd.markForCheck();
-
-        // debug cruzado
+        //console.log('🧭 ccoMap =>', this.ccoMap);
+        //console.log('🔑 ccoMap keys =>', Object.keys(this.ccoMap));
         this.debugCcoMapping();
       },
       error: (err) => console.error('❌ Error loading ccos', err)
@@ -471,12 +459,12 @@ initDefaultRange(days: number) {
   }
 
   debugCcoMapping() {
-    console.log('🧪 DEBUG withdrawn -> ccoMap');
+    //console.log('🧪 DEBUG withdrawn -> ccoMap');
 
     this.filteredList.slice(0, 10).forEach((item, i) => {
       const ccoId = item?.data?.name;
 
-      console.log(`🔎 item[${i}] ccoId =>`, ccoId, 'tipo:', typeof ccoId);
+      //console.log(`🔎 item[${i}] ccoId =>`, ccoId, 'tipo:', typeof ccoId);
 
       const cco = this.ccoMap[ccoId];
 

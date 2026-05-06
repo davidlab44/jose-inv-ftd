@@ -13,10 +13,6 @@ export interface Product {
   };
 }
 
-
-
-
-
 export const defaultProduct: Product = {
   id: 0,
   creado_en: new Date().toISOString(),
@@ -28,9 +24,6 @@ export const defaultProduct: Product = {
     categ: []
   }
 };
-
-
-
 
 export function createDefaultWithdrawn(): Withdrawn {
   return {
@@ -45,8 +38,6 @@ export function createDefaultWithdrawn(): Withdrawn {
   };
 }
 
-
-
 export const defaultWithdrawnData: WithdrawnData = {
   kg: 0,
   img: '',
@@ -54,6 +45,7 @@ export const defaultWithdrawnData: WithdrawnData = {
   date: '',
   name: 0,
   seal: [],
+  twin: 0,
   wnet: 0,
   price: 0,
   id_replenishment_product: 0,
@@ -80,6 +72,7 @@ export interface WithdrawnData {
   date: string;
   name: number;
   seal: string[];
+  twin: number;
   wnet: number;
   price: number;
   id_replenishment_product: number;
