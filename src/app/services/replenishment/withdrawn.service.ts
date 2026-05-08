@@ -31,12 +31,24 @@ export class WithdrawnService {
       );
   }
 
-  getIntervalByAdate(since: string, until: string): Observable<any[]> {
+   getIntervalByAdate(since: string, until: string): Observable<any[]> {
     const params = [
       `data->>date=gte.${since}`,
       `data->>date=lte.${until}`
     ].join('&');
 
+    return this.http
+      .get<any[]>(`${this.apiUrl}/${this.model}?${params}`)
+      .pipe(
+        map(response => response ?? [])
+      );
+  }
+
+  getIntervalByCreatedAtDate(since: string, until: string): Observable<any[]> {
+    const params = [
+      `created_at=gte.${since}`,
+      `created_at=lte.${until}`
+    ].join('&');
     return this.http
       .get<any[]>(`${this.apiUrl}/${this.model}?${params}`)
       .pipe(

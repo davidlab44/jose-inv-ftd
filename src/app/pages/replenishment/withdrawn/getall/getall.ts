@@ -100,7 +100,7 @@ export class GetallPage implements OnInit {
   /*}*/
 
   ngOnInit() {
-    this.initDefaultRange(45);
+    this.initDefaultRange(30);
     this.loadCcos();
   }
 
@@ -111,15 +111,15 @@ export class GetallPage implements OnInit {
   getAll() {
     const since = this.dayOfYearToISO(this.startDay);
     const until = this.dayOfYearToISO(this.endDay, true);
-    this.withdrawnService.getIntervalByAdate(since, until).subscribe({
+    //this.withdrawnService.getIntervalByAdate(since, until).subscribe({
+    //tiene que utilizarse created at xq cuando se crea el segundo (el clon ) ese no tiene datain ni nada
+    this.withdrawnService.getIntervalByCreatedAtDate(since, until).subscribe({
       next: response => {
         this.withdrawnList = response;
         console.log("withdrawnList response",this.withdrawnList)
-        this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList).reverse();
+        //this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList).reverse();
+        this.fullWithdrawnList=this.sortWithdrawnByIdDesc(this.withdrawnList);
         console.log('full',this,this.fullWithdrawnList)
-        /* setTimeout(() => {*/
-          /*this.cd.detach();*/
-        /*}, 10000); // 10000 ms = 10 segundos*/
       }
     });
   }
@@ -131,6 +131,13 @@ export class GetallPage implements OnInit {
       return dateA - dateB;
     });
   }
+
+  sortWithdrawnByIdDesc(withdrawnList: any[]): any[] {
+    return withdrawnList.sort((a, b) => {
+      return b.id - a.id;
+    });
+  }
+
 
   trackByGroup(index: number, group: any): string {
     return group.refdate + '-' + index;
@@ -331,16 +338,6 @@ initDefaultRange(days: number) {
     });
   }
 
-  /*  patch(withdrawn:any,page:any){*/
-    /*console.log("item to patch",withdrawn);*/
-    /*console.log("ruta",page);*/
-    /*const pageRoute=`/app/tabs/replenishment-${page}-patch`;*/
-    /*console.log("pageRoute",pageRoute);*/
-    /*this.router.navigate([pageRoute], { state:*/
-                         /*{ item: withdrawn,*/
-                    /*list: this.withdrawnList*/
-    /*} });*/
-  /*} */
 
  async  cloneWithdrawn(item: any) {
     console.log("item pasado:", item);
