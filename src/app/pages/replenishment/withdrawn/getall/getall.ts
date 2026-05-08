@@ -114,7 +114,7 @@ export class GetallPage implements OnInit {
     this.withdrawnService.getIntervalByAdate(since, until).subscribe({
       next: response => {
         this.withdrawnList = response;
-        //console.log("withdrawnList response",this.withdrawnList)
+        console.log("withdrawnList response",this.withdrawnList)
         this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList).reverse();
         console.log('full',this,this.fullWithdrawnList)
         /* setTimeout(() => {*/
@@ -342,7 +342,7 @@ initDefaultRange(days: number) {
     /*} });*/
   /*} */
 
-  cloneWithdrawn(item: any) {
+ async  cloneWithdrawn(item: any) {
     console.log("item pasado:", item);
     //chatgpt => agregar al payload en data.twin el item.id
     const payload = this.buildClonePayload(item);
@@ -351,7 +351,8 @@ initDefaultRange(days: number) {
       next: (response) => {
         console.log("Clone creado", response);
         //chatgpt => hacer un patch a este "withdrawnItem" data.twin el que se creo
-        this.getAll();
+        this.selfPatch(item,response[0].id);
+        //this.getAll();
       },
       error: (err) => {
         console.error("Error al clonar", err);
@@ -363,14 +364,11 @@ initDefaultRange(days: number) {
   buildClonePayload(item: any): any {
     //  Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)
     const d = item?.data?.data ?? item?.data ?? {};
-
     return {
       ext_id: null,
-
       // ⚠️ Puedes cambiar esto a new Date().toISOString() si quieres que sea "nuevo"
       created_at: item.created_at,
       updated_at: item.created_at,
-
       data: {
         // RESET
         kg: 0,
@@ -379,7 +377,7 @@ initDefaultRange(days: number) {
         date: d.date ?? null,
         name: 0,
         seal: [],
-        twin: 0,
+        twin: item.id,
         price: 0,
         imgin: null,
         shipin: 0,
@@ -387,32 +385,40 @@ initDefaultRange(days: number) {
         tripin: "",
         vendor: 0,
         datein: "",
-
         // MANTENER w*
         wnet: d.wnet ?? 0,
         wtare: d.wtare ?? 0,
         wgross: d.wgross ?? 0,
         wticket: d.wticket ?? 0,
-
         // MANTENER *out
         imgout: d.imgout ?? null,
         dateout: d.dateout ?? null,
         shipout: d.shipout ?? 0,
         tripout: d.tripout ?? "",
         deliveryout: d.deliveryout ?? 0,
-
         // OTROS
         imgscale: d.imgscale ?? null,
         rotogate: 0,
         deliveryin: 0
       },
-
       refdate: null,
-      state: "pending"
+      state: "pre-in"
     };
   }
 
-
+  async selfPatch(item:any,twin:number) {
+    item.data.twin=twin;
+    console.log("item to selfpatch ",item)
+    console.log("d to selfpatch ",item)
+    this.withdrawnService.patch(item.id,item.data).subscribe({
+      next: (response) => {
+        console.log("Withdrawn selfpatch response", response);
+      },
+      error: (err) => {
+        console.error("Withdrawn selfpatch error", err);
+      }
+    });
+  }
 
   searchTerm: string = ''; 
 
@@ -426,12 +432,10 @@ initDefaultRange(days: number) {
     );
   }
 
-
-
   private buildCcoMap(ccoList: Cco[]): CcoMap {
     const map: CcoMap = {};
     ccoList.forEach((cco, index) => {
-      const id = Number(cco.id); // 🔥 NORMALIZAR
+      const id = Number(cco.id); // NORMALIZAR
       //console.log(`➡️ cco[${index}] id(normalizado) =>`, id, typeof id);
       map[id] = {
         name: cco.data?.name ?? 'N/A',
@@ -463,11 +467,8 @@ initDefaultRange(days: number) {
 
     this.filteredList.slice(0, 10).forEach((item, i) => {
       const ccoId = item?.data?.name;
-
       //console.log(`🔎 item[${i}] ccoId =>`, ccoId, 'tipo:', typeof ccoId);
-
       const cco = this.ccoMap[ccoId];
-
       if (!cco) {
         console.warn(`❌ NO MATCH para ccoId=${ccoId}`, {
           availableKeys: Object.keys(this.ccoMap)
@@ -477,8 +478,6 @@ initDefaultRange(days: number) {
       }
     });
   }
-
-
 
 
 }
