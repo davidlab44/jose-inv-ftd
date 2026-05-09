@@ -29,7 +29,6 @@ import { OcrService } from '../../../../services/ai/ocr.service';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
-import { Cco,CcoMap } from '../../../../interfaces/cco';
 
 @Component({
   selector: 'page-patch',
@@ -37,15 +36,6 @@ import { Cco,CcoMap } from '../../../../interfaces/cco';
   styleUrls: ['./patch.scss'],
 })
 export class PatchPage {
-
- withdrawnList: any[] = [];
-  fullWithdrawnList: any[] = [];
-  dayRange = {
-    lower: 1,
-    upper: this.getTodayDayOfYear()
-  };
-  startDay = 1;
-  endDay = this.dayRange.upper;
 
   ios: boolean;
   hasOwner:boolean=false;
@@ -117,35 +107,26 @@ export class PatchPage {
   ngOnInit() {
     this.form = this.fb.group({
       id: [this.movement?.id ?? null],
-      container: [this.movement?.container ?? 'NA'],
-      container2: [this.movement?.container2 ?? 'NA'],
       wticket: [this.movement?.data?.wticket ?? 0], 
       wgross: [this.movement?.data?.wgross ?? 0], 
       wtare: [this.movement?.data?.wtare ?? 0], 
       wnet: [this.movement?.data?.wnet ?? 0], 
     });
-    this.initDefaultRange(4);
-    this.loadCcos();
   }
 
   ionViewWillEnter() {
-    this.form.patchValue({
+    this.form = this.fb.group({
       id: [this.movement?.id ?? null],
       wticket: [this.movement?.data?.wticket ?? 0], 
-      container: [this.movement?.data?.container ?? 'NA'], 
-      container2: [this.movement?.data?.container2 ?? 'NA'], 
       wgross: [this.movement?.data?.wgross ?? 0], 
       wtare: [this.movement?.data?.wtare ?? 0], 
       wnet: [this.movement?.data?.wnet ?? 0], 
     });
-    this.getAll();
   }
 
   resetForm(): void {
     this.form.reset({
       id: 0,
-      container: 0,
-      container2: 0,
       wticket: 0,
       wgross: 0,
       wtare: 0,
@@ -166,7 +147,14 @@ export class PatchPage {
      
   }
 
+  prodrexList:any[]=[];
   ionViewDidEnter() {
+    this.prodrexService.getAll().subscribe({
+      next: response=>{
+        this.prodrexList=response;
+        console.log("getProdRexList",response)
+      }
+    })
   }
 
   searchProducts(hash: string, productList: any[]): any[] {
@@ -245,7 +233,7 @@ export class PatchPage {
     url$.subscribe({
       next: (url) => {
         this.uploadedUrl = url;
-        //  lanzar OCR cuando la URL esté disponible
+        // 👇 lanzar OCR cuando la URL esté disponible
         this.launchOcr(url);
       },
       error: (err) => {
@@ -259,35 +247,29 @@ export class PatchPage {
   }
 
   ocrResponse:any;
+
   launchOcr(url: string) {
     this.ocrService.postScale(url).subscribe({
       next: (res) => {
         this.ocrResponse = res;
         console.log('OCR Response:', res);
-        //  PASO 1: resolver IDs de contenedores
-        this.resolveContainersFromOCR();
-        //  PASO 2: opcional → setear en movement (debug / trazabilidad)
-        this.movement.data.container_id = this.container1;
-        this.movement.data.container2_id = this.container2;
         const normalizedDate = this.normalizeOCRDate(res?.data?.date);
+        const seals = res?.data?.seal ?? [];
+        // actualizar movement
         this.movement.data = {
           ...this.movement.data,
-          container: res?.data?.container ?? '',
-          container2: res?.data?.container2 ?? '',
           wticket: Number(res?.data?.wticket ?? 0),
           wgross: Number(res?.data?.wgross ?? 0),
           wtare: Number(res?.data?.wtare ?? 0),
           wnet: Number(res?.data?.wnet ?? 0),
         };
         this.form.patchValue({
-          container: res?.data?.container ?? '',
-          container2: res?.data?.container2 ?? '',
           wticket: Number(res?.data?.wticket ?? 0),
           wgross: Number(res?.data?.wgross ?? 0),
           wtare: Number(res?.data?.wtare ?? 0),
           wnet: Number(res?.data?.wnet ?? 0),
         });
-        //console.log("movement actualizado:", this.movement);
+        console.log("movement actualizado:", this.movement);
       },
       error: (err) => {
         console.error('Error OCR:', err);
@@ -299,13 +281,28 @@ export class PatchPage {
     const f = this.form.value;
     this.movement.data = {
       ...this.movement.data,
-      container: f.container ?? 'no-existe',
-      container2: f.container2 ?? 'no-existe',
       wticket: Number(f.wticket ?? 0),
       wgross: Number(f.wgross ?? 0),
       wtare: Number(f.wtare ?? 0),
       wnet: Number(f.wnet ?? 0),
     };
+  }
+
+  patch() {
+    // 1️⃣ tomar lo editado en el form
+    this.updateMovementFromForm();
+    this.movement.data.imgscale = this.uploadedUrl;
+    // 2️⃣ enviar SOLO data
+    const payload = { ...this.movement.data };
+    console.log("payload to patch =>", payload);
+    this.withdrawnService.patch(this.movement.id, payload).subscribe({
+      next: (response) => {
+        console.log("Withdrawn patch response", response);
+      },
+      error: (err) => {
+        console.error("Withdrawn patch error", err);
+      }
+    });
   }
 
   normalizeOCRDate(dateStr: string): string | null {
@@ -323,244 +320,6 @@ export class PatchPage {
     const ss = String(date.getSeconds()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
-
-  normalizeContainer(container: string): string | null {
-    if (!container || typeof container !== 'string') return null;
-    const clean = container.trim().toUpperCase();
-    if (clean.length !== 11) return null;
-    const prefix = clean.slice(0, 4);   // TCSU
-    const numbers = clean.slice(4);     // 5000141
-    if (!/^\d{7}$/.test(numbers)) return null;
-    const formatted = `${prefix} ${numbers.slice(0, 6)}-${numbers.slice(6)}`;
-    return formatted; // TCSU 500014-1
-  }
-
-  findCcoIdByContainer(containerFormatted: string): number {
-    if (!containerFormatted) return 0;
-    const match = this.ccoList.find(cco => {
-      const name = (cco?.data?.name || '').toUpperCase().trim();
-      return name === containerFormatted;
-    });
-    return match ? Number(match.id) : 0;
-  }
-
-  container1:number=0;
-  container2:number=0;
-  resolveContainersFromOCR(): void {
-    console.log("==== RESOLVE CONTAINERS START ====");
-    const c1_raw = this.ocrResponse?.data?.container;
-    const c2_raw = this.ocrResponse?.data?.container2;
-    console.log("[OCR RAW]", { c1_raw, c2_raw });
-    // 🔧 normalizar
-    const c1_fmt = this.normalizeContainer(c1_raw);
-    const c2_fmt = this.normalizeContainer(c2_raw);
-    console.log("[FORMATTED]", { c1_fmt, c2_fmt });
-    // 🔍 buscar IDs
-    this.container1 = c1_fmt ? this.findCcoIdByContainer(c1_fmt) : 0;
-    this.container2 = c2_fmt ? this.findCcoIdByContainer(c2_fmt) : 0;
-    console.log("[RESULT IDS]", {
-      container1: this.container1,
-      container2: this.container2
-    });
-    console.log("==== RESOLVE CONTAINERS END ====");
-  }
-
-  getTodayDayOfYear(): number {
-    const today = new Date();
-    const start = new Date(today.getFullYear(), 0, 0);
-    const diff =
-      today.getTime() -
-      start.getTime() +
-      (start.getTimezoneOffset() - today.getTimezoneOffset()) * 60 * 1000;
-    return Math.floor(diff / (1000 * 60 * 60 * 24));
-  }
-
-  stateFilteredList:any[]=[];
-  getAll() {
-    //const since = this.dayOfYearToISO(this.startDay);
-    const since = '2026-04-24T05:00:00'; 
-    const until = this.dayOfYearToISO(this.endDay, true);
-    /*console.log("[INPUT] startDay:", this.startDay);*/
-    /*console.log("[INPUT] endDay:", this.endDay);*/
-    /*console.log("[CALCULATED] since:", since);*/
-    /*console.log("[CALCULATED] until:", until);*/
-    this.withdrawnService.getIntervalByAdate(since, until).subscribe({
-      next: response => {
-        this.withdrawnList = response;
-        //console.log('withdrawnList',response)
-        this.stateFilteredList=this.getInAndPlexaStateMovements(this.withdrawnList);
-        console.log("withdrawnList response",this.stateFilteredList)
-      }
-    });
-  }
-
-  getInAndPlexaStateMovements(withdrawnList: any[]) {
-    if (!Array.isArray(withdrawnList)) return [];
-    return withdrawnList.filter(item => {
-      const state = (item?.state || '').toString().trim().toLowerCase();
-      return state === 'in' || state === 'plexa';
-    });
-  }
-
-  dayOfYearToISO(day: number, endOfDay = false): string {
-    const year = 2026;
-    const date = new Date(year, 0);
-    date.setDate(day);
-    if (endOfDay) {
-      date.setHours(23, 59, 59, 999);
-    } else {
-      date.setHours(0, 0, 0, 0);
-    }
-    return date.toISOString().slice(0, 19);
-  }
-
-  initDefaultRange(days: number) {
-    const today = this.getTodayDayOfYear();
-    this.dayRange = {
-      lower: Math.max(1, today - days),
-      upper: today
-    };
-  }
-
-  ccoList: Cco[] = [];
-  ccoMap: CcoMap = {};
-
-  loadCcos() {
-    this.ccoService.getAll().subscribe({
-      next: (ccos) => {
-        this.ccoList = ccos;
-        this.ccoMap = this.buildCcoMap(ccos);
-        console.log(' ccoMap =>', this.ccoMap);
-        //console.log(' ccoMap keys =>', Object.keys(this.ccoMap));
-        //this.cd.markForCheck();
-        // debug cruzado
-        this.debugCcoMapping();
-      },
-      error: (err) => console.error('❌ Error loading ccos', err)
-    });
-  }
-
-
-  debugCcoMapping() {
-    //console.log(' DEBUG withdrawn -> ccoMap');
-    this.filteredList.slice(0, 10).forEach((item, i) => {
-      const ccoId = item?.data?.name;
-      //console.log(`🔎 item[${i}] ccoId =>`, ccoId, 'tipo:', typeof ccoId);
-      const cco = this.ccoMap[ccoId];
-      if (!cco) {
-        console.warn(` NO MATCH para ccoId=${ccoId}`, {
-          availableKeys: Object.keys(this.ccoMap)
-        });
-      } else {
-        console.log(` MATCH ccoId=${ccoId} =>`, cco);
-      }
-    });
-  }
-
-  searchTerm: string = ''; 
-  get filteredList() {
-    if (!this.searchTerm) return this.fullWithdrawnList;
-    const term = this.searchTerm.toLowerCase();
-    return this.fullWithdrawnList.filter(item =>
-      Object.values(item.data).some(val =>
-        String(val).toLowerCase().includes(term)
-      )
-    );
-  }
-
-  private buildCcoMap(ccoList: Cco[]): CcoMap {
-    const map: CcoMap = {};
-    ccoList.forEach((cco, index) => {
-      const id = Number(cco.id);
-      //console.log(` cco[${index}] id(normalizado) =>`, id, typeof id);
-      map[id] = {
-        name: cco.data?.name ?? 'N/A',
-        color: cco.data?.color ?? '#ccc'
-      };
-    });
-    return map;
-  }
-
-  joinTwins(): { current: any, twin: any | null } {
-    const c1 = Number(this.container1) || 0;
-    const c2 = Number(this.container2) || 0;
-    console.log("[JOIN] container1:", c1, "container2:", c2);
-    //  buscar registro actual
-    const current = this.stateFilteredList.find(item =>
-      Number(item?.data?.name) === c1
-    );
-    if (!current) {
-      console.warn("[JOIN] current NOT FOUND");
-      return { current: null, twin: null };
-    }
-    //  buscar twin
-    let twin = null;
-    if (c2 > 0) {
-      twin = this.stateFilteredList.find(item =>
-        Number(item?.data?.name) === c2
-      );
-    }
-    console.log("[JOIN RESULT]", { current, twin });
-    return { current, twin };
-  }
-
-  calculateDiff(): { updates: any[] } {
-    console.log("==== CALCULATE DIFF START ====");
-    const { current, twin } = this.joinTwins();
-    if (!current) return { updates: [] };
-    const kg1 = Number(current?.data?.kg) || 0;
-    const wnet = Number(this.ocrResponse?.data?.wnet) || 0;
-    let updates: any[] = [];
-    //  SIN twin
-    if (!twin) {
-      const diff = kg1 - wnet;
-      current.data.diff = diff;
-      current.data.twin = 0;
-      console.log("[NO TWIN] diff:", diff);
-      updates.push(current);
-      return { updates };
-    }
-    //  CON twin
-    const kg2 = Number(twin?.data?.kg) || 0;
-    const totalKg = kg1 + kg2;
-    const diff = totalKg - wnet;
-    console.log("[WITH TWIN]", { kg1, kg2, totalKg, wnet, diff });
-    // asignar en ambos
-    current.data.diff = diff;
-    twin.data.diff = diff;
-    current.data.twin = twin.id;
-    twin.data.twin = current.id;
-    updates.push(current, twin);
-    return { updates };
-  }
-
-  patch() {
-    this.updateMovementFromForm();
-    this.movement.data.imgscale = this.uploadedUrl;
-    const { updates } = this.calculateDiff();
-    if (!updates.length) {
-      console.warn("[PATCH] No updates");
-      return;
-    }
-    console.log("[PATCH UPDATES]", updates);
-    //  múltiples requests
-    const requests = updates.map(item => {
-      const payload = { ...item.data };
-      console.log("[PATCH ITEM]", item.id, payload);
-      return this.withdrawnService.patch(item.id, payload);
-    });
-    // ejecutar en paralelo
-    Promise.all(requests.map(r => r.toPromise()))
-      .then(responses => {
-        console.log("[PATCH OK]", responses);
-        this.utilService.presentToast("Actualizado correctamente","success",1000);
-        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'], { replaceUrl: true });
-      })
-      .catch(err => {
-        console.error("[PATCH ERROR]", err);
-      });
-  }
-
 
 
 }

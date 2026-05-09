@@ -263,7 +263,9 @@ export class AssetSupplyPostPage {
       ...withdrawn.data,
       ...formData,
     };
+    withdrawn.data.shipin=this.shipId
     const payload = withdrawn.data;
+    
     console.log("payload to post =>", payload);
     this.withdrawnService.post(payload).subscribe({
       next: (response) => {
@@ -486,6 +488,7 @@ normalize(v: string): string {
     const selectedShip = this.idMap[selectedId];
     console.log('ID seleccionado =>', selectedId);
     console.log('Ship seleccionado =>', selectedShip);
+    this.shipId=selectedId;
   }
   
   onSearch(text: string) { 

@@ -41,24 +41,16 @@
         </ion-card-header>
         <ion-card-content>
           <h6>Imagen</h6>
-          <img [src]="uploadedUrl" />
+          <img [src]="bucket+uploadedUrl" />
           <p>
             imgUrl:
-            <a [href]="uploadedUrl" target="_blank">
+            <a [href]="bucket+uploadedUrl" target="_blank">
               {{ bucket+uploadedUrl }}
             </a>
           </p>
           <!--<p>{{ uploadedUrl }}</p>-->
         </ion-card-content>
       </ion-card>
-          <ion-item>
-          <ion-label position="floating">Container:</ion-label>
-            <ion-input formControlName="container"></ion-input>
-        </ion-item>       
-        <ion-item>
-          <ion-label position="floating">Container2:</ion-label>
-            <ion-input formControlName="container2"></ion-input>
-        </ion-item>       
         <ion-item>
           <ion-label position="floating">Ticket Nro: <span style="font-size:xx-small;" > (sin comas ni puntos)</span> </ion-label>
             <ion-input type="number" formControlName="wticket"></ion-input>

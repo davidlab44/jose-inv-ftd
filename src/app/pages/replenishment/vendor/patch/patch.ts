@@ -383,6 +383,7 @@ export class PatchPage {
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) {
       console.warn("Fecha OCR inválida:", dateStr);
+      //imported: this.movement?.data?.id_replenishment_product ?? 0,
       return null;
     }
     const yyyy = date.getFullYear();
