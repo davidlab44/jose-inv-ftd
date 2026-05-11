@@ -41,6 +41,9 @@ export function createDefaultWithdrawn(): Withdrawn {
 export const defaultWithdrawnData: WithdrawnData = {
   kg: 0,
   img: '',
+  imgin: '',
+  imgout: '',
+  imgscale: '',
   psi: 0,
   date: '',
   name: 0,
@@ -68,6 +71,9 @@ export const defaultWithdrawnData: WithdrawnData = {
 export interface WithdrawnData {
   kg: number;
   img: string;
+  imgin: string;
+  imgout: string;
+  imgscale: string;
   psi: number;
   date: string;
   name: number;

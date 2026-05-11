@@ -264,8 +264,10 @@ export class AssetSupplyPostPage {
       ...formData,
     };
     withdrawn.data.shipin=this.shipId
+    withdrawn.data.imgin=this.uploadedUrl;
     const payload = withdrawn.data;
-    
+  
+     
     console.log("payload to post =>", payload);
     this.withdrawnService.post(payload).subscribe({
       next: (response) => {

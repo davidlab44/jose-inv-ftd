@@ -93,38 +93,30 @@
 <!-- ================= HEADER COLUMNAS ================= -->
 
 <ion-grid class="withdrawn-header">
-
   <ion-row class="ion-align-items-center header-row">
-
-   <ion-col size="1" class="header-col">
-      <ion-label>F.creacion</ion-label>
+  <ion-col size="1" class="header-col">
+     <ion-label>F.creacion</ion-label>
+  </ion-col>
+  <ion-col size="1" class="header-col">
+      <ion-label>Entrega:</ion-label>
    </ion-col>
-
    <ion-col size="1" class="header-col">
       <ion-label>F.vacio</ion-label>
     </ion-col>
-
     <ion-col size="2" class="header-col">
       <ion-label>Isotanq.</ion-label>
     </ion-col>
-
     <ion-col size="1" class="header-col">
       <ion-label>Tkt.</ion-label>
     </ion-col>
-
     <ion-col size="1" class="header-col">
       <ion-label>kg</ion-label>
     </ion-col>
-
-    <ion-col size="6" class="header-col">
+    <ion-col size="5" class="header-col">
       <ion-label></ion-label>
     </ion-col>
-
   </ion-row>
-
 </ion-grid>
-
-
 
 <!-- LISTA DE REGISTROS -->
 <ng-container *ngFor="let item of fullWithdrawnList">
@@ -158,18 +150,17 @@
         <!--{{ getCcoNameById(p?.data?.name) }}-->
       <!--</ion-col>-->
 
-      <!-- DATE -->
-      <ion-col size="1">
-        {{ p.created_at | date:'dd/MM/yyyy' }}
-      </ion-col>
+     <!--<ion-col size="1">-->
+        <!--{{ p.created_at | date:'dd/MM/yyyy' }}-->
+     <!--</ion-col>-->
 
-      <!-- DATE -->
       <ion-col size="1">
         {{ p.data.datein | date:'dd/MM/yyyy' }}
       </ion-col>
 
-
-
+      <ion-col size="1">
+        {{ p.data.deliveryin }}
+      </ion-col>
 
       <!-- ISOTANQ -->
       <ion-col size="2" [style.background]="ccoMap[+p.data.name]?.color || '#eee'"> {{ ccoMap[+p.data.name]?.name || 'N/A' }} </ion-col>
