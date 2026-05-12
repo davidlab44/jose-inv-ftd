@@ -129,15 +129,15 @@ export class PatchPage {
   resetForm(): void {
     this.form.reset({
       id: 0,
-      deliveryin: 0,
-      datein: 0,
+      deliveryin: '',
+      datein: '',
       tripin: '',
-      shipin: 0,
+      shipin: '',
     });
     this.uploadProgress = 0; 
     this.uploadedUrl= null;
     this.uploading = false;
-  }
+  }n
 
   slideOpts = {
     initialSlide: 0,
@@ -270,13 +270,13 @@ export class PatchPage {
         const normalizedDate = this.normalizeOCRDate(res?.data?.date);
         this.movement.data = {
           ...this.movement.data,
-          deliveryin: this.parseNumber(res?.data?.deliveryin ?? 0),
+          deliveryin: res?.data?.deliveryin ?? '',
           datein: res?.data?.datein ?? '',
           tripin: res?.data?.tripin ?? '',
           //shipin: this.shipNombreEsp,
         };
         this.form.patchValue({
-          deliveryin: this.parseNumber(res?.data?.deliveryin ?? 0),
+          deliveryin: res?.data?.deliveryin ?? '',
           datein: res?.data?.datein ?? '',
           tripin: res?.data?.tripin ?? '',
           //shipin: this.shipNombreEsp,
@@ -293,7 +293,7 @@ export class PatchPage {
     const f = this.form.value;
     this.movement.data = {
       ...this.movement.data,
-      deliveryin: Number(f.deliveryin ?? ''),
+      deliveryin: f.deliveryin ?? '',
       datein: f.datein ?? '',
       tripin: f.tripin ?? '',
       //shipin: Number(f.shipin ?? 0),

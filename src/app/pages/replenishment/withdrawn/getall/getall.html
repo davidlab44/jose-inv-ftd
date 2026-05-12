@@ -95,7 +95,7 @@
 <ion-grid class="withdrawn-header">
   <ion-row class="ion-align-items-center header-row">
   <ion-col size="1" class="header-col">
-     <ion-label>F.creacion</ion-label>
+     <ion-label></ion-label>
   </ion-col>
   <ion-col size="1" class="header-col">
       <ion-label>Entrega:</ion-label>
@@ -135,24 +135,9 @@
       class="withdrawn-row ion-align-items-center"
       [ngClass]="{ 'row-erp': p.state === 'erp' }">
 
-       <!--<td>{{ item.data.date | date:'dd/MM/yyyy' }}</td>-->
-
-      <!-- FECHA -->
-<!--      <ion-col size="2">-->
-        <!--{{p.id}} |  {{ formatFechaLatam(p.data.date) }}-->
-      <!--</ion-col>-->
-
-      <!-- ISOTANQUE -->
-<!--      <ion-col-->
-        <!--size="2"-->
-        <!--[ngStyle]="{ 'background-color': getCcoColorById(p?.data?.name) }"-->
-        <!--class="isotank-col">-->
-        <!--{{ getCcoNameById(p?.data?.name) }}-->
-      <!--</ion-col>-->
-
-     <!--<ion-col size="1">-->
-        <!--{{ p.created_at | date:'dd/MM/yyyy' }}-->
-     <!--</ion-col>-->
+      <ion-col size="1">
+        {{ p.id }}
+      </ion-col>
 
       <ion-col size="1">
         {{ p.data.datein | date:'dd/MM/yyyy' }}
@@ -173,28 +158,6 @@
       <!-- KG -->
       <ion-col size="1">
         {{ p.data.kg }}
-      </ion-col>
-
-      <!--[> VENDOR <]-->
-      <!--<ion-col size="1">-->
-        <!--<span *ngIf="p.data.vendor==1">Plexa</span>-->
-        <!--<span *ngIf="p.data.vendor==2">Plexa port</span>-->
-        <!--<span *ngIf="p.data.vendor==3">Otro</span>-->
-      <!--</ion-col>-->
-
-      <!--[> BASCULA <]-->
-      <!--<ion-col size="2">-->
-        <!--{{ p.data.wnet }}-->
-      <!--</ion-col>-->
-
-      <!--[> DIF <]-->
-      <!--<ion-col-->
-        <!--size="1"-->
-        <!--[ngClass]="p.diff >= 500 ? 'diff-warning' : 'diff-normal'">-->
-        <!--{{ p.diff }}-->
-      <!--</ion-col>-->
-
-      <ion-col size="1" class="actions-col">                                                                                                                                        
       </ion-col>
 
       <ion-col size="1" class="actions-col">
@@ -259,7 +222,6 @@
     </ion-row>
   </ion-grid>
 
-
 <!--<ion-fab vertical="bottom" horizontal="end" slot="fixed">-->
   <!--<ion-fab-button-->
     <!--class="fab-clean"-->
@@ -267,7 +229,6 @@
     <!--<ion-icon name="add"></ion-icon>-->
   <!--</ion-fab-button>-->
 <!--</ion-fab>-->
-
 
 </ng-template>
 

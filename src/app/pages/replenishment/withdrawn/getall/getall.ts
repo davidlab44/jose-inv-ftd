@@ -138,7 +138,6 @@ export class GetallPage implements OnInit {
     });
   }
 
-
   trackByGroup(index: number, group: any): string {
     return group.refdate + '-' + index;
   }
@@ -349,7 +348,7 @@ initDefaultRange(days: number) {
         console.log("Clone creado", response);
         //chatgpt => hacer un patch a este "withdrawnItem" data.twin el que se creo
         this.selfPatch(item,response[0].id);
-        //this.getAll();
+        this.getAll();
       },
       error: (err) => {
         console.error("Error al clonar", err);
