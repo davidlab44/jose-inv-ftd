@@ -312,6 +312,8 @@ export class PatchPage {
       next: (res) => {
         this.ocrResponse = res;
         this.ccoName="TCSU "+res?.data?.isotanq;
+        //tengo que sacar el id , hay un metodo para eso 
+        //
         console.log('OCR Response:', res);
         const normalizedDate = this.normalizeOCRDate(res?.data?.date);
         const seals = res?.data?.seal ?? [];
@@ -362,7 +364,7 @@ export class PatchPage {
     console.log("patch price",this.form.value.price);
     this.updateMovementFromForm();
     this.movement.data.img = this.uploadedUrl;
-    this.movement.data.name = this.cco.id;
+    this.movement.data.name = this.ccoId;
     this.movement.data.price = Number(this.form.value.price) || 0;
     const payload = this.movement.data;
     console.log("payload to patch =>", payload);
@@ -408,6 +410,7 @@ export class PatchPage {
   }
 
   ccoName: string = '';   // nombre a mostrar
+  ccoId: number = 0;   // id cco seleccionado a mostrar
 
   resolveInitialCco() {
     //validar que haya lista
@@ -423,6 +426,7 @@ export class PatchPage {
     if (found) {
       this.cco = found;
       this.ccoName = found.data.name;
+      this.ccoId = found.data.id;
       console.log('CCO encontrado:', this.ccoName);
     } else {
       console.warn('CCO no encontrado para id:', ccoId);
