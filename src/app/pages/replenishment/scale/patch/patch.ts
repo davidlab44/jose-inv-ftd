@@ -298,6 +298,14 @@ export class PatchPage {
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
+        /*this.withdrawnService.getIntervalById(this.movement.id).subscribe({*/
+          /*next:*/
+        /*})   */
+
+        //traer el registro twin
+        //crea un metodo para:
+          //consultar si el twin tiene info en wnet
+          //si no tiene editarlo y patch en otro metodo para evitar recursividad
       },
       error: (err) => {
         console.error("Withdrawn patch error", err);

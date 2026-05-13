@@ -175,24 +175,11 @@ export class PatchPage {
     speed: 300
   };
 
-  updateSchedule(){
-     
-  }
+  updateSchedule(){}
 
   ccoList:any[]=[];
   ionViewDidEnter() {
- 
-  this.ccoService.getAll().subscribe({
-      next: (response: any[]) => {
-        console.log('cco List', response);
-        this.ccoList = response;
-        //this.filteredList = response; // inicializar
-        this.resolveInitialCco();
-      },
-      error: (err: any) => {
-        console.error('Error cargando CCO', err);
-      }
-    });
+    this.getAllCco();
     this.getAllPrices();
   }
 
@@ -306,14 +293,13 @@ export class PatchPage {
   }
 
   ocrResponse:any;
-
   launchOcr(url: string) {
     this.ocrService.postVendor(url).subscribe({
       next: (res) => {
         this.ocrResponse = res;
         this.ccoName="TCSU "+res?.data?.isotanq;
         //tengo que sacar el id , hay un metodo para eso 
-        //
+        //buscar ese metodo , ya existe ya debe existir  
         console.log('OCR Response:', res);
         const normalizedDate = this.normalizeOCRDate(res?.data?.date);
         const seals = res?.data?.seal ?? [];
@@ -351,7 +337,7 @@ export class PatchPage {
     this.movement.data = {
       ...this.movement.data,
       date: f.fecha,
-      name: f.name,
+      name: this.ccoName,
       ticket: f.ticket,
       kg: Number(f.kg),
       psi: Number(f.psi),
@@ -363,10 +349,14 @@ export class PatchPage {
   patch() {
     console.log("patch price",this.form.value.price);
     this.updateMovementFromForm();
+    //console.log("2");
     this.movement.data.img = this.uploadedUrl;
-    this.movement.data.name = this.ccoId;
+    //console.log("3");
     this.movement.data.price = Number(this.form.value.price) || 0;
-    const payload = this.movement.data;
+    //console.log("4");
+    let payload = this.movement.data;
+    //console.log("5");
+    payload.name = this.ccoId;
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
@@ -398,40 +388,56 @@ export class PatchPage {
   }
 
   filteredList: any[] = [];     //lista filtrada
-  
+
+  getAllCco(){
+    this.ccoService.getAll().subscribe({
+      next: (response: any[]) => {
+        console.log('cco List', response);
+        this.ccoList = response;
+        //this.filteredList = response; // inicializar
+        //this.resolveInitialCco();
+      },
+      error: (err: any) => {
+        console.error('Error cargando CCO', err);
+      }
+    });
+  }
+  ccoName: string = '';   // nombre a mostrar
+  ccoId: number = 0;   // id cco seleccionado a mostrar
   selectCco(item: any) {
     this.cco = item;
     this.ccoName = item.data.name;
+    this.ccoId = item.id;
     //actualizar movement (muy importante en tu flujo)
     if (this.movement?.data) {
       this.movement.data.name = item.id;
     }
-    console.log('CCO seleccionado:', this.ccoName);
+    console.log('item pasado:', item);
+    console.log('cco name:', this.ccoName);
+    console.log('cco id:', this.ccoId);
   }
-
-  ccoName: string = '';   // nombre a mostrar
-  ccoId: number = 0;   // id cco seleccionado a mostrar
-
-  resolveInitialCco() {
-    //validar que haya lista
-    if (!this.ccoList || this.ccoList.length === 0) return;
-    //obtener ID desde router
-    const ccoId = this.movement?.data?.name;
-    if (!ccoId) {
-      console.warn('No hay ccoId en movement');
-      return;
-    }
-    //buscar en lista
-    const found = this.ccoList.find(item => item.id == ccoId);
-    if (found) {
-      this.cco = found;
-      this.ccoName = found.data.name;
-      this.ccoId = found.data.id;
-      console.log('CCO encontrado:', this.ccoName);
-    } else {
-      console.warn('CCO no encontrado para id:', ccoId);
-    }
-  }
+  /*resolveInitialCco() {*/
+  
+    /*console.log("resolve initial cco")*/
+    /*//validar que haya lista*/
+    /*if (!this.ccoList || this.ccoList.length === 0) return;*/
+    /*//obtener ID desde router*/
+    /*const ccoId = this.movement?.data?.name;*/
+    /*if (!ccoId) {*/
+      /*console.warn('No hay ccoId en movement');*/
+      /*return;*/
+    /*}*/
+    /*//buscar en lista*/
+    /*const found = this.ccoList.find(item => item.id == ccoId);*/
+    /*if (found) {*/
+      /*this.cco = found;*/
+      /*this.ccoName = found.data.name;*/
+      /*this.ccoId = found.data.id;*/
+      /*console.log('CCO encontrado:', this.ccoName);*/
+    /*} else {*/
+      /*console.warn('CCO no encontrado para id:', ccoId);*/
+    /*}*/
+  /*}*/
 
   isImportedGlp(ev: any) {
     const checked = ev.detail.checked;
@@ -451,7 +457,6 @@ export class PatchPage {
       }
     });
   }
-
   getMaxIdItem(items: any[]) {
     const filtered = items.filter(i => i.data?.id_replenishment_product === 1);
     if (!filtered.length) return;
@@ -467,7 +472,6 @@ export class PatchPage {
       });
     }
   }
-
   getMaxImportedItem(items: any[]) {
     const filtered = items.filter(i => i.data?.id_replenishment_product === 2);
     if (!filtered.length) return;

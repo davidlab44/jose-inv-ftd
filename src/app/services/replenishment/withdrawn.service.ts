@@ -17,6 +17,12 @@ export class WithdrawnService {
   getAll(): Observable<any[]> {   
     return this.http.get<any[]>(`${this.apiUrl}/${this.model}`);
   }   
+  
+  getById(id: number): Observable<any> {
+    const url = `${this.apiUrl}/${this.apiUrl}?id=eq.${id}`;
+    return this.http.get<any[]>(url);
+  }
+
 
   getInterval(since: string, until: string): Observable<any[]> {
     const params = [
