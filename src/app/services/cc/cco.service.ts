@@ -7,6 +7,21 @@ import { BehaviorSubject, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 
+export interface Cco {
+  id: number;
+  data: {
+    name?: string;
+    color?: string;
+  };
+}
+
+export interface CcoMap {
+  [key: number]: {
+    name: string;
+    color: string;
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -27,7 +42,6 @@ export class CcoService {
       `created_at=gte.${since}`,
       `created_at=lte.${until}`
     ].join('&');
-
     return this.http
       .get<any[]>(`${this.apiUrl}/${this.model}?${params}`)
       .pipe(
@@ -40,7 +54,6 @@ export class CcoService {
       `data->>date=gte.${since}`,
       `data->>date=lte.${until}`
     ].join('&');
-
     return this.http
       .get<any[]>(`${this.apiUrl}/${this.model}?${params}`)
       .pipe(
@@ -81,6 +94,88 @@ export class CcoService {
     });
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+  ccoList: Cco[] = [];
+  ccoMap: CcoMap = {};
+
+  load(): Observable<CcoMap> {
+    return this.getAll().pipe(
+      map((ccos) => {
+        this.ccoList = ccos;
+        const mapData: CcoMap = {};
+        ccos.forEach((cco, index) => {
+          const id = Number(cco.id);
+          console.log(
+            '➡️ cco[' + index + '] id(normalizado) =>',
+            id,
+            typeof id
+          );
+          mapData[id] = {
+            name: cco.data?.name ?? 'N/A',
+            color: cco.data?.color ?? '#ccc'
+          };
+        });
+        this.ccoMap = mapData;
+        console.log('ccoMap =>', this.ccoMap);
+        console.log('ccoMap keys =>', Object.keys(this.ccoMap));
+        return this.ccoMap;
+      })
+    );
+  }
+
+  getMap(): CcoMap {
+    return this.ccoMap;
+  }
+
+  getById(id: number | string) {
+    return this.ccoMap[Number(id)];
+  }
+
+  getName(id: number | string): string {
+    return this.ccoMap[Number(id)]?.name || 'N/A';
+  }
+
+  getColor(id: number | string): string {
+    return this.ccoMap[Number(id)]?.color || '#ccc';
+  }
+
+  debugMapping(withdrawnList: any[]) {
+    console.log(' DEBUG withdrawn -> ccoMap');
+    withdrawnList.slice(0, 10).forEach((item, i) => {
+      const ccoId = item?.data?.name;
+      console.log(
+        ' item[' + i + '] ccoId =>',
+        ccoId,
+        'tipo:',
+        typeof ccoId
+      );
+      const cco = this.ccoMap[Number(ccoId)];
+      if (!cco) {
+        console.warn(
+          ' NO MATCH para ccoId=' + ccoId,
+          {
+            availableKeys: Object.keys(this.ccoMap)
+          }
+        );
+      } else {
+        console.log(
+          ' MATCH ccoId=' + ccoId + ' =>',
+          cco
+        );
+      }
+    });
+  }
 
 
 
