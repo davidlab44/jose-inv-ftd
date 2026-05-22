@@ -129,6 +129,8 @@ export class CcoService {
         this.ccoMap = mapData;
         console.log('ccoMap =>', this.ccoMap);
         console.log('ccoMap keys =>', Object.keys(this.ccoMap));
+        const idObtenido= this.getIdByName("TCSU 500020-2");
+        console.log('is obtenido',idObtenido);
         return this.ccoMap;
       })
     );
@@ -177,6 +179,23 @@ export class CcoService {
     });
   }
 
+
+  getIdByName(name: string): number | null {
+    const target = (name || '').trim().toLowerCase();
+
+    for (const key in this.ccoMap) {
+
+      const item = this.ccoMap[Number(key)];
+
+      if (
+        item?.name &&
+        item.name.trim().toLowerCase() === target
+      )
+        return Number(key);
+    }
+
+    return null;
+  }
 
 
 }

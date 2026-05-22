@@ -103,7 +103,6 @@ export class AssetSupplyPostPage {
   hash:string='';
   table:any
   rexDocument:any;
-
   item:any;
   withdrawnList:any[]=[];
   ngOnInit() {
@@ -124,7 +123,6 @@ export class AssetSupplyPostPage {
     this.displayLast();
   }
 
-
   lastAsset:any;
   displayLast() {
     this.productService.getAll().subscribe({
@@ -136,11 +134,7 @@ export class AssetSupplyPostPage {
     });
   }
 
-  slideOpts = {
-    initialSlide: 0,
-    slidesPerView: 1,
-    speed: 300
-  };
+  slideOpts = {initialSlide: 0,slidesPerView: 1,speed: 300};
 
   updateSchedule(){}
 
@@ -310,6 +304,22 @@ export class AssetSupplyPostPage {
       }); 
    } 
 
+  getGlpPriceItemByDate(date:string,idReplenishmentProduct:number):any|null {
+    const target=new Date(date).getTime();
+    for(const item of this.glpPriceList) {
+      const data=item?.data;
+      if(!data)
+        continue;
+      if(data.id_replenishment_product!==idReplenishmentProduct)
+        continue;
+      const init=new Date(data.init).getTime();
+      const end=new Date(data.end).getTime();
+      if(target>=init && target<=end)
+        return item;
+    }
+    return null;
+  }
+
    glpAllocList: any[] = []; 
    glpAllocPureList: any[] = []; 
    loadGlpAlloc() {                
@@ -322,7 +332,6 @@ export class AssetSupplyPostPage {
           console.log("pure Alooc List",this.glpAllocPureList);
           const nacional = this.glpAllocPureList[0];
           const importado = this.glpAllocPureList[1];
-
         }, 
         error: (err) => {      
           console.error(' Error al cargar glp alloc:', err); 
@@ -355,7 +364,10 @@ export class AssetSupplyPostPage {
     };
     withdrawn.data.name = this.isotanq?.id ?? null;
     withdrawn.data.img = this.uploadedUrl;
-    withdrawn.data.id_replenishment_product = this.procesarRetiroGLP(this.glpAllocPureList,withdrawn.data.kg)
+    withdrawn.data.price=this.getGlpPriceItemByDate('2026-04-11T16:26:07',1);
+    withdrawn.data.id_replenishment_product=1;
+    //const nacional=this.getGlpPriceItemByDate('2026-04-11T16:26:07',1);
+    //withdrawn.data.id_replenishment_product = this.procesarRetiroGLP(this.glpAllocPureList,withdrawn.data.kg)
     const payload = withdrawn.data;
     console.log("payload to post =>", payload);
     this.withdrawnService.post(payload).subscribe({
@@ -432,50 +444,56 @@ export class AssetSupplyPostPage {
     return resultado;
   }
 
-  procesarRetiroGLP(glpAllocPureList: any[], kg: number): number {
-    if (!Array.isArray(glpAllocPureList) || glpAllocPureList.length === 0) {
-      console.log('⚠️ ERROR: lista glpAllocPureList inválida');
-      return 0;
-    }
+procesarRetiroGLP(){
 
-    const itemNacional = glpAllocPureList.find(
-      (g) => g.data.id_replenishment_product === 1
-    );
 
-    const itemImportado = glpAllocPureList.find(
-      (g) => g.data.id_replenishment_product === 2
-    );
-    if (!itemNacional) console.log('⚠️ ERROR: no existe item nacional');
-    if (!itemImportado) console.log('⚠️ ERROR: no existe item importado');
-    // ====== 1. NACIONAL ======
-    if (itemNacional) {
-      const resultadoNacional =
-        (itemNacional.data.acum + itemNacional.data.alloc) - kg;
-      itemNacional.data.acumnext = resultadoNacional;
-      if (resultadoNacional >= -10000) {
-        return 1; // ✅ usar nacional
-      }
-      console.log(
-        '⚠️ Nacional fuera de rango (< -10000), se pasa a importado',
-        resultadoNacional
-      );
-    }
-    // ====== 2. IMPORTADO ======
-    if (itemImportado) {
-      const resultadoImportado =
-        (itemImportado.data.acum + itemImportado.data.alloc) - kg;
-      itemImportado.data.acumnext = resultadoImportado;
-      if (resultadoImportado < -100000) {
-        console.log(
-          '⚠️ Importado fuera de rango (< -100000), pero se permite continuar',
-          resultadoImportado
-        );
-      }
-      return 2; // 🔥 SIEMPRE usar importado en fallback
-    }
-    console.log('⚠️ ERROR CRÍTICO: no existe fuente válida');
-    return 0;
-  }
+}
+
+
+  /*procesarRetiroGLP(glpAllocPureList: any[], kg: number): number {*/
+    /*if (!Array.isArray(glpAllocPureList) || glpAllocPureList.length === 0) {*/
+      /*console.log('⚠️ ERROR: lista glpAllocPureList inválida');*/
+      /*return 0;*/
+    /*}*/
+
+    /*const itemNacional = glpAllocPureList.find(*/
+      /*(g) => g.data.id_replenishment_product === 1*/
+    /*);*/
+
+    /*const itemImportado = glpAllocPureList.find(*/
+      /*(g) => g.data.id_replenishment_product === 2*/
+    /*);*/
+    /*if (!itemNacional) console.log('⚠️ ERROR: no existe item nacional');*/
+    /*if (!itemImportado) console.log('⚠️ ERROR: no existe item importado');*/
+    /*// ====== 1. NACIONAL ======*/
+    /*if (itemNacional) {*/
+      /*const resultadoNacional =*/
+        /*(itemNacional.data.acum + itemNacional.data.alloc) - kg;*/
+      /*itemNacional.data.acumnext = resultadoNacional;*/
+      /*if (resultadoNacional >= -10000) {*/
+        /*return 1; // ✅ usar nacional*/
+      /*}*/
+      /*console.log(*/
+        /*'⚠️ Nacional fuera de rango (< -10000), se pasa a importado',*/
+        /*resultadoNacional*/
+      /*);*/
+    /*}*/
+    /*// ====== 2. IMPORTADO ======*/
+    /*if (itemImportado) {*/
+      /*const resultadoImportado =*/
+        /*(itemImportado.data.acum + itemImportado.data.alloc) - kg;*/
+      /*itemImportado.data.acumnext = resultadoImportado;*/
+      /*if (resultadoImportado < -100000) {*/
+        /*console.log(*/
+          /*'⚠️ Importado fuera de rango (< -100000), pero se permite continuar',*/
+          /*resultadoImportado*/
+        /*);*/
+      /*}*/
+      /*return 2; // 🔥 SIEMPRE usar importado en fallback*/
+    /*}*/
+    /*console.log('⚠️ ERROR CRÍTICO: no existe fuente válida');*/
+    /*return 0;*/
+  /*}*/
 
   sumKgMesActual(withdrawnList: any[]): number {
     try {

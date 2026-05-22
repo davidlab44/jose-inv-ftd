@@ -29,18 +29,6 @@ import { ActivatedRoute,Router } from '@angular/router';
   styleUrls:['./getall.scss'],
 })
 
-/*@Component({*/
-  /*selector:'app-getall',*/
-  /*templateUrl:'getall.page.html',*/
-  /*styleUrls:['./getall.page.scss'],*/
-/*})*/
-
-/*@Component({*/
-  /*selector:'app-getall',*/
-  /*templateUrl:'getall.html',*/
-  /*styleUrls:['./getall.scss'],*/
-/*})*/
-
 export class GetallPage implements OnInit {
   @ViewChild(IonList,{ static:false }) ionList!:IonList;
   withdrawnList:any[]=[];
@@ -88,18 +76,18 @@ export class GetallPage implements OnInit {
     public toastCtrl:ToastController,
     public user:UserData,
     public config:Config,
-    private opportunityService:OpportunityService,
-    private posOrderService:PosOrderService,
-    private tableService:TableService,
-    private route:ActivatedRoute,
-    private sessionService:SessionService,
+    //private opportunityService:OpportunityService,
+    //private posOrderService:PosOrderService,
+    //private tableService:TableService,
+    //private route:ActivatedRoute,
+    //private sessionService:SessionService,
     private utilService:UtilService,
-    private productService:ProductService,
-    private categoryService:CategoryService,
-    private dateService:DateService,
-    private rexService:RexService,
-    private prodrexService:ProdrexService,
-    private userService:UserService,
+    //private productService:ProductService,
+    //private categoryService:CategoryService,
+    //private dateService:DateService,
+    //private rexService:RexService,
+    //private prodrexService:ProdrexService,
+    //private userService:UserService,
     private withdrawnService:WithdrawnService,
     private ccoService:CcoService,
     private shipService:ShipService,

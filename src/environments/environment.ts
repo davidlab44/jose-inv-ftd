@@ -6,7 +6,6 @@ export const environment = {
   production: false,
   //apiHost: 'https://invapi.chrisantemogourmet.com',
   //ocrUrl: 'http://10.100.100.3:8000',
-
   apiHost: 'https://invapidev.inbemetal.com',
   ocrUrl: 'https://ocr.inbemetal.com',
   s3aws: 'https://s3aws.inbemetal.com/',

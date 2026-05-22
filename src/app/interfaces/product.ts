@@ -50,7 +50,7 @@ export const defaultWithdrawnData: WithdrawnData = {
   seal: [],
   twin: 0,
   wnet: 0,
-  price: 0,
+  price: '',
   id_replenishment_product: 0,
   wtare: 0,
   wgross: 0,
@@ -80,7 +80,7 @@ export interface WithdrawnData {
   seal: string[];
   twin: number;
   wnet: number;
-  price: number;
+  price: string;
   id_replenishment_product: number;
   wtare: number;
   wgross: number;

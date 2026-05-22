@@ -38,11 +38,9 @@ export class OcrService {
    * OCR OUT document
    */
   postOut(imageUrl: string): Observable<any> {
-
     const body = {
       url: imageUrl
     };
-
     return this.http.post(`${this.ocrUrl}/post-out`, body);
   }
 
@@ -50,11 +48,9 @@ export class OcrService {
    * OCR SCALE document
    */
   postScale(imageUrl: string): Observable<any> {
-
     const body = {
       url: imageUrl
     };
-
     return this.http.post(`${this.ocrUrl}/post-scale`, body);
   }
 

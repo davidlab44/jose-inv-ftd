@@ -136,7 +136,9 @@ export class AssetSupplyPostPage {
     this.getShip(); 
   }
 
-  ionViewDidEnter() {}
+  ionViewDidEnter() {
+    this.loadGlpPrice();
+  }
 
   async takePhotoAndUpload() {
     this.uploading = true;
@@ -265,9 +267,10 @@ export class AssetSupplyPostPage {
     };
     withdrawn.data.shipin=this.shipId
     withdrawn.data.imgin=this.uploadedUrl;
+    const item= this.getGlpPriceItemByDate('2026-04-11T16:26:07',1)
+    withdrawn.data.price=item.data.price + "," + String(item.data.cents).padStart(2, '0');
+    withdrawn.data.id_replenishment_product=1;
     const payload = withdrawn.data;
-  
-     
     console.log("payload to post =>", payload);
     this.withdrawnService.post(payload).subscribe({
       next: (response) => {
@@ -285,7 +288,7 @@ export class AssetSupplyPostPage {
     this.withdrawnService.updateWithdrawnState(id,state).subscribe({
       next: response => {
         console.log('Response from server:',response);
-        //this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true });  
+        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true });  
       },
       error: err => {
         console.error('Error updating state:', err);
@@ -496,6 +499,39 @@ normalize(v: string): string {
   onSearch(text: string) { 
     this.searchSubject.next(text);  
   } 
+
+
+  glpPriceList: any[] = []; 
+  loadGlpPrice() {              
+     this.glpPricesService.getAll().subscribe({ 
+        next: (res) => {       
+          console.log('✅glpPrices',res);    
+          this.glpPriceList = res;
+
+        }, 
+        error: (err) => {      
+          console.error(' Error al cargar glpPrices:', err); 
+        } 
+      }); 
+  } 
+
+  getGlpPriceItemByDate(date:string,idReplenishmentProduct:number):any|null {
+    const target=new Date(date).getTime();
+    for(const item of this.glpPriceList) {
+      const data=item?.data;
+      if(!data)
+        continue;
+      if(data.id_replenishment_product!==idReplenishmentProduct)
+        continue;
+      const init=new Date(data.init).getTime();
+      const end=new Date(data.end).getTime();
+      if(target>=init && target<=end)
+        return item;
+    }
+    return null;
+  }
+
+
 
 
 }

@@ -41,10 +41,10 @@
         </ion-card-header>
         <ion-card-content>
           <h6>Imagen</h6>
-          <img [src]="bucket+uploadedUrl" />
+          <img [src]="uploadedUrl" />
           <p>
             imgUrl:
-            <a [href]="bucket+uploadedUrl" target="_blank">
+            <a [href]="uploadedUrl" target="_blank">
               {{ bucket+uploadedUrl }}
             </a>
           </p>
@@ -73,8 +73,6 @@
       Guardar
     </ion-button>
   </form>
-
-
 
 
 </ion-content>

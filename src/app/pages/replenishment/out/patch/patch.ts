@@ -130,7 +130,7 @@ export class PatchPage {
     this.form.reset({
       id: 0,
       deliveryout: 0,
-      dateout: 0,
+      dateout: '',
       tripout: '',
       shipout: 0,
     });
@@ -307,14 +307,19 @@ export class PatchPage {
         this.movement.data = {
           ...this.movement.data,
           deliveryout: res?.data?.deliveryout ?? 0,
-          dateout: res?.data?.dateout ?? '',
-          tripout: res?.data?.tripout ?? '',
+          dateout: res?.data?.dateout[0] ?? '',
+          //tripout: res?.data?.tripout ?? '',
+          tripout: 'TMSYP',
+          shipout: 3,
           //shipout: this.shipNombreEsp,
         };
         this.form.patchValue({
           deliveryout: res?.data?.deliveryout ?? 0,
-          dateout: res?.data?.dateout ?? '',
-          tripout: res?.data?.tripout ?? '',
+          dateout: res?.data?.dateout[0] ?? '',
+          tripout: 'TMSYP',
+          shipout: 3,
+          //shipout: this.shipNombreEsp,
+          //tripout: res?.data?.tripout ?? '',
           //shipout: this.shipNombreEsp,
         });
         console.log("movement actualizado:", this.movement);
@@ -332,7 +337,7 @@ export class PatchPage {
       deliveryout: f.deliveryout ?? '',
       dateout: f.dateout ?? '',
       tripout: f.tripout ?? '',
-      //shipout: (f.shipout ?? 0),
+      shipout: (f.shipout ?? 0),
     };
   }
 
@@ -341,8 +346,8 @@ export class PatchPage {
     this.movement.data.imgout = this.uploadedUrl;
     const payload = {
       ...this.movement.data,
-      shipout: Number(this.form.value.shipout) || 0 
-      //shipout: this.shipId ?? 0
+      shipout: 3333 
+      //shipout: Number(this.form.value.shipout) || 0 
     };
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({

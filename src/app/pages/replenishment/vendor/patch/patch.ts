@@ -30,6 +30,7 @@ import { CcoService } from '../../../../services/cc/cco.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
 import { GlppricesService } from '../../../../services/replenishment/glpprices.service';
+import { Cco,CcoMap } from '../../../../interfaces/cco';
 
 @Component({
   selector: 'page-patch',
@@ -179,8 +180,21 @@ export class PatchPage {
 
   ccoList:any[]=[];
   ionViewDidEnter() {
-    this.getAllCco();
+    //this.getAllCco();
+    this.loadCcos();
     this.getAllPrices();
+  }
+  ccoMap:CcoMap={};                
+  loadCcos() {
+    this.ccoService.load().subscribe({
+      next:(map)=>{
+        this.ccoMap=map;
+        this.ccoService.debugMapping(this.filteredList);
+      },
+      error:(err)=>{
+        console.error('Error loading ccos',err);
+      }
+    });
   }
 
   onSearch(text: string) {
@@ -298,6 +312,9 @@ export class PatchPage {
       next: (res) => {
         this.ocrResponse = res;
         this.ccoName="TCSU "+res?.data?.isotanq;
+        console.log('');
+        this.ccoId=this.ccoService.getIdByName(this.ccoName);     
+        console.log('ad correcto asignado:',this.ccoId)
         //tengo que sacar el id , hay un metodo para eso 
         //buscar ese metodo , ya existe ya debe existir  
         console.log('OCR Response:', res);
@@ -487,7 +504,7 @@ export class PatchPage {
   }
 
 
-}
+ }
 
 
 
