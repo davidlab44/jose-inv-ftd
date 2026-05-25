@@ -40,8 +40,6 @@ private s3: S3Client;
   }
 
   uploadBase64Image(base64: string): { progress$: Observable<number>, url$: Observable<string> } {
-console.log('Bucket',environment.bkt)
-
     const progressSubject = new BehaviorSubject<number>(0);
     const urlSubject = new BehaviorSubject<string>('');
     (async () => {
@@ -51,7 +49,7 @@ console.log('Bucket',environment.bkt)
         const parallelUploads3 = new Upload({
           client: this.s3,
           params: {
-            Bucket: environment.bkt,
+            Bucket: 'fotos',
             Key: key,
             Body: bytes,
             ContentType: mimeType
@@ -67,7 +65,7 @@ console.log('Bucket',environment.bkt)
         });
         await parallelUploads3.done();
         progressSubject.next(100);
-        urlSubject.next(`${environment.s3aws}${environment.bkt}/${key}`);
+        urlSubject.next(`${environment.s3aws}fotos/${key}`);
         progressSubject.complete();
         urlSubject.complete();
       } catch (err) {
@@ -106,14 +104,14 @@ console.log('Bucket',environment.bkt)
     try {
       await this.s3.send(
         new PutObjectCommand({
-          Bucket: environment.bkt,
+          Bucket: "fotos",
           Key: key,
           Body: bytes,          // 👈 pasamos los bytes
           ContentType: mimeType // ej. "image/jpeg"
         })
       );
       console.log("✅ Imagen subida correctamente");
-      return `${environment.s3aws}${environment.bkt}/${key}`;
+      return `${environment.s3aws}fotos/${key}`;
     } catch (err: any) {
       console.error("❌ Error en testUploadImage");
       console.error("📝 Mensaje:", err.message);
@@ -144,7 +142,7 @@ console.log('Bucket',environment.bkt)
     try {
       await this.s3.send(
         new PutObjectCommand({
-          Bucket: environment.bkt,
+          Bucket: "fotos",
           Key: key,
           Body: uint8Array, // 👈 sin Blob, solo bytes
           ContentType: "text/plain",
@@ -152,7 +150,7 @@ console.log('Bucket',environment.bkt)
       );
 
       console.log("✅ Texto subido correctamente");
-      return `http://192.168.40.47/${environment.bkt}/${key}`;
+      return `http://192.168.40.47/fotos/${key}`;
     } catch (err: any) {
       console.error("❌ Error en testUploadText");
       console.error("📝 Mensaje:", err.message);

@@ -69,13 +69,11 @@ export class SchedulePage{
   }
 
   updateSchedule(){}
-
   hash:string='';
   table:any
-
   storedObject:any;
   async ngOnInit(){
-
+    console.log('environment.s3aws',environment.s3aws)
   }
   
   async setSession() {
@@ -94,7 +92,6 @@ export class SchedulePage{
     }
   }
 
-
   refreshView() {
     this.setSession();
     const ahora = new Date();
@@ -109,9 +106,7 @@ export class SchedulePage{
 
   if (state?.item) {
     this.barcodeRouted = state.item;
-
     console.log('routed', this.barcodeRouted);
-
     if (
       Number(this.barcodeRouted?.data?.barcode) &&
       Number(this.barcodeRouted.data.barcode) > 0
