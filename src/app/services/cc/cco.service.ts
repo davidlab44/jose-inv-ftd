@@ -180,22 +180,39 @@ export class CcoService {
   }
 
 
-  getIdByName(name: string): number | null {
-    const target = (name || '').trim().toLowerCase();
 
-    for (const key in this.ccoMap) {
-
-      const item = this.ccoMap[Number(key)];
-
-      if (
-        item?.name &&
-        item.name.trim().toLowerCase() === target
-      )
+  getIdByName(name:string):number{
+    const input=(name||'')
+      .toUpperCase()
+      .trim();
+    if(!input)
+      return 0;
+    // extrae los 6 numeros importantes
+    const inputMatch=input.match(/\d{6}/);
+    const inputCore=inputMatch?.[0]||'';
+    for(const key in this.ccoMap){
+      const item=this.ccoMap[Number(key)];
+      if(!item?.name)
+        continue;
+      const itemName=item.name
+        .toUpperCase()
+        .trim();
+      // match exacto completo
+      if(itemName===input)
+        return Number(key);
+      // match parcial normal
+      if(itemName.includes(input))
+        return Number(key);
+      // match por los 6 numeros unicos
+      const itemMatch=itemName.match(/\d{6}/);
+      const itemCore=itemMatch?.[0]||'';
+      if(inputCore && itemCore===inputCore)
         return Number(key);
     }
-
-    return null;
+    return 0;
   }
+
+
 
 
 }

@@ -27,12 +27,13 @@ import { UserService } from '../../../../services/user.service';
 import { ReplenishmentService } from '../../../../services/replenishment/replenishment.service';
 import { PhotoService } from '../../../../services/asset/photo.service';
 import { OcrService } from '../../../../services/ai/ocr.service';
-import { CcoService } from '../../../../services/cc/cco.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { GlppricesService } from '../../../../services/replenishment/glpprices.service';
 import { AllocService } from '../../../../services/replenishment/alloc.service';
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
 import { ShipService } from '../../../../services/logistic/ship.service';
+import { Cco,CcoMap } from '../../../../interfaces/cco';
+import { CcoService } from '../../../../services/cc/cco.service';
 
 @Component({
   selector: 'page-post',
@@ -77,8 +78,6 @@ export class AssetSupplyPostPage {
     public toastCtrl: ToastController,
     public user: UserData,
     public config: Config,
-  
-
     private opportunityService: OpportunityService,
     private posOrderService: PosOrderService,
     private tableService: TableService,
@@ -132,14 +131,8 @@ export class AssetSupplyPostPage {
   updateSchedule(){}
 
   ionViewWillEnter() {
-    this.loadCco();
     this.getShip(); 
   }
-
-  ionViewDidEnter() {
-    this.loadGlpPrice();
-  }
-
   async takePhotoAndUpload() {
     this.uploading = true;
     this.uploadProgress = 0;
@@ -203,8 +196,14 @@ export class AssetSupplyPostPage {
   launchOcr(url:string){
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
+        console.log('ocr response',res)
         this.ocrResponse=res;
         this.shipId=this.getShipId(res);
+        console.log('contenedores extraidos',res.data.contenedores)
+        this.ccoName="TCSU "+res.data.contenedores[0];
+        this.ccoId=this.ccoService.getIdByName(this.ccoName);     
+        console.log('name:', this.ccoName);
+        console.log('id:', this.ccoId);
         console.log('OCR Response:', this.ocrResponse);
         console.log('ocrResponse.data:', this.ocrResponse.data);
         console.log('shipId:', this.shipId);
@@ -217,7 +216,6 @@ export class AssetSupplyPostPage {
     ;
   }
 
-  isotanq:any;
   updateUi(){
     const data = this.ocrResponse.data;
     const normalizedDate = this.normalizeOCRDate(data.date);
@@ -228,34 +226,6 @@ export class AssetSupplyPostPage {
       shipin: data.shipin ?? null,
     });
     //this.isotanq = this.validateIsotanqName(data.isotanq, this.ccos);
-   }
-
-   ccos: any[] = []; 
-   loadCco() {                
-     this.ccoService.getAll().subscribe({ 
-        next: (res) => {       
-          console.log('Cco:', res);    
-          this.ccos = res;
-        }, 
-        error: (err) => {      
-          console.error(' Error al cargar cco:', err); 
-        } 
-      }); 
-   } 
-
-   validateIsotanqName(hash: string, ccos: any[]): any | null {
-    if (!hash || !ccos) {
-      return null;
-    }
-    const cleanHash = hash.trim();
-    for (const cco of ccos) {
-      const name: string = cco?.data?.name || '';
-      const match = name.match(/(\d{6}-\d)/);
-      if (match && match[1] === cleanHash) {
-        return cco;
-      }
-    }
-    return null;
   }
 
   post() {
@@ -270,7 +240,8 @@ export class AssetSupplyPostPage {
     const item= this.getGlpPriceItemByDate('2026-04-11T16:26:07',1)
     withdrawn.data.price=item.data.price + "," + String(item.data.cents).padStart(2, '0');
     withdrawn.data.id_replenishment_product=1;
-    const payload = withdrawn.data;
+    let payload = withdrawn.data;
+    payload.name= this.ccoId;
     console.log("payload to post =>", payload);
     this.withdrawnService.post(payload).subscribe({
       next: (response) => {
@@ -357,21 +328,18 @@ export class AssetSupplyPostPage {
   }
 
   shipList: any[] = [];
-
   shipMap: Record<string, number> = {};
   imoMap: Record<string, number> = {};
   idMap: Record<number, any> = {};
-
   getShip() {
-  this.shipService.getAll().subscribe(res => {
-    console.log("respouesta res",res)
-    this.shipList=res;
-    this.buildShipMaps(res);
-    console.log('shipMap', this.shipMap);
-    console.log('imoMap', this.imoMap);
-  });
-}
-
+    this.shipService.getAll().subscribe(res => {
+      console.log("respouesta res",res)
+      this.shipList=res;
+      this.buildShipMaps(res);
+      console.log('shipMap', this.shipMap);
+      console.log('imoMap', this.imoMap);
+    });
+  }
   buildShipMap(shipList: any[]): Record<string, number> {
     const map: Record<string, number> = {};
     for (let i = 0; i < shipList.length; i++) {
@@ -382,34 +350,33 @@ export class AssetSupplyPostPage {
     return map;
   }
 
+  buildShipMaps(shipList: any[]) {
+    const nameMap: Record<string, number> = {};
+    const imoMap: Record<string, number> = {};
+    const idMap: Record<number, any> = {};
 
-buildShipMaps(shipList: any[]) {
-  const nameMap: Record<string, number> = {};
-  const imoMap: Record<string, number> = {};
-  const idMap: Record<number, any> = {};
+    for (let i = 0; i < shipList.length; i++) {
+      const s = shipList[i];
+      const name = s?.data?.name;
+      const imo  = s?.data?.imo;
+      if (name) nameMap[this.normalize(name)] = s.id;
+      if (imo)  imoMap[this.normalize(imo)]   = s.id;
+      idMap[s.id] = s;
+    }
 
-  for (let i = 0; i < shipList.length; i++) {
-    const s = shipList[i];
-    const name = s?.data?.name;
-    const imo  = s?.data?.imo;
-    if (name) nameMap[this.normalize(name)] = s.id;
-    if (imo)  imoMap[this.normalize(imo)]   = s.id;
-    idMap[s.id] = s;
+    this.shipMap = nameMap;
+    this.imoMap  = imoMap;
+    this.idMap   = idMap;
+    this.shipList = shipList; 
   }
 
-  this.shipMap = nameMap;
-  this.imoMap  = imoMap;
-  this.idMap   = idMap;
-  this.shipList = shipList; 
-}
-
-normalize(v: string): string {
-  return v
-    ?.toUpperCase()
-    .replace(/\s+/g, '')   // quitarespacios
-    .replace(/[^A-Z0-9]/g, '') // limpiar ruido OCR
-    .trim();
-}
+  normalize(v: string): string {
+    return v
+      ?.toUpperCase()
+      .replace(/\s+/g, '')   // quitarespacios
+      .replace(/[^A-Z0-9]/g, '') // limpiar ruido OCR
+      .trim();
+  }
 
   getShipId(res: any): number {
     console.log("🔎 getShipId input:", res);
@@ -533,7 +500,97 @@ normalize(v: string): string {
 
 
 
+  /*---- CCO------ */
+  ccoList:any[]=[];          
+  ionViewDidEnter() {        
+    this.loadGlpPrice();
+    this.loadCcos();         
+    //this.getAllPrices();     
+  }
 
+  ccoMap:CcoMap={};                
+  loadCcos() {               
+    this.ccoService.load().subscribe({
+      next:(map)=>{
+        this.ccoMap=map;     
+        this.ccoService.debugMapping(this.filteredList);
+      },    
+      error:(err)=>{
+        console.error('Error loading ccos',err); 
+      }     
+    });     
+  }   
+  applyFilter(text: string) {
+    if (!text || text.trim() === '') {
+      this.filteredList = this.ccoList;
+      return;
+    }
+    const search = this.normalize(text);
+    this.filteredList = this.ccoList.filter(item => {
+      const name = item?.data?.name || '';
+      const normalizedName = this.normalize(name);
+      return normalizedName.includes(search);
+    });
+  }
+  filteredList: any[] = [];     //lista filtrada
+  getAllCco(){
+    this.ccoService.getAll().subscribe({
+      next: (response: any[]) => {
+        console.log('cco List', response);
+        this.ccoList = response;
+        //this.filteredList = response; // inicializar
+        //this.resolveInitialCco();
+      },
+      error: (err: any) => {
+        console.error('Error cargando CCO', err);
+      }
+    });
+  }
+  ccoName: string = '';   // nombre a mostrar
+  ccoId: number = 0;   // id cco seleccionado a mostrar
+  selectCco(item: any) {
+    this.cco = item;
+    this.ccoName = item.data.name;
+    this.ccoId = item.id;
+    //actualizar movement (muy importante en tu flujo)
+    console.log('item pasado:', item);
+    console.log('cco name:', this.ccoName);
+    console.log('cco id:', this.ccoId);
+  }
+
+  cco:any;  
+  isotanq:any;
+  ccos: any[] = []; 
+  loadCco() {                
+    this.ccoService.getAll().subscribe({ 
+        next: (res) => {       
+          console.log('Cco:', res);    
+          this.ccos = res;
+        }, 
+        error: (err) => {      
+          console.error(' Error al cargar cco:', err); 
+        } 
+      }); 
+   } 
+
+   /*validateIsotanqName(hash: string, ccos: any[]): any | null {*/
+    /*if (!hash || !ccos) {*/
+      /*return null;*/
+    /*}*/
+    /*const cleanHash = hash.trim();*/
+    /*for (const cco of ccos) {*/
+      /*const name: string = cco?.data?.name || '';*/
+      /*const match = name.match(/(\d{6}-\d)/);*/
+      /*if (match && match[1] === cleanHash) {*/
+        /*return cco;*/
+      /*}*/
+    /*}*/
+    /*return null;*/
+  /*}*/
+
+
+
+  
 }
 
 

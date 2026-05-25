@@ -73,7 +73,6 @@ export class SchedulePage{
   table:any
   storedObject:any;
   async ngOnInit(){
-    console.log('environment.s3aws',environment.s3aws)
   }
   
   async setSession() {
