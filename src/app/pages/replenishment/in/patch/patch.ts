@@ -31,6 +31,7 @@ import { ShipService } from '../../../../services/logistic/ship.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
 
+
 @Component({
   selector: 'page-patch',
   templateUrl: 'patch.html',
@@ -251,19 +252,24 @@ export class PatchPage {
     });
   }
 
-  shipId:any;
+  contenedores:any[]=[];
+  shipId:number=0;
   shipNombreEsp:string | null; 
   launchOcr(url: string) {
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
         console.log('OCR Response:', res);
-        this.shipId=this.getShipId(res,this.shipList);
+        this.contenedores=res.data.contenedores;
+        if(this.contenedores[0]&&this.contenedores[0]>0){
+          const ship=this.shipService.findShipByAbbreviation(this.shipList,this.contenedores[0].slice(0, 2).toUpperCase()); 
+          this.shipId=ship.id;
+          console.log("ship ",ship)
+        }
         if(this.shipId>0){
           console.log('shipId',this.shipId)
           this.shipNombreEsp=this.getShipNameById(this.shipId);
-
           console.log('shipNombreEsp',this.shipNombreEsp)
-          this.shipNombreEsp=this.getShipNameById(this.shipId);
+          //this.shipNombreEsp=this.getShipNameById(this.shipId);
         }else{
           this.shipNombreEsp='Seleccionar'
         }
@@ -398,39 +404,39 @@ export class PatchPage {
     const score = this.similarity(na, nb);
     return score >= threshold;
   }
-  getShipId(objA, objBList) {
-    const shipName = objA?.data?.shipin ?? null;
-    const shipIMO = objA?.data?.shipinimo ?? null;
-    let bestScore = 0;
-    let bestId = 0;
-    // 1️⃣ buscar por nombre
-    if (shipName) {
-      for (const ship of objBList) {
-        const name = ship?.data?.name;
-        if (!name) continue;
-        const score = this.similarity(
-          this.normalizeOCR(shipName),
-          this.normalizeOCR(name)
-        );
-        if (score > bestScore && score > 0.75) {
-          bestScore = score;
-          bestId = ship.id;
-        }
-      }
-      if (bestId !== 0) return bestId;
-    }
-    // 2️⃣ fallback por IMO
-    if (shipIMO) {
-      for (const ship of objBList) {
-        const imo = ship?.data?.imo;
-        if (!imo) continue;
-        if (this.fuzzyMatch(shipIMO, imo, 0.9)) {
-          return ship.id;
-        }
-      }
-    }
-    return 0;
-  }
+/*  getShipId(objA, objBList) {*/
+    /*const shipName = objA?.data?.shipin ?? null;*/
+    /*const shipIMO = objA?.data?.shipinimo ?? null;*/
+    /*let bestScore = 0;*/
+    /*let bestId = 0;*/
+    /*// 1️⃣ buscar por nombre*/
+    /*if (shipName) {*/
+      /*for (const ship of objBList) {*/
+        /*const name = ship?.data?.name;*/
+        /*if (!name) continue;*/
+        /*const score = this.similarity(*/
+          /*this.normalizeOCR(shipName),*/
+          /*this.normalizeOCR(name)*/
+        /*);*/
+        /*if (score > bestScore && score > 0.75) {*/
+          /*bestScore = score;*/
+          /*bestId = ship.id;*/
+        /*}*/
+      /*}*/
+      /*if (bestId !== 0) return bestId;*/
+    /*}*/
+    /*// 2️⃣ fallback por IMO*/
+    /*if (shipIMO) {*/
+      /*for (const ship of objBList) {*/
+        /*const imo = ship?.data?.imo;*/
+        /*if (!imo) continue;*/
+        /*if (this.fuzzyMatch(shipIMO, imo, 0.9)) {*/
+          /*return ship.id;*/
+        /*}*/
+      /*}*/
+    /*}*/
+    /*return 0;*/
+  /*}*/
 
   shipList: any[] = [];
   getShip() {

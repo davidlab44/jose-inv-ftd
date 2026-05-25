@@ -40,6 +40,8 @@ private s3: S3Client;
   }
 
   uploadBase64Image(base64: string): { progress$: Observable<number>, url$: Observable<string> } {
+console.log('Bucket',environment.bkt)
+
     const progressSubject = new BehaviorSubject<number>(0);
     const urlSubject = new BehaviorSubject<string>('');
     (async () => {
@@ -49,7 +51,7 @@ private s3: S3Client;
         const parallelUploads3 = new Upload({
           client: this.s3,
           params: {
-            Bucket: 'fotos',
+            Bucket: environment.bkt,
             Key: key,
             Body: bytes,
             ContentType: mimeType
@@ -65,7 +67,7 @@ private s3: S3Client;
         });
         await parallelUploads3.done();
         progressSubject.next(100);
-        urlSubject.next(`${environment.s3aws}fotos/${key}`);
+        urlSubject.next(`${environment.s3aws}${environment.bkt}/${key}`);
         progressSubject.complete();
         urlSubject.complete();
       } catch (err) {
@@ -104,14 +106,14 @@ private s3: S3Client;
     try {
       await this.s3.send(
         new PutObjectCommand({
-          Bucket: "fotos",
+          Bucket: environment.bkt,
           Key: key,
           Body: bytes,          // 👈 pasamos los bytes
           ContentType: mimeType // ej. "image/jpeg"
         })
       );
       console.log("✅ Imagen subida correctamente");
-      return `${environment.s3aws}fotos/${key}`;
+      return `${environment.s3aws}${environment.bkt}/${key}`;
     } catch (err: any) {
       console.error("❌ Error en testUploadImage");
       console.error("📝 Mensaje:", err.message);
@@ -142,7 +144,7 @@ private s3: S3Client;
     try {
       await this.s3.send(
         new PutObjectCommand({
-          Bucket: "fotos",
+          Bucket: environment.bkt,
           Key: key,
           Body: uint8Array, // 👈 sin Blob, solo bytes
           ContentType: "text/plain",
@@ -150,7 +152,7 @@ private s3: S3Client;
       );
 
       console.log("✅ Texto subido correctamente");
-      return `http://192.168.40.47/fotos/${key}`;
+      return `http://192.168.40.47/${environment.bkt}/${key}`;
     } catch (err: any) {
       console.error("❌ Error en testUploadText");
       console.error("📝 Mensaje:", err.message);

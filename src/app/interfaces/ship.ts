@@ -3,6 +3,7 @@ export interface Ship {
   data: {
     name: string;
     imo: string;
+    abb: string;
   };
 }
 
@@ -14,6 +15,7 @@ export function createDefaultShip(): Ship {
     data: {
       name: '',
       imo: '',
+      abb: '',
     }
   }
 }

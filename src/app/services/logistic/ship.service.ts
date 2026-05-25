@@ -6,8 +6,6 @@ import { tap } from 'rxjs/operators';
 import { BehaviorSubject, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-
-
 @Injectable({
   providedIn: 'root'
 })
@@ -27,7 +25,6 @@ export class ShipService {
       `created_at=gte.${since}`,
       `created_at=lte.${until}`
     ].join('&');
-
     return this.http
       .get<any[]>(`${this.apiUrl}/${this.model}?${params}`)
       .pipe(
@@ -40,7 +37,6 @@ export class ShipService {
       `data->>date=gte.${since}`,
       `data->>date=lte.${until}`
     ].join('&');
-
     return this.http
       .get<any[]>(`${this.apiUrl}/${this.model}?${params}`)
       .pipe(
@@ -83,6 +79,32 @@ export class ShipService {
 
 
 
+
+findShipByAbbreviation(shipList: any[], abbreviation: string): any {
+
+   console.log("param list",shipList)
+   console.log("param abb",abbreviation)
+  if (!shipList?.length || !abbreviation) return null;
+
+  const abb = abbreviation
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, '');
+
+  for (const shipElement of shipList) {
+
+    const shipAbb = (shipElement?.data?.abb || '')
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, '');
+
+    if (shipAbb === abb) {
+      return shipElement;
+    }
+  }
+
+  return null;
+}
 
 
 
