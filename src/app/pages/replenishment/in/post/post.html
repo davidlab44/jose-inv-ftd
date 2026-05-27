@@ -4,10 +4,10 @@
     <ion-buttons *ngIf="!showSearchbar" slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-searchbar
-      placeholder="Buscar"
-      (ionInput)="onSearch($event.target.value)">
-    </ion-searchbar>
+<!--    <ion-searchbar-->
+      <!--placeholder="Buscar"-->
+      <!--(ionInput)="onSearch($event.target.value)">-->
+    <!--</ion-searchbar>-->
     <ion-buttons slot="end">
       <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
         <span *ngIf="ios">Filter</span>
@@ -59,9 +59,10 @@
           <ion-input formControlName="tripin"></ion-input>
         </ion-item>
         <br><br>
-        <ion-item  *ngIf="shipList?.length"  >
+        <!--<ion-item  *ngIf="shipList?.length"  >-->
+        <ion-item>
           <ion-label>
-            <p>Motonave: {{ getShipNameById(shipId) }}</p>              
+            <!--<p>Motonave: {{ getShipNameById(shipId) }}</p>              -->
           </ion-label>
           <ion-select
             interface="popover"
@@ -99,7 +100,7 @@
           <ion-searchbar
             placeholder="Buscar CCO (ej: TCSU 500046)"
             show-clear-button="always"
-            (ionInput)="onSearch($event.detail.value)">
+            (ionInput)="onCcoSearch($event.detail.value)">
           </ion-searchbar>
           <!--  lista -->
           <ion-list>

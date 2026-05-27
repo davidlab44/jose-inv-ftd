@@ -7,6 +7,7 @@ export const environment={
   s3aws:env==='dev'
     ? 'https://s3dev.inbemetal.com/'
     : 'https://s3aws.inbemetal.com/',
+//  s3aws: 'https://s3aws.inbemetal.com/',
   db:"na",
   i:38,
   p:"tumae",
