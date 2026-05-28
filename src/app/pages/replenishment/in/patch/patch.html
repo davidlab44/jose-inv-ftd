@@ -62,7 +62,7 @@
         <!--</ion-item>-->
         <br><br>
         <ion-item  *ngIf="shipList?.length"  >
-          <ion-label>Motonave</ion-label>
+          <ion-label>Motonave {{shipNombreEsp}} </ion-label>
           <ion-select
             interface="popover"
             formControlName="shipin"
@@ -77,12 +77,59 @@
         <br>
     </ion-list>
     <br>
+
+    <ion-grid>
+      <ion-row>
+        <!--  IZQUIERDA (input) -->
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label>
+              <h2 *ngIf="ccoName; else loading">
+                {{ ccoName }}
+              </h2>
+              <ng-template #loading>
+                <span>Cargando Isotanq...</span>
+              </ng-template>
+            </ion-label>
+          </ion-item>
+        </ion-col>
+        <!--  DERECHA (buscador + lista) -->
+        <ion-col size="12" size-md="6">
+          <!-- buscador -->
+          <ion-searchbar
+            placeholder="Buscar CCO (ej: TCSU 500046)"
+            show-clear-button="always"
+            (ionInput)="onCcoSearch($event.detail.value)">
+          </ion-searchbar>
+          <!--  lista -->
+          <ion-list>
+            <ion-item *ngFor="let item of filteredList" button>
+              <div class="cco-item" (click)="selectCco(item)">
+                <ion-label>
+                  <h2>{{ item.data.name }}</h2>
+                </ion-label>
+                <ion-badge
+                  *ngIf="item.data.color"
+                  [style.background]="item.data.color">
+                </ion-badge>
+              </div>
+            </ion-item>
+          </ion-list>
+          <!--  vacío -->
+          <ion-text *ngIf="filteredList.length === 0" color="medium">
+            <p class="empty-text">
+              No se encontraron resultados
+            </p>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
     <ion-button expand="block" (click)="patch()">
       Guardar
     </ion-button>
   </form>
 </ion-content>
-
 
 
 

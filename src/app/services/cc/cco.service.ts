@@ -99,13 +99,6 @@ export class CcoService {
 
 
 
-
-
-
-
-
-
-
   ccoList: Cco[] = [];
   ccoMap: CcoMap = {};
 
@@ -127,10 +120,10 @@ export class CcoService {
           };
         });
         this.ccoMap = mapData;
-        console.log('ccoMap =>', this.ccoMap);
-        console.log('ccoMap keys =>', Object.keys(this.ccoMap));
-        const idObtenido= this.getIdByName("TCSU 500020-2");
-        console.log('is obtenido',idObtenido);
+/*        console.log('ccoMap =>', this.ccoMap);*/
+        /*console.log('ccoMap keys =>', Object.keys(this.ccoMap));*/
+        /*const idObtenido= this.getIdByName("TCSU 500020-2");*/
+        /*console.log('is obtenido',idObtenido);*/
         return this.ccoMap;
       })
     );
@@ -182,6 +175,9 @@ export class CcoService {
 
 
   getIdByName(name:string):number{
+
+ console.log('name padaso al servicio',name)
+ console.log('ccoMap.length servicio',this.ccoMap)
     const input=(name||'')
       .toUpperCase()
       .trim();

@@ -140,7 +140,7 @@ export class AssetSupplyPostPage {
   updateSchedule(){}
 
   ionViewWillEnter() {
-    //this.getShip(); 
+    this.getShip(); 
   }
   async takePhotoAndUpload() {
     this.uploading = true;
@@ -202,12 +202,14 @@ export class AssetSupplyPostPage {
   }
 
   ocrResponse:any;
+  shipNombreEsp:string | null; 
+ 
   launchOcr(url:string){
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
         console.log('ocr response',res)
         this.ocrResponse=res;
-        //this.shipId=this.getShipId(res);
+        this.shipId=this.getShipId(res);
         console.log('contenedores extraidos',res.data.contenedores)
         this.ccoName="TCSU "+res.data.contenedores[0];
         this.ccoId=this.ccoService.getIdByName(this.ccoName);     
@@ -216,13 +218,20 @@ export class AssetSupplyPostPage {
         console.log('OCR Response:', this.ocrResponse);
         console.log('ocrResponse.data:', this.ocrResponse.data);
         console.log('shipId:', this.shipId);
+        if(this.shipId>0){
+          console.log('shipId',this.shipId)
+          this.shipNombreEsp=this.getShipNameById(this.shipId);
+          console.log('shipNombreEsp',this.shipNombreEsp)
+          this.shipNombreEsp=this.getShipNameById(this.shipId);
+        }else{
+          this.shipNombreEsp='Seleccionar'
+        }
         this.updateUi();
       },
       error: (err) => {
         console.error('Error OCR:', err);
       }
-    })
-    ;
+    });
   }
 
   updateUi(){
@@ -336,145 +345,157 @@ export class AssetSupplyPostPage {
     return score >= threshold;
   }
 
-  /*shipList: any[] = [];*/
-  /*shipMap: Record<string, number> = {};*/
-  /*imoMap: Record<string, number> = {};*/
-  /*idMap: Record<number, any> = {};*/
-  /*getShip() {*/
-    /*this.shipService.getAll().subscribe(res => {*/
-      /*console.log("respouesta res",res)*/
-      /*this.shipList=res;*/
-      /*this.buildShipMaps(res);*/
-      /*console.log('shipMap', this.shipMap);*/
-      /*console.log('imoMap', this.imoMap);*/
-    /*});*/
-  /*}*/
-  /*buildShipMap(shipList: any[]): Record<string, number> {*/
-    /*const map: Record<string, number> = {};*/
-    /*for (let i = 0; i < shipList.length; i++) {*/
-      /*const s = shipList[i];*/
-      /*const name = s?.data?.name;*/
-      /*if (name) map[name.trim().toUpperCase()] = s.id;*/
-    /*}*/
-    /*return map;*/
-  /*}*/
 
-  /*buildShipMaps(shipList: any[]) {*/
-    /*const nameMap: Record<string, number> = {};*/
-    /*const imoMap: Record<string, number> = {};*/
-    /*const idMap: Record<number, any> = {};*/
 
-    /*for (let i = 0; i < shipList.length; i++) {*/
-      /*const s = shipList[i];*/
-      /*const name = s?.data?.name;*/
-      /*const imo  = s?.data?.imo;*/
-      /*if (name) nameMap[this.normalize(name)] = s.id;*/
-      /*if (imo)  imoMap[this.normalize(imo)]   = s.id;*/
-      /*idMap[s.id] = s;*/
-    /*}*/
 
-    /*this.shipMap = nameMap;*/
-    /*this.imoMap  = imoMap;*/
-    /*this.idMap   = idMap;*/
-    /*this.shipList = shipList; */
-  /*}*/
 
-  /*normalize(v: string): string {*/
-    /*return v*/
-      /*?.toUpperCase()*/
-      /*.replace(/\s+/g, '')   // quitarespacios*/
-      /*.replace(/[^A-Z0-9]/g, '') // limpiar ruido OCR*/
-      /*.trim();*/
-  /*}*/
 
-  /*getShipId(res: any): number {*/
-    /*console.log("🔎 getShipId input:", res);*/
-    /*const shipName = res?.data?.shipin ?? null;*/
-    /*const shipIMO  = res?.data?.shipinimo ?? null;*/
-    /*console.log("➡️ shipName:", shipName, "shipIMO:", shipIMO);*/
-    /*//  1. O(1) por nombre*/
-    /*if (shipName) {*/
+/*  -------  ship --------- */  
+  shipList: any[] = [];
+  shipMap: Record<string, number> = {};
+  imoMap: Record<string, number> = {};
+  idMap: Record<number, any> = {};
+  getShip() {
+    this.shipService.getAll().subscribe(res => {
+      console.log("respouesta res",res)
+      this.shipList=res;
+      this.buildShipMaps(res);
+      console.log('shipMap', this.shipMap);
+      console.log('imoMap', this.imoMap);
+    });
+  }
+  buildShipMap(shipList: any[]): Record<string, number> {
+    const map: Record<string, number> = {};
+    for (let i = 0; i < shipList.length; i++) {
+      const s = shipList[i];
+      const name = s?.data?.name;
+      if (name) map[name.trim().toUpperCase()] = s.id;
+    }
+    return map;
+  }
 
-      /*const normName = this.normalize(shipName);*/
-      /*//\ccconst normName = this.normalize(shipName);*/
-      /*const id = this.shipMap[normName];*/
-      /*console.log("🔹 O(1) name lookup:", normName, "=>", id);*/
-      /*if (id) {*/
-        /*console.log(" return by name O(1):", id);*/
-        /*return id;*/
-      /*}*/
-    /*}*/
-    /*//  2. O(1) por IMO*/
-    /*if (shipIMO) {*/
-      /*const normIMO = this.normalize(shipIMO);*/
-      /*const id = this.imoMap[normIMO];*/
-      /*console.log("🔹 O(1) IMO lookup:", normIMO, "=>", id);*/
-      /*if (id) {*/
-        /*console.log(" return by IMO O(1):", id);*/
-        /*return id;*/
-      /*}*/
-    /*}*/
-    /*// 3. Fuzzy SOLO si falla*/
-    /*let bestScore = 0;*/
-    /*let bestId = 0;*/
-    /*if (shipName) {*/
-      /*const normA = this.normalizeOCR(shipName);*/
-      /*console.log("Fuzzy name start:", normA);*/
-      /*for (const ship of this.shipList) {*/
-        /*const name = ship?.data?.name;*/
-        /*if (!name) continue;*/
-        /*const score = this.similarity(normA, this.normalizeOCR(name));*/
-        /*if (score > bestScore && score > 0.75) {*/
-          /*bestScore = score;*/
-          /*bestId = ship.id;*/
-        /*}*/
-      /*}*/
-      /*console.log("🔸 best fuzzy name:", bestId, "score:", bestScore);*/
-      /*if (bestId !== 0) {*/
-        /*console.log(" return by fuzzy name:", bestId);*/
-        /*return bestId;*/
-      /*}*/
-    /*}*/
-    /*// 4. Fallback fuzzy IMO*/
-    /*if (shipIMO) {*/
-      /*console.log("🔸 Fuzzy IMO start:", shipIMO);*/
-      /*let foundId = 0;*/
-      /*for (const ship of this.shipList) {*/
-        /*const imo = ship?.data?.imo;*/
-        /*if (!imo) continue;*/
-        /*if (this.fuzzyMatch(shipIMO, imo, 0.9)) {*/
-          /*foundId = ship.id;*/
-          /*break;*/
-        /*}*/
-      /*}*/
-      /*console.log("🔸 fuzzy IMO result:", foundId);*/
-      /*if (foundId) {*/
-        /*console.log("return by fuzzy IMO:", foundId);*/
-        /*return foundId;*/
-      /*}*/
-    /*}*/
-    /*console.log("no match, return 0");*/
-    /*return 0;*/
-  /*}*/
+  buildShipMaps(shipList: any[]) {
+    const nameMap: Record<string, number> = {};
+    const imoMap: Record<string, number> = {};
+    const idMap: Record<number, any> = {};
 
-  /*getShipNameById(id: number | null | undefined): string {*/
-    /*if (id == null) return 'Sin nombre';*/
-    /*const ship = this.idMap[id];*/
-    /*const name = ship?.data?.name;*/
-    /*return name?.trim() ? name : 'Sin Nombre';*/
-  /*}*/
+    for (let i = 0; i < shipList.length; i++) {
+      const s = shipList[i];
+      const name = s?.data?.name;
+      const imo  = s?.data?.imo;
+      if (name) nameMap[this.normalize(name)] = s.id;
+      if (imo)  imoMap[this.normalize(imo)]   = s.id;
+      idMap[s.id] = s;
+    }
 
-  /*onShipSelect(ev: any) {*/
-    /*const selectedId = ev.detail.value;*/
-    /*const selectedShip = this.idMap[selectedId];*/
-    /*console.log('ID seleccionado =>', selectedId);*/
-    /*console.log('Ship seleccionado =>', selectedShip);*/
-    /*this.shipId=selectedId;*/
-  /*}*/
+    this.shipMap = nameMap;
+    this.imoMap  = imoMap;
+    this.idMap   = idMap;
+    this.shipList = shipList; 
+  }
+
+  normalize(v: string): string {
+    return v
+      ?.toUpperCase()
+      .replace(/\s+/g, '')   // quitarespacios
+      .replace(/[^A-Z0-9]/g, '') // limpiar ruido OCR
+      .trim();
+  }
+
+  getShipId(res: any): number {
+    console.log("🔎 getShipId input:", res);
+    const shipName = res?.data?.shipin ?? null;
+    const shipIMO  = res?.data?.shipinimo ?? null;
+    console.log("➡️ shipName:", shipName, "shipIMO:", shipIMO);
+    //  1. O(1) por nombre
+    if (shipName) {
+
+      const normName = this.normalize(shipName);
+      //\ccconst normName = this.normalize(shipName);
+      const id = this.shipMap[normName];
+      console.log("🔹 O(1) name lookup:", normName, "=>", id);
+      if (id) {
+        console.log(" return by name O(1):", id);
+        return id;
+      }
+    }
+    //  2. O(1) por IMO
+    if (shipIMO) {
+      const normIMO = this.normalize(shipIMO);
+      const id = this.imoMap[normIMO];
+      console.log("🔹 O(1) IMO lookup:", normIMO, "=>", id);
+      if (id) {
+        console.log(" return by IMO O(1):", id);
+        return id;
+      }
+    }
+    // 3. Fuzzy SOLO si falla
+    let bestScore = 0;
+    let bestId = 0;
+    if (shipName) {
+      const normA = this.normalizeOCR(shipName);
+      console.log("Fuzzy name start:", normA);
+      for (const ship of this.shipList) {
+        const name = ship?.data?.name;
+        if (!name) continue;
+        const score = this.similarity(normA, this.normalizeOCR(name));
+        if (score > bestScore && score > 0.75) {
+          bestScore = score;
+          bestId = ship.id;
+        }
+      }
+      console.log("🔸 best fuzzy name:", bestId, "score:", bestScore);
+      if (bestId !== 0) {
+        console.log(" return by fuzzy name:", bestId);
+        return bestId;
+      }
+    }
+    // 4. Fallback fuzzy IMO
+    if (shipIMO) {
+      console.log("🔸 Fuzzy IMO start:", shipIMO);
+      let foundId = 0;
+      for (const ship of this.shipList) {
+        const imo = ship?.data?.imo;
+        if (!imo) continue;
+        if (this.fuzzyMatch(shipIMO, imo, 0.9)) {
+          foundId = ship.id;
+          break;
+        }
+      }
+      console.log("🔸 fuzzy IMO result:", foundId);
+      if (foundId) {
+        console.log("return by fuzzy IMO:", foundId);
+        return foundId;
+      }
+    }
+    console.log("no match, return 0");
+    return 0;
+  }
+
+  getShipNameById(id: number | null | undefined): string {
+    if (id == null) return 'Sin nombre';
+    const ship = this.idMap[id];
+    const name = ship?.data?.name;
+    return name?.trim() ? name : 'Sin Nombre';
+  }
+
+  onShipSelect(ev: any) {
+    const selectedId = ev.detail.value;
+    const selectedShip = this.idMap[selectedId];
+    console.log('ID seleccionado =>', selectedId);
+    console.log('Ship seleccionado =>', selectedShip);
+    this.shipId=selectedId;
+  }
   
-  /*onSearch(text: string) { */
-    /*this.searchSubject.next(text);  */
-  /*} */
+  onSearch(text: string) { 
+    this.searchSubject.next(text);  
+  } 
+
+/* ---------end ship ----------*/
+
+
+
+
 
 
   glpPriceList: any[] = []; 
@@ -582,8 +603,8 @@ export class AssetSupplyPostPage {
       }); 
    } 
 
-  onShipSelect(e:any){}
-  shipList:any[]=[];
+  /*onShipSelect(e:any){}*/
+  /*shipList:any[]=[];*/
 
 
 }

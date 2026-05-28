@@ -30,13 +30,14 @@ import { CcoService } from '../../../../services/cc/cco.service';
 import { ShipService } from '../../../../services/logistic/ship.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
-
+import { Cco,CcoMap } from '../../../../interfaces/cco';
 
 @Component({
   selector: 'page-patch',
   templateUrl: 'patch.html',
   styleUrls: ['./patch.scss'],
 })
+
 export class PatchPage {
 
   ios: boolean;
@@ -125,6 +126,11 @@ export class PatchPage {
       shipin: this.movement?.data?.shipin ?? null,
     });
     this.getShip();
+    //this.loadGlpPrice();
+    this.loadCcos();         
+    //this.getAllPrices();     
+    this.getAllCco();
+
   }
 
   resetForm(): void {
@@ -138,7 +144,7 @@ export class PatchPage {
     this.uploadProgress = 0; 
     this.uploadedUrl= null;
     this.uploading = false;
-  }n
+  }
 
   slideOpts = {
     initialSlide: 0,
@@ -152,20 +158,20 @@ export class PatchPage {
 
   prodrexList:any[]=[];
   ionViewDidEnter() {
-    this.prodrexService.getAll().subscribe({
-      next: response=>{
-        this.prodrexList=response;
-        console.log("getProdRexList",response)
-      }
-    })
+  /*this.prodrexService.getAll().subscribe({*/
+      /*next: response=>{*/
+        /*this.prodrexList=response;*/
+        /*console.log("getProdRexList",response)*/
+      /*}*/
+    /*})*/
   }
 
-  searchProducts(hash: string, productList: any[]): any[] {
-    if (!hash || hash.trim() === '') return productList;
-    return productList.filter(product =>
-      product.name.toLowerCase().includes(hash.toLowerCase())
-    );
-  }
+  /*searchProducts(hash: string, productList: any[]): any[] {*/
+    /*if (!hash || hash.trim() === '') return productList;*/
+    /*return productList.filter(product =>*/
+      /*product.name.toLowerCase().includes(hash.toLowerCase())*/
+    /*);*/
+  /*}*/
 
   onSearch(text: string) {
     this.searchSubject.next(text);
@@ -260,16 +266,23 @@ export class PatchPage {
       next: (res) => {
         console.log('OCR Response:', res);
         this.contenedores=res.data.contenedores;
-        if(this.contenedores[0]&&this.contenedores[0]>0){
-          const ship=this.shipService.findShipByAbbreviation(this.shipList,this.contenedores[0].slice(0, 2).toUpperCase()); 
+        if(this.contenedores[0]&&this.contenedores[0].length>0){
+          this.ccoName="TCSU "+res.data.contenedores[0];
+          console.log('cconame',this.ccoName)
+          this.ccoId=this.ccoService.getIdByName(this.ccoName);     
+          console.log('name:', this.ccoName);
+          console.log('id:', this.ccoId);
+          const ship=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
           this.shipId=ship.id;
           console.log("ship ",ship)
+        }else{
+          this.utilService.presentToast('no se reconocieron isotanques','danger',500);
         }
         if(this.shipId>0){
           console.log('shipId',this.shipId)
           this.shipNombreEsp=this.getShipNameById(this.shipId);
           console.log('shipNombreEsp',this.shipNombreEsp)
-          //this.shipNombreEsp=this.getShipNameById(this.shipId);
+          this.shipNombreEsp=this.getShipNameById(this.shipId);
         }else{
           this.shipNombreEsp='Seleccionar'
         }
@@ -279,13 +292,13 @@ export class PatchPage {
           deliveryin: res?.data?.deliveryin ?? '',
           datein: res?.data?.datein ?? '',
           tripin: res?.data?.tripin ?? '',
-          //shipin: this.shipNombreEsp,
+          shipin: this.shipNombreEsp,
         };
         this.form.patchValue({
           deliveryin: res?.data?.deliveryin ?? '',
           datein: res?.data?.datein ?? '',
           tripin: res?.data?.tripin ?? '',
-          //shipin: this.shipNombreEsp,
+          shipin: this.shipNombreEsp,
         });
         console.log("movement actualizado:", this.movement);
       },
@@ -302,7 +315,7 @@ export class PatchPage {
       deliveryin: f.deliveryin ?? '',
       datein: f.datein ?? '',
       tripin: f.tripin ?? '',
-      //shipin: Number(f.shipin ?? 0),
+      shipin: Number(f.shipin ?? 0),
     };
   }
 
@@ -357,10 +370,6 @@ export class PatchPage {
   }
 
 
-
-
-
-
    normalizeOCR(str) {
     if (!str) return '';
     return str
@@ -404,39 +413,41 @@ export class PatchPage {
     const score = this.similarity(na, nb);
     return score >= threshold;
   }
-/*  getShipId(objA, objBList) {*/
-    /*const shipName = objA?.data?.shipin ?? null;*/
-    /*const shipIMO = objA?.data?.shipinimo ?? null;*/
-    /*let bestScore = 0;*/
-    /*let bestId = 0;*/
-    /*// 1️⃣ buscar por nombre*/
-    /*if (shipName) {*/
-      /*for (const ship of objBList) {*/
-        /*const name = ship?.data?.name;*/
-        /*if (!name) continue;*/
-        /*const score = this.similarity(*/
-          /*this.normalizeOCR(shipName),*/
-          /*this.normalizeOCR(name)*/
-        /*);*/
-        /*if (score > bestScore && score > 0.75) {*/
-          /*bestScore = score;*/
-          /*bestId = ship.id;*/
-        /*}*/
-      /*}*/
-      /*if (bestId !== 0) return bestId;*/
-    /*}*/
-    /*// 2️⃣ fallback por IMO*/
-    /*if (shipIMO) {*/
-      /*for (const ship of objBList) {*/
-        /*const imo = ship?.data?.imo;*/
-        /*if (!imo) continue;*/
-        /*if (this.fuzzyMatch(shipIMO, imo, 0.9)) {*/
-          /*return ship.id;*/
-        /*}*/
-      /*}*/
-    /*}*/
-    /*return 0;*/
-  /*}*/
+
+/*---------- SHIP-----*/
+    getShipId(objA, objBList) {
+    const shipName = objA?.data?.shipin ?? null;
+    const shipIMO = objA?.data?.shipinimo ?? null;
+    let bestScore = 0;
+    let bestId = 0;
+    // 1️⃣ buscar por nombre
+    if (shipName) {
+      for (const ship of objBList) {
+        const name = ship?.data?.name;
+        if (!name) continue;
+        const score = this.similarity(
+          this.normalizeOCR(shipName),
+          this.normalizeOCR(name)
+        );
+        if (score > bestScore && score > 0.75) {
+          bestScore = score;
+          bestId = ship.id;
+        }
+      }
+      if (bestId !== 0) return bestId;
+    }
+    // 2️⃣ fallback por IMO
+    if (shipIMO) {
+      for (const ship of objBList) {
+        const imo = ship?.data?.imo;
+        if (!imo) continue;
+        if (this.fuzzyMatch(shipIMO, imo, 0.9)) {
+          return ship.id;
+        }
+      }
+    }
+    return 0;
+  }
 
   shipList: any[] = [];
   getShip() {
@@ -463,7 +474,74 @@ export class PatchPage {
     this.movement.data.ship=selectedId;
   }
 
+ /*---- CCO------ */
+  onCcoSearch(text: string) {
+    console.log('text to search',text)
+    this.applyFilter(text);  
+  }  
+  applyFilter(text: string) {
+    if (!text || text.trim() === '') {
+      this.filteredList = this.ccoList;
+      return;
+    }
+    const search = text.trim().toLowerCase();
+    this.filteredList = this.ccoList.filter(item => {
+      const name = (item?.data?.name || '').toLowerCase();
 
+      return name.includes(search);
+    });
+    console.log('filteredList', this.filteredList);
+  }
+  ccoList:any[]=[];          
+  ccoMap:CcoMap={};                
+  loadCcos() {               
+    this.ccoService.load().subscribe({
+      next:(map)=>{
+        this.ccoMap=map;     
+        this.ccoService.debugMapping(this.filteredList);
+      },    
+      error:(err)=>{
+        console.error('Error loading ccos',err); 
+      }     
+    });     
+  }   
+  filteredList: any[] = [];     //lista filtrada
+  getAllCco(){
+    this.ccoService.getAll().subscribe({
+      next: (response: any[]) => {
+        console.log('cco List', response);
+        this.ccoList = response;
+      },
+      error: (err: any) => {
+        console.error('Error cargando CCO', err);
+      }
+    });
+  }
+  ccoName: string = '';   // nombre a mostrar
+  ccoId: number = 0;   // id cco seleccionado a mostrar
+  selectCco(item: any) {
+    this.cco = item;
+    this.ccoName = item.data.name;
+    this.ccoId = item.id;
+    //actualizar movement (muy importante en tu flujo)
+    console.log('item pasado:', item);
+    console.log('cco name:', this.ccoName);
+    console.log('cco id:', this.ccoId);
+  }
+  cco:any;  
+  isotanq:any;
+  ccos: any[] = []; 
+  loadCco() {                
+    this.ccoService.getAll().subscribe({ 
+        next: (res) => {       
+          console.log('Cco:', res);    
+          this.ccos = res;
+        }, 
+        error: (err) => {      
+          console.error(' Error al cargar cco:', err); 
+        } 
+      }); 
+   } 
 
 
 }

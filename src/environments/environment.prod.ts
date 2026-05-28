@@ -1,4 +1,4 @@
-const env='dev';
+let env='dev';
 
 export const environment={
   production:true,
