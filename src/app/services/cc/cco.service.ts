@@ -96,9 +96,6 @@ export class CcoService {
 
 
 
-
-
-
   ccoList: Cco[] = [];
   ccoMap: CcoMap = {};
 
@@ -109,11 +106,7 @@ export class CcoService {
         const mapData: CcoMap = {};
         ccos.forEach((cco, index) => {
           const id = Number(cco.id);
-          console.log(
-            '➡️ cco[' + index + '] id(normalizado) =>',
-            id,
-            typeof id
-          );
+          //console.log('➡️ cco['+index +'] id(normalizado) =>',id,typeof id);
           mapData[id] = {
             name: cco.data?.name ?? 'N/A',
             color: cco.data?.color ?? '#ccc'
@@ -149,12 +142,7 @@ export class CcoService {
     console.log(' DEBUG withdrawn -> ccoMap');
     withdrawnList.slice(0, 10).forEach((item, i) => {
       const ccoId = item?.data?.name;
-      console.log(
-        ' item[' + i + '] ccoId =>',
-        ccoId,
-        'tipo:',
-        typeof ccoId
-      );
+      //console.log(' item[' + i + '] ccoId =>',ccoId,'tipo:',typeof ccoId);
       const cco = this.ccoMap[Number(ccoId)];
       if (!cco) {
         console.warn(

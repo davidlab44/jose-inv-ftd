@@ -28,7 +28,6 @@ import { ReplenishmentService } from '../../../../services/replenishment/repleni
 import { PhotoService } from '../../../../services/asset/photo.service';
 import { OcrService } from '../../../../services/ai/ocr.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
-import { GlppricesService } from '../../../../services/replenishment/glpprices.service';
 import { AllocService } from '../../../../services/replenishment/alloc.service';
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
 import { ShipService } from '../../../../services/logistic/ship.service';
@@ -47,20 +46,13 @@ export class AssetSupplyPostPage {
   hasOwner:boolean=false;
   segment = 'all';
   showSearchbar: boolean;
-  opportunities = [];
   storedObject: any;
-  posOrders: any[] = [];
-  posOrderLineList: any[] = [];
-  pendingCommands: any[] = [];
-  deliveredList: any[] = [];
   filteredProductList: any[] = [];
   maxQtyDeliveredItems: any[] = [];
   queryText:any
-  mesas: any[] = [];
   activeSession: Session | null = null;
   sessionId: number | null = null;
   searchSubject = new Subject<string>();
-  
   searchCcoSubject = new Subject<string>(); 
   todayDate:any;
   form!: FormGroup;
@@ -99,7 +91,6 @@ export class AssetSupplyPostPage {
     private ocrService: OcrService,
     private ccoService: CcoService,
     private allocService: AllocService,
-    private glpPricesService: GlppricesService,
     private shipService : ShipService,
     private withdrawnService: WithdrawnService
   ) {}
@@ -255,8 +246,6 @@ export class AssetSupplyPostPage {
     };
     withdrawn.data.shipin=this.shipId
     withdrawn.data.imgin=this.uploadedUrl;
-    const item= this.getGlpPriceItemByDate('2026-04-11T16:26:07',1)
-    withdrawn.data.price=item.data.price + "," + String(item.data.cents).padStart(2, '0');
     withdrawn.data.id_replenishment_product=1;
     let payload = withdrawn.data;
     payload.name= this.ccoId;
@@ -266,6 +255,12 @@ export class AssetSupplyPostPage {
         console.log("Withdrawn post response", response);
         this.utilService.presentToast("registro actualizado exitosamente","success",1000);
         this.setWithdrawnState(response[0]?.id,'in');
+        if(this.ocrResponse.data.contenedores[1].length>1){
+          const container2Id=this.ccoService.getIdByName(this.ocrResponse.data.contenedores[1])
+          this.cloneWithdrawn(payload,container2Id);
+        }else{
+
+        }
       },
       error: (err) => {
         console.error("Withdrawn post error", err);
@@ -347,10 +342,7 @@ export class AssetSupplyPostPage {
 
 
 
-
-
-
-/*  -------  ship --------- */  
+  /*  -------  ship --------- */  
   shipList: any[] = [];
   shipMap: Record<string, number> = {};
   imoMap: Record<string, number> = {};
@@ -496,38 +488,6 @@ export class AssetSupplyPostPage {
 
 
 
-
-
-  glpPriceList: any[] = []; 
-  loadGlpPrice() {              
-     this.glpPricesService.getAll().subscribe({ 
-        next: (res) => {       
-          console.log('✅glpPrices',res);    
-          this.glpPriceList = res;
-
-        }, 
-        error: (err) => {      
-          console.error(' Error al cargar glpPrices:', err); 
-        } 
-      }); 
-  } 
-
-  getGlpPriceItemByDate(date:string,idReplenishmentProduct:number):any|null {
-    const target=new Date(date).getTime();
-    for(const item of this.glpPriceList) {
-      const data=item?.data;
-      if(!data)
-        continue;
-      if(data.id_replenishment_product!==idReplenishmentProduct)
-        continue;
-      const init=new Date(data.init).getTime();
-      const end=new Date(data.end).getTime();
-      if(target>=init && target<=end)
-        return item;
-    }
-    return null;
-  }
-
   /*---- CCO------ */
   onCcoSearch(text: string) {
     console.log('text to search',text)
@@ -548,7 +508,6 @@ export class AssetSupplyPostPage {
   }
   ccoList:any[]=[];          
   ionViewDidEnter() {        
-    this.loadGlpPrice();
     this.loadCcos();         
     //this.getAllPrices();     
     this.getAllCco();
@@ -605,6 +564,88 @@ export class AssetSupplyPostPage {
 
   /*onShipSelect(e:any){}*/
   /*shipList:any[]=[];*/
+/*------clone-------*/
+
+ async  cloneWithdrawn(item: any,contenedor2Id) {
+    console.log("item pasado:", item);
+    //chatgpt => agregar al payload en data.twin el item.id
+    const payload = this.buildClonePayload(item,contenedor2Id);
+    console.log("Payload a enviar:", payload);
+    this.withdrawnService.postClone(payload).subscribe({
+      next: (response) => {
+        console.log("Clone creado", response);
+        //chatgpt => hacer un patch a este "withdrawnItem" data.twin el que se creo
+        this.selfPatch(item,response[0].id);
+      },
+      error: (err) => {
+        console.error("Error al clonar", err);
+      }
+    });
+  }
+
+  buildClonePayload(item: any,container2Id): any {
+    //  Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)
+    const d = item?.data?.data ?? item?.data ?? {};
+    return {
+      ext_id: null,
+      // ⚠️ Puedes cambiar esto a new Date().toISOString() si quieres que sea "nuevo"
+      created_at: item.created_at,
+      updated_at: item.created_at,
+      data: {
+        // RESET
+        kg: 0,
+        img: "",
+        psi: 0,
+        date: d.date ?? null,
+        name: container2Id,
+        seal: [],
+        twin: item.id,
+        id_replenishment_product: 0,
+        price: 0,
+        imgin: null,
+        shipin: 0,
+        ticket: "",
+        tripin: "",
+        vendor: 0,
+        datein: "",
+        // MANTENER w*
+        wnet: d.wnet ?? 0,
+        wtare: d.wtare ?? 0,
+        wgross: d.wgross ?? 0,
+        wticket: d.wticket ?? 0,
+        // MANTENER *out
+        imgout: d.imgout ?? null,
+        dateout: d.dateout ?? null,
+        shipout: d.shipout ?? 0,
+        tripout: d.tripout ?? "",
+        deliveryout: d.deliveryout ?? 0,
+        // OTROS
+        imgscale: d.imgscale ?? null,
+        rotogate: 0,
+        deliveryin: 0
+      },
+      refdate: null,
+      state: "pre-in"
+    };
+  }
+
+  async selfPatch(item:any,twin:number) {
+    item.data.twin=twin;
+    console.log("item to selfpatch ",item)
+    console.log("d to selfpatch ",item)
+    this.withdrawnService.patch(item.id,item.data).subscribe({
+      next: (response) => {
+        console.log("Withdrawn selfpatch response", response);
+        this.utilService.presentToast("movimiento actualizado",'success',500)
+        //this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
+ 
+      },
+      error: (err) => {
+        console.error("Withdrawn selfpatch error", err);
+      }
+    });
+  }
+
 
 
 }

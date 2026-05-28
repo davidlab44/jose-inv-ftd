@@ -193,25 +193,23 @@ export class GetallPage implements OnInit {
   }
 
 
-
-
-changeStartDay(delta: number) {
-  this.startDay = Math.max(1, Math.min(365, this.startDay + delta));
-  // evitar que supere endDay
-  if (this.startDay > this.endDay) {
-    this.startDay = this.endDay;
+  changeStartDay(delta: number) {
+    this.startDay = Math.max(1, Math.min(365, this.startDay + delta));
+    // evitar que supere endDay
+    if (this.startDay > this.endDay) {
+      this.startDay = this.endDay;
+    }
+    this.updateRangeAndFetch();
   }
-  this.updateRangeAndFetch();
-}
 
-changeEndDay(delta: number) {
-  this.endDay = Math.max(1, Math.min(365, this.endDay + delta));
-  // evitar que sea menor que startDay
-  if (this.endDay < this.startDay) {
-    this.endDay = this.startDay;
+  changeEndDay(delta: number) {
+    this.endDay = Math.max(1, Math.min(365, this.endDay + delta));
+    // evitar que sea menor que startDay
+    if (this.endDay < this.startDay) {
+      this.endDay = this.startDay;
+    }
+    this.updateRangeAndFetch();
   }
-  this.updateRangeAndFetch();
-}
 
 
 
@@ -375,6 +373,7 @@ initDefaultRange(days: number) {
         seal: [],
         twin: item.id,
         price: 0,
+        id_replenishment_product: 0,
         imgin: null,
         shipin: 0,
         ticket: "",

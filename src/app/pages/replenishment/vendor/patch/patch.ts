@@ -98,7 +98,7 @@ export class PatchPage {
     private ocrService : OcrService,
     private withdrawnService : WithdrawnService,
     private ccoService : CcoService,
-    private glpricesService: GlppricesService
+    private glpPricesService: GlppricesService
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state?.item) {
@@ -133,6 +133,7 @@ export class PatchPage {
       ).subscribe(text => {
         this.applyFilter(text);
       });
+     this.loadGlpPrice();
   }
 
   ionViewWillEnter() {
@@ -363,16 +364,16 @@ export class PatchPage {
     };
   }
 
+
   patch() {
+    const item= this.getGlpPriceItemByDate('2026-05-20T16:26:07',1)
+    this.movement.data.price=item.data.price + "," + String(item.data.cents).padStart(2, '0').toString();
+    this.movement.data.id_replenishment_product=1;
     console.log("patch price",this.form.value.price);
     this.updateMovementFromForm();
-    //console.log("2");
     this.movement.data.img = this.uploadedUrl;
-    //console.log("3");
     this.movement.data.price = Number(this.form.value.price) || 0;
-    //console.log("4");
     let payload = this.movement.data;
-    //console.log("5");
     payload.name = this.ccoId;
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
@@ -465,7 +466,7 @@ export class PatchPage {
   }
 
   getAllPrices() {
-    this.glpricesService.getAll().subscribe({
+    this.glpPricesService.getAll().subscribe({
       next: (response) => {
         this.glppricesList = response.slice().reverse();
         console.log("pricelist",this.glppricesList)
@@ -502,6 +503,42 @@ export class PatchPage {
         });
     }
   }
+
+
+
+
+/*--------price-----------*/
+  glpPriceList: any[] = []; 
+  loadGlpPrice() {              
+     this.glpPricesService.getAll().subscribe({ 
+        next: (res) => {       
+          console.log('✅glpPrices',res);    
+          this.glpPriceList = res;
+
+        }, 
+        error: (err) => {      
+          console.error(' Error al cargar glpPrices:', err); 
+        } 
+      }); 
+  } 
+
+  getGlpPriceItemByDate(date:string,idReplenishmentProduct:number):any|null {
+    const target=new Date(date).getTime();
+    for(const item of this.glpPriceList) {
+      const data=item?.data;
+      if(!data)
+        continue;
+      if(data.id_replenishment_product!==idReplenishmentProduct)
+        continue;
+      const init=new Date(data.init).getTime();
+      const end=new Date(data.end).getTime();
+      if(target>=init && target<=end)
+        return item;
+    }
+    return null;
+  }
+
+
 
 
  }
