@@ -203,6 +203,9 @@ export class AssetSupplyPostPage {
         this.shipId=this.getShipId(res);
         console.log('contenedores extraidos',res.data.contenedores)
         this.ccoName="TCSU "+res.data.contenedores[0];
+        if(res.data.contenedores[1]){
+          this.cco2Name="TCSU "+res.data.contenedores[1];
+        }
         this.ccoId=this.ccoService.getIdByName(this.ccoName);     
         console.log('name:', this.ccoName);
         console.log('id:', this.ccoId);
@@ -561,6 +564,52 @@ export class AssetSupplyPostPage {
         } 
       }); 
    } 
+
+
+
+
+
+
+  /*---- CCO2------ */
+  cco2Name: string = '';   // nombre a mostrar
+  cco2Id: number = 0;   // id cco seleccionado a mostrar
+  select2Cco(item: any) {
+    this.cco2 = item;
+    this.cco2Name = item.data.name;
+    this.cco2Id = item.id;
+    //actualizar movement (muy importante en tu flujo)
+    console.log('item pasado cco2:', item);
+    console.log('cco2 name:', this.cco2Name);
+    console.log('cco2 id :', this.cco2Id);
+  }
+  cco2:any;  
+  isotanq2:any;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   /*onShipSelect(e:any){}*/
   /*shipList:any[]=[];*/

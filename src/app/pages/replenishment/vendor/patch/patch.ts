@@ -364,7 +364,6 @@ export class PatchPage {
     };
   }
 
-
   patch() {
     const item= this.getGlpPriceItemByDate('2026-05-20T16:26:07',1)
     this.movement.data.price=item.data.price + "," + String(item.data.cents).padStart(2, '0').toString();
@@ -434,28 +433,6 @@ export class PatchPage {
     console.log('cco name:', this.ccoName);
     console.log('cco id:', this.ccoId);
   }
-  /*resolveInitialCco() {*/
-  
-    /*console.log("resolve initial cco")*/
-    /*//validar que haya lista*/
-    /*if (!this.ccoList || this.ccoList.length === 0) return;*/
-    /*//obtener ID desde router*/
-    /*const ccoId = this.movement?.data?.name;*/
-    /*if (!ccoId) {*/
-      /*console.warn('No hay ccoId en movement');*/
-      /*return;*/
-    /*}*/
-    /*//buscar en lista*/
-    /*const found = this.ccoList.find(item => item.id == ccoId);*/
-    /*if (found) {*/
-      /*this.cco = found;*/
-      /*this.ccoName = found.data.name;*/
-      /*this.ccoId = found.data.id;*/
-      /*console.log('CCO encontrado:', this.ccoName);*/
-    /*} else {*/
-      /*console.warn('CCO no encontrado para id:', ccoId);*/
-    /*}*/
-  /*}*/
 
   isImportedGlp(ev: any) {
     const checked = ev.detail.checked;
@@ -512,9 +489,8 @@ export class PatchPage {
   loadGlpPrice() {              
      this.glpPricesService.getAll().subscribe({ 
         next: (res) => {       
-          console.log('✅glpPrices',res);    
+          console.log('glpPrices',res);    
           this.glpPriceList = res;
-
         }, 
         error: (err) => {      
           console.error(' Error al cargar glpPrices:', err); 
@@ -541,7 +517,7 @@ export class PatchPage {
 
 
 
- }
+}
 
 
 

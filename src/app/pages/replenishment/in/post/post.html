@@ -126,6 +126,56 @@
       </ion-row>
     </ion-grid>
 
+
+
+
+
+
+    <!--<ion-grid>-->
+      <!--<ion-row>-->
+        <!--<ion-col size="12" size-md="6">-->
+          <!--<ion-item>-->
+            <!--<ion-label>-->
+              <!--<h2 *ngIf="cco2Name else loading">-->
+                <!--{{ cco2Name }}-->
+              <!--</h2>-->
+              <!--<ng-template #loading>-->
+                <!--<span>Cargando Isotanq...</span>-->
+              <!--</ng-template>-->
+            <!--</ion-label>-->
+          <!--</ion-item>-->
+        <!--</ion-col>-->
+        <!--<ion-col size="12" size-md="6">-->
+          <!--<ion-searchbar-->
+            <!--placeholder="Buscar CCO No. 2 (ej: TCSU 500032)"-->
+            <!--show-clear-button="always"-->
+            <!--(ionInput)="onCcoSearch($event.detail.value)">-->
+          <!--</ion-searchbar>-->
+          <!--<ion-list>-->
+            <!--<ion-item *ngFor="let item2 of filteredList" button>-->
+              <!--<div class="cco-item" (click)="select2Cco(item)">-->
+                <!--<ion-label>-->
+                  <!--<h2>{{ item2.data.name }}</h2>-->
+                <!--</ion-label>-->
+                <!--<ion-badge-->
+                  <!--*ngIf="item2.data.color"-->
+                  <!--[style.background]="item2.data.color">-->
+                <!--</ion-badge>-->
+              <!--</div>-->
+            <!--</ion-item>-->
+          <!--</ion-list>-->
+          <!--<ion-text *ngIf="filteredList.length === 0" color="medium">-->
+            <!--<p class="empty-text">-->
+              <!--No se encontraron resultados-->
+            <!--</p>-->
+          <!--</ion-text>-->
+        <!--</ion-col>-->
+      <!--</ion-row>-->
+    <!--</ion-grid>-->
+
+
+
+
     <ion-button expand="block" (click)="post()">
       Guardar
     </ion-button>
