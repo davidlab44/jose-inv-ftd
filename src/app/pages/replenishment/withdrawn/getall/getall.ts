@@ -66,7 +66,8 @@ export class GetallPage implements OnInit {
   showSearchbar: boolean;
   searchSubject = new Subject<string>();
   //ccoList: any[] = [];
-
+  displayToEnevis=true;
+  
   constructor(
     private barcodeService: BarcodeService,
     public alertCtrl: AlertController,

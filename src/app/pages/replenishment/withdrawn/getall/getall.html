@@ -118,12 +118,33 @@
   </ion-row>
 </ion-grid>
 
+
+
+
+
+
 <!-- LISTA DE REGISTROS -->
 <ng-container *ngFor="let item of fullWithdrawnList">
   <ng-container
-    *ngTemplateOutlet="withdrawnRow; context: { p: item }">
+    *ngIf="
+      !displayToEnevis ||
+      (
+        item?.data?.deliveryout?.length > 2 &&
+        item?.data?.shipout > 0 &&
+        item?.data?.imgout?.length > 2
+      )
+    ">
+    <ng-container
+      *ngTemplateOutlet="withdrawnRow; context:{p:item}">
+    </ng-container>
   </ng-container>
 </ng-container>
+
+<!--<ng-container *ngFor="let item of fullWithdrawnList">-->
+  <!--<ng-container-->
+    <!--*ngTemplateOutlet="withdrawnRow; context: { p: item }">-->
+  <!--</ng-container>-->
+<!--</ng-container>-->
 
 <!-- ================= TEMPLATE ROW ================= -->
 
@@ -161,6 +182,19 @@
       </ion-col>
 
       <ion-col size="1" class="actions-col">
+       <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Viajes | Llegadas"
+          [color]="p.data.shipin > 0 ? 'success' : 'dark'"
+          (click)="patch(p,'in'); $event.stopPropagation()">
+          <ion-icon name="boat-outline"></ion-icon>
+        </ion-button>
+      </ion-col>
+
+
+      <ion-col size="1" class="actions-col">
         <ion-button
           fill="clear"
           size="small"
@@ -189,18 +223,6 @@
           fill="clear"
           size="small"
           class="btn-compact"
-          title="Viajes | Llegadas"
-          [color]="p.data.shipin > 0 ? 'success' : 'dark'"
-          (click)="patch(p,'in'); $event.stopPropagation()">
-          <ion-icon name="boat-outline"></ion-icon>
-        </ion-button>
-      </ion-col>
-
-      <ion-col size="1" class="actions-col">
-       <ion-button
-          fill="clear"
-          size="small"
-          class="btn-compact"
           title="Viajes | Salidas"
           [color]="p.data.shipout > 0 ? 'success' : 'dark'"
           (click)="patch(p,'out'); $event.stopPropagation()">
@@ -222,14 +244,9 @@
     </ion-row>
   </ion-grid>
 
-
-<!--<ion-fab vertical="bottom" horizontal="end" slot="fixed">-->
-  <!--<ion-fab-button-->
-    <!--class="fab-clean"-->
-    <!--(click)="plexaUploader('no estoy pasando nada')">-->
-    <!--<ion-icon name="add"></ion-icon>-->
-  <!--</ion-fab-button>-->
-<!--</ion-fab>-->
-
 </ng-template>
+
+
+
+
 
