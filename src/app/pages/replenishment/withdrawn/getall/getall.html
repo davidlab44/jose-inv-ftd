@@ -6,7 +6,7 @@
 
     <ion-searchbar
       placeholder="Buscar"
-      (ionInput)="onSearch($event.target.value)">
+      (ionInput)="onSearch2($event.target.value)">
     </ion-searchbar>
 
     <ion-buttons slot="end">
@@ -21,15 +21,14 @@
 </ion-header>
 
 <ion-content>
-
+  <div>filteredwithdrawnlist<pre>{{filteredWithdrawnList | json}}</pre></div>
+  <div>fullwihhdrawnlist<pre>{{fullWithdrawnList | json}}</pre></div>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button class="fab-premium" (click)="plexaUploader('no estoy pasando nada')">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-
   <br>
-
   <ion-item class="range-container" lines="none">
     <div class="date-boxes">
       <!-- DESDE -->
@@ -118,20 +117,15 @@
   </ion-row>
 </ion-grid>
 
-
-
-
-
-
 <!-- LISTA DE REGISTROS -->
 <ng-container *ngFor="let item of fullWithdrawnList">
   <ng-container
     *ngIf="
       !displayToEnevis ||
       (
-        item?.data?.deliveryout?.length > 2 &&
-        item?.data?.shipout > 0 &&
-        item?.data?.imgout?.length > 2
+        item?.data?.deliveryout?.length ==0 ||
+        item?.data?.shipout == 0 ||
+        item?.data?.imgout?.length ==0 
       )
     ">
     <ng-container

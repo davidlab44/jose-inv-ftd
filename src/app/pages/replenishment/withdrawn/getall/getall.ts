@@ -23,7 +23,6 @@ import { ProductService } from '../../../../services/product.service';
 import { BarcodeService } from '../../../../services/barcode.service';
 import { CategoryService } from '../../../../services/category.service';
 import { Product } from '../../../../interfaces/product';
-import { Subject } from 'rxjs';
 import { DateService } from '../../../../services/local/date.service';
 import { RexService } from '../../../../services/rex.service';
 import { ProdrexService } from '../../../../services/prodrex.service';
@@ -31,6 +30,8 @@ import { UserService } from '../../../../services/user.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { Cco,CcoMap } from '../../../../interfaces/cco';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'page-getall',
@@ -40,7 +41,9 @@ import { Cco,CcoMap } from '../../../../interfaces/cco';
 export class GetallPage implements OnInit {
 
   @ViewChild(IonList, { static: false }) ionList!: IonList;
+  searchSubject: Subject<string> = new Subject();
   withdrawnList: any[] = [];
+  filteredWithdrawnList: any[] = [];
   fullWithdrawnList: any[] = [];
   dayRange = {
     lower: 1,
@@ -64,7 +67,7 @@ export class GetallPage implements OnInit {
   valor4 = 0;
   ios: boolean;
   showSearchbar: boolean;
-  searchSubject = new Subject<string>();
+  //searchSubject = new Subject<string>();
   //ccoList: any[] = [];
   displayToEnevis=true;
   
@@ -103,6 +106,48 @@ export class GetallPage implements OnInit {
   ngOnInit() {
     this.initDefaultRange(30);
     this.loadCcos();
+    this.displayToEnevis=false;//esto es para que muestre todo los elementos que coincidan 
+    
+    this.filteredWithdrawnList = [...this.withdrawnList];
+
+
+
+
+
+this.searchSubject.pipe(
+  debounceTime(500),
+  distinctUntilChanged()
+).subscribe((text: string) => {
+
+  console.log('withdrawnList size', this.withdrawnList.length);
+
+  const value = text.toLowerCase().trim();
+
+  this.filteredWithdrawnList = this.withdrawnList.filter(item =>
+    JSON.stringify(item).toLowerCase().includes(value)
+  );
+
+  console.log(
+    'filtered size',
+    this.filteredWithdrawnList.length
+  );
+});
+
+
+
+
+
+  }
+
+
+
+
+
+
+  onSearch2(event: any) {
+console.log('event',event)  
+    const value = event || '';
+    this.searchSubject.next(value);
   }
 
   ionViewWillEnter() {
@@ -432,7 +477,7 @@ initDefaultRange(days: number) {
     const map: CcoMap = {};
     ccoList.forEach((cco, index) => {
       const id = Number(cco.id); // NORMALIZAR
-      //console.log(`➡️ cco[${index}] id(normalizado) =>`, id, typeof id);
+      //console.log(`cco[${index}] id(normalizado) =>`, id, typeof id);
       map[id] = {
         name: cco.data?.name ?? 'N/A',
         color: cco.data?.color ?? '#ccc'
@@ -447,32 +492,47 @@ initDefaultRange(days: number) {
   loadCcos() {
     this.ccoService.getAll().subscribe({
       next: (ccos) => {
-        //console.log('📦 ccoList RAW =>', ccos);
+        //console.log('ccoList RAW =>', ccos);
         this.ccoList = ccos;
         this.ccoMap = this.buildCcoMap(ccos);
-        //console.log('🧭 ccoMap =>', this.ccoMap);
-        //console.log('🔑 ccoMap keys =>', Object.keys(this.ccoMap));
+        //console.log('ccoMap =>', this.ccoMap);
+        //console.log('ccoMap keys =>', Object.keys(this.ccoMap));
         this.debugCcoMapping();
       },
-      error: (err) => console.error('❌ Error loading ccos', err)
+      error: (err) => console.error('Error loading ccos', err)
     });
   }
 
   debugCcoMapping() {
-    //console.log('🧪 DEBUG withdrawn -> ccoMap');
-
     this.filteredList.slice(0, 10).forEach((item, i) => {
       const ccoId = item?.data?.name;
-      //console.log(`🔎 item[${i}] ccoId =>`, ccoId, 'tipo:', typeof ccoId);
+      //console.log(`item[${i}] ccoId =>`, ccoId, 'tipo:', typeof ccoId);
       const cco = this.ccoMap[ccoId];
       if (!cco) {
-        console.warn(`❌ NO MATCH para ccoId=${ccoId}`, {
+        console.warn(`NO MATCH para ccoId=${ccoId}`, {
           availableKeys: Object.keys(this.ccoMap)
         });
       } else {
-        console.log(`✅ MATCH ccoId=${ccoId} =>`, cco);
+        console.log(`MATCH ccoId=${ccoId} =>`, cco);
       }
     });
+  }
+
+  presentFilter(){
+    this.displayToEnevis=!this.displayToEnevis;
+    console.log('display to enevis',this.displayToEnevis.toString())
+  }
+
+  findMostRecentMovement(name: number): any | null {
+    return this.withdrawnList.reduce((max, item) => {
+      if (item?.data?.name !== name) {
+        return max;
+      }
+      if (!max || item.id > max.id) {
+        return item;
+      }
+      return max;
+    }, null);
   }
 
 
