@@ -16,29 +16,29 @@ const routes: Routes = [
             path: '',
             component: SchedulePage,
           },
-          {
-            path: 'session/:sessionId',
-            loadChildren: () => import('../session-detail/session-detail.module').then(m => m.SessionDetailModule)
-          }
+  /*        {*/
+            /*path: 'session/:sessionId',*/
+            /*loadChildren: () => import('../session-detail/session-detail.module').then(m => m.SessionDetailModule)*/
+          /*}*/
         ]
       },
-      {
-        path: 'speakers',
-        children: [
-          {
-            path: '',
-            loadChildren: () => import('../speaker-list/speaker-list.module').then(m => m.SpeakerListModule)
-          },
-          {
-            path: 'session/:sessionId',
-            loadChildren: () => import('../session-detail/session-detail.module').then(m => m.SessionDetailModule)
-          },
-          {
-            path: 'speaker-details/:speakerId',
-            loadChildren: () => import('../speaker-detail/speaker-detail.module').then(m => m.SpeakerDetailModule)
-          }
-        ]
-      },
+/*      {*/
+        /*path: 'speakers',*/
+        /*children: [*/
+          /*{*/
+            /*path: '',*/
+            /*loadChildren: () => import('../speaker-list/speaker-list.module').then(m => m.SpeakerListModule)*/
+          /*},*/
+          /*{*/
+            /*path: 'session/:sessionId',*/
+            /*loadChildren: () => import('../session-detail/session-detail.module').then(m => m.SessionDetailModule)*/
+          /*},*/
+          /*{*/
+            /*path: 'speaker-details/:speakerId',*/
+            /*loadChildren: () => import('../speaker-detail/speaker-detail.module').then(m => m.SpeakerDetailModule)*/
+          /*}*/
+        /*]*/
+      /*},*/
       {
         path: 'map',
         children: [
@@ -48,24 +48,24 @@ const routes: Routes = [
           }
         ]
       },
-      {
-        path: 'about',
-        children: [
-          {
-            path: '',
-            loadChildren: () => import('../about/about.module').then(m => m.AboutModule)
-          }
-        ]
-      },
-      {
-        path: 'order',
-        children: [
-          {
-            path: '',
-            loadChildren: () => import('../order/order.module').then(m => m.OrderModule)
-          }
-        ]
-      },
+      /*      {*/
+        /*path: 'about',*/
+        /*children: [*/
+          /*{*/
+            /*path: '',*/
+            /*loadChildren: () => import('../about/about.module').then(m => m.AboutModule)*/
+          /*}*/
+        /*]*/
+      /*},*/
+/*      {*/
+        /*path: 'order',*/
+        /*children: [*/
+          /*{*/
+            /*path: '',*/
+            /*loadChildren: () => import('../order/order.module').then(m => m.OrderModule)*/
+          /*}*/
+        /*]*/
+      /*},*/
       {
         path: 'scnbrcd',
         children: [
@@ -75,15 +75,15 @@ const routes: Routes = [
           }
         ]
       },
-      {
-        path: 'kitchen',
-        children: [
-          {
-            path: '',
-            loadChildren: () => import('../kitchen/kitchen.module').then(m => m.KitchenModule)
-          }
-        ]
-      },
+/*      {*/
+        /*path: 'kitchen',*/
+        /*children: [*/
+          /*{*/
+            /*path: '',*/
+            /*loadChildren: () => import('../kitchen/kitchen.module').then(m => m.KitchenModule)*/
+          /*}*/
+        /*]*/
+      /*},*/
       {
         path: 'readprd',
         children: [

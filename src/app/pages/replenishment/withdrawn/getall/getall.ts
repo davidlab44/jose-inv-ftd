@@ -214,7 +214,6 @@ export class GetallPage implements OnInit {
     return date.toISOString().slice(0, 19);
   }
 
-
   changeStartDay(delta: number) {
     this.startDay = Math.max(1, Math.min(365, this.startDay + delta));
     // evitar que supere endDay
