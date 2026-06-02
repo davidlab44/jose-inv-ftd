@@ -6,7 +6,6 @@ import { tap } from 'rxjs/operators';
 import { BehaviorSubject, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-
 export interface Cco {
   id: number;
   data: {
@@ -27,7 +26,6 @@ export interface CcoMap {
 })
 export class CcoService {
 
-  
   private apiUrl = environment.apiHost; 
   private model = 'cco';
 
@@ -94,8 +92,6 @@ export class CcoService {
     });
   }
 
-
-
   ccoList: Cco[] = [];
   ccoMap: CcoMap = {};
 
@@ -160,12 +156,49 @@ export class CcoService {
     });
   }
 
+  /*findMostRecentMovementOfIsotanq(withdrawnList:any[],isotanqId:number):any{*/
+    /*//filtra los elementos que contengan este data.name   (el numero id del contenedor (data.name puede ser ej: 45))*/
+     /*//desopues toma el que tenga el id mas alto (ese ees el mas reciente y lo retorna*/
 
+  /*}*/
+
+  /*findMostRecentMovementOfIsotanq(withdrawnList:any,isotanqId:number):any{*/
+    /*console.log('withdrawnList',withdrawnList)*/
+    /*console.log('isotanqId',isotanqId)*/
+    /*let found:any=null;*/
+    /*for(const item of withdrawnList){*/
+      /*if(Number(item?.data?.name)!==Number(isotanqId)) continue;*/
+      /*if(!found||item.id>found.id) found=item;*/
+    /*}*/
+    /*return found;*/
+  /*}*/
+
+  findMostRecentMovementOfIsotanq(withdrawnList:any[],ccoId:number):any{
+    console.log('==============================');
+    console.log('findMostRecentMovementOfIsotanq');
+    console.log('ccoId:',ccoId);
+    console.log('isArray:',Array.isArray(withdrawnList));
+    console.log('items:',withdrawnList?.length);
+    const matches=withdrawnList
+      ?.filter(x=>Number(x?.data?.name)===Number(ccoId))
+      ?.map(x=>x.id);
+    console.log('matchingIds:',matches);
+    console.log('matchingCount:',matches?.length||0);
+    let found:any=null;
+    for(const item of withdrawnList){
+      if(Number(item?.data?.name)!==Number(ccoId)) continue;
+      if(!found||Number(item.id)>Number(found.id)) found=item;
+    }
+    console.log('resultId:',found?.id);
+    console.log('resultName:',found?.data?.name);
+    console.log('result:',found);
+    console.log('==============================');
+    return found;
+  }
 
   getIdByName(name:string):number{
-
- console.log('name padaso al servicio',name)
- console.log('ccoMap.length servicio',this.ccoMap)
+  console.log('name pasado al servicio',name)
+  console.log('ccoMap.length servicio',this.ccoMap)
     const input=(name||'')
       .toUpperCase()
       .trim();
@@ -195,8 +228,6 @@ export class CcoService {
     }
     return 0;
   }
-
-
 
 
 }

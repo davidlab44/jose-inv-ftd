@@ -107,45 +107,25 @@ export class GetallPage implements OnInit {
     this.initDefaultRange(30);
     this.loadCcos();
     this.displayToEnevis=false;//esto es para que muestre todo los elementos que coincidan 
-    
     this.filteredWithdrawnList = [...this.withdrawnList];
-
-
-
-
-
-this.searchSubject.pipe(
-  debounceTime(500),
-  distinctUntilChanged()
-).subscribe((text: string) => {
-
-  console.log('withdrawnList size', this.withdrawnList.length);
-
-  const value = text.toLowerCase().trim();
-
-  this.filteredWithdrawnList = this.withdrawnList.filter(item =>
-    JSON.stringify(item).toLowerCase().includes(value)
-  );
-
-  console.log(
-    'filtered size',
-    this.filteredWithdrawnList.length
-  );
-});
-
-
-
-
-
+    this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe((text: string) => {
+      console.log('withdrawnList size', this.withdrawnList.length);
+      const value = text.toLowerCase().trim();
+      this.filteredWithdrawnList = this.withdrawnList.filter(item =>
+        JSON.stringify(item).toLowerCase().includes(value)
+      );
+      console.log(
+        'filtered size',
+        this.filteredWithdrawnList.length
+      );
+    });
   }
 
-
-
-
-
-
   onSearch2(event: any) {
-console.log('event',event)  
+    console.log('event',event)  
     const value = event || '';
     this.searchSubject.next(value);
   }
@@ -157,15 +137,11 @@ console.log('event',event)
   getAll() {
     const since = this.dayOfYearToISO(this.startDay);
     const until = this.dayOfYearToISO(this.endDay, true);
-    //this.withdrawnService.getIntervalByAdate(since, until).subscribe({
-    //tiene que utilizarse created at xq cuando se crea el segundo (el clon ) ese no tiene datain ni nada
     this.withdrawnService.getIntervalByCreatedAtDate(since, until).subscribe({
       next: response => {
         this.withdrawnList = response;
         console.log("withdrawnList response",this.withdrawnList)
-        //this.fullWithdrawnList=this.sortWithdrawnByDate(this.withdrawnList).reverse();
-        this.fullWithdrawnList=this.sortWithdrawnByIdDesc(this.withdrawnList);
-        console.log('full',this,this.fullWithdrawnList)
+        this.fillFullWithdrawnList();
       }
     });
   }
@@ -257,46 +233,44 @@ console.log('event',event)
     this.updateRangeAndFetch();
   }
 
+  private rangeTimeout: any;
 
-
-private rangeTimeout: any;
-
-updateRangeAndFetch() {
-  this.dayRange = {
-    lower: this.startDay,
-    upper: this.endDay
-  };
-  clearTimeout(this.rangeTimeout);
-  this.rangeTimeout = setTimeout(() => {
-    this.getAll();
-  }, 1000); // debounce 🔥
-}
-
-quickRange(ev: any) {
-  const today = this.getTodayDayOfYear();
-  if (ev.detail.value === 'today') {
-    this.startDay = today;
-    this.endDay = today;
+  updateRangeAndFetch() {
+    this.dayRange = {
+      lower: this.startDay,
+      upper: this.endDay
+    };
+    clearTimeout(this.rangeTimeout);
+    this.rangeTimeout = setTimeout(() => {
+      this.getAll();
+    }, 1000);
   }
-  if (ev.detail.value === 'week') {
-    this.startDay = today - 7;
-    this.endDay = today;
-  }
-  if (ev.detail.value === 'month') {
-    this.startDay = today - 30;
-    this.endDay = today;
-  }
-  this.updateRangeAndFetch();
-}
 
-initDefaultRange(days: number) {
-  const today = this.getTodayDayOfYear();
-  this.dayRange = {
-    lower: Math.max(1, today - days),
-    upper: today
-  };
-  this.syncDays();
-}
+  quickRange(ev: any) {
+    const today = this.getTodayDayOfYear();
+    if (ev.detail.value === 'today') {
+      this.startDay = today;
+      this.endDay = today;
+    }
+    if (ev.detail.value === 'week') {
+      this.startDay = today - 7;
+      this.endDay = today;
+    }
+    if (ev.detail.value === 'month') {
+      this.startDay = today - 30;
+      this.endDay = today;
+    }
+    this.updateRangeAndFetch();
+  }
+
+  initDefaultRange(days: number) {
+    const today = this.getTodayDayOfYear();
+    this.dayRange = {
+      lower: Math.max(1, today - days),
+      upper: today
+    };
+    this.syncDays();
+  }
 
   calcularResultado(): number {
     return (this.valor1 || 0) * (this.valor2 || 0);
@@ -381,8 +355,7 @@ initDefaultRange(days: number) {
     });
   }
 
-
- async  cloneWithdrawn(item: any) {
+  async  cloneWithdrawn(item: any) {
     console.log("item pasado:", item);
     //chatgpt => agregar al payload en data.twin el item.id
     const payload = this.buildClonePayload(item);
@@ -399,7 +372,6 @@ initDefaultRange(days: number) {
       }
     });
   }
-
 
   buildClonePayload(item: any): any {
     //  Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)
@@ -462,7 +434,6 @@ initDefaultRange(days: number) {
   }
 
   searchTerm: string = ''; 
-
   get filteredList() {
     if (!this.searchTerm) return this.fullWithdrawnList;
     const term = this.searchTerm.toLowerCase();
@@ -473,6 +444,7 @@ initDefaultRange(days: number) {
     );
   }
 
+  /*---------cco --------------*/
   private buildCcoMap(ccoList: Cco[]): CcoMap {
     const map: CcoMap = {};
     ccoList.forEach((cco, index) => {
@@ -534,6 +506,57 @@ initDefaultRange(days: number) {
       return max;
     }, null);
   }
+
+  /*[>---- CCO------ <]*/
+  onCcoSearch(text: string) {
+    console.log('text to search',text)
+    this.applyFilter(text);  
+  }  
+  applyFilter(text: string) {
+    if (!text || text.trim() === '') {
+      this.topFilteredList = this.ccoList;
+      return;
+    }
+    const search = text.trim().toLowerCase();
+    this.topFilteredList = this.ccoList.filter(item => {
+      const name = (item?.data?.name || '').toLowerCase();
+      return name.includes(search);
+    });
+    console.log('topFilteredList', this.topFilteredList);
+  }
+  topFilteredList: any[] = [];     //lista filtrada
+  ccoName: string = '';   // nombre a mostrar
+  ccoId: number = 0;   // id cco seleccionado a mostrar
+  selectCco(item: any) {
+    this.cco = item;
+    this.ccoName = item.data.name;
+    this.ccoId = item.id;
+    //actualizar movement (muy importante en tu flujo)
+    console.log('item pasado:', item);
+    console.log('cco name:', this.ccoName);
+    console.log('cco id:', this.ccoId);
+    this.findMostRecentMovementOfIsotanq(this.ccoId);
+  }
+  cco:any;  
+  isotanq:any;
+  ccos: any[] = []; 
+
+  /*-------isotanq main -------*/
+  findMostRecentMovementOfIsotanq(ccoId:number){
+    this.fullWithdrawnList=[];
+    const isotanqMain=this.ccoService.findMostRecentMovementOfIsotanq(this.withdrawnList,ccoId);
+    console.log('isotanqMain',isotanqMain)
+    console.log(Array.isArray(this.fullWithdrawnList));
+    console.log(this.fullWithdrawnList);
+    console.log(this.fullWithdrawnList.length);
+    this. fullWithdrawnList.push(isotanqMain); 
+  }
+
+  fillFullWithdrawnList(){
+    this.fullWithdrawnList=this.sortWithdrawnByIdDesc(this.withdrawnList);
+    console.log('full',this,this.fullWithdrawnList)
+  }
+  
 
 
 }
