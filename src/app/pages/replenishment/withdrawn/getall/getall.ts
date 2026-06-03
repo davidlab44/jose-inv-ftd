@@ -541,22 +541,35 @@ export class GetallPage implements OnInit {
   ccos: any[] = []; 
 
   /*-------isotanq main -------*/
-  findMostRecentMovementOfIsotanq(ccoId:number){
-    this.fullWithdrawnList=[];
-    const isotanqMain=this.ccoService.findMostRecentMovementOfIsotanq(this.withdrawnList,ccoId);
-    console.log('isotanqMain',isotanqMain)
-    console.log(Array.isArray(this.fullWithdrawnList));
-    console.log(this.fullWithdrawnList);
-    console.log(this.fullWithdrawnList.length);
-    this. fullWithdrawnList.push(isotanqMain); 
+/*  findMostRecentMovementOfIsotanq(ccoId:number){*/
+    /*this.fullWithdrawnList=[];*/
+    /*const isotanqMain=this.ccoService.findMostRecentMovementOfIsotanq(this.withdrawnList,ccoId);*/
+    /*console.log('isotanqMain',isotanqMain)*/
+    /*this. fullWithdrawnList.push(isotanqMain); */
+    /*console.log(Array.isArray(this.fullWithdrawnList));*/
+    /*console.log(this.fullWithdrawnList);*/
+    /*console.log(this.fullWithdrawnList.length);*/
+  /*}*/
+
+findMostRecentMovementOfIsotanq(ccoId:number){
+  this.fullWithdrawnList=[];
+  const isotanqMain=this.ccoService.findMostRecentMovementOfIsotanq(this.withdrawnList,ccoId);
+  console.log('isotanqMain',isotanqMain);
+  if(!isotanqMain){
+    console.log('No se encontró isotanque para ccoId',ccoId);
+    return;
   }
+  this.fullWithdrawnList=[isotanqMain];
+  console.log('fullWithdrawnList',this.fullWithdrawnList);
+  console.log('length',this.fullWithdrawnList.length);
+}
+
 
   fillFullWithdrawnList(){
     this.fullWithdrawnList=this.sortWithdrawnByIdDesc(this.withdrawnList);
     console.log('full',this,this.fullWithdrawnList)
   }
   
-
 
 }
 

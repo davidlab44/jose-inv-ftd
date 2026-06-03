@@ -57,7 +57,6 @@ export class OrderPage {
   groupedOrder: any = {};
   hash:string='';
   ngOnInit() {
-    // Recuperar session_id desde localStorage
     const mesa_id = localStorage.getItem("mesa_id");
     if (!mesa_id || !Number(mesa_id)) {
       this.utilService.presentToast("No hay mesa activa, reiniciar app", 'danger',1000);
