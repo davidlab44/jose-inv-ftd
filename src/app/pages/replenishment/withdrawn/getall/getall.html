@@ -45,222 +45,99 @@
         </ion-text>
       </ion-col>
     </ion-row>
-    <!--    <ion-row>-->
-      <!--<ion-item *ngFor="let item of topFilteredList">-->
-        <!--p.data.name-->
-        <!--p.data.id-->
-        <!--p.data.ticket-->
-      <!--</ion-item> -->
-    <!--</ion-row>-->
+  </ion-grid>
+  <ion-grid *ngIf="viajanJuntosList && viajanJuntosList.length>0" >
+    <ion-row> 
+      <ion-col size="10">
+        <ion-grid class="viajanjuntos-grid">
+          <ion-row class="withdrawn-header ion-align-items-center">
+            <ion-col size="1"><ion-label></ion-label></ion-col>
+            <ion-col size="1"><ion-label>Entrega:</ion-label></ion-col>
+            <ion-col size="1"><ion-label>F.vacio</ion-label></ion-col>
+            <ion-col size="2"><ion-label>Isotanq.</ion-label></ion-col>
+            <ion-col size="1"><ion-label>Tkt.</ion-label></ion-col>
+            <ion-col size="1"><ion-label>kg</ion-label></ion-col>
+            <ion-col size="5"></ion-col>
+          </ion-row>
+          <ng-container *ngIf="viajanJuntosList?.length">
+            <ion-row
+              *ngFor="let p of viajanJuntosList"
+              class="viajanjuntos-row ion-align-items-center">
+              <ion-col size="1">
+                {{ p.id }}
+              </ion-col>
+              <ion-col size="2">
+                {{ p.data.datein | date:'dd/MM/yyyy' }}
+              </ion-col>
+              <ion-col size="2">
+                {{ p.data.deliveryin }}
+              </ion-col>
+              <ion-col size="4" [style.background]="ccoMap[+p.data.name]?.color || '#eee'" (click)="discoverTwins(p)">
+                {{ ccoMap[+p.data.name]?.name || 'N/A' }}
+              </ion-col>
+              <ion-col size="1">
+                {{ p.data.ticket }}
+              </ion-col>
+              <ion-col size="2">
+                {{ p.data.kg }}
+              </ion-col>
+            </ion-row>
+          </ng-container>
+        </ion-grid>
+      </ion-col> 
+      <ion-col size="2">
+        <br><br>
+        <ion-grid class="viajanjuntos-grid">
+          <ion-row>
+            <ion-col size="12">
+              <br><br>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="12" *ngIf='hasTwin()'>
+              <ion-button
+                fill="clear"
+                size="small"
+                class="btn-compact"
+                title="Desenganchar"
+                [color]="viajanJuntosList?.length > 0 && viajanJuntosList[0]?.data?.twin > 0 ? 'success' : 'dark'"
+                [disabled]="!viajanJuntosList?.length"
+                (click)="desenganchar(viajanJuntosList); $event.stopPropagation()">
+                <ion-icon name="lock-open-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="12" *ngIf='!hasTwin()'>
+              <ion-button
+                fill="clear"
+                size="small"
+                class="btn-compact"
+                title="Desenganchar"
+                [color]="viajanJuntosList?.length > 0 && viajanJuntosList[0]?.data?.twin > 0 ? 'success' : 'dark'"
+                [disabled]="!viajanJuntosList?.length"
+                (click)="enganchar(viajanJuntosList); $event.stopPropagation()">
+                <ion-icon name="lock-open-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-col>
+    </ion-row>
   </ion-grid>
 
 
 
 
-<ion-grid class="withdrawn-header">
-
-  <!-- HEADER -->
-  <ion-row class="ion-align-items-center header-row">
-    <ion-col size="1" class="header-col"><ion-label></ion-label></ion-col>
-    <ion-col size="1" class="header-col"><ion-label>Entrega:</ion-label></ion-col>
-    <ion-col size="1" class="header-col"><ion-label>F.vacio</ion-label></ion-col>
-    <ion-col size="2" class="header-col"><ion-label>Isotanq.</ion-label></ion-col>
-    <ion-col size="1" class="header-col"><ion-label>Tkt.</ion-label></ion-col>
-    <ion-col size="1" class="header-col"><ion-label>kg</ion-label></ion-col>
-    <ion-col size="5" class="header-col"><ion-label></ion-label></ion-col>
-  </ion-row>
-
-
-
-
-  <ion-row>
-    <ion-col size="10">
-      <div style="display:flex;flex-direction:column;width:100%;">
-        <div *ngFor="let item of viajanJuntosList">
-          {{item.id}} {{item.data?.name}} {{item.data?.ticket}}
-        </div>
-      </div>
-    </ion-col>
-    <ion-col
-      size="2"
-      style="display:flex;justify-content:center;align-items:center;">
-      <ion-button
-        size="small"
-        (click)="hookList(viajanJuntosList)">
-        Hook
-      </ion-button>
-    </ion-col>
-  </ion-row>
 
 
 
 
 
-  <!-- DETALLE -->
-<!--  <ion-row>-->
-
-    <!--<ion-col size="10">-->
-
-      <!--<div-->
-        <!--*ngFor="let item of viajanJuntosList"-->
-        <!--style="display:block;width:100%;padding:4px 0;">-->
-
-        <!--<ion-grid>-->
-          <!--<ion-row class="ion-align-items-center">-->
-
-            <!--<ion-col size="1"></ion-col>-->
-
-            <!--<ion-col size="1">-->
-              <!--{{item?.data?.deliveryout}}-->
-            <!--</ion-col>-->
-
-            <!--<ion-col size="1">-->
-              <!--{{item?.data?.dateout}}-->
-            <!--</ion-col>-->
-
-            <!--<ion-col size="2">-->
-              <!--{{item?.data?.name}}-->
-            <!--</ion-col>-->
-
-            <!--<ion-col size="1">-->
-              <!--{{item?.data?.ticket}}-->
-            <!--</ion-col>-->
-
-            <!--<ion-col size="1">-->
-              <!--{{item?.data?.kg}}-->
-            <!--</ion-col>-->
-
-            <!--<ion-col size="5">-->
-            <!--</ion-col>-->
-
-          <!--</ion-row>-->
-        <!--</ion-grid>-->
-
-      <!--</div>-->
-
-    <!--</ion-col>-->
-
-    <!--<ion-col-->
-      <!--size="2"-->
-      <!--style="display:flex;justify-content:center;align-items:center;">-->
-
-      <!--<ion-button-->
-        <!--size="small"-->
-        <!--(click)="hookList(viajanJuntosList)">-->
-        <!--Hook-->
-      <!--</ion-button>-->
-
-    <!--</ion-col>-->
-
-  <!--</ion-row>-->
-
-</ion-grid>
 
 
-<!-- <ion-grid>-->
-  <!--<ion-row>-->
 
-    <!--<ion-col size="10">-->
 
-      <!--<div style="display:flex;flex-direction:column;width:100%;">-->
 
-        <!--<div *ngFor="let item of viajanJuntosList">-->
-          <!--{{item.id}} {{item.data?.name}} {{item.data?.ticket}}-->
-        <!--</div>-->
 
-      <!--</div>-->
-
-    <!--</ion-col>-->
-
-    <!--<ion-col-->
-      <!--size="2"-->
-      <!--style="display:flex;justify-content:center;align-items:center;">-->
-
-      <!--<ion-button-->
-        <!--size="small"-->
-        <!--(click)="hookList(viajanJuntosList)">-->
-        <!--Hook-->
-      <!--</ion-button>-->
-
-    <!--</ion-col>-->
-
-  <!--</ion-row>-->
-<!--</ion-grid>-->
-
-<!--<ion-grid>-->
-  <!--<ion-col size="10">-->
-    <!--<ion-row>-->
-      <!--<ng-container *ngFor="let item of viajanJuntosList">-->
-        <!--<div style="width:100%;">       -->
-          <!--<span>-->
-            <!--{{item?.id}}-->
-          <!--</span>-->
-          <!--<span>-->
-            <!--{{item?.data?.name}}-->
-          <!--</span>-->
-          <!--<span>-->
-            <!--{{item?.data?.ticket}}-->
-          <!--</span>-->
-        <!--</div> -->
-      <!--</ng-container>-->
-    <!--</ion-row>-->
-    <!--<ion-row-->
-      <!--size="2"-->
-      <!--style="display:flex;justify-content:center;align-items:center;">-->
-      <!--<ion-button-->
-        <!--size="small"-->
-        <!--(click)="hookList(viajanJuntosList)">-->
-        <!--Hook-->
-      <!--</ion-button>-->
-    <!--</ion-row>-->
-  <!--</ion-col>-->
-<!--</ion-grid>-->
-
-<!--<ion-grid>-->
-  <!--<ion-row>-->
-    <!--[> Columna izquierda <]-->
-    <!--<ion-col size="10">-->
-      <!--<ion-item *ngFor="let item of viajanJuntosList">-->
-        <!--{{item?.id}}-->
-        <!--{{item?.data?.name}}-->
-        <!--{{item?.data?.ticket}}-->
-      <!--</ion-item>-->
-    <!--</ion-col>-->
-    <!--[> Columna derecha <]-->
-    <!--<ion-col-->
-      <!--size="2"-->
-      <!--style="display:flex;justify-content:center;align-items:center;">-->
-      <!--<ion-button-->
-        <!--size="small"-->
-        <!--(click)="hookList(topFilteredList)">-->
-        <!--Hook-->
-      <!--</ion-button>-->
-    <!--</ion-col>-->
-  <!--</ion-row>-->
-<!--</ion-grid>-->
-
-  <!--<ion-item *ngFor="let item of viajanJuntosList">-->
-    <!--<ion-grid>-->
-      <!--<ion-row class="ion-align-items-center">-->
-        <!--[> Columna 10 <]-->
-        <!--<ion-col size="10">-->
-          <!--<div>{{item?.data?.name}}</div>-->
-          <!--<div>{{item?.data?.id}}</div>-->
-          <!--<div>{{item?.data?.ticket}}</div>-->
-        <!--</ion-col>-->
-        <!--[> Columna 2 <]-->
-        <!--<ion-col-->
-          <!--size="2"-->
-          <!--class="ion-text-center ion-align-self-center">-->
-          <!--<ion-button-->
-            <!--size="small"-->
-            <!--(click)="hookItem(item)">-->
-            <!--Hook-->
-          <!--</ion-button>-->
-        <!--</ion-col>-->
-      <!--</ion-row>-->
-    <!--</ion-grid>-->
-  <!--</ion-item>-->
 
 
 
