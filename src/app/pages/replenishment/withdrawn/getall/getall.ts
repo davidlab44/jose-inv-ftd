@@ -541,7 +541,7 @@ export class GetallPage implements OnInit {
   ccos: any[] = []; 
 
   /*-------isotanq main -------*/
-/*  findMostRecentMovementOfIsotanq(ccoId:number){*/
+  /*  findMostRecentMovementOfIsotanq(ccoId:number){*/
     /*this.fullWithdrawnList=[];*/
     /*const isotanqMain=this.ccoService.findMostRecentMovementOfIsotanq(this.withdrawnList,ccoId);*/
     /*console.log('isotanqMain',isotanqMain)*/
@@ -551,25 +551,60 @@ export class GetallPage implements OnInit {
     /*console.log(this.fullWithdrawnList.length);*/
   /*}*/
 
-findMostRecentMovementOfIsotanq(ccoId:number){
-  this.fullWithdrawnList=[];
-  const isotanqMain=this.ccoService.findMostRecentMovementOfIsotanq(this.withdrawnList,ccoId);
-  console.log('isotanqMain',isotanqMain);
-  if(!isotanqMain){
-    console.log('No se encontró isotanque para ccoId',ccoId);
-    return;
+  findMostRecentMovementOfIsotanq(ccoId:number){
+    this.fullWithdrawnList=[];
+    const isotanqMain=this.ccoService.findMostRecentMovementOfIsotanq(this.withdrawnList,ccoId);
+    console.log('isotanqMain',isotanqMain);
+    if(!isotanqMain){
+      console.log('No se encontró isotanque para ccoId',ccoId);
+      return;
+    }
+    this.fullWithdrawnList=[isotanqMain];
+    console.log('fullWithdrawnList',this.fullWithdrawnList);
+    console.log('length',this.fullWithdrawnList.length);
   }
-  this.fullWithdrawnList=[isotanqMain];
-  console.log('fullWithdrawnList',this.fullWithdrawnList);
-  console.log('length',this.fullWithdrawnList.length);
-}
-
 
   fillFullWithdrawnList(){
     this.fullWithdrawnList=this.sortWithdrawnByIdDesc(this.withdrawnList);
     console.log('full',this,this.fullWithdrawnList)
   }
-  
+
+  viajanJuntosList:any[]=[];
+  discoverTwins(p: any) {
+    this.viajanJuntosList=[];
+    this.viajanJuntosList.push(p);
+    console.log('twin', p.data.twin);
+    const id2 = p.data.twin;
+    if (Number(id2)) {
+      const twin = this.withdrawnList.find(
+        item => item.id == id2
+      );
+      console.log('twin found:', twin);
+      if(twin && twin != undefined)
+        this.viajanJuntosList.push(twin);
+      console.log('viajenJuntosList',this.viajanJuntosList)
+    }
+  }
+
+  /*showTwins(p:any){*/
+    /*console.log('contenedor twin or single',p)*/
+    /*console.log('twin',p.data.twin)*/
+    /*const id2=p.data.twin;*/
+    /*if(Number(id2)){*/
+      /*const twin=this.withdrawnList.find(*/
+        /*(item)=>{*/
+          /*item.data.id==id2;*/
+        /*}*/
+      /*)  */
+    /*}*/
+ 
+  /*}*/
+
+  hookList(list:any[]){
+    console.log('HOOK LIST',list);
+  }
+
+
 
 }
 
