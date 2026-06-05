@@ -326,6 +326,9 @@ export class PatchPage {
       ...this.movement.data,
       shipin: Number(this.form.value.shipin) || 0 
     };
+    payload.shipin=this.shipId
+    payload.imgin=this.uploadedUrl;
+    payload.name= this.ccoId; 
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
@@ -414,7 +417,7 @@ export class PatchPage {
     return score >= threshold;
   }
 
-/*---------- SHIP-----*/
+  /*---------- SHIP-----*/
     getShipId(objA, objBList) {
     const shipName = objA?.data?.shipin ?? null;
     const shipIMO = objA?.data?.shipinimo ?? null;
@@ -436,7 +439,7 @@ export class PatchPage {
       }
       if (bestId !== 0) return bestId;
     }
-    // 2️⃣ fallback por IMO
+    // fallback por IMO
     if (shipIMO) {
       for (const ship of objBList) {
         const imo = ship?.data?.imo;
@@ -474,7 +477,7 @@ export class PatchPage {
     this.movement.data.ship=selectedId;
   }
 
- /*---- CCO------ */
+  /*---- CCO------ */
   onCcoSearch(text: string) {
     console.log('text to search',text)
     this.applyFilter(text);  
@@ -542,6 +545,11 @@ export class PatchPage {
         } 
       }); 
    } 
+
+
+
+
+
 
 
 }
