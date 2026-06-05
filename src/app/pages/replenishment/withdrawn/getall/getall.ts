@@ -696,6 +696,15 @@ export class GetallPage implements OnInit {
     this.viajanJuntosList=[];
   } 
 
+  hasTwin():boolean{
+    const found=(this._viajanJuntosList||[]).some(item=>Number(item?.data?.twin)>0);
+    console.log('hay twins:',found);
+    return found;
+  }
+
+  clearViajanJuntosList():void{
+    this.viajanJuntosList=[];
+  }
 
 }
 
