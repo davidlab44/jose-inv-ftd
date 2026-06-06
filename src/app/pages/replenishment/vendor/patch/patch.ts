@@ -365,13 +365,15 @@ export class PatchPage {
   }
 
   patch() {
-    const item= this.getGlpPriceItemByDate('2026-05-20T16:26:07',1)
-    this.movement.data.price=item.data.price + "," + String(item.data.cents).padStart(2, '0').toString();
-    this.movement.data.id_replenishment_product=1;
-    console.log("patch price",this.form.value.price);
     this.updateMovementFromForm();
     this.movement.data.img = this.uploadedUrl;
-    this.movement.data.price = Number(this.form.value.price) || 0;
+    //this.movement.data.price = Number(this.form.value.price) || 0;
+    //withdrawn.data.price=this.getGlpPriceItemByDate('2026-06-11T16:26:07',1); 
+    const now = new Date().toISOString().slice(0, 19);
+    const item = this.getGlpPriceItemByDate(now, 1);
+    //const item= this.getGlpPriceItemByDate('2026-05-20T16:26:07',1)
+    this.movement.data.price=item.data.price + "," + String(item.data.cents).padStart(2, '0').toString();
+    this.movement.data.id_replenishment_product=1;
     let payload = this.movement.data;
     payload.name = this.ccoId;
     console.log("payload to patch =>", payload);
@@ -483,8 +485,7 @@ export class PatchPage {
 
 
 
-
-/*--------price-----------*/
+  /*--------price-----------*/
   glpPriceList: any[] = []; 
   loadGlpPrice() {              
      this.glpPricesService.getAll().subscribe({ 

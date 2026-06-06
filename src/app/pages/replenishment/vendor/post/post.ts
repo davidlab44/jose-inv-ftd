@@ -364,7 +364,7 @@ export class AssetSupplyPostPage {
     };
     withdrawn.data.name = this.isotanq?.id ?? null;
     withdrawn.data.img = this.uploadedUrl;
-    withdrawn.data.price=this.getGlpPriceItemByDate('2026-04-11T16:26:07',1);
+    withdrawn.data.price=this.getGlpPriceItemByDate('2026-06-11T16:26:07',1);
     withdrawn.data.id_replenishment_product=1;
     //const nacional=this.getGlpPriceItemByDate('2026-04-11T16:26:07',1);
     //withdrawn.data.id_replenishment_product = this.procesarRetiroGLP(this.glpAllocPureList,withdrawn.data.kg)
@@ -449,51 +449,6 @@ procesarRetiroGLP(){
 
 }
 
-
-  /*procesarRetiroGLP(glpAllocPureList: any[], kg: number): number {*/
-    /*if (!Array.isArray(glpAllocPureList) || glpAllocPureList.length === 0) {*/
-      /*console.log('⚠️ ERROR: lista glpAllocPureList inválida');*/
-      /*return 0;*/
-    /*}*/
-
-    /*const itemNacional = glpAllocPureList.find(*/
-      /*(g) => g.data.id_replenishment_product === 1*/
-    /*);*/
-
-    /*const itemImportado = glpAllocPureList.find(*/
-      /*(g) => g.data.id_replenishment_product === 2*/
-    /*);*/
-    /*if (!itemNacional) console.log('⚠️ ERROR: no existe item nacional');*/
-    /*if (!itemImportado) console.log('⚠️ ERROR: no existe item importado');*/
-    /*// ====== 1. NACIONAL ======*/
-    /*if (itemNacional) {*/
-      /*const resultadoNacional =*/
-        /*(itemNacional.data.acum + itemNacional.data.alloc) - kg;*/
-      /*itemNacional.data.acumnext = resultadoNacional;*/
-      /*if (resultadoNacional >= -10000) {*/
-        /*return 1; // ✅ usar nacional*/
-      /*}*/
-      /*console.log(*/
-        /*'⚠️ Nacional fuera de rango (< -10000), se pasa a importado',*/
-        /*resultadoNacional*/
-      /*);*/
-    /*}*/
-    /*// ====== 2. IMPORTADO ======*/
-    /*if (itemImportado) {*/
-      /*const resultadoImportado =*/
-        /*(itemImportado.data.acum + itemImportado.data.alloc) - kg;*/
-      /*itemImportado.data.acumnext = resultadoImportado;*/
-      /*if (resultadoImportado < -100000) {*/
-        /*console.log(*/
-          /*'⚠️ Importado fuera de rango (< -100000), pero se permite continuar',*/
-          /*resultadoImportado*/
-        /*);*/
-      /*}*/
-      /*return 2; // 🔥 SIEMPRE usar importado en fallback*/
-    /*}*/
-    /*console.log('⚠️ ERROR CRÍTICO: no existe fuente válida');*/
-    /*return 0;*/
-  /*}*/
 
   sumKgMesActual(withdrawnList: any[]): number {
     try {
