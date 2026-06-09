@@ -293,6 +293,7 @@ export class PatchPage {
           datein: res?.data?.datein ?? '',
           tripin: res?.data?.tripin ?? '',
           shipin: this.shipNombreEsp,
+
         };
         this.form.patchValue({
           deliveryin: res?.data?.deliveryin ?? '',

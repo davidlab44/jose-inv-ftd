@@ -571,6 +571,27 @@ export class AssetSupplyPostPage {
 
 
   /*---- CCO2------ */
+  filteredList2: any[] = [];     //lista filtrada
+  onCco2Search(text: string) {
+    console.log('text to search',text)
+    this.applyFilter2(text);  
+  }  
+  applyFilter2(text: string) {
+    if (!text || text.trim() === '') {
+      this.filteredList2 = this.ccoList;
+      return;
+    }
+    const search = text.trim().toLowerCase();
+    this.filteredList2= this.ccoList.filter(item => {
+      const name = (item?.data?.name || '').toLowerCase();
+
+      return name.includes(search);
+    });
+    console.log('filteredList2', this.filteredList2);
+  }
+ 
+
+
   cco2Name: string = '';   // nombre a mostrar
   cco2Id: number = 0;   // id cco seleccionado a mostrar
   select2Cco(item: any) {

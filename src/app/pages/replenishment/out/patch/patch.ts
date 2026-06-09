@@ -307,7 +307,7 @@ export class PatchPage {
         this.movement.data = {
           ...this.movement.data,
           deliveryout: res?.data?.deliveryout ?? 0,
-          dateout: res?.data?.dateout[0] ?? '',
+          dateout: res?.data.dateout ?? '',
           //tripout: res?.data?.tripout ?? '',
           tripout: 'TMSYP',
           shipout: 3,
@@ -315,7 +315,7 @@ export class PatchPage {
         };
         this.form.patchValue({
           deliveryout: res?.data?.deliveryout ?? 0,
-          dateout: res?.data?.dateout[0] ?? '',
+          dateout: res?.data?.dateout ?? '',
           tripout: 'TMSYP',
           shipout: 3,
           //shipout: this.shipNombreEsp,
