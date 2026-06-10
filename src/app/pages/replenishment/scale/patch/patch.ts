@@ -143,18 +143,25 @@ export class PatchPage {
     speed: 300
   };
 
-  updateSchedule(){
-     
-  }
+  updateSchedule(){}
 
   prodrexList:any[]=[];
+  movement2:any;
   ionViewDidEnter() {
-    this.prodrexService.getAll().subscribe({
-      next: response=>{
-        this.prodrexList=response;
-        console.log("getProdRexList",response)
-      }
-    })
+    if(this.movement.data.twin && Number(this.movement.data.twin)>0){
+      this.withdrawnService.getById(this.movement.data.twin).subscribe({
+        next: res=> {
+          console.log('twin consultado[0]',res[0])
+          this.movement2=res[0];
+        }
+      })
+    }
+    /*this.prodrexService.getAll().subscribe({*/
+      /*next: response=>{*/
+        /*this.prodrexList=response;*/
+        /*console.log("getProdRexList",response)*/
+      /*}*/
+    /*})*/
   }
 
   searchProducts(hash: string, productList: any[]): any[] {
@@ -288,30 +295,84 @@ export class PatchPage {
     };
   }
 
+
   patch() {
-    // 1️⃣ tomar lo editado en el form
     this.updateMovementFromForm();
     this.movement.data.imgscale = this.uploadedUrl;
-    // 2️⃣ enviar SOLO data
     const payload = { ...this.movement.data };
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
-        /*this.withdrawnService.getIntervalById(this.movement.id).subscribe({*/
-          /*next:*/
-        /*})   */
-
-        //traer el registro twin
-        //crea un metodo para:
-          //consultar si el twin tiene info en wnet
-          //si no tiene editarlo y patch en otro metodo para evitar recursividad
+        const twinId = Number(payload?.twin || 0);
+        if (twinId < 1) {
+          this.finishPatch();
+          return;
+        }
+        this.movement2.data.imgscale = this.uploadedUrl;
+        this.movement2.data.wticket = this.movement.data.wticket;
+        this.movement2.data.wgross = this.movement.data.wgross;
+        this.movement2.data.wnet = this.movement.data.wnet;
+        this.movement2.data.wtare = this.movement.data.wtare;
+        this.withdrawnService.patch(this.movement2.id, this.movement2.data).subscribe({
+          next: (response2) => {
+            console.log("Twin patch response", response2);
+            this.finishPatch();
+          },
+          error: (err) => {
+            console.error("Twin patch error", err);
+            this.utilService.presentToast("Error actualizando el movimiento twin", "danger", 1500);
+          }
+        });
       },
       error: (err) => {
         console.error("Withdrawn patch error", err);
+        this.utilService.presentToast("Error actualizando el movimiento", "danger", 1500);
       }
     });
   }
+  private finishPatch() {
+    this.utilService.presentToast("Actualizado correctamente", "success", 1000);
+    this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'], { replaceUrl: true });
+  }
+
+
+  /*patch() {*/
+    /*// tomar lo editado en el form*/
+    /*this.updateMovementFromForm();*/
+    /*this.movement.data.imgscale = this.uploadedUrl;*/
+    /*// enviar SOLO data*/
+    /*const payload = { ...this.movement.data };*/
+    /*console.log("payload to patch =>", payload);*/
+    /*this.withdrawnService.patch(this.movement.id, payload).subscribe({*/
+      /*next: (response) => {*/
+        /*console.log("Withdrawn patch response", response);*/
+        /*// Si tiene un compañero o twin que viaja con el :*/
+        /*// Actualizalo tambien en los campos relacionados con "scale"*/
+        /*if(payload.twin<1){*/
+          /*this.utilService.presentToast("Actualizado correctamente","success",1000);*/
+          /*this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'], { replaceUrl: true });*/
+          /*return;*/
+        /*}*/
+        /*this.movement2.data.imgscale=this.uploadedUrl;*/
+        /*this.movement2.data.wticket=this.movement.data.wticket;*/
+        /*this.movement2.data.wgross=this.movement.data.wgross;*/
+        /*this.movement2.data.wnet=this.movement.data.wnet;*/
+        /*this.movement2.data.wtare=this.movement.data.wtare;*/
+        /*this.withdrawnService.patch(this.movement2.id,this.movement2.data).subscribe({*/
+          /*next: (response) => {*/
+            /*console.log('patchField response');*/
+            /*this.utilService.presentToast("Actualizado correctamente","success",1000);*/
+            /*this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'], { replaceUrl: true });*/
+
+          /*}*/
+        /*})*/
+     /*},*/
+     /*error: (err) => {*/
+        /*console.error("Withdrawn patch error", err);*/
+      /*}*/
+    /*});*/
+  /*}*/
 
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;
@@ -328,6 +389,8 @@ export class PatchPage {
     const ss = String(date.getSeconds()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
+
+
 
 
 }

@@ -184,15 +184,28 @@ export class PatchPage {
      
   }
 
-  prodrexList:any[]=[];
+  movement2:any;
   ionViewDidEnter() {
-/*    this.prodrexService.getAll().subscribe({*/
+    if(this.movement.data.twin && Number(this.movement.data.twin)>0){
+      this.withdrawnService.getById(this.movement.data.twin).subscribe({
+        next: res=> {
+          console.log('twin consultado[0]',res[0])
+          this.movement2=res[0];
+        }
+      })
+    }
+    /*this.prodrexService.getAll().subscribe({*/
       /*next: response=>{*/
         /*this.prodrexList=response;*/
         /*console.log("getProdRexList",response)*/
       /*}*/
     /*})*/
   }
+
+
+
+
+  //prodrexList:any[]=[];
 
   /*searchProducts(hash: string, productList: any[]): any[] {*/
     /*if (!hash || hash.trim() === '') return productList;*/
@@ -346,21 +359,49 @@ export class PatchPage {
     this.movement.data.imgout = this.uploadedUrl;
     const payload = {
       ...this.movement.data,
-      shipout: 3333 
+      shipout: 3 
       //shipout: Number(this.form.value.shipout) || 0 
     };
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
-        this.utilService.presentToast("registro actualizado exitosamente","success",1000);
-        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
+        //this.utilService.presentToast("registro actualizado exitosamente","success",1000);
+        //this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
+        const twinId = Number(payload?.twin || 0);
+        if (twinId < 1) {
+          this.finishPatch();
+          return;
+        }
+        this.movement2.data.imgscale = this.uploadedUrl;
+        this.movement2.data.wticket = this.movement.data.wticket;
+        this.movement2.data.wgross = this.movement.data.wgross;
+        this.movement2.data.wnet = this.movement.data.wnet;
+        this.movement2.data.wtare = this.movement.data.wtare;
+        this.withdrawnService.patch(this.movement2.id, this.movement2.data).subscribe({
+          next: (response2) => {
+            console.log("Twin patch response", response2);
+            this.finishPatch();
+          },
+          error: (err) => {
+            console.error("Twin patch error", err);
+            this.utilService.presentToast("Error actualizando el movimiento twin2", "danger", 1500);
+          }
+        });
       },
       error: (err) => {
         console.error("Withdrawn patch error", err);
       }
     });
   }
+
+
+  private finishPatch() {
+    this.utilService.presentToast("Actualizado correctamente", "success", 1000);
+    this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'], { replaceUrl: true });
+  }
+
+
 
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;

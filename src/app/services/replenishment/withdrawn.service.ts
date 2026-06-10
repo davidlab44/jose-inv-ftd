@@ -19,7 +19,7 @@ export class WithdrawnService {
   }   
   
   getById(id: number): Observable<any> {
-    const url = `${this.apiUrl}/${this.apiUrl}?id=eq.${id}`;
+    const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;
     return this.http.get<any[]>(url);
   }
 
@@ -100,6 +100,21 @@ export class WithdrawnService {
       }
     });
   }
+
+
+  /*patchField(id: number, updatedElement: any): Observable<any> {*/
+    /*const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;*/
+    /*const body = {*/
+      /*data: updatedElement  */
+    /*};*/
+    /*console.log('body',body);*/
+    /*return this.http.patch(url, body, {*/
+      /*headers: {*/
+        /*'Content-Type': 'application/json',*/
+        /*'Prefer': 'return=representation'*/
+      /*}*/
+    /*});*/
+  /*}*/
 
   delete(id: number): Observable<any> {
     const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;
