@@ -130,7 +130,6 @@ export class PatchPage {
     this.loadCcos();         
     //this.getAllPrices();     
     this.getAllCco();
-
   }
 
   resetForm(): void {
@@ -264,20 +263,22 @@ export class PatchPage {
   launchOcr(url: string) {
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
-        console.log('OCR Response:', res);
+        console.log('ocrResponse:', res);
         this.contenedores=res.data.contenedores;
         if(this.contenedores[0]&&this.contenedores[0].length>0){
-          this.ccoName="TCSU "+res.data.contenedores[0];
-          console.log('cconame',this.ccoName)
-          this.ccoId=this.ccoService.getIdByName(this.ccoName);     
-          console.log('name:', this.ccoName);
-          console.log('id:', this.ccoId);
-          const ship=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
-          this.shipId=ship.id;
-          console.log("ship ",ship)
+          const hasOne = this.thersIsSomeCCoLikeThis(res.data.contenedores[0])
+          if(hasOne){
+            this.ccoName="TCSU "+res.data.contenedores[0];
+            this.ccoId=this.ccoService.getIdByName(this.ccoName);     
+            console.log('cco Name:', this.ccoName);
+          }
         }else{
           this.utilService.presentToast('no se reconocieron isotanques','danger',500);
         }
+        console.log('id:', this.ccoId);
+       const ship=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
+        this.shipId=ship.id;
+        console.log("ship ",ship)
         if(this.shipId>0){
           console.log('shipId',this.shipId)
           this.shipNombreEsp=this.getShipNameById(this.shipId);
@@ -292,14 +293,13 @@ export class PatchPage {
           deliveryin: res?.data?.deliveryin ?? '',
           datein: res?.data?.datein ?? '',
           tripin: res?.data?.tripin ?? '',
-          shipin: this.shipNombreEsp,
-
+          shipin: this.ccoName,
         };
         this.form.patchValue({
           deliveryin: res?.data?.deliveryin ?? '',
           datein: res?.data?.datein ?? '',
           tripin: res?.data?.tripin ?? '',
-          shipin: this.shipNombreEsp,
+          shipin: this.ccoName,
         });
         console.log("movement actualizado:", this.movement);
       },
@@ -308,6 +308,13 @@ export class PatchPage {
       }
     });
   }
+
+  thersIsSomeCCoLikeThis(ccoNamehash:string):boolean{
+    return (this.ccoList||[]).some(item=>
+      (item?.data?.name||'').match(/\d+-\d+$/)?.[0]===ccoNamehash
+    );
+  }
+
 
   updateMovementFromForm() {
     const f = this.form.value;
