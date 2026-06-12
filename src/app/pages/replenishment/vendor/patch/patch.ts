@@ -127,6 +127,7 @@ export class PatchPage {
       imported: [this.movement?.data?.id_replenishment_product ?? 0], 
       price: [this.movement?.data?.price ?? 0], 
     });
+    this.ccoName=this.ccoService.getName(this.movement.data.name); 
     this.searchSubject.pipe(
         debounceTime(300),
         distinctUntilChanged()
@@ -180,22 +181,45 @@ export class PatchPage {
   updateSchedule(){}
 
   ccoList:any[]=[];
+  movement2:any;
+  hasTwin:Boolean=false;
   ionViewDidEnter() {
-    //this.getAllCco();
+
     this.loadCcos();
     this.getAllPrices();
   }
+
   ccoMap:CcoMap={};                
   loadCcos() {
     this.ccoService.load().subscribe({
       next:(map)=>{
         this.ccoMap=map;
         this.ccoService.debugMapping(this.filteredList);
+        this.getCco2();
+
       },
       error:(err)=>{
         console.error('Error loading ccos',err);
       }
     });
+  }
+
+  getCco2(){
+    if(this.movement.data.twin && Number(this.movement.data.twin)>0){
+      this.hasTwin=true;
+      this.withdrawnService.getById(this.movement.data.twin).subscribe({
+        next: res=> {
+          console.log('twin consultado[0]',res[0])
+          this.movement2=res[0];
+          this.cco2Id=this.movement2.data.name;
+          console.log('this.cco2Id',this.cco2Id);
+          this.cco2Name=this.ccoMap[this.cco2Id]?.name;
+
+          //this.cco2Name=this.ccoService.getName(this.ccoId)
+          console.log('this.cco2Name',this.cco2Name);
+        }
+      })
+    }  
   }
 
   onSearch(text: string) {
@@ -380,15 +404,69 @@ export class PatchPage {
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
-          this.utilService.presentToast("registro actualizado exitosamente","success",1000);
-          this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
+          //this.utilService.presentToast("registro actualizado exitosamente","success",1000);
+          //this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
+          const twinId = Number(payload?.twin || 0);
+          //si el que reconocio es diferente del que traia cuando llego 
+          //
+          //
+          //
+          //
+          //crear un metodo para saber si el data.name de este isotanque es el mismo del twin , si hay relacion 
+          //lo que voy a comprobar es que esten doblemente enlazados , porque si no 
+          //esta doblemente enlazado 
+          //si sr
+          //
+          //cuando no estaria doblemente enlazado 
+          //OJO 
+          //AQUI ESTA EL PROBLEMA 
+          //SIEMPRE SERIA POSITIVO 
+          //NUNCA SERIA NEGATIVO 
+          //
+          //
+          //
+          //
+          //PORQUE NOP HAY ALGO EN ESTA REMISION QUE ME SIRVA PARA ISDENTIFICAR SI VIENEN NJUNTOS O NO 
+          //
+          //
+          //
+          //
+          //
+          //
+          //separarlos
+          //insertar el nuevo 
+          //si es igual no hacer nada 
+          if (twinId < 1) {
+            this.finishPatch();
+            return;
+          }
+          this.movement2.data.imgscale = this.uploadedUrl;
+          this.movement2.data.wticket = this.movement.data.wticket;
+          this.movement2.data.wgross = this.movement.data.wgross;
+          this.movement2.data.wnet = this.movement.data.wnet;
+          this.movement2.data.wtare = this.movement.data.wtare;
+          this.withdrawnService.patch(this.movement2.id, this.movement2.data).subscribe({
+            next: (response2) => {
+              console.log("Twin patch response", response2);
+              this.finishPatch();
+            },
+            error: (err) => {
+              console.error("Twin patch error", err);
+              this.utilService.presentToast("Error actualizando el movimiento twin", "danger", 1500);
+            }
+          });
       },
       error: (err) => {
         console.error("Withdrawn patch error", err);
       }
     });
   }
-  
+ 
+  private finishPatch() {
+    this.utilService.presentToast("Actualizado correctamente", "success", 1000);
+    this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'], { replaceUrl: true });
+  }
+
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;
     const date = new Date(dateStr);
@@ -436,6 +514,78 @@ export class PatchPage {
     console.log('cco id:', this.ccoId);
   }
 
+
+
+
+
+
+  /*---- CCO2------ */
+  filteredList2: any[] = [];     //lista filtrada
+  onCco2Search(text: string) {
+    console.log('text to search',text)
+    this.applyFilter2(text);  
+  }  
+  applyFilter2(text: string) {
+    if (!text || text.trim() === '') {
+      this.filteredList2 = this.ccoList;
+      return;
+    }
+    const search = text.trim().toLowerCase();
+    this.filteredList2= this.ccoList.filter(item => {
+      const name = (item?.data?.name || '').toLowerCase();
+
+      return name.includes(search);
+    });
+    console.log('filteredList2', this.filteredList2);
+  }
+ 
+
+
+  cco2Name: string = '';   // nombre a mostrar
+  cco2Id: number = 0;   // id cco seleccionado a mostrar
+  select2Cco(item: any) {
+    this.cco2 = item;
+    this.cco2Name = item.data.name;
+    this.cco2Id = item.id;
+    //actualizar movement (muy importante en tu flujo)
+    console.log('item pasado cco2:', item);
+    console.log('cco2 name:', this.cco2Name);
+    console.log('cco2 id :', this.cco2Id);
+  }
+  cco2:any;  
+  isotanq2:any;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   isImportedGlp(ev: any) {
     const checked = ev.detail.checked;
     if(checked>0){
@@ -456,7 +606,7 @@ export class PatchPage {
   }
   getMaxIdItem(items: any[]) {
     const filtered = items.filter(i => i.data?.id_replenishment_product === 1);
-    if (!filtered.length) return;
+    //if (!filtered.length) return;
     this.lastGlpprice = filtered.reduce((max, item) =>
       item.id > max.id ? item : max
     );

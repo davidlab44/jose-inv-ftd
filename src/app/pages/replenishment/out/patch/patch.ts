@@ -369,15 +369,18 @@ export class PatchPage {
         //this.utilService.presentToast("registro actualizado exitosamente","success",1000);
         //this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
         const twinId = Number(payload?.twin || 0);
+        console.log('twin id es:',twinId);
         if (twinId < 1) {
           this.finishPatch();
           return;
         }
+        console.log('twin id es:',twinId);
         this.movement2.data.imgscale = this.uploadedUrl;
-        this.movement2.data.wticket = this.movement.data.wticket;
-        this.movement2.data.wgross = this.movement.data.wgross;
-        this.movement2.data.wnet = this.movement.data.wnet;
-        this.movement2.data.wtare = this.movement.data.wtare;
+        this.movement2.data.dateout = this.movement.data.dateout;
+        this.movement2.data.deliveryout = this.movement.data.deliveryout;
+        this.movement2.data.tripout = this.movement.data.tripout;
+        this.movement2.data.shipout = this.movement.data.shipout;
+        console.log('movement2',this.movement2) 
         this.withdrawnService.patch(this.movement2.id, this.movement2.data).subscribe({
           next: (response2) => {
             console.log("Twin patch response", response2);
@@ -395,13 +398,10 @@ export class PatchPage {
     });
   }
 
-
   private finishPatch() {
     this.utilService.presentToast("Actualizado correctamente", "success", 1000);
     this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'], { replaceUrl: true });
   }
-
-
 
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;

@@ -6,6 +6,11 @@ import { tap } from 'rxjs/operators';
 import { BehaviorSubject, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+
+
+
+
+
 export interface Cco {
   id: number;
   data: {
@@ -102,17 +107,12 @@ export class CcoService {
         const mapData: CcoMap = {};
         ccos.forEach((cco, index) => {
           const id = Number(cco.id);
-          //console.log('➡️ cco['+index +'] id(normalizado) =>',id,typeof id);
           mapData[id] = {
             name: cco.data?.name ?? 'N/A',
             color: cco.data?.color ?? '#ccc'
           };
         });
         this.ccoMap = mapData;
-/*        console.log('ccoMap =>', this.ccoMap);*/
-        /*console.log('ccoMap keys =>', Object.keys(this.ccoMap));*/
-        /*const idObtenido= this.getIdByName("TCSU 500020-2");*/
-        /*console.log('is obtenido',idObtenido);*/
         return this.ccoMap;
       })
     );
@@ -127,6 +127,9 @@ export class CcoService {
   }
 
   getName(id: number | string): string {
+    console.log("id en el servicio",id)
+    console.log("this.ccoMap en el servicio",this.ccoMap)
+    
     return this.ccoMap[Number(id)]?.name || 'N/A';
   }
 
@@ -155,23 +158,6 @@ export class CcoService {
       }
     });
   }
-
-  /*findMostRecentMovementOfIsotanq(withdrawnList:any[],isotanqId:number):any{*/
-    /*//filtra los elementos que contengan este data.name   (el numero id del contenedor (data.name puede ser ej: 45))*/
-     /*//desopues toma el que tenga el id mas alto (ese ees el mas reciente y lo retorna*/
-
-  /*}*/
-
-  /*findMostRecentMovementOfIsotanq(withdrawnList:any,isotanqId:number):any{*/
-    /*console.log('withdrawnList',withdrawnList)*/
-    /*console.log('isotanqId',isotanqId)*/
-    /*let found:any=null;*/
-    /*for(const item of withdrawnList){*/
-      /*if(Number(item?.data?.name)!==Number(isotanqId)) continue;*/
-      /*if(!found||item.id>found.id) found=item;*/
-    /*}*/
-    /*return found;*/
-  /*}*/
 
   findMostRecentMovementOfIsotanq(withdrawnList:any[],ccoId:number):any{
     console.log('==============================');
