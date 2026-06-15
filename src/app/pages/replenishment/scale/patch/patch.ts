@@ -29,6 +29,7 @@ import { OcrService } from '../../../../services/ai/ocr.service';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
+import { Cco,CcoMap } from '../../../../interfaces/cco';
 
 @Component({
   selector: 'page-patch',
@@ -162,7 +163,29 @@ export class PatchPage {
         /*console.log("getProdRexList",response)*/
       /*}*/
     /*})*/
+
+
+    this.loadCcos();                                                                                                                                
+  }         
+     
+
+  ccoMap:CcoMap={};                
+  loadCcos() {
+    this.ccoService.load().subscribe({
+      next:(map)=>{
+        this.ccoMap=map;     
+      },
+      error:(err)=>{         
+        console.error('Error loading ccos',err);
+      }
+    });
   }
+
+
+
+
+
+
 
   searchProducts(hash: string, productList: any[]): any[] {
     if (!hash || hash.trim() === '') return productList;
@@ -254,12 +277,40 @@ export class PatchPage {
   }
 
   ocrResponse:any;
-
+  isotanq2Name:string='';
+  isotanq1Name:string='';
+  isotanq1Id:number=0;
+  isotanq2Id:number=0;
   launchOcr(url: string) {
     this.ocrService.postScale(url).subscribe({
       next: (res) => {
         this.ocrResponse = res;
         console.log('OCR Response:', res);
+        console.log('isotanques[0]:', res.data.isotanques[0]);
+        //this.resolveContainersFromOCR();
+        //  PASO 2: opcional → setear en movement (debug / trazabilidad)
+        //this.movement.data.container_id = this.container1;
+        //this.movement.data.container2_id = this.container2;
+        
+
+
+        if(res.data.isotanques[0]){
+          this.isotanq1Id=this.ccoService.getIdByName(res.data.isotanques[0]);
+          //this.isotanq1Id=this.ccoService.getIdByName(res.data.isotanques[0]);
+          this.isotanq1Name=this.ccoMap[this.isotanq1Id]?.name;
+console.log('hardcoded',        this.ccoService.getIdByName("500003-3"));
+
+          console.log('isotanques[0]:', res.data.isotanques[0]);
+          //this.resolveContainersFromOCR();
+        }
+        console.log('isotanq1Id',this.isotanq1Id);
+        console.log('isotanq1Name',this.isotanq1Name);
+
+
+        
+        //obtener el nombre a partir del hash del nombre 
+        //obtener el id   y despues obtener el nomnbre eso no es costoso 
+        
         const normalizedDate = this.normalizeOCRDate(res?.data?.date);
         const seals = res?.data?.seal ?? [];
         // actualizar movement
@@ -284,6 +335,65 @@ export class PatchPage {
     });
   }
 
+  container1:any;
+  container2:any;
+  /*  resolveContainersFromOCR(): void {*/
+    /*console.log("==== RESOLVE CONTAINERS START ====");*/
+    /*const c1_raw = this.ocrResponse?.data?.isotanques[0];*/
+    /*const c2_raw = this.ocrResponse?.data?.isotanques[1];*/
+    /*console.log("[OCR RAW]", { c1_raw, c2_raw });*/
+    /*// 🔧 normalizar*/
+    /*const c1_fmt = this.normalizeContainer(c1_raw);*/
+    /*const c2_fmt = this.normalizeContainer(c2_raw);*/
+    /*console.log("[FORMATTED]", { c1_fmt, c2_fmt });*/
+    /*// 🔍 buscar IDs*/
+    /*this.container1 = c1_fmt ? this.findCcoIdByContainer(c1_fmt) : 0;*/
+    /*this.container2 = c2_fmt ? this.findCcoIdByContainer(c2_fmt) : 0;*/
+    /*console.log("[RESULT IDS]", {*/
+      /*container1: this.container1,*/
+      /*container2: this.container2*/
+    /*});*/
+    /*console.log("==== RESOLVE CONTAINERS END ====");*/
+  /*}*/
+
+  private buildCcoMap(ccoList: Cco[]): CcoMap {
+    const map: CcoMap = {};
+    ccoList.forEach((cco, index) => {
+      const id = Number(cco.id);
+      //console.log(` cco[${index}] id(normalizado) =>`, id, typeof id);
+      map[id] = {
+        name: cco.data?.name ?? 'N/A',
+        color: cco.data?.color ?? '#ccc'
+      };
+    });
+    return map;
+  }
+
+  stateFilteredList:any[]=[];
+ 
+  /*joinTwins(): { current: any, twin: any | null } {*/
+    /*const c1 = Number(this.container1) || 0;*/
+    /*const c2 = Number(this.container2) || 0;*/
+    /*console.log("[JOIN] container1:", c1, "container2:", c2);*/
+    /*//  buscar registro actual*/
+    /*const current = this.stateFilteredList.find(item =>*/
+      /*Number(item?.data?.name) === c1*/
+    /*);*/
+    /*if (!current) {*/
+      /*console.warn("[JOIN] current NOT FOUND");*/
+      /*return { current: null, twin: null };*/
+    /*}*/
+    /*//  buscar twin*/
+    /*let twin = null;*/
+    /*if (c2 > 0) {*/
+      /*twin = this.stateFilteredList.find(item =>*/
+        /*Number(item?.data?.name) === c2*/
+      /*);*/
+    /*}*/
+    /*console.log("[JOIN RESULT]", { current, twin });*/
+    /*return { current, twin };*/
+  /*}*/
+
   updateMovementFromForm() {
     const f = this.form.value;
     this.movement.data = {
@@ -307,6 +417,19 @@ export class PatchPage {
         const twinId = Number(payload?.twin || 0);
         if (twinId < 1) {
           this.finishPatch();
+          return;
+        }
+        if(this.isotanq2Id!=twinId){
+          this.utilService.presentToast('Pareja no coincide',"danger",1000);
+          setTimeout(() => {this.utilService.presentToast('Revisar!', 'danger', 500)}, 1000);  
+          //NO desenganchar para eso esta plexa alli es la unica parte donde se puede desenganchar 
+          //patch con la nueva pareja
+          //le faltaria plexa
+          //le faltaria in
+          //si seria conveniente desenganchar aqui ?    eso no lo tengo muy claro creo que solo en plexa se desengancha 
+          //caso practico lleno y cogio para el puerto pero vino al taller y por xy motivo lo coambiaron . eso muy cpoco se presenta 
+          //bueno entonces solo presentale el compañero si necesita desenganchar que vaya a plexa 
+          //pero solo a modo de lectura
           return;
         }
         this.movement2.data.imgscale = this.uploadedUrl;
@@ -336,44 +459,6 @@ export class PatchPage {
     this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'], { replaceUrl: true });
   }
 
-
-  /*patch() {*/
-    /*// tomar lo editado en el form*/
-    /*this.updateMovementFromForm();*/
-    /*this.movement.data.imgscale = this.uploadedUrl;*/
-    /*// enviar SOLO data*/
-    /*const payload = { ...this.movement.data };*/
-    /*console.log("payload to patch =>", payload);*/
-    /*this.withdrawnService.patch(this.movement.id, payload).subscribe({*/
-      /*next: (response) => {*/
-        /*console.log("Withdrawn patch response", response);*/
-        /*// Si tiene un compañero o twin que viaja con el :*/
-        /*// Actualizalo tambien en los campos relacionados con "scale"*/
-        /*if(payload.twin<1){*/
-          /*this.utilService.presentToast("Actualizado correctamente","success",1000);*/
-          /*this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'], { replaceUrl: true });*/
-          /*return;*/
-        /*}*/
-        /*this.movement2.data.imgscale=this.uploadedUrl;*/
-        /*this.movement2.data.wticket=this.movement.data.wticket;*/
-        /*this.movement2.data.wgross=this.movement.data.wgross;*/
-        /*this.movement2.data.wnet=this.movement.data.wnet;*/
-        /*this.movement2.data.wtare=this.movement.data.wtare;*/
-        /*this.withdrawnService.patch(this.movement2.id,this.movement2.data).subscribe({*/
-          /*next: (response) => {*/
-            /*console.log('patchField response');*/
-            /*this.utilService.presentToast("Actualizado correctamente","success",1000);*/
-            /*this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'], { replaceUrl: true });*/
-
-          /*}*/
-        /*})*/
-     /*},*/
-     /*error: (err) => {*/
-        /*console.error("Withdrawn patch error", err);*/
-      /*}*/
-    /*});*/
-  /*}*/
-
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;
     const date = new Date(dateStr);
@@ -390,11 +475,29 @@ export class PatchPage {
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
 
-
+  /*normalizeContainer(container: string): string | null {*/
+    /*if (!container || typeof container !== 'string') return null;*/
+    /*const clean = container.trim().toUpperCase();*/
+    /*if (clean.length !== 11) return null; */
+    /*const prefix = clean.slice(0, 4);   // TCSU*/
+    /*const numbers = clean.slice(4);     // 5000141*/
+    /*if (!/^\d{7}$/.test(numbers)) return null;*/
+    /*const formatted = `${prefix} ${numbers.slice(0, 6)}-${numbers.slice(6)}`; */
+    /*return formatted; // TCSU 500014-1*/
+  /*}         */
+ 
+  /*ccoList: Cco[] = [];*/
+  /*ccoMap: CcoMap = {};*/
+  /*idIsotanq2:number=0;*/
+  /*findCcoIdByContainer(containerFormatted: string): number { */
+    /*if (!containerFormatted) return 0;*/
+    /*const match = this.ccoList.find(cco => {*/
+      /*const name = (cco?.data?.name || '').toUpperCase().trim();*/
+      /*return name === containerFormatted;                                                                                                           */
+    /*});     */
+    /*return match ? Number(match.id) : 0;                                                                                                            */
+  /*} */
 
 
 }
-
-
-
 

@@ -6,11 +6,6 @@ import { tap } from 'rxjs/operators';
 import { BehaviorSubject, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-
-
-
-
-
 export interface Cco {
   id: number;
   data: {
@@ -182,38 +177,182 @@ export class CcoService {
     return found;
   }
 
-  getIdByName(name:string):number{
-  console.log('name pasado al servicio',name)
-  console.log('ccoMap.length servicio',this.ccoMap)
-    const input=(name||'')
+
+
+
+
+
+
+getIdByName(hash:string):number{
+  console.log('========================================');
+  console.log('findIdByName');
+  console.log('hash recibido:',hash);
+  console.log('ccoMap keys:',Object.keys(this.ccoMap||{}).length);
+
+  const norm=(value:string):string=>{
+    const raw=(value||'')
       .toUpperCase()
       .trim();
-    if(!input)
-      return 0;
-    // extrae los 6 numeros importantes
-    const inputMatch=input.match(/\d{6}/);
-    const inputCore=inputMatch?.[0]||'';
-    for(const key in this.ccoMap){
-      const item=this.ccoMap[Number(key)];
-      if(!item?.name)
-        continue;
-      const itemName=item.name
-        .toUpperCase()
-        .trim();
-      // match exacto completo
-      if(itemName===input)
-        return Number(key);
-      // match parcial normal
-      if(itemName.includes(input))
-        return Number(key);
-      // match por los 6 numeros unicos
-      const itemMatch=itemName.match(/\d{6}/);
-      const itemCore=itemMatch?.[0]||'';
-      if(inputCore && itemCore===inputCore)
-        return Number(key);
+
+    const digits=(raw.match(/\d/g)||[])
+      .join('');
+
+    console.log('----------------------------------------');
+    console.log('norm()');
+    console.log('raw:',raw);
+    console.log('digits:',digits);
+
+    if(digits.length>=7){
+      const result=`${digits.slice(0,6)}-${digits[6]}`;
+      console.log('normalized(7):',result);
+      return result;
     }
+
+    if(digits.length===6){
+      console.log('normalized(6):',digits);
+      return digits;
+    }
+
+    console.log('normalized: INVALID');
+    return '';
+  };
+
+  const input=norm(hash);
+
+  console.log('input normalized:',input);
+
+  if(!input){
+    console.log('input invalido -> return 0');
+    console.log('========================================');
     return 0;
   }
+
+  const inputCore=input.replace('-','');
+
+  console.log('inputCore:',inputCore);
+
+  for(const key in this.ccoMap){
+
+    const item=this.ccoMap[Number(key)];
+
+    console.log('----------------------------------------');
+    console.log('checking key:',key);
+    console.log('item:',item);
+
+    if(!item?.name){
+      console.log('skip: no name');
+      continue;
+    }
+
+    const itemNorm=norm(item.name);
+
+    console.log('item.name:',item.name);
+    console.log('itemNorm:',itemNorm);
+
+    if(!itemNorm){
+      console.log('skip: itemNorm invalido');
+      continue;
+    }
+
+    const itemCore=itemNorm.replace('-','');
+
+    console.log('itemCore:',itemCore);
+
+    if(itemNorm===input){
+      console.log('MATCH EXACT');
+      console.log('return id:',Number(key));
+      console.log('========================================');
+      return Number(key);
+    }
+
+    if(itemCore===inputCore){
+      console.log('MATCH CORE');
+      console.log('return id:',Number(key));
+      console.log('========================================');
+      return Number(key);
+    }
+
+    if(
+      input.length===6 &&
+      itemCore.startsWith(input)
+    ){
+      console.log('MATCH PREFIX');
+      console.log('return id:',Number(key));
+      console.log('========================================');
+      return Number(key);
+    }
+
+    console.log('NO MATCH');
+  }
+
+  console.log('SIN RESULTADOS');
+  console.log('return 0');
+  console.log('========================================');
+
+  return 0;
+}
+
+
+  /*getIdByName(hash:string):number{*/
+    /*console.log('hash pasado al servicio',hash);*/
+    /*console.log('ccoMap servicio',this.ccoMap);*/
+    /*const norm=(value:string):string=>{*/
+      /*const raw=(value||'').toUpperCase().trim();*/
+      /*const digits=(raw.match(/\d/g)||[]).join('');*/
+      /*if(digits.length>=7)return `${digits.slice(0,6)}-${digits[6]}`;*/
+      /*if(digits.length===6)return digits;*/
+      /*return '';*/
+    /*};*/
+    /*const input=norm(hash);*/
+    /*if(!input)return 0;*/
+    /*const inputCore=input.replace('-','');*/
+    /*for(const key in this.ccoMap){*/
+      /*const item=this.ccoMap[Number(key)];*/
+      /*if(!item?.name)continue;*/
+      /*const itemNorm=norm(item.name);*/
+      /*if(!itemNorm)continue;*/
+      /*const itemCore=itemNorm.replace('-','');*/
+      /*if(itemNorm===input)return Number(key);*/
+      /*if(itemCore===inputCore)return Number(key);*/
+      /*if(input.length===6&&itemCore.startsWith(input))return Number(key);*/
+    /*}*/
+    /*return 0;*/
+  /*}*/
+
+
+
+/*  getIdByName(name:string):number{*/
+  /*console.log('name pasado al servicio',name)*/
+  /*console.log('ccoMap.length servicio',this.ccoMap)*/
+    /*const input=(name||'')*/
+      /*.toUpperCase()*/
+      /*.trim();*/
+    /*if(!input)*/
+      /*return 0;*/
+    /*// extrae los 6 numeros importantes*/
+    /*const inputMatch=input.match(/\d{6}/);*/
+    /*const inputCore=inputMatch?.[0]||'';*/
+    /*for(const key in this.ccoMap){*/
+      /*const item=this.ccoMap[Number(key)];*/
+      /*if(!item?.name)*/
+        /*continue;*/
+      /*const itemName=item.name*/
+        /*.toUpperCase()*/
+        /*.trim();*/
+      /*// match exacto completo*/
+      /*if(itemName===input)*/
+        /*return Number(key);*/
+      /*// match parcial normal*/
+      /*if(itemName.includes(input))*/
+        /*return Number(key);*/
+      /*// match por los 6 numeros unicos*/
+      /*const itemMatch=itemName.match(/\d{6}/);*/
+      /*const itemCore=itemMatch?.[0]||'';*/
+      /*if(inputCore && itemCore===inputCore)*/
+        /*return Number(key);*/
+    /*}*/
+    /*return 0;*/
+  /*}*/
 
 
 }
