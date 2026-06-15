@@ -285,32 +285,12 @@ export class PatchPage {
     this.ocrService.postScale(url).subscribe({
       next: (res) => {
         this.ocrResponse = res;
-        console.log('OCR Response:', res);
-        console.log('isotanques[0]:', res.data.isotanques[0]);
-        //this.resolveContainersFromOCR();
-        //  PASO 2: opcional → setear en movement (debug / trazabilidad)
-        //this.movement.data.container_id = this.container1;
-        //this.movement.data.container2_id = this.container2;
-        
-
 
         if(res.data.isotanques[0]){
           this.isotanq1Id=this.ccoService.getIdByName(res.data.isotanques[0]);
-          //this.isotanq1Id=this.ccoService.getIdByName(res.data.isotanques[0]);
           this.isotanq1Name=this.ccoMap[this.isotanq1Id]?.name;
-console.log('hardcoded',        this.ccoService.getIdByName("500003-3"));
-
           console.log('isotanques[0]:', res.data.isotanques[0]);
-          //this.resolveContainersFromOCR();
         }
-        console.log('isotanq1Id',this.isotanq1Id);
-        console.log('isotanq1Name',this.isotanq1Name);
-
-
-        
-        //obtener el nombre a partir del hash del nombre 
-        //obtener el id   y despues obtener el nomnbre eso no es costoso 
-        
         const normalizedDate = this.normalizeOCRDate(res?.data?.date);
         const seals = res?.data?.seal ?? [];
         // actualizar movement
@@ -337,24 +317,6 @@ console.log('hardcoded',        this.ccoService.getIdByName("500003-3"));
 
   container1:any;
   container2:any;
-  /*  resolveContainersFromOCR(): void {*/
-    /*console.log("==== RESOLVE CONTAINERS START ====");*/
-    /*const c1_raw = this.ocrResponse?.data?.isotanques[0];*/
-    /*const c2_raw = this.ocrResponse?.data?.isotanques[1];*/
-    /*console.log("[OCR RAW]", { c1_raw, c2_raw });*/
-    /*// 🔧 normalizar*/
-    /*const c1_fmt = this.normalizeContainer(c1_raw);*/
-    /*const c2_fmt = this.normalizeContainer(c2_raw);*/
-    /*console.log("[FORMATTED]", { c1_fmt, c2_fmt });*/
-    /*// 🔍 buscar IDs*/
-    /*this.container1 = c1_fmt ? this.findCcoIdByContainer(c1_fmt) : 0;*/
-    /*this.container2 = c2_fmt ? this.findCcoIdByContainer(c2_fmt) : 0;*/
-    /*console.log("[RESULT IDS]", {*/
-      /*container1: this.container1,*/
-      /*container2: this.container2*/
-    /*});*/
-    /*console.log("==== RESOLVE CONTAINERS END ====");*/
-  /*}*/
 
   private buildCcoMap(ccoList: Cco[]): CcoMap {
     const map: CcoMap = {};
@@ -371,28 +333,6 @@ console.log('hardcoded',        this.ccoService.getIdByName("500003-3"));
 
   stateFilteredList:any[]=[];
  
-  /*joinTwins(): { current: any, twin: any | null } {*/
-    /*const c1 = Number(this.container1) || 0;*/
-    /*const c2 = Number(this.container2) || 0;*/
-    /*console.log("[JOIN] container1:", c1, "container2:", c2);*/
-    /*//  buscar registro actual*/
-    /*const current = this.stateFilteredList.find(item =>*/
-      /*Number(item?.data?.name) === c1*/
-    /*);*/
-    /*if (!current) {*/
-      /*console.warn("[JOIN] current NOT FOUND");*/
-      /*return { current: null, twin: null };*/
-    /*}*/
-    /*//  buscar twin*/
-    /*let twin = null;*/
-    /*if (c2 > 0) {*/
-      /*twin = this.stateFilteredList.find(item =>*/
-        /*Number(item?.data?.name) === c2*/
-      /*);*/
-    /*}*/
-    /*console.log("[JOIN RESULT]", { current, twin });*/
-    /*return { current, twin };*/
-  /*}*/
 
   updateMovementFromForm() {
     const f = this.form.value;
@@ -497,6 +437,21 @@ console.log('hardcoded',        this.ccoService.getIdByName("500003-3"));
     /*});     */
     /*return match ? Number(match.id) : 0;                                                                                                            */
   /*} */
+  
+  goToTwins(){
+
+
+    console.log('this.movement',this.movement)
+    this.router.navigate(
+      ['/app/tabs/replenishment-twin-getall'],
+       {
+         state:{
+           withdrawn:this.movement
+        }
+      }
+    );
+  }
+
 
 
 }

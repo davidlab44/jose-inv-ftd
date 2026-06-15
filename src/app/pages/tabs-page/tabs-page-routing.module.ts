@@ -183,12 +183,21 @@ const routes: Routes = [
           }
         ]
       },
-      {
+       {
         path: 'replenishment-withdrawn-getall',
         children: [
           {
             path: '',
             loadChildren: () => import('../replenishment/withdrawn/getall/getall.module').then(m => m.GetallModule)
+          }
+        ]
+      },
+     {
+        path: 'replenishment-twin-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/twin/getall/getall.module').then(m => m.GetallModule)
           }
         ]
       },
