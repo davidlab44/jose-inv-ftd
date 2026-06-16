@@ -156,36 +156,39 @@ export class GetallPage implements OnInit {
       next: response => {
         this.withdrawnList = response;
         console.log("withdrawnList response",this.withdrawnList)
-        this.fillFullWithdrawnList();
+        this.discoverTwins(this.withdrawn);
+        //this.fillFullWithdrawnList();
       }
     });
   }
 
-  sortWithdrawnByDate(withdrawnList: any[]): any[] {
-    return withdrawnList.sort((a, b) => {
-      const dateA = new Date(a.data.date).getTime();
-      const dateB = new Date(b.data.date).getTime();
-      return dateA - dateB;
-    });
-  }
 
-  sortWithdrawnByIdDesc(withdrawnList: any[]): any[] {
-    return withdrawnList.sort((a, b) => {
-      return b.id - a.id;
-    });
-  }
 
-  trackByGroup(index: number, group: any): string {
-    return group.refdate + '-' + index;
-  }
+  /*sortWithdrawnByDate(withdrawnList: any[]): any[] {*/
+    /*return withdrawnList.sort((a, b) => {*/
+      /*const dateA = new Date(a.data.date).getTime();*/
+      /*const dateB = new Date(b.data.date).getTime();*/
+      /*return dateA - dateB;*/
+    /*});*/
+  /*}*/
 
-  getTotalKg(): number {
-    if (!this.withdrawnList?.length) return 0;
-    return this.withdrawnList.reduce((total, p) => {
-      const kg = Number(p?.data?.kg) || 0;
-      return total + kg;
-    }, 0);
-  }
+  /*sortWithdrawnByIdDesc(withdrawnList: any[]): any[] {*/
+    /*return withdrawnList.sort((a, b) => {*/
+      /*return b.id - a.id;*/
+    /*});*/
+  /*}*/
+
+  /*trackByGroup(index: number, group: any): string {*/
+    /*return group.refdate + '-' + index;*/
+  /*}*/
+
+  /*getTotalKg(): number {*/
+    /*if (!this.withdrawnList?.length) return 0;*/
+    /*return this.withdrawnList.reduce((total, p) => {*/
+      /*const kg = Number(p?.data?.kg) || 0;*/
+      /*return total + kg;*/
+    /*}, 0);*/
+  /*}*/
 
   onRangeChange(event: any) {
     this.startDay = event.detail.value.lower;
@@ -478,6 +481,9 @@ export class GetallPage implements OnInit {
   cco1Id=0;
   cco1Name='';
 
+  cco2Id=0;
+  cco2Name='';
+
   loadCcos() {
     this.ccoService.getAll().subscribe({
       next: (ccos) => {
@@ -492,6 +498,10 @@ export class GetallPage implements OnInit {
         //this.ccoName=this.ccoService.getName(40);  
         console.log('id',this.cco1Id ) 
         console.log('name',this.cco1Name ) 
+        //this.ccoMap=map;
+//\        this.ccoService.debugMapping(this.filteredList);
+        this.getCco2();
+
       },
       error: (err) => console.error('Error loading ccos', err)
     });
@@ -565,17 +575,6 @@ export class GetallPage implements OnInit {
   isotanq:any;
   ccos: any[] = []; 
 
-  /*-------isotanq main -------*/
-  /*  findMostRecentMovementOfIsotanq(ccoId:number){*/
-    /*this.fullWithdrawnList=[];*/
-    /*const isotanqMain=this.ccoService.findMostRecentMovementOfIsotanq(this.withdrawnList,ccoId);*/
-    /*console.log('isotanqMain',isotanqMain)*/
-    /*this. fullWithdrawnList.push(isotanqMain); */
-    /*console.log(Array.isArray(this.fullWithdrawnList));*/
-    /*console.log(this.fullWithdrawnList);*/
-    /*console.log(this.fullWithdrawnList.length);*/
-  /*}*/
-
   findMostRecentMovementOfIsotanq(ccoId:number){
     this.fullWithdrawnList=[];
     const isotanqMain=this.ccoService.findMostRecentMovementOfIsotanq(this.withdrawnList,ccoId);
@@ -589,10 +588,10 @@ export class GetallPage implements OnInit {
     console.log('length',this.fullWithdrawnList.length);
   }
 
-  fillFullWithdrawnList(){
-    this.fullWithdrawnList=this.sortWithdrawnByIdDesc(this.withdrawnList);
-    console.log('full',this,this.fullWithdrawnList)
-  }
+  /*fillFullWithdrawnList(){*/
+    /*this.fullWithdrawnList=this.sortWithdrawnByIdDesc(this.withdrawnList);*/
+    /*console.log('full',this,this.fullWithdrawnList)*/
+  /*}*/
 
   private _viajanJuntosList:any[]=[];
   set viajanJuntosList(value:any[]){
@@ -640,40 +639,6 @@ export class GetallPage implements OnInit {
     }
     console.log('viajanJuntosList final',this.viajanJuntosList);
   }
-
-  /*viajanJuntosList:any[]=[];*/
-  /*discoverTwins(p: any) {*/
-    /*this.viajanJuntosList=[];*/
-    /*this.viajanJuntosList.push(p);*/
-    /*console.log('twin', p.data.twin);*/
-    /*const id2 = p.data.twin;*/
-    /*if (Number(id2)) {*/
-      /*const twin = this.withdrawnList.find(*/
-        /*item => item.id == id2*/
-      /*);*/
-      /*console.log('twin found:', twin);*/
-      /*if(twin && twin != undefined)*/
-        /*this.viajanJuntosList.push(twin);*/
-      /*console.log('viajanJuntosList',this.viajanJuntosList)*/
-    /*}*/
-  /*}*/
-
-  /*showTwins(p:any){*/
-    /*console.log('contenedor twin or single',p)*/
-    /*console.log('twin',p.data.twin)*/
-    /*const id2=p.data.twin;*/
-    /*if(Number(id2)){*/
-      /*const twin=this.withdrawnList.find(*/
-        /*(item)=>{*/
-          /*item.data.id==id2;*/
-        /*}*/
-      /*)  */
-    /*}*/
-  /*}*/
-
-  /*hookList(list:any[]){*/
-    /*console.log('HOOK LIST',list);*/
-  /*}*/
 
   desenganchar(viajanJuntosList:any){
     viajanJuntosList[0].data.twin=0;
@@ -734,6 +699,28 @@ export class GetallPage implements OnInit {
 
 
   goToTwins(){ this.location.back(); }
+
+
+  //hasTwin:boolean=false;
+  withdrawn2:any;
+  getCco2(){
+    if(this.withdrawn.data.twin && Number(this.withdrawn.data.twin)>0){
+      //this.hasTwin();
+      this.withdrawnService.getById(this.withdrawn.data.twin).subscribe({
+        next: res=> {
+          console.log('twin consultado[0]',res[0])
+          this.withdrawn2=res[0];
+          this.cco2Id=this.withdrawn2.data.name;
+          console.log('this.cco2Id',this.cco2Id);
+          this.cco2Name=this.ccoMap[this.cco2Id]?.name;
+          //this.cco2Name=this.ccoService.getName(this.ccoId)
+          console.log('this.cco2Name',this.cco2Name);
+        }
+      })
+    }  
+  }
+
+
 
 }
 

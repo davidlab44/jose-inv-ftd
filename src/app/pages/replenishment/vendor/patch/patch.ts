@@ -214,7 +214,6 @@ export class PatchPage {
           this.cco2Id=this.movement2.data.name;
           console.log('this.cco2Id',this.cco2Id);
           this.cco2Name=this.ccoMap[this.cco2Id]?.name;
-
           //this.cco2Name=this.ccoService.getName(this.ccoId)
           console.log('this.cco2Name',this.cco2Name);
         }
