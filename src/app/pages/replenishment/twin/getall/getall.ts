@@ -68,8 +68,6 @@ export class GetallPage implements OnInit {
   valor4 = 0;
   ios: boolean;
   showSearchbar: boolean;
-  //searchSubject = new Subject<string>();
-  //ccoList: any[] = [];
   displayToEnevis=true;
   withdrawn:any;
 
@@ -100,7 +98,6 @@ export class GetallPage implements OnInit {
     //private cd: ChangeDetectorRef,
     private location: Location,
   ){
-
     const navigation = this.router.getCurrentNavigation();
     console.log('navigation',navigation)
     console.log('navigation state',navigation.extras.state)
@@ -110,13 +107,7 @@ export class GetallPage implements OnInit {
       console.warn('No se recibió item por NavigationExtras.state');
     }
     console.log("Item recibidox:", this.withdrawn);
-
   }
-
-  /*ngOnInit() {*/
-    /*this.syncDays();*/
-    /*this.loadCcos();*/
-  /*}*/
 
   ngOnInit() {
     this.initDefaultRange(30);
@@ -161,34 +152,6 @@ export class GetallPage implements OnInit {
       }
     });
   }
-
-
-
-  /*sortWithdrawnByDate(withdrawnList: any[]): any[] {*/
-    /*return withdrawnList.sort((a, b) => {*/
-      /*const dateA = new Date(a.data.date).getTime();*/
-      /*const dateB = new Date(b.data.date).getTime();*/
-      /*return dateA - dateB;*/
-    /*});*/
-  /*}*/
-
-  /*sortWithdrawnByIdDesc(withdrawnList: any[]): any[] {*/
-    /*return withdrawnList.sort((a, b) => {*/
-      /*return b.id - a.id;*/
-    /*});*/
-  /*}*/
-
-  /*trackByGroup(index: number, group: any): string {*/
-    /*return group.refdate + '-' + index;*/
-  /*}*/
-
-  /*getTotalKg(): number {*/
-    /*if (!this.withdrawnList?.length) return 0;*/
-    /*return this.withdrawnList.reduce((total, p) => {*/
-      /*const kg = Number(p?.data?.kg) || 0;*/
-      /*return total + kg;*/
-    /*}, 0);*/
-  /*}*/
 
   onRangeChange(event: any) {
     this.startDay = event.detail.value.lower;
@@ -508,21 +471,6 @@ export class GetallPage implements OnInit {
     console.log('hello loadCCos')
   }
 
-  /*debugCcoMapping() {*/
-    /*this.filteredList.slice(0, 10).forEach((item, i) => {*/
-      /*const ccoId = item?.data?.name;*/
-      /*//console.log(`item[${i}] ccoId =>`, ccoId, 'tipo:', typeof ccoId);*/
-      /*const cco = this.ccoMap[ccoId];*/
-      /*if (!cco) {*/
-        /*console.warn(`NO MATCH para ccoId=${ccoId}`, {*/
-          /*availableKeys: Object.keys(this.ccoMap)*/
-        /*});*/
-      /*} else {*/
-        /*console.log(`MATCH ccoId=${ccoId} =>`, cco);*/
-      /*}*/
-      /*this.discoverTwins(this.withdrawn) //aqui se setea automaticamente el valor del object withdrawn & twin*/
-    /*});*/
-  /*}*/
 
   presentFilter(){
     this.displayToEnevis=!this.displayToEnevis;
@@ -541,7 +489,6 @@ export class GetallPage implements OnInit {
     }, null);
   }
 
-  /*[>---- CCO------ <]*/
   onCcoSearch(text: string) {
     console.log('text to search',text)
     this.applyFilter(text);  
@@ -588,10 +535,6 @@ export class GetallPage implements OnInit {
     console.log('length',this.fullWithdrawnList.length);
   }
 
-  /*fillFullWithdrawnList(){*/
-    /*this.fullWithdrawnList=this.sortWithdrawnByIdDesc(this.withdrawnList);*/
-    /*console.log('full',this,this.fullWithdrawnList)*/
-  /*}*/
 
   private _viajanJuntosList:any[]=[];
   set viajanJuntosList(value:any[]){
@@ -697,9 +640,7 @@ export class GetallPage implements OnInit {
   }
 
 
-
   goToTwins(){ this.location.back(); }
-
 
   //hasTwin:boolean=false;
   withdrawn2:any;
