@@ -22,8 +22,8 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { RexService } from '../../services/rex.service';
 import { IonSearchbar } from '@ionic/angular';
-
 import { RateClientComponent } from '../../pages/modal/rate-client/rate-client.component';   
+import { ExcelService } from '../../services/local/excel.service';
 
 @Component({
   selector: 'page-readprd',
@@ -72,7 +72,8 @@ export class ReadprdPage {
     private productService:ProductService,
     private categoryService:CategoryService,
     private umService:UmService,
-    private rexService: RexService
+    private rexService: RexService,
+    private excelService:ExcelService,
   ) {}
 
 
@@ -192,6 +193,7 @@ export class ReadprdPage {
       this.categoryService.getAllCategories().subscribe({ 
         next: (res) => {       
           this.categories = res;          
+          console.log("categories",this.categories)
           this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
         }, 
         error: (err) => {      
@@ -341,17 +343,26 @@ export class ReadprdPage {
     this.barcodeService.printIn50mmPortablePrinterBt(p.data.name,selectedBarcodes,p.id.toString());
   }
 
+  async openModal(p) { 
+    const modal = await this.modalController.create({
+      component: RateClientComponent,
+      componentProps: { //items: ['Item 1', 'Item 2', 'Item 3', 'Item 4'] 
+        items:p
+      }
+    });
+    return await modal.present();
+  }
 
 
-    async openModal(p) {                                                                                                                                                 
-      const modal = await this.modalController.create({
-        component: RateClientComponent,
-        componentProps: { //items: ['Item 1', 'Item 2', 'Item 3', 'Item 4'] 
-          items:p
-        }
-      });
-      return await modal.present();
-    }
+
+  downloadExcel(){
+    this.excelService.exportInventory(
+      this.productList,
+      this.ums,
+      this.categories,
+      'products'
+    );
+  }
 
 
 

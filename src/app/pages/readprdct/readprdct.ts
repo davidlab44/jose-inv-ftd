@@ -1,7 +1,6 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
-
 import { tap } from 'rxjs/operators';
 import { ConferenceData } from '../../providers/conference-data';
 import { UserData } from '../../providers/user-data';

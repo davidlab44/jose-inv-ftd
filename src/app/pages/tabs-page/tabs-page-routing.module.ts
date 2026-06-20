@@ -183,7 +183,7 @@ const routes: Routes = [
           }
         ]
       },
-       {
+      {
         path: 'replenishment-withdrawn-getall',
         children: [
           {
@@ -264,6 +264,50 @@ const routes: Routes = [
           }
         ]
       },
+
+      {
+        path: 'pchs-in-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../pchs/in/post/post.module').then(m => m.AssetSupplyPostModule)
+          }
+        ]
+      },
+
+      {
+        path: 'pchs-withdrawn-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../pchs/withdrawn/getall/getall.module').then(m => m.GetallModule)
+          }
+        ]
+      },
+
+
+      {
+        path: 'cert-main-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../cert/main/getall/getall.module').then(m => m.GetallModule)
+          }
+        ]
+      },
+
+
+      {
+        path: 'asset-supply-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../asset/supply/post/post.module').then(m => m.AssetSupplyPostModule)
+          }
+        ]
+      },
+
+
       {
         path: '',
         redirectTo: '/app/tabs/schedule',

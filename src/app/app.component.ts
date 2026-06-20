@@ -126,6 +126,16 @@ export class AppComponent implements OnInit {
        title: 'Listar productos ',
        url: '/app/tabs/asset-supply-readprdct',
        icon: 'document-text'
+     },   
+     {
+       title: 'Certificados',
+       url: '/app/tabs/cert-main-getall',
+       icon: 'ribbon'
+     },
+     {
+       title: 'Compras',
+       url: '/app/tabs/pchs-withdrawn-getall',
+       icon: 'document-text'
      },
      {
        title: 'Glp precios',
@@ -133,7 +143,7 @@ export class AppComponent implements OnInit {
        icon: 'cash'
      },
      {
-       title: 'Bolsas | Cupo | Quota',
+       title: 'Cupo | Quota',
        url: '/app/tabs/replenishment-allocated',
        icon: 'pie-chart'
      },

@@ -1,0 +1,181 @@
+
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+<!--    <ion-searchbar-->
+      <!--placeholder="Buscar"-->
+      <!--(ionInput)="onSearch($event.target.value)">-->
+    <!--</ion-searchbar>-->
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <form [formGroup]="form">    
+    <!--<input type="hidden" formControlName="id">-->
+    <ion-list>
+      <ion-button expand="block" (click)="takePhotoAndUpload()">
+        📸 Tomar foto
+      </ion-button>
+      <ion-button expand="block" color="secondary" (click)="pickImageAndUpload()">
+        🖼 Elegir de galería
+      </ion-button>
+      <ion-progress-bar
+        *ngIf="uploading"
+        [value]="uploadProgress / 100">
+      </ion-progress-bar>
+      <p *ngIf="uploading">
+        Subiendo: {{ uploadProgress }} %
+      </p>
+      <ion-card *ngIf="uploadedUrl">
+        <ion-card-header>
+          <ion-card-title>Imagen subida</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <img [src]="uploadedUrl" />
+          <p>{{ uploadedUrl }}</p>
+        </ion-card-content>
+      </ion-card>
+        <ion-item>
+          <ion-label position="floating">Fecha remision (VACIOS) | 2026-02-25T00:00:00</ion-label>
+          <ion-input formControlName="datein"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Entrega Numero:</ion-label>
+          <ion-input formControlName="deliveryin"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Viaje:</ion-label>
+          <ion-input formControlName="tripin"></ion-input>
+        </ion-item>
+        <br><br>
+        <!--<ion-item  *ngIf="shipList?.length"  >-->
+        <ion-item>
+          <ion-label>
+            <p>Motonave: {{shipNombreEsp}}</p>
+          </ion-label>
+          <ion-select
+            interface="popover"
+            formControlName="shipin"
+            (ionChange)="onShipSelect($event)">
+            <ion-select-option
+              *ngFor="let ship of shipList"
+              [value]="ship.id">
+              {{ ship.data?.name | uppercase }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <br>
+    </ion-list>
+    <br>
+
+    <ion-grid>
+      <ion-row>
+        <!--  IZQUIERDA (input) -->
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label>
+              <h2 *ngIf="ccoName; else loading">
+                {{ ccoName }}
+              </h2>
+              <ng-template #loading>
+                <span>Cargando Isotanq...</span>
+              </ng-template>
+            </ion-label>
+          </ion-item>
+        </ion-col>
+        <!--  DERECHA (buscador + lista) -->
+        <ion-col size="12" size-md="6">
+          <!-- 🔍 buscador -->
+          <ion-searchbar
+            placeholder="Buscar CCO (ej: TCSU 500046)"
+            show-clear-button="always"
+            (ionInput)="onCcoSearch($event.detail.value)">
+          </ion-searchbar>
+          <!-- lista -->
+          <ion-list>
+            <ion-item *ngFor="let item of filteredList" button>
+              <div class="cco-item" (click)="selectCco(item)">
+                <ion-label>
+                  <h2>{{ item.data.name }}</h2>
+                </ion-label>
+                <ion-badge
+                  *ngIf="item.data.color"
+                  [style.background]="item.data.color">
+                </ion-badge>
+              </div>
+            </ion-item>
+          </ion-list>
+          <!--  vacío -->
+          <ion-text *ngIf="filteredList.length === 0" color="medium">
+            <p class="empty-text">
+              No se encontraron resultados
+            </p>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+
+
+    <ion-grid *ngIf="cco2Id>0&&ocrResponse.data.contenedores[1].length>3" >
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label>
+              <h2 *ngif="cco2name else loading">
+                {{ cco2name }}
+              </h2>
+              <ng-template #loading>
+                <span>cargando isotanq...</span>
+              </ng-template>
+            </ion-label>
+          </ion-item>
+        </ion-col>
+        <ion-col size="12" size-md="6">
+          <ion-searchbar
+            placeholder="buscar cco no. 2 (ej: tcsu 500032)"
+            show-clear-button="always"
+            (ioninput)="onccosearch2($event.detail.value)">
+          </ion-searchbar>
+          <ion-list>
+            <ion-item *ngfor="let item2 of filteredlist2" button>
+              <div class="cco-item" (click)="select2cco(item)">
+                <ion-label>
+                  <h2>{{ item2.data.name }}</h2>
+                </ion-label>
+                <ion-badge
+                  *ngif="item2.data.color"
+                  [style.background]="item2.data.color">
+                </ion-badge>
+              </div>
+            </ion-item>
+          </ion-list>
+          <ion-text *ngif="filteredlist.length === 0" color="medium">
+            <p class="empty-text">
+              no se encontraron resultados
+            </p>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+
+    <ion-button expand="block" (click)="post()">
+      Guardar
+    </ion-button>
+  </form>
+
+</ion-content>
+
+

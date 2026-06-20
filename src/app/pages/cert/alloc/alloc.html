@@ -1,0 +1,187 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-searchbar
+      placeholder="Buscar"
+      (ionInput)="onSearch($event.target.value)">
+    </ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment (ionChange)="onSegmentChange($event)">
+      <ion-segment-button value="all">NACIONAL</ion-segment-button>
+      <ion-segment-button value="favorites">IMPORTADO</ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [ngClass]="{ 'bg-nacional': !importado, 'bg-importado': importado }" class="ion-padding">
+
+  <full-calendar [options]="calendarOptions"></full-calendar>
+
+  <div *ngIf="showEditForm" class="edit-form">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Editar cantidad</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">Alloc</ion-label>
+          <ion-input type="number" [(ngModel)]="selectedPrice.price"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Cents</ion-label>
+          <ion-input type="number" [(ngModel)]="selectedPrice.cents"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Fecha Inicio</ion-label>
+          <ion-input type="datetime-local" [(ngModel)]="selectedPrice.init"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Fecha Fin</ion-label>
+          <ion-input type="datetime-local" [(ngModel)]="selectedPrice.end"></ion-input>
+        </ion-item>
+        <ion-button expand="block" color="primary" (click)="updatePrice()">
+          Guardar Cambios
+        </ion-button>
+        <ion-button expand="block" fill="outline" (click)="cancelEdit()">
+          Cancelar
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  <br>
+  <br>
+  <div>
+    <div class="datetime-center">
+      <ion-item>
+        <ion-label position="stacked">Fecha / Hora inicio</ion-label>
+        <ion-datetime
+          presentation="date-time"
+          [(ngModel)]="dateTimeStart"
+          (ionChange)="onDateTimeChange()">
+        </ion-datetime>
+      </ion-item>
+
+      <br>
+
+      <ion-item>
+        <ion-label position="stacked">Fecha / Hora fin</ion-label>
+        <ion-datetime
+          presentation="date-time"
+          [(ngModel)]="dateTimeEnd"
+          (ionChange)="onDateTimeChange()">
+        </ion-datetime>
+      </ion-item>
+
+    </div>
+    <br>
+
+  <!--  <br>-->
+     <!--<ion-item>-->
+      <!--<ion-label position="stacked">Nuevo precio</ion-label>-->
+      <!--<ion-input-->
+        <!--type="number"-->
+        <!--inputmode="numeric"-->
+        <!--placeholder="0"-->
+        <!--[(ngModel)]="numero">-->
+      <!--</ion-input>-->
+    <!--</ion-item>-->
+   <!-- <br>   <ion-item>-->
+      <!--<ion-label position="stacked">Cent</ion-label>-->
+      <!--<ion-input-->
+        <!--type="number"-->
+        <!--inputmode="numeric"-->
+        <!--placeholder="0"-->
+        <!--[(ngModel)]="cents">-->
+      <!--</ion-input>-->
+    <!--</ion-item>-->
+   <!--    <br>-->
+    <!--<ion-button expand="block" (click)="addGlpprice(numero,cents)">-->
+      <!--Actualizar precio-->
+    <!--</ion-button>-->
+    <br>
+
+    <table style="width: 100%;">
+      <tr [ngClass]="importado ? 'row-importado' : 'row-nacional'">
+        <td style="width: 70%;">
+          <span style="font-size:small;">
+            &nbsp;&nbsp;CUPO | QUOTA ACTUAL: &nbsp;&nbsp; {{formatFechaLatam(currentAlloc?.data.init) }}&nbsp;&nbsp;-&nbsp;&nbsp;{{formatFechaLatam(currentAlloc?.data.end)}}&nbsp;&nbsp;
+          </span>
+        </td>
+         <td style="padding:8px;width:20%;">
+           <h5>{{ currentAlloc?.data?.alloc | number:'1.0-0':'es-CO'}}&nbsp;</h5>
+        </td>
+      </tr>
+    </table>
+
+    <br><br>
+
+    <ion-list *ngIf="!importado">
+      <ion-item class="titulo-historico">
+        <span>Histórico</span>
+      </ion-item>
+      <ng-container *ngFor="let p of glpAllocList">
+        <ion-item
+          *ngIf="p.data.id_replenishment_product === 1"
+          class="item-historico">
+          <div style="display: flex; width: 100%; align-items: center;">
+            <div style="flex: 0 0 66%; text-align:left;">
+              <span style="font-size: x-small;">
+                &nbsp;&nbsp;&nbsp; {{formatFechaLatam(currentAlloc?.data.init) }}&nbsp;&nbsp;-&nbsp;&nbsp;{{formatFechaLatam(currentAlloc?.data.end)}}&nbsp;&nbsp;
+              </span>
+            </div>
+            <div style="flex: 0 0 33%; text-align:right; font-size: small;">
+              <span>
+                {{ p.data.alloc+p.data.acumprev  | number:'1.0-0':'es-CO' }}
+              </span>
+            </div>
+          </div>
+        </ion-item>
+      </ng-container>
+    </ion-list>
+
+    <ion-list *ngIf="importado">
+      <ion-item class="titulo-historico">
+        <span>Histórico</span>
+      </ion-item>
+      <ng-container *ngFor="let p of glpAllocList">
+        <ion-item
+          *ngIf="p.data.id_replenishment_product === 2"
+          class="item-historico">
+          <div style="display: flex; width: 100%; align-items: center;">
+            <div style="flex: 0 0 66%; text-align:left;">
+              <span style="font-size: x-small;">
+                &nbsp;&nbsp;&nbsp; {{formatFechaLatam(currentAlloc?.data.init) }}&nbsp;&nbsp;-&nbsp;&nbsp;{{formatFechaLatam(currentAlloc?.data.end)}}&nbsp;&nbsp;
+              </span>
+            </div>
+            <div style="flex: 0 0 33%; text-align:right; font-size: small;">
+              <span>
+                {{ p.data.alloc | number:'1.0-0':'es-CO' }}
+              </span>
+            </div>
+          </div>
+        </ion-item>
+      </ng-container>
+    </ion-list>
+
+  </div>
+</ion-content>
+
+
+
+
+
+
+
+

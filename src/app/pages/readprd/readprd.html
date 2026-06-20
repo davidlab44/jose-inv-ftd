@@ -9,6 +9,14 @@
       (ionInput)="onSearch($event.target.value)">
     </ion-searchbar>
     <ion-buttons slot="end">
+      <ion-button (click)="downloadExcel()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="download"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+   <ion-buttons slot="end">
       <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
         <span *ngIf="ios">Filter</span>
         <span *ngIf="!ios">
