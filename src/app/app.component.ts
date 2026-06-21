@@ -211,6 +211,16 @@ export class AppComponent implements OnInit {
        icon: 'document-text'
      },
      {
+       title: 'Certificados',
+       url: '/app/tabs/cert-main-getall',
+       icon: 'ribbon'
+     },
+     {
+       title: 'Compras',
+       url: '/app/tabs/pchs-withdrawn-getall',
+       icon: 'document-text'
+     },
+     {
        title: 'Glp precios',
        url: '/app/tabs/glpprices',
        icon: 'cash'

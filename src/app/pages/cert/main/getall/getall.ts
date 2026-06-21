@@ -27,7 +27,7 @@ import { DateService } from '../../../../services/local/date.service';
 import { RexService } from '../../../../services/rex.service';
 import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
-import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
+import { CertService } from '../../../../services/cert/cert.service';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { Cco,CcoMap } from '../../../../interfaces/cco';
 import { Subject } from 'rxjs';
@@ -93,7 +93,7 @@ export class GetallPage implements OnInit {
     private rexService: RexService,
     private prodrexService: ProdrexService,
     private userService: UserService,
-    private withdrawnService: WithdrawnService,
+    private certService: CertService,
     private ccoService: CcoService,
     //private cd: ChangeDetectorRef,
   ) {}
@@ -137,7 +137,7 @@ export class GetallPage implements OnInit {
   getAll() {
     const since = this.dayOfYearToISO(this.startDay);
     const until = this.dayOfYearToISO(this.endDay, true);
-    this.withdrawnService.getIntervalByCreatedAtDate(since, until).subscribe({
+    this.certService.getAll().subscribe({
       next: response => {
         this.withdrawnList = response;
         console.log("withdrawnList response",this.withdrawnList)
@@ -354,95 +354,89 @@ export class GetallPage implements OnInit {
     });
   }
 
-  async  cloneWithdrawn(item: any) {
-    console.log("item pasado:", item);
-    //chatgpt => agregar al payload en data.twin el item.id
-    const payload = this.buildClonePayload(item);
-    console.log("Payload a enviar:", payload);
-    this.withdrawnService.postClone(payload).subscribe({
-      next: (response) => {
-        console.log("Clone creado", response);
-        //chatgpt => hacer un patch a este "withdrawnItem" data.twin el que se creo
-        this.selfPatch(item,response[0].id);
-        this.getAll();
-      },
-      error: (err) => {
-        console.error("Error al clonar", err);
-      }
-    });
-  }
 
-  buildClonePayload(item: any): any {
-    //  Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)
-    const d = item?.data?.data ?? item?.data ?? {};
-    return {
-      ext_id: null,
-      // ⚠️ Puedes cambiar esto a new Date().toISOString() si quieres que sea "nuevo"
-      created_at: item.created_at,
-      updated_at: item.created_at,
-      data: {
-        // RESET
-        kg: 0,
-        img: "",
-        psi: 0,
-        date: d.date ?? null,
-        name: 0,
-        seal: [],
-        twin: item.id,
-        price: 0,
-        id_replenishment_product: 0,
-        imgin: null,
-        shipin: 0,
-        ticket: "",
-        tripin: "",
-        vendor: 0,
-        datein: "",
-        // MANTENER w*
-        wnet: d.wnet ?? 0,
-        wtare: d.wtare ?? 0,
-        wgross: d.wgross ?? 0,
-        wticket: d.wticket ?? 0,
-        // MANTENER *out
-        imgout: d.imgout ?? null,
-        dateout: d.dateout ?? null,
-        shipout: d.shipout ?? 0,
-        tripout: d.tripout ?? "",
-        deliveryout: d.deliveryout ?? 0,
-        // OTROS
-        imgscale: d.imgscale ?? null,
-        rotogate: 0,
-        deliveryin: 0
-      },
-      refdate: null,
-      state: "pre-in"
-    };
-  }
+  /*async  cloneWithdrawn(item: any) {*/
+    /*console.log("item pasado:", item);*/
+    /*//chatgpt => agregar al payload en data.twin el item.id*/
+    /*const payload = this.buildClonePayload(item);*/
+    /*console.log("Payload a enviar:", payload);*/
+    /*this.certService.postClone(payload).subscribe({*/
+      /*next: (response) => {*/
+        /*console.log("Clone creado", response);*/
+        /*//chatgpt => hacer un patch a este "withdrawnItem" data.twin el que se creo*/
+        /*this.selfPatch(item,response[0].id);*/
+        /*this.getAll();*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error("Error al clonar", err);*/
+      /*}*/
+    /*});*/
+  /*}*/
 
-  async selfPatch(item:any,twin:number) {
-    item.data.twin=twin;
-    console.log("item to selfpatch ",item)
-    console.log("d to selfpatch ",item)
-    this.withdrawnService.patch(item.id,item.data).subscribe({
-      next: (response) => {
-        console.log("Withdrawn selfpatch response", response);
-      },
-      error: (err) => {
-        console.error("Withdrawn selfpatch error", err);
-      }
-    });
-  }
+
+
+  /*buildClonePayload(item: any): any {*/
+    /*//  Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)*/
+    /*const d = item?.data?.data ?? item?.data ?? {};*/
+    /*return {*/
+      /*ext_id: null,*/
+      /*// ⚠️ Puedes cambiar esto a new Date().toISOString() si quieres que sea "nuevo"*/
+      /*created_at: item.created_at,*/
+      /*updated_at: item.created_at,*/
+      /*data: {*/
+        /*// RESET*/
+        /*kg: 0,*/
+        /*img: "",*/
+        /*psi: 0,*/
+        /*date: d.date ?? null,*/
+        /*name: 0,*/
+        /*seal: [],*/
+        /*twin: item.id,*/
+        /*price: 0,*/
+        /*id_replenishment_product: 0,*/
+        /*imgin: null,*/
+        /*shipin: 0,*/
+        /*ticket: "",*/
+        /*tripin: "",*/
+        /*vendor: 0,*/
+        /*datein: "",*/
+        /*// MANTENER w**/
+        /*wnet: d.wnet ?? 0,*/
+        /*wtare: d.wtare ?? 0,*/
+        /*wgross: d.wgross ?? 0,*/
+        /*wticket: d.wticket ?? 0,*/
+        /*// MANTENER *out*/
+        /*imgout: d.imgout ?? null,*/
+        /*dateout: d.dateout ?? null,*/
+        /*shipout: d.shipout ?? 0,*/
+        /*tripout: d.tripout ?? "",*/
+        /*deliveryout: d.deliveryout ?? 0,*/
+        /*// OTROS*/
+        /*imgscale: d.imgscale ?? null,*/
+        /*rotogate: 0,*/
+        /*deliveryin: 0*/
+      /*},*/
+      /*refdate: null,*/
+      /*state: "pre-in"*/
+    /*};*/
+  /*}*/
+
+  /*async selfPatch(item:any,twin:number) {*/
+    /*item.data.twin=twin;*/
+    /*console.log("item to selfpatch ",item)*/
+    /*console.log("d to selfpatch ",item)*/
+    /*this.withdrawnService.patch(item.id,item.data).subscribe({*/
+      /*next: (response) => {*/
+        /*console.log("Withdrawn selfpatch response", response);*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error("Withdrawn selfpatch error", err);*/
+      /*}*/
+    /*});*/
+  /*}*/
 
   searchTerm: string = ''; 
-  get filteredList() {
-    if (!this.searchTerm) return this.fullWithdrawnList;
-    const term = this.searchTerm.toLowerCase();
-    return this.fullWithdrawnList.filter(item =>
-      Object.values(item.data).some(val =>
-        String(val).toLowerCase().includes(term)
-      )
-    );
-  }
-
+ 
   /*---------cco --------------*/
   private buildCcoMap(ccoList: Cco[]): CcoMap {
     const map: CcoMap = {};
@@ -565,7 +559,8 @@ export class GetallPage implements OnInit {
   }
 
   fillFullWithdrawnList(){
-    this.fullWithdrawnList=this.sortWithdrawnByIdDesc(this.withdrawnList);
+    //this.fullWithdrawnList=this.sortWithdrawnByIdDesc(this.withdrawnList);
+    this.fullWithdrawnList=this.withdrawnList;
     console.log('full',this,this.fullWithdrawnList)
   }
 
@@ -650,61 +645,76 @@ export class GetallPage implements OnInit {
     /*console.log('HOOK LIST',list);*/
   /*}*/
 
-  desenganchar(viajanJuntosList:any){
-    viajanJuntosList[0].data.twin=0;
-    this.withdrawnService.patch(viajanJuntosList[0].id,viajanJuntosList[0].data).subscribe({
-      next: (response) => {  
-        console.log("elemento 0 response", response);
-          viajanJuntosList[1].data.twin=0;
-          this.withdrawnService.patch(viajanJuntosList[1].id,viajanJuntosList[1].data).subscribe({
-            next: (res) => {  
-              console.log("elemento 1 response", res);
-            },
-            error: (err) => {      
-              console.error("Error al patchear elemento 1", err);
-            } 
-          }); 
-      },
-      error: (err) => {      
-        console.error("Error al patchear elemento 0 ", err);
-      } 
-    });
-    this.utilService.presentToast('Isotanques desenganchados','success',600)
-    this.viajanJuntosList=[];
-  } 
+  /*desenganchar(viajanJuntosList:any){*/
+    /*viajanJuntosList[0].data.twin=0;*/
+    /*this.withdrawnService.patch(viajanJuntosList[0].id,viajanJuntosList[0].data).subscribe({*/
+      /*next: (response) => {  */
+        /*console.log("elemento 0 response", response);*/
+          /*viajanJuntosList[1].data.twin=0;*/
+          /*this.withdrawnService.patch(viajanJuntosList[1].id,viajanJuntosList[1].data).subscribe({*/
+            /*next: (res) => {  */
+              /*console.log("elemento 1 response", res);*/
+            /*},*/
+            /*error: (err) => {      */
+              /*console.error("Error al patchear elemento 1", err);*/
+            /*} */
+          /*}); */
+      /*},*/
+      /*error: (err) => {      */
+        /*console.error("Error al patchear elemento 0 ", err);*/
+      /*} */
+    /*});*/
+    /*this.utilService.presentToast('Isotanques desenganchados','success',600)*/
+    /*this.viajanJuntosList=[];*/
+  /*} */
 
-  enganchar(viajanJuntosList:any){
-    viajanJuntosList[0].data.twin=viajanJuntosList[1].id;
-    this.withdrawnService.patch(viajanJuntosList[0].id,viajanJuntosList[0].data).subscribe({
-      next: (response) => {  
-        console.log("elemento 0 enganchado response", response);
-          viajanJuntosList[1].data.twin=viajanJuntosList[0].id;
-          this.withdrawnService.patch(viajanJuntosList[1].id,viajanJuntosList[1].data).subscribe({
-            next: (res) => {  
-              console.log("elemento 1 enganchado response", res);
-            },
-            error: (err) => {      
-              console.error("Error al patchear elemento 1", err);
-            } 
-          }); 
-      },
-      error: (err) => {      
-        console.error("Error al patchear elemento 0 ", err);
-      } 
-    });
-    this.utilService.presentToast('Isotanques desenganchados','success',600)
-    this.viajanJuntosList=[];
-  } 
+  /*enganchar(viajanJuntosList:any){*/
+    /*viajanJuntosList[0].data.twin=viajanJuntosList[1].id;*/
+    /*this.withdrawnService.patch(viajanJuntosList[0].id,viajanJuntosList[0].data).subscribe({*/
+      /*next: (response) => {  */
+        /*console.log("elemento 0 enganchado response", response);*/
+          /*viajanJuntosList[1].data.twin=viajanJuntosList[0].id;*/
+          /*this.withdrawnService.patch(viajanJuntosList[1].id,viajanJuntosList[1].data).subscribe({*/
+            /*next: (res) => {  */
+              /*console.log("elemento 1 enganchado response", res);*/
+            /*},*/
+            /*error: (err) => {      */
+              /*console.error("Error al patchear elemento 1", err);*/
+            /*} */
+          /*}); */
+      /*},*/
+      /*error: (err) => {      */
+        /*console.error("Error al patchear elemento 0 ", err);*/
+      /*} */
+    /*});*/
+    /*this.utilService.presentToast('Isotanques desenganchados','success',600)*/
+    /*this.viajanJuntosList=[];*/
+  /*} */
 
-  hasTwin():boolean{
-    const found=(this._viajanJuntosList||[]).some(item=>Number(item?.data?.twin)>0);
-    console.log('hay twins:',found);
-    return found;
+  /*hasTwin():boolean{*/
+    /*const found=(this._viajanJuntosList||[]).some(item=>Number(item?.data?.twin)>0);*/
+    /*console.log('hay twins:',found);*/
+    /*return found;*/
+  /*}*/
+
+  /*clearViajanJuntosList():void{*/
+    /*this.viajanJuntosList=[];*/
+  /*}*/
+
+
+
+  get filteredList() {
+    if (!this.searchTerm) return this.fullWithdrawnList;
+    const term = this.searchTerm.toLowerCase();
+    return this.fullWithdrawnList.filter(item =>
+      Object.values(item.data).some(val =>
+        String(val).toLowerCase().includes(term)
+      )
+    );
   }
 
-  clearViajanJuntosList():void{
-    this.viajanJuntosList=[];
-  }
+
+
 
 }
 

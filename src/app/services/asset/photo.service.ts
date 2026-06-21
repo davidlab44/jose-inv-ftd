@@ -76,6 +76,75 @@ private s3: S3Client;
     return { progress$: progressSubject.asObservable(), url$: urlSubject.asObservable() };
   }
 
+
+
+
+
+
+
+uploadToCertBucket(
+  base64:string,
+  cco:string,
+  year:number,
+  type:'parcial'|'total'
+):{progress$:Observable<number>,url$:Observable<string>}{
+
+  const progressSubject=new BehaviorSubject<number>(0);
+  const urlSubject=new BehaviorSubject<string>('');
+
+  (async()=>{
+
+    try{
+
+      const {bytes}=this.base64ToUint8Array(base64);
+
+      const key=`${cco}/${type}/${year}.pdf`;
+
+      const upload=new Upload({
+        client:this.s3,
+        params:{
+          Bucket:'cert',
+          Key:key,
+          Body:bytes,
+          ContentType:'application/pdf'
+        },
+        queueSize:4,
+        partSize:1024*1024*5
+      });
+
+      upload.on('httpUploadProgress',p=>{
+        if(p.loaded&&p.total)
+          progressSubject.next(Math.round((p.loaded/p.total)*100));
+      });
+
+      await upload.done();
+
+      progressSubject.next(100);
+      urlSubject.next(`${environment.s3aws}cert/${key}`);
+
+      progressSubject.complete();
+      urlSubject.complete();
+
+    }catch(err){
+
+      progressSubject.error(err);
+      urlSubject.error(err);
+
+    }
+
+  })();
+
+  return{
+    progress$:progressSubject.asObservable(),
+    url$:urlSubject.asObservable()
+  };
+
+}
+
+
+
+
+
   async testUploadImage(base64Image: string): Promise<string | null> {
     console.log("📤 Subiendo imagen...");
 

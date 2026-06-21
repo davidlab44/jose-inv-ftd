@@ -20,6 +20,8 @@
 </ion-header>
 
 <ion-content>
+  
+
   <ion-grid>
     <ion-row>
       <ion-col size="12">
@@ -211,6 +213,7 @@
     </ion-range>
   </ion-item>
  <br>
+
 <!-- ================= HEADER COLUMNAS ================= -->
 
 <ion-grid class="withdrawn-header">
@@ -273,7 +276,7 @@
         {{ p.data.deliveryin }}
       </ion-col>
       <!-- ISOTANQ -->
-      <ion-col size="2" [style.background]="ccoMap[+p.data.name]?.color || '#eee'" (click)="discoverTwins(p)"> {{ ccoMap[+p.data.name]?.name || 'N/A' }} </ion-col>
+      <ion-col size="2" [style.background]="ccoMap[+p.data.istq_id]?.color || '#eee'" (click)="discoverTwins(p)"> {{ ccoMap[+p.data.name]?.name || 'N/A' }} </ion-col>
       <!-- TICKET -->
       <ion-col size="1">
         {{ p.data.ticket }}
