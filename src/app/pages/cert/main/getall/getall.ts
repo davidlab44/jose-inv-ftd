@@ -560,7 +560,7 @@ export class GetallPage implements OnInit {
 
   fillFullWithdrawnList(){
     //this.fullWithdrawnList=this.sortWithdrawnByIdDesc(this.withdrawnList);
-    this.fullWithdrawnList=this.withdrawnList;
+    this.fullWithdrawnList=this.sortCerts();
     console.log('full',this,this.fullWithdrawnList)
   }
 
@@ -574,134 +574,6 @@ export class GetallPage implements OnInit {
     return this._viajanJuntosList;
   }
 
-  discoverTwins(p:any):void{
-    console.log('this._viajanJuntosList length inicio',this._viajanJuntosList.length);
-    console.log('p.dat.twin inicio value',p.data.twin)
-    if(this._viajanJuntosList.length==0&&p.data.twin>0){
-      this.viajanJuntosList=[p];
-      const id2=Number(p?.data?.twin);
-      //console.log('twin',id2);
-      if(!id2){
-        console.log('sin twin asociado');
-        return;
-      }
-      const twin=this.withdrawnList.find(item=>Number(item.id)===id2);
-      console.log('twin found',twin);
-      if(twin){
-        this.viajanJuntosList=[
-          ...this.viajanJuntosList,
-          twin
-        ];
-      }
-      return;
-    }
-    if(this._viajanJuntosList.length==0&&p.data.twin==0){
-      this.viajanJuntosList=[p];
-      return;
-    }
-    if(this._viajanJuntosList.length==1&&p.data.twin==0){
-      this._viajanJuntosList.push(p);
-      return;
-    }
-    if(this._viajanJuntosList.length>1&&p.data.twin==0){
-      //const hasTwin=(this._viajanJuntosList||[]).some(item=>Number(item?.data?.twin)>0);
-      this.utilService.presentToast('solo puede juntar dos contenedores','danger',1000);
-      return;
-    }
-    console.log('viajanJuntosList final',this.viajanJuntosList);
-  }
-
-  /*viajanJuntosList:any[]=[];*/
-  /*discoverTwins(p: any) {*/
-    /*this.viajanJuntosList=[];*/
-    /*this.viajanJuntosList.push(p);*/
-    /*console.log('twin', p.data.twin);*/
-    /*const id2 = p.data.twin;*/
-    /*if (Number(id2)) {*/
-      /*const twin = this.withdrawnList.find(*/
-        /*item => item.id == id2*/
-      /*);*/
-      /*console.log('twin found:', twin);*/
-      /*if(twin && twin != undefined)*/
-        /*this.viajanJuntosList.push(twin);*/
-      /*console.log('viajanJuntosList',this.viajanJuntosList)*/
-    /*}*/
-  /*}*/
-
-  /*showTwins(p:any){*/
-    /*console.log('contenedor twin or single',p)*/
-    /*console.log('twin',p.data.twin)*/
-    /*const id2=p.data.twin;*/
-    /*if(Number(id2)){*/
-      /*const twin=this.withdrawnList.find(*/
-        /*(item)=>{*/
-          /*item.data.id==id2;*/
-        /*}*/
-      /*)  */
-    /*}*/
-  /*}*/
-
-  /*hookList(list:any[]){*/
-    /*console.log('HOOK LIST',list);*/
-  /*}*/
-
-  /*desenganchar(viajanJuntosList:any){*/
-    /*viajanJuntosList[0].data.twin=0;*/
-    /*this.withdrawnService.patch(viajanJuntosList[0].id,viajanJuntosList[0].data).subscribe({*/
-      /*next: (response) => {  */
-        /*console.log("elemento 0 response", response);*/
-          /*viajanJuntosList[1].data.twin=0;*/
-          /*this.withdrawnService.patch(viajanJuntosList[1].id,viajanJuntosList[1].data).subscribe({*/
-            /*next: (res) => {  */
-              /*console.log("elemento 1 response", res);*/
-            /*},*/
-            /*error: (err) => {      */
-              /*console.error("Error al patchear elemento 1", err);*/
-            /*} */
-          /*}); */
-      /*},*/
-      /*error: (err) => {      */
-        /*console.error("Error al patchear elemento 0 ", err);*/
-      /*} */
-    /*});*/
-    /*this.utilService.presentToast('Isotanques desenganchados','success',600)*/
-    /*this.viajanJuntosList=[];*/
-  /*} */
-
-  /*enganchar(viajanJuntosList:any){*/
-    /*viajanJuntosList[0].data.twin=viajanJuntosList[1].id;*/
-    /*this.withdrawnService.patch(viajanJuntosList[0].id,viajanJuntosList[0].data).subscribe({*/
-      /*next: (response) => {  */
-        /*console.log("elemento 0 enganchado response", response);*/
-          /*viajanJuntosList[1].data.twin=viajanJuntosList[0].id;*/
-          /*this.withdrawnService.patch(viajanJuntosList[1].id,viajanJuntosList[1].data).subscribe({*/
-            /*next: (res) => {  */
-              /*console.log("elemento 1 enganchado response", res);*/
-            /*},*/
-            /*error: (err) => {      */
-              /*console.error("Error al patchear elemento 1", err);*/
-            /*} */
-          /*}); */
-      /*},*/
-      /*error: (err) => {      */
-        /*console.error("Error al patchear elemento 0 ", err);*/
-      /*} */
-    /*});*/
-    /*this.utilService.presentToast('Isotanques desenganchados','success',600)*/
-    /*this.viajanJuntosList=[];*/
-  /*} */
-
-  /*hasTwin():boolean{*/
-    /*const found=(this._viajanJuntosList||[]).some(item=>Number(item?.data?.twin)>0);*/
-    /*console.log('hay twins:',found);*/
-    /*return found;*/
-  /*}*/
-
-  /*clearViajanJuntosList():void{*/
-    /*this.viajanJuntosList=[];*/
-  /*}*/
-
-
 
   get filteredList() {
     if (!this.searchTerm) return this.fullWithdrawnList;
@@ -710,6 +582,15 @@ export class GetallPage implements OnInit {
       Object.values(item.data).some(val =>
         String(val).toLowerCase().includes(term)
       )
+    );
+  }
+
+
+  sortCerts():any[]{
+    return [...this.withdrawnList].sort((a,b)=>
+      a.data.istq_id-b.data.istq_id ||
+      a.data.type-b.data.type ||
+      Number(a.data.year)-Number(b.data.year)
     );
   }
 
