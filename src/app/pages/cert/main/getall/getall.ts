@@ -331,7 +331,7 @@ export class GetallPage implements OnInit {
   plexaUploader(item:any){
     //console.log("item to patch",item);
     this.router.navigate(    
-      ['/app/tabs/replenishment-in-post'], 
+      ['/app/tabs/cert-main-post'], 
       { state: { item } }    
     );
   } 

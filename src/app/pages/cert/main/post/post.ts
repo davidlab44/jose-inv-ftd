@@ -305,12 +305,12 @@ export class AssetSupplyPostPage {
 
 
 
-this.s3Service.uploadToCertBucket(
-  pdfBase64,
-  'TCSU-500002-1',
-  2026,
-  'parcial'
-);
+/*this.s3Service.uploadToCertBucket(*/
+  /*pdfBase64,*/
+  /*'TCSU-500002-1',*/
+  /*2026,*/
+  /*'parcial'*/
+/*);*/
 
 
 

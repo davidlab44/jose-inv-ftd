@@ -54,10 +54,19 @@
 
             <ion-col
               size="3"
+              class="cco-pill"
+              style="border-radius:9999px;"
               [style.background]="ccoMap[+p.data.istq_id]?.color || '#eee'"
               (click)="discoverTwins(p)">
               {{ ccoMap[+p.data.istq_id]?.name || 'N/A' }}
             </ion-col>
+
+            <!--<ion-col-->
+              <!--size="3"-->
+              <!--[style.background]="ccoMap[+p.data.istq_id]?.color || '#eee'"-->
+              <!--(click)="discoverTwins(p)">-->
+              <!--{{ ccoMap[+p.data.istq_id]?.name || 'N/A' }}-->
+            <!--</ion-col>-->
 
             <ion-col size="2">
               {{ p.data.year }}

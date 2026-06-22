@@ -286,12 +286,23 @@ const routes: Routes = [
       },
 
 
+
       {
         path: 'cert-main-getall',
         children: [
           {
             path: '',
             loadChildren: () => import('../cert/main/getall/getall.module').then(m => m.GetallModule)
+          }
+        ]
+      },
+
+      {
+        path: 'cert-main-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../cert/main/post/post.module').then(m => m.AssetSupplyPostModule)
           }
         ]
       },
