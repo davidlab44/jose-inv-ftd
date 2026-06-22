@@ -491,6 +491,7 @@ export class GetallPage implements OnInit {
   }
 
   openCert(cert:any,isotanqName:string){
+    isotanqName=this.formatName(isotanqName);
     let type='';
     if(cert.data.type==1){
       type='total';
@@ -499,11 +500,13 @@ export class GetallPage implements OnInit {
       type='parcial';
     }
     //const url = 'https://s3dev.inbemetal.com/cert/cert/ABSU-500054-1/total/2018.pdf';
-    const url = 'https://s3dev.inbemetal.com/cert/cert/'+isotanqName+'/'+type+'/'+cert.data.type+'.pdf';
+    const url = 'https://s3dev.inbemetal.com/cert/cert/'+isotanqName+'/'+type+'/'+cert.data.year+'.pdf';
     window.open(url, '_blank');
   }
 
-
+formatName(name:string):string{
+  return name?.replace(/^(.{4})\s+/, '$1-') || '';
+}
 
 }
 

@@ -45,41 +45,57 @@
 
           <ion-row
             class="withdrawn-row ion-align-items-center"
-            [style.background]="p.data.type==1 ? '#585858' : '#d5d5d5'"
+            [style.background]="p.data.type==1 ? '#A6B7FF' : '#C2FF9E'"
             [ngClass]="{'row-erp':p.state==='erp'}">
 
-            <ion-col size="2">
+            <ion-col size="1">
               {{ p.data.istq_id }}
             </ion-col>
 
             <ion-col
-              size="6"
+              size="3"
               [style.background]="ccoMap[+p.data.istq_id]?.color || '#eee'"
               (click)="discoverTwins(p)">
-
               {{ ccoMap[+p.data.istq_id]?.name || 'N/A' }}
-
             </ion-col>
 
             <ion-col size="2">
               {{ p.data.year }}
             </ion-col>
 
-            <ion-col
-              size="2"
-              class="actions-col">
+            <ion-col size="2"></ion-col>
 
+            <ion-col size="1" class="actions-col">
               <ion-button
                 fill="clear"
                 size="small"
                 class="btn-compact"
                 (click)="openCert(p,ccoMap[+p.data.istq_id]?.name);$event.stopPropagation()">
-
                 <ion-icon name="eye-outline"></ion-icon>
-
               </ion-button>
-
             </ion-col>
+
+            <ion-col size="1" class="actions-col">
+              <ion-button
+                fill="clear"
+                size="small"
+                class="btn-compact"
+                (click)="openCert(p,ccoMap[+p.data.istq_id]?.name);$event.stopPropagation()">
+                <ion-icon name="download-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+
+            <ion-col size="1" class="actions-col">
+              <ion-button
+                fill="clear"
+                size="small"
+                class="btn-compact"
+                (click)="openCert(p,ccoMap[+p.data.istq_id]?.name);$event.stopPropagation()">
+                <ion-icon name="share-social-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+
+            <ion-col size="1"></ion-col>
 
           </ion-row>
 
@@ -95,84 +111,4 @@
 
 
 
-
-<!--<ion-content>-->
- 
-
-  <!--<ion-fab vertical="bottom" horizontal="end" slot="fixed">-->
-    <!--<ion-fab-button class="fab-premium" (click)="plexaUploader('no estoy pasando nada')">-->
-      <!--<ion-icon name="add"></ion-icon>-->
-    <!--</ion-fab-button>-->
-  <!--</ion-fab>-->
-  <!--<br>-->
-
-  <!--<ng-container *ngIf="fullCertList && fullCertList.length>0">-->
-    <!--<ng-container *ngFor="let item of fullCertList">-->
-      <!--<ng-container-->
-        <!--*ngIf="-->
-          <!--!displayToEnevis ||-->
-          <!--(-->
-            <!--item?.data?.deliveryout?.length ==0 ||-->
-            <!--item?.data?.shipout == 0 ||-->
-            <!--item?.data?.imgout?.length ==0 -->
-          <!--)-->
-        <!--">-->
-        <!--<ng-container-->
-          <!--*ngTemplateOutlet="withdrawnRow; context:{p:item}">-->
-        <!--</ng-container>-->
-      <!--</ng-container>-->
-    <!--</ng-container>-->
-  <!--</ng-container>-->
-  <!--<ng-template #withdrawnRow let-p="p">-->
-    <!--<ion-grid class="withdrawn-grid">-->
-      <!--<ion-row-->
-        <!--class="withdrawn-row ion-align-items-center"-->
-        <!--[ngClass]="{ 'row-erp': p.state === 'erp' }">-->
-          <!--<div *ngIf="p.data.type==1" style="background-color=#585858" >-->
-          <!--<ion-col size="1">-->
-            <!--{{ p.data.istq_id }}-->
-          <!--</ion-col>-->
-          <!--<ion-col size="2" [style.background]="ccoMap[+p.data.name]?.color || '#eee'" (click)="discoverTwins(p)"> {{ ccoMap[+p.data.istq_id]?.name || 'N/A' }} </ion-col>-->
-          <!--<ion-col size="1">-->
-            <!--{{ p.data.year}}-->
-          <!--</ion-col>-->
-          <!--<ion-col size="1" class="actions-col">-->
-            <!--<ion-button-->
-              <!--fill="clear"-->
-              <!--size="small"-->
-              <!--class="btn-compact"-->
-              <!--title="Viajes | Llegadas"-->
-              <!--[color]="p.data.shipin > 0 ? 'success' : 'dark'"-->
-              <!--(click)="openCert(p,ccoMap[+p.data.istq_id]?.name); $event.stopPropagation()">-->
-              <!--<ion-icon name="eye-outline"></ion-icon>-->
-            <!--</ion-button>-->
-          <!--</ion-col>-->
-        <!--</div>      -->
-        <!--<div *ngIf="p.data.type==2" style="background-color=#d5d5d5" >-->
-          <!--<ion-col size="1">-->
-            <!--{{ p.data.istq_id }}-->
-          <!--</ion-col>-->
-          <!--[> ISOTANQ <]-->
-          <!--<ion-col size="2" [style.background]="ccoMap[+p.data.name]?.color || '#eee'" (click)="discoverTwins(p)"> {{ ccoMap[+p.data.istq_id]?.name || 'N/A' }} </ion-col>-->
-          <!--<ion-col size="1">-->
-            <!--{{ p.data.year}}-->
-          <!--</ion-col>-->
-          <!--<ion-col size="1" class="actions-col">-->
-            <!--<ion-button-->
-              <!--fill="clear"-->
-              <!--size="small"-->
-              <!--class="btn-compact"-->
-              <!--title="Viajes | Llegadas"-->
-              <!--[color]="p.data.shipin > 0 ? 'success' : 'dark'"-->
-              <!--(click)="openCert(p,ccoMap[+p.data.istq_id]?.name); $event.stopPropagation()">-->
-              <!--<ion-icon name="eye-outline"></ion-icon>-->
-            <!--</ion-button>-->
-          <!--</ion-col>-->
-        <!--</div> -->
-      <!--</ion-row>-->
-    <!--</ion-grid>-->
-  <!--</ng-template>-->
-
-
-<!--</ion-content>-->
 
