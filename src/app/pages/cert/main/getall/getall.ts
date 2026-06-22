@@ -42,9 +42,9 @@ export class GetallPage implements OnInit {
 
   @ViewChild(IonList, { static: false }) ionList!: IonList;
   searchSubject: Subject<string> = new Subject();
-  withdrawnList: any[] = [];
-  filteredWithdrawnList: any[] = [];
-  fullWithdrawnList: any[] = [];
+  certList: any[] = [];
+  filteredCertList: any[] = [];
+  fullCertList: any[] = [];
   dayRange = {
     lower: 1,
     upper: this.getTodayDayOfYear()
@@ -95,31 +95,24 @@ export class GetallPage implements OnInit {
     private userService: UserService,
     private certService: CertService,
     private ccoService: CcoService,
-    //private cd: ChangeDetectorRef,
   ) {}
-
-  /*ngOnInit() {*/
-    /*this.syncDays();*/
-    /*this.loadCcos();*/
-  /*}*/
 
   ngOnInit() {
     this.initDefaultRange(30);
     this.loadCcos();
     this.displayToEnevis=false;//esto es para que muestre todo los elementos que coincidan 
-    this.filteredWithdrawnList = [...this.withdrawnList];
+    this.filteredCertList = [...this.certList];
     this.searchSubject.pipe(
       debounceTime(500),
       distinctUntilChanged()
     ).subscribe((text: string) => {
-      console.log('withdrawnList size', this.withdrawnList.length);
       const value = text.toLowerCase().trim();
-      this.filteredWithdrawnList = this.withdrawnList.filter(item =>
+      this.filteredCertList = this.certList.filter(item =>
         JSON.stringify(item).toLowerCase().includes(value)
       );
       console.log(
         'filtered size',
-        this.filteredWithdrawnList.length
+        this.filteredCertList.length
       );
     });
   }
@@ -139,23 +132,23 @@ export class GetallPage implements OnInit {
     const until = this.dayOfYearToISO(this.endDay, true);
     this.certService.getAll().subscribe({
       next: response => {
-        this.withdrawnList = response;
-        console.log("withdrawnList response",this.withdrawnList)
-        this.fillFullWithdrawnList();
+        this.certList = response;
+        console.log("certList response",this.certList)
+        this.fillFullCertList();
       }
     });
   }
 
-  sortWithdrawnByDate(withdrawnList: any[]): any[] {
-    return withdrawnList.sort((a, b) => {
+  sortWithdrawnByDate(certList: any[]): any[] {
+    return certList.sort((a, b) => {
       const dateA = new Date(a.data.date).getTime();
       const dateB = new Date(b.data.date).getTime();
       return dateA - dateB;
     });
   }
 
-  sortWithdrawnByIdDesc(withdrawnList: any[]): any[] {
-    return withdrawnList.sort((a, b) => {
+  sortWithdrawnByIdDesc(certList: any[]): any[] {
+    return certList.sort((a, b) => {
       return b.id - a.id;
     });
   }
@@ -165,8 +158,8 @@ export class GetallPage implements OnInit {
   }
 
   getTotalKg(): number {
-    if (!this.withdrawnList?.length) return 0;
-    return this.withdrawnList.reduce((total, p) => {
+    if (!this.certList?.length) return 0;
+    return this.certList.reduce((total, p) => {
       const kg = Number(p?.data?.kg) || 0;
       return total + kg;
     }, 0);
@@ -225,7 +218,6 @@ export class GetallPage implements OnInit {
 
   changeEndDay(delta: number) {
     this.endDay = Math.max(1, Math.min(365, this.endDay + delta));
-    // evitar que sea menor que startDay
     if (this.endDay < this.startDay) {
       this.endDay = this.startDay;
     }
@@ -349,91 +341,10 @@ export class GetallPage implements OnInit {
     this.router.navigate([pageRoute], {
       state: {
         item: withdrawn,
-        list: this.withdrawnList
+        list: this.certList
       }
     });
   }
-
-
-  /*async  cloneWithdrawn(item: any) {*/
-    /*console.log("item pasado:", item);*/
-    /*//chatgpt => agregar al payload en data.twin el item.id*/
-    /*const payload = this.buildClonePayload(item);*/
-    /*console.log("Payload a enviar:", payload);*/
-    /*this.certService.postClone(payload).subscribe({*/
-      /*next: (response) => {*/
-        /*console.log("Clone creado", response);*/
-        /*//chatgpt => hacer un patch a este "withdrawnItem" data.twin el que se creo*/
-        /*this.selfPatch(item,response[0].id);*/
-        /*this.getAll();*/
-      /*},*/
-      /*error: (err) => {*/
-        /*console.error("Error al clonar", err);*/
-      /*}*/
-    /*});*/
-  /*}*/
-
-
-
-  /*buildClonePayload(item: any): any {*/
-    /*//  Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)*/
-    /*const d = item?.data?.data ?? item?.data ?? {};*/
-    /*return {*/
-      /*ext_id: null,*/
-      /*// ⚠️ Puedes cambiar esto a new Date().toISOString() si quieres que sea "nuevo"*/
-      /*created_at: item.created_at,*/
-      /*updated_at: item.created_at,*/
-      /*data: {*/
-        /*// RESET*/
-        /*kg: 0,*/
-        /*img: "",*/
-        /*psi: 0,*/
-        /*date: d.date ?? null,*/
-        /*name: 0,*/
-        /*seal: [],*/
-        /*twin: item.id,*/
-        /*price: 0,*/
-        /*id_replenishment_product: 0,*/
-        /*imgin: null,*/
-        /*shipin: 0,*/
-        /*ticket: "",*/
-        /*tripin: "",*/
-        /*vendor: 0,*/
-        /*datein: "",*/
-        /*// MANTENER w**/
-        /*wnet: d.wnet ?? 0,*/
-        /*wtare: d.wtare ?? 0,*/
-        /*wgross: d.wgross ?? 0,*/
-        /*wticket: d.wticket ?? 0,*/
-        /*// MANTENER *out*/
-        /*imgout: d.imgout ?? null,*/
-        /*dateout: d.dateout ?? null,*/
-        /*shipout: d.shipout ?? 0,*/
-        /*tripout: d.tripout ?? "",*/
-        /*deliveryout: d.deliveryout ?? 0,*/
-        /*// OTROS*/
-        /*imgscale: d.imgscale ?? null,*/
-        /*rotogate: 0,*/
-        /*deliveryin: 0*/
-      /*},*/
-      /*refdate: null,*/
-      /*state: "pre-in"*/
-    /*};*/
-  /*}*/
-
-  /*async selfPatch(item:any,twin:number) {*/
-    /*item.data.twin=twin;*/
-    /*console.log("item to selfpatch ",item)*/
-    /*console.log("d to selfpatch ",item)*/
-    /*this.withdrawnService.patch(item.id,item.data).subscribe({*/
-      /*next: (response) => {*/
-        /*console.log("Withdrawn selfpatch response", response);*/
-      /*},*/
-      /*error: (err) => {*/
-        /*console.error("Withdrawn selfpatch error", err);*/
-      /*}*/
-    /*});*/
-  /*}*/
 
   searchTerm: string = ''; 
  
@@ -442,7 +353,6 @@ export class GetallPage implements OnInit {
     const map: CcoMap = {};
     ccoList.forEach((cco, index) => {
       const id = Number(cco.id); // NORMALIZAR
-      //console.log(`cco[${index}] id(normalizado) =>`, id, typeof id);
       map[id] = {
         name: cco.data?.name ?? 'N/A',
         color: cco.data?.color ?? '#ccc'
@@ -489,7 +399,7 @@ export class GetallPage implements OnInit {
   }
 
   findMostRecentMovement(name: number): any | null {
-    return this.withdrawnList.reduce((max, item) => {
+    return this.certList.reduce((max, item) => {
       if (item?.data?.name !== name) {
         return max;
       }
@@ -534,34 +444,22 @@ export class GetallPage implements OnInit {
   isotanq:any;
   ccos: any[] = []; 
 
-  /*-------isotanq main -------*/
-  /*  findMostRecentMovementOfIsotanq(ccoId:number){*/
-    /*this.fullWithdrawnList=[];*/
-    /*const isotanqMain=this.ccoService.findMostRecentMovementOfIsotanq(this.withdrawnList,ccoId);*/
-    /*console.log('isotanqMain',isotanqMain)*/
-    /*this. fullWithdrawnList.push(isotanqMain); */
-    /*console.log(Array.isArray(this.fullWithdrawnList));*/
-    /*console.log(this.fullWithdrawnList);*/
-    /*console.log(this.fullWithdrawnList.length);*/
-  /*}*/
-
   findMostRecentMovementOfIsotanq(ccoId:number){
-    this.fullWithdrawnList=[];
-    const isotanqMain=this.ccoService.findMostRecentMovementOfIsotanq(this.withdrawnList,ccoId);
+    this.fullCertList=[];
+    const isotanqMain=this.ccoService.findMostRecentMovementOfIsotanq(this.certList,ccoId);
     console.log('isotanqMain',isotanqMain);
     if(!isotanqMain){
       console.log('No se encontró isotanque para ccoId',ccoId);
       return;
     }
-    this.fullWithdrawnList=[isotanqMain];
-    console.log('fullWithdrawnList',this.fullWithdrawnList);
-    console.log('length',this.fullWithdrawnList.length);
+    this.fullCertList=[isotanqMain];
+    console.log('fullCertList',this.fullCertList);
+    console.log('length',this.fullCertList.length);
   }
 
-  fillFullWithdrawnList(){
-    //this.fullWithdrawnList=this.sortWithdrawnByIdDesc(this.withdrawnList);
-    this.fullWithdrawnList=this.sortCerts();
-    console.log('full',this,this.fullWithdrawnList)
+  fillFullCertList(){
+    this.fullCertList=this.sortCerts();
+    console.log('full',this,this.fullCertList)
   }
 
   private _viajanJuntosList:any[]=[];
@@ -574,26 +472,36 @@ export class GetallPage implements OnInit {
     return this._viajanJuntosList;
   }
 
-
   get filteredList() {
-    if (!this.searchTerm) return this.fullWithdrawnList;
+    if (!this.searchTerm) return this.fullCertList;
     const term = this.searchTerm.toLowerCase();
-    return this.fullWithdrawnList.filter(item =>
+    return this.fullCertList.filter(item =>
       Object.values(item.data).some(val =>
         String(val).toLowerCase().includes(term)
       )
     );
   }
 
-
   sortCerts():any[]{
-    return [...this.withdrawnList].sort((a,b)=>
+    return [...this.certList].sort((a,b)=>
       a.data.istq_id-b.data.istq_id ||
       a.data.type-b.data.type ||
       Number(a.data.year)-Number(b.data.year)
     );
   }
 
+  openCert(cert:any,isotanqName:string){
+    let type='';
+    if(cert.data.type==1){
+      type='total';
+    }   
+    if(cert.data.type==2){
+      type='parcial';
+    }
+    //const url = 'https://s3dev.inbemetal.com/cert/cert/ABSU-500054-1/total/2018.pdf';
+    const url = 'https://s3dev.inbemetal.com/cert/cert/'+isotanqName+'/'+type+'/'+cert.data.type+'.pdf';
+    window.open(url, '_blank');
+  }
 
 
 
