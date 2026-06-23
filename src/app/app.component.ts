@@ -95,7 +95,6 @@ export class AppComponent implements OnInit {
      },
    ];
     
-
    appPages7 = [
      {
        title: 'Inicio',
@@ -126,7 +125,7 @@ export class AppComponent implements OnInit {
        title: 'Listar productos ',
        url: '/app/tabs/asset-supply-readprdct',
        icon: 'document-text'
-     },   
+     },
      {
        title: 'Certificados',
        url: '/app/tabs/cert-main-getall',
@@ -143,7 +142,7 @@ export class AppComponent implements OnInit {
        icon: 'cash'
      },
      {
-       title: 'Cupo | Quota',
+       title: 'Bolsas | Cupo | Quota',
        url: '/app/tabs/replenishment-allocated',
        icon: 'pie-chart'
      },
@@ -170,6 +169,8 @@ export class AppComponent implements OnInit {
    ];
 
 
+
+   //enevis
    appPages8 = [
      {
        title: 'Plexa',

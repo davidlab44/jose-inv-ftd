@@ -17,7 +17,9 @@ import { ProductService } from '../../services/product.service';
 import { BarcodeService } from '../../services/barcode.service';
 import { CategoryService } from '../../services/category.service';
 import { UmService } from '../../services/um.service';
+//import { BrowserMultiFormatReader } from '@zxing/browser';
 import { BrowserMultiFormatReader } from '@zxing/browser';
+import { BarcodeFormat,DecodeHintType } from '@zxing/library';
 import { RexService } from '../../services/rex.service';
 import { ProdrexService } from '../../services/prodrex.service';
 import { Product, defaultProduct } from '../../interfaces/product';
@@ -72,9 +74,21 @@ export class SchedulePage{
   hash:string='';
   table:any
   storedObject:any;
-  async ngOnInit(){
-  }
-  
+
+  /*async ngOnInit(){*/
+  /*}*/
+ 
+  async ngOnInit() {
+    const hints = new Map();
+    hints.set(
+      DecodeHintType.POSSIBLE_FORMATS,
+      [
+        BarcodeFormat.CODE_128
+      ]
+    );
+    this.codeReader = new BrowserMultiFormatReader(hints);
+  }  
+
   async setSession() {
     this.storedObject = await this.userService.getStoredUserInfo();
     console.log("userInfo schedule",this.storedObject)
@@ -155,64 +169,96 @@ export class SchedulePage{
   async ionViewDidEnter() {
   }
 
+
+
   componentsEnabled: boolean = true;
   scannedValue: string = '';
+
   async startScan() {
     this.refreshView();
     try {
-      const devices = await BrowserMultiFormatReader.listVideoInputDevices();
-      if (!devices.length) {
-        console.error('No se encontraron cámaras');
-        return;
-      }
-      const backCamera = devices.find(d =>
-        d.label.toLowerCase().includes('back') ||
-        d.label.toLowerCase().includes('rear') ||
-        d.label.toLowerCase().includes('trás') ||
-        d.label.toLowerCase().includes('principal')
-      );
-      if (!backCamera) {
-        console.error('No se detectó cámara trasera');
-        return;
-      }
-      this.codeReader.decodeFromVideoDevice(
-        backCamera.deviceId,
-        this.videoElement.nativeElement,
-        (result, err) => {
-          if (result) {
-            const code = result.getText()?.trim();
-            if (code && code.length > 0) {
-              this.scannedValue = code;
-              this.getProductByBarcode(Number(this.scannedValue));
-              this.componentsEnabled = true;
-              this.stopScan();
-            }
+      this.componentsEnabled = false;
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: {
+            ideal: 'environment'
           }
-          if (err && !(err.name === 'NotFoundException')) {
-            console.error('⚠️ Error de lectura:', err);
+        },
+        audio: false
+      });
+      const video = this.videoElement.nativeElement;
+      video.srcObject = stream;
+      video.setAttribute('playsinline', 'true');
+      await video.play();
+      this.codeReader.decodeFromVideoElement(
+        video,
+        (result) => {
+
+          if (!result) {
+            return;
           }
+
+          const code = result.getText()?.trim();
+
+          if (!code) {
+            return;
+          }
+
+          this.scannedValue = code;
+
+          this.getProductByBarcode(
+            Number(this.scannedValue)
+          );
+
+          this.componentsEnabled = true;
+
+          this.stopScan();
         }
       );
+
     } catch (error) {
-      console.error('❌ Error al acceder a la cámara trasera:', error);
+
+      this.componentsEnabled = true;
+
+      console.error(
+        '❌ Error al acceder a la cámara:',
+        error
+      );
     }
   }
 
   stopScan() {
+
     try {
-      if ((this.codeReader as any).stopStreams) {
-        (this.codeReader as any).stopStreams();
-      } else if ((this.codeReader as any).reset) {
+
+      if (
+        this.codeReader &&
+        typeof (this.codeReader as any).reset === 'function'
+      ) {
         (this.codeReader as any).reset();
       }
-      const video = this.videoElement?.nativeElement;
-      if (video && video.srcObject instanceof MediaStream) {
-        video.srcObject.getTracks().forEach(track => track.stop());
+
+      const video =
+        this.videoElement?.nativeElement;
+
+      if (
+        video &&
+        video.srcObject instanceof MediaStream
+      ) {
+
+        video.srcObject
+          .getTracks()
+          .forEach(track => track.stop());
+
         video.srcObject = null;
       }
-      //console.log('Escaneo detenido correctamente');
+
     } catch (e) {
-      console.warn('Error al detener la cámara:', e);
+
+      console.warn(
+        '⚠️ Error al detener la cámara:',
+        e
+      );
     }
   }
 

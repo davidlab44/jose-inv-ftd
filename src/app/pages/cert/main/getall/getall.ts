@@ -32,6 +32,7 @@ import { CcoService } from '../../../../services/cc/cco.service';
 import { Cco,CcoMap } from '../../../../interfaces/cco';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'page-getall',
@@ -453,6 +454,7 @@ export class GetallPage implements OnInit {
       return;
     }
     this.fullCertList=[isotanqMain];
+    //this.topFilteredList=this.fullCertList;
     console.log('fullCertList',this.fullCertList);
     console.log('length',this.fullCertList.length);
   }
@@ -460,6 +462,7 @@ export class GetallPage implements OnInit {
   fillFullCertList(){
     this.fullCertList=this.sortCerts();
     console.log('full',this,this.fullCertList)
+    //this.topFilteredList=this.fullCertList;
   }
 
   private _viajanJuntosList:any[]=[];
@@ -500,7 +503,7 @@ export class GetallPage implements OnInit {
       type='parcial';
     }
     //const url = 'https://s3dev.inbemetal.com/cert/cert/ABSU-500054-1/total/2018.pdf';
-    const url = 'https://s3dev.inbemetal.com/cert/cert/'+isotanqName+'/'+type+'/'+cert.data.year+'.pdf';
+    const url = environment.s3aws+'cert/cert/'+isotanqName+'/'+type+'/'+cert.data.year+'.pdf';
     window.open(url, '_blank');
   }
 
