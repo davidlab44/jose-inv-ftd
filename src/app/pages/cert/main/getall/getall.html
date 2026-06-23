@@ -29,20 +29,10 @@
     </ion-fab-button>
   </ion-fab>
 
-  <ng-container *ngIf="fullCertList?.length">
-
+  <ng-container>
     <ion-grid class="withdrawn-grid">
-
       <ng-container *ngFor="let p of fullCertList">
-
-        <ng-container
-          *ngIf="
-            !displayToEnevis ||
-            p?.data?.deliveryout?.length==0 ||
-            p?.data?.shipout==0 ||
-            p?.data?.imgout?.length==0
-          ">
-
+        <ng-container>
           <ion-row
             class="withdrawn-row ion-align-items-center"
             [style.background]="p.data.type==1 ? '#A6B7FF' : '#C2FF9E'"
@@ -60,13 +50,6 @@
               (click)="discoverTwins(p)">
               {{ ccoMap[+p.data.istq_id]?.name || 'N/A' }}
             </ion-col>
-
-            <!--<ion-col-->
-              <!--size="3"-->
-              <!--[style.background]="ccoMap[+p.data.istq_id]?.color || '#eee'"-->
-              <!--(click)="discoverTwins(p)">-->
-              <!--{{ ccoMap[+p.data.istq_id]?.name || 'N/A' }}-->
-            <!--</ion-col>-->
 
             <ion-col size="2">
               {{ p.data.year }}

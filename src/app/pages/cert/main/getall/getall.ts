@@ -68,8 +68,6 @@ export class GetallPage implements OnInit {
   valor4 = 0;
   ios: boolean;
   showSearchbar: boolean;
-  //searchSubject = new Subject<string>();
-  //ccoList: any[] = [];
   displayToEnevis=true;
   
   constructor(
@@ -101,7 +99,6 @@ export class GetallPage implements OnInit {
   ngOnInit() {
     this.initDefaultRange(30);
     this.loadCcos();
-    this.displayToEnevis=false;//esto es para que muestre todo los elementos que coincidan 
     this.filteredCertList = [...this.certList];
     this.searchSubject.pipe(
       debounceTime(500),
@@ -330,7 +327,6 @@ export class GetallPage implements OnInit {
   }
 
   plexaUploader(item:any){
-    //console.log("item to patch",item);
     this.router.navigate(    
       ['/app/tabs/cert-main-post'], 
       { state: { item } }    
@@ -368,11 +364,8 @@ export class GetallPage implements OnInit {
   loadCcos() {
     this.ccoService.getAll().subscribe({
       next: (ccos) => {
-        //console.log('ccoList RAW =>', ccos);
         this.ccoList = ccos;
         this.ccoMap = this.buildCcoMap(ccos);
-        //console.log('ccoMap =>', this.ccoMap);
-        //console.log('ccoMap keys =>', Object.keys(this.ccoMap));
         this.debugCcoMapping();
       },
       error: (err) => console.error('Error loading ccos', err)
@@ -418,24 +411,23 @@ export class GetallPage implements OnInit {
   }  
   applyFilter(text: string) {
     if (!text || text.trim() === '') {
-      this.topFilteredList = this.ccoList;
+      //this.topFilteredList = this.ccoList;
+      this.fullCertList = [...this.fullCertList,this.ccoList];
       return;
     }
     const search = text.trim().toLowerCase();
-    this.topFilteredList = this.ccoList.filter(item => {
+    this.fullCertList = this.ccoList.filter(item => {
       const name = (item?.data?.name || '').toLowerCase();
       return name.includes(search);
     });
-    console.log('topFilteredList', this.topFilteredList);
+    console.log('fullCertList', this.fullCertList);
   }
-  topFilteredList: any[] = [];     //lista filtrada
   ccoName: string = '';   // nombre a mostrar
   ccoId: number = 0;   // id cco seleccionado a mostrar
   selectCco(item: any) {
     this.cco = item;
     this.ccoName = item.data.name;
     this.ccoId = item.id;
-    //actualizar movement (muy importante en tu flujo)
     console.log('item pasado:', item);
     console.log('cco name:', this.ccoName);
     console.log('cco id:', this.ccoId);
@@ -502,14 +494,13 @@ export class GetallPage implements OnInit {
     if(cert.data.type==2){
       type='parcial';
     }
-    //const url = 'https://s3dev.inbemetal.com/cert/cert/ABSU-500054-1/total/2018.pdf';
     const url = environment.s3aws+'cert/cert/'+isotanqName+'/'+type+'/'+cert.data.year+'.pdf';
     window.open(url, '_blank');
   }
 
-formatName(name:string):string{
-  return name?.replace(/^(.{4})\s+/, '$1-') || '';
-}
+  formatName(name:string):string{
+    return name?.replace(/^(.{4})\s+/, '$1-') || '';
+  }
 
 }
 
