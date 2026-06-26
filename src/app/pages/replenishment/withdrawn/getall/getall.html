@@ -4,7 +4,7 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-searchbar
-      placeholder="Buscar CCO (ej: TCSU 500046)"
+      placeholder="Buscar"
       show-clear-button="always"
       (ionInput)="onCcoSearch($event.detail.value)"> 
     </ion-searchbar>
@@ -52,11 +52,11 @@
         <ion-grid class="viajanjuntos-grid">
           <ion-row class="withdrawn-header ion-align-items-center">
             <ion-col size="1"><ion-label></ion-label></ion-col>
-            <ion-col size="1"><ion-label>Entrega:</ion-label></ion-col>
-            <ion-col size="1"><ion-label>F.vacio</ion-label></ion-col>
+            <ion-col size="2"><ion-label>Entrega:</ion-label></ion-col>
+            <ion-col size="2"><ion-label>F.vacio</ion-label></ion-col>
             <ion-col size="2"><ion-label>Isotanq.</ion-label></ion-col>
-            <ion-col size="1"><ion-label>Tkt.</ion-label></ion-col>
-            <ion-col size="1"><ion-label>kg</ion-label></ion-col>
+            <!--<ion-col size="1"><ion-label>Tkt.</ion-label></ion-col>-->
+            <!--<ion-col size="1"><ion-label>kg</ion-label></ion-col>-->
             <ion-col size="5"></ion-col>
           </ion-row>
           <ng-container *ngIf="viajanJuntosList?.length">
@@ -131,29 +131,11 @@
               </ion-button>
             </ion-col>
 
-
           </ion-row>
         </ion-grid>
       </ion-col>
     </ion-row>
   </ion-grid>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
@@ -218,21 +200,21 @@
   <ion-col size="1" class="header-col">
      <ion-label></ion-label>
   </ion-col>
-  <ion-col size="1" class="header-col">
-      <ion-label>Entrega:</ion-label>
+  <ion-col size="2" class="header-col">
+      <ion-label>F. vacio:</ion-label>
    </ion-col>
-   <ion-col size="1" class="header-col">
-      <ion-label>F.vacio</ion-label>
+   <ion-col size="2" class="header-col">
+      <ion-label>Entrega</ion-label>
     </ion-col>
     <ion-col size="2" class="header-col">
       <ion-label>Isotanq.</ion-label>
     </ion-col>
-    <ion-col size="1" class="header-col">
-      <ion-label>Tkt.</ion-label>
-    </ion-col>
-    <ion-col size="1" class="header-col">
-      <ion-label>kg</ion-label>
-    </ion-col>
+<!--    <ion-col size="1" class="header-col">-->
+      <!--<ion-label>Tkt.</ion-label>-->
+    <!--</ion-col>-->
+    <!--<ion-col size="1" class="header-col">-->
+      <!--<ion-label>kg</ion-label>-->
+    <!--</ion-col>-->
     <ion-col size="5" class="header-col">
       <ion-label></ion-label>
     </ion-col>
@@ -266,22 +248,20 @@
       <ion-col size="1">
         {{ p.id }}
       </ion-col>
-      <ion-col size="1">
-        {{ p.data.datein | date:'dd/MM/yyyy' }}
+      <ion-col size="2"  style="font-size:x-small;"  >
+        {{ p.data.datein | date:'dd/MM/yy' }}
       </ion-col>
-      <ion-col size="1">
+      <ion-col size="2" style="font-size:x-small;" >
         {{ p.data.deliveryin }}
       </ion-col>
       <!-- ISOTANQ -->
-      <ion-col size="2" [style.background]="ccoMap[+p.data.name]?.color || '#eee'" (click)="discoverTwins(p)"> {{ ccoMap[+p.data.name]?.name || 'N/A' }} </ion-col>
-      <!-- TICKET -->
-      <ion-col size="1">
-        {{ p.data.ticket }}
-      </ion-col>
-      <!-- KG -->
-      <ion-col size="1">
-        {{ p.data.kg }}
-      </ion-col>
+      <ion-col size="2" [style.background]="ccoMap[+p.data.name]?.color || '#eee'" (click)="discoverTwins(p)"  style="font-size:x-small;"> {{ ccoMap[+p.data.name]?.name || 'N/A' }} </ion-col>
+<!--      <ion-col size="1">-->
+        <!--{{ p.data.ticket }}-->
+      <!--</ion-col>-->
+      <!--<ion-col size="1">-->
+        <!--{{ p.data.kg }}-->
+      <!--</ion-col>-->
       <ion-col size="1" class="actions-col">
        <ion-button
           fill="clear"
@@ -290,7 +270,8 @@
           title="Viajes | Llegadas"
           [color]="p.data.shipin > 0 ? 'success' : 'dark'"
           (click)="patch(p,'in'); $event.stopPropagation()">
-          <ion-icon name="boat-outline"></ion-icon>
+          <!--<ion-icon name="boat-outline"></ion-icon>-->
+          <span>V</span>
         </ion-button>
       </ion-col>
       <ion-col size="1" class="actions-col">
@@ -301,7 +282,8 @@
           title="Plexa"
           [color]="p.data.kg > 0 ? 'success' : 'dark'"
           (click)="patch(p,'vendor'); $event.stopPropagation()">
-          <ion-icon name="logo-amplify"></ion-icon>
+          <!--<ion-icon name="logo-amplify"></ion-icon>-->
+          <span>P</span>
         </ion-button>
       </ion-col>
       <ion-col size="1" class="actions-col">
@@ -312,7 +294,8 @@
           title="Bascula"
           [color]="p.data.wnet > 0 ? 'success' : 'dark'"
           (click)="patch(p,'scale'); $event.stopPropagation()">
-          <ion-icon name="scale-outline"></ion-icon>
+          <!--<ion-icon name="scale-outline"></ion-icon>-->
+          <span>B</span>
         </ion-button>
       </ion-col>
       <ion-col size="1" class="actions-col">
@@ -323,7 +306,8 @@
           title="Viajes | Salidas"
           [color]="p.data.shipout > 0 ? 'success' : 'dark'"
           (click)="patch(p,'out'); $event.stopPropagation()">
-          <ion-icon name="basket-outline"></ion-icon>
+          <!--<ion-icon name="basket-outline"></ion-icon>-->
+          <span>M</span>
         </ion-button>
       </ion-col>
       <ion-col size="1" class="actions-col">

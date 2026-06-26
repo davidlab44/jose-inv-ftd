@@ -389,21 +389,35 @@ export class PatchPage {
 
   patch() {
     this.updateMovementFromForm();
+    console.log('1')
+
+    this.updateMovementFromForm();
     this.movement.data.img = this.uploadedUrl;
     //this.movement.data.price = Number(this.form.value.price) || 0;
     //withdrawn.data.price=this.getGlpPriceItemByDate('2026-06-11T16:26:07',1); 
     const now = new Date().toISOString().slice(0, 19);
     const item = this.getGlpPriceItemByDate(now, 1);
     //const item= this.getGlpPriceItemByDate('2026-05-20T16:26:07',1)
-    this.movement.data.price=item.data.price + "," + String(item.data.cents).padStart(2, '0').toString();
+    console.log('2')
+    //this.movement.data.price=item.data.price + "," + String(item.data.cents).padStart(2, '0').toString();
+    this.movement.data.price= this.price;
+    console.log('2c') 
+    console.log('movement.data',this.movement.data) 
+    console.log('2c2') 
+    console.log('item.data',item) 
     this.movement.data.id_replenishment_product=1;
+     console.log('2d') 
     let payload = this.movement.data;
     payload.name = this.ccoId;
     console.log("payload to patch =>", payload);
+    console.log('2a')
+    this.updateMovementFromForm();
+    console.log('3')
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
-          //this.utilService.presentToast("registro actualizado exitosamente","success",1000);
+         console.log('4')
+        //this.utilService.presentToast("registro actualizado exitosamente","success",1000);
           //this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
           const twinId = Number(payload?.twin || 0);
           //si el que reconocio es diferente del que traia cuando llego 
@@ -439,6 +453,9 @@ export class PatchPage {
             this.finishPatch();
             return;
           }
+
+    
+          console.log('10')
           this.movement2.data.imgscale = this.uploadedUrl;
           this.movement2.data.wticket = this.movement.data.wticket;
           this.movement2.data.wgross = this.movement.data.wgross;
@@ -446,6 +463,7 @@ export class PatchPage {
           this.movement2.data.wtare = this.movement.data.wtare;
           this.withdrawnService.patch(this.movement2.id, this.movement2.data).subscribe({
             next: (response2) => {
+             console.log('11') 
               console.log("Twin patch response", response2);
               this.finishPatch();
             },
@@ -603,6 +621,7 @@ export class PatchPage {
       }
     });
   }
+  price:string='';
   getMaxIdItem(items: any[]) {
     const filtered = items.filter(i => i.data?.id_replenishment_product === 1);
     //if (!filtered.length) return;
@@ -613,6 +632,9 @@ export class PatchPage {
       const price = Number(this.lastGlpprice.data.price) || 0;
       const cents = String(this.lastGlpprice.data.cents ?? 0).padStart(2, '0');
 
+
+
+        this.price= `${price}.${cents}`
       this.form.patchValue({
         price: `${price}.${cents}`
       });

@@ -153,15 +153,15 @@ export class AssetSupplyPostPage {
     data.img = this.uploadedUrl; 
     delete data.category;
     console.log('Product to post =>', data);
-    this.productService.post(data).subscribe({
-      next: (response) => {
-        console.log("product post response", response);
-        if(response && response.length>0){
-          this.utilService.presentToast(response.toString())
-          this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });    
-        }
-      }
-    });
+/*    this.productService.post(data).subscribe({*/
+      /*next: (response) => {*/
+        /*console.log("product post response", response);*/
+        /*if(response && response.length>0){*/
+          /*this.utilService.presentToast(response.toString())*/
+          /*this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });    */
+        /*}*/
+      /*}*/
+    /*});*/
   }
 
   slideOpts = {
