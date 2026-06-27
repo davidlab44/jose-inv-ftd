@@ -3,32 +3,16 @@ import { Router } from '@angular/router';
 import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
 import { ConferenceData } from '../../../../providers/conference-data';
 import { UserData } from '../../../../providers/user-data';
-import { OpportunityService } from '../../../../services/opportunity.service';
-import { PosOrderService } from '../../../../services/pos-order.service';
-import { TableService } from '../../../../services/table.service';
-import { environment } from '../../../../../environments/environment';
-import { ActivatedRoute } from '@angular/router'
 import { Session } from '../../../../interfaces/session';
-import { SessionService } from '../../../../services/session.service';
 import { UtilService } from '../../../../services/util.service';
-import { ProductService } from '../../../../services/product.service';
-import { BarcodeService } from '../../../../services/barcode.service';
-import { CategoryService } from '../../../../services/category.service';
-import { UmService } from '../../../../services/um.service';
-import { Product } from '../../../../interfaces/product';
-import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { DateService } from '../../../../services/local/date.service';
-import { RexService } from '../../../../services/rex.service';
-import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PhotoService } from '../../../../services/asset/photo.service';
 import { OcrService } from '../../../../services/ai/ocr.service';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
-import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
 import { GlppricesService } from '../../../../services/replenishment/glpprices.service';
 import { Cco,CcoMap } from '../../../../interfaces/cco';
 
@@ -71,7 +55,6 @@ export class PatchPage {
   lastImportedPrice: any = null;
 
   constructor(
-    private barcodeService: BarcodeService,
     public alertCtrl: AlertController,
     public confData: ConferenceData,
     public loadingCtrl: LoadingController,
@@ -80,18 +63,7 @@ export class PatchPage {
     public toastCtrl: ToastController,
     public user: UserData,
     public config: Config,
-    private opportunityService: OpportunityService,
-    private posOrderService: PosOrderService,
-    private tableService: TableService,
-    private route: ActivatedRoute,
-    private sessionService:SessionService,
     private utilService:UtilService,
-    private productService:ProductService,
-    private categoryService:CategoryService,
-    private umService:UmService,
-    private dateService: DateService,
-    private rexService: RexService,
-    private prodrexService: ProdrexService,
     private userService: UserService,
     private fb: FormBuilder ,
     private photoService: PhotoService,
@@ -187,12 +159,14 @@ export class PatchPage {
 
     this.loadCcos();
     this.getAllPrices();
+    this.getAllCco();   
   }
 
   ccoMap:CcoMap={};                
   loadCcos() {
     this.ccoService.load().subscribe({
       next:(map)=>{
+
         this.ccoMap=map;
         this.ccoService.debugMapping(this.filteredList);
         this.getCco2();
@@ -226,11 +200,14 @@ export class PatchPage {
   }
 
   applyFilter(text: string) {
+    console.log('text',text);
     if (!text || text.trim() === '') {
       this.filteredList = this.ccoList;
       return;
     }
     const search = this.normalize(text);
+    console.log('textNoprmalized',search);
+    console.log('ccoList',this.ccoList);
     this.filteredList = this.ccoList.filter(item => {
       const name = item?.data?.name || '';
       const normalizedName = this.normalize(name);
@@ -508,8 +485,6 @@ export class PatchPage {
       next: (response: any[]) => {
         console.log('cco List', response);
         this.ccoList = response;
-        //this.filteredList = response; // inicializar
-        //this.resolveInitialCco();
       },
       error: (err: any) => {
         console.error('Error cargando CCO', err);
@@ -519,6 +494,8 @@ export class PatchPage {
   ccoName: string = '';   // nombre a mostrar
   ccoId: number = 0;   // id cco seleccionado a mostrar
   selectCco(item: any) {
+    
+    console.log('item pasado:', item);
     this.cco = item;
     this.ccoName = item.data.name;
     this.ccoId = item.id;
@@ -526,6 +503,7 @@ export class PatchPage {
     if (this.movement?.data) {
       this.movement.data.name = item.id;
     }
+    
     console.log('item pasado:', item);
     console.log('cco name:', this.ccoName);
     console.log('cco id:', this.ccoId);
