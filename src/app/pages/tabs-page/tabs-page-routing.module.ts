@@ -308,6 +308,18 @@ const routes: Routes = [
       },
 
 
+
+      {
+        path: 'pchs-main-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../pchs/main/post/post.module').then(m => m.AssetSupplyPostModule)
+          }
+        ]
+      },
+
+
       {
         path: 'asset-supply-post',
         children: [

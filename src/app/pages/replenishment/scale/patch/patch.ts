@@ -277,10 +277,9 @@ export class PatchPage {
   }
 
   ocrResponse:any;
-  isotanq2Name:string='';
+  //isotanq2Name:string='';
   isotanq1Name:string='';
   isotanq1Id:number=0;
-  isotanq2Id:number=0;
   launchOcr(url: string) {
     this.ocrService.postScale(url).subscribe({
       next: (res) => {
@@ -346,6 +345,8 @@ export class PatchPage {
   }
 
 
+
+  twinId=0;
   patch() {
     this.updateMovementFromForm();
     this.movement.data.imgscale = this.uploadedUrl;
@@ -354,22 +355,16 @@ export class PatchPage {
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
-        const twinId = Number(payload?.twin || 0);
-        if (twinId < 1) {
+        this.twinId = Number(payload?.twin || 0);
+        if (this.twinId < 1) {
           this.finishPatch();
           return;
         }
-        if(this.isotanq2Id!=twinId){
+        console.log("twin id",this.twinId);
+        console.log("id2 ",this.movement.data.twin);
+        if(this.movement.data.twin!=this.twinId){
           this.utilService.presentToast('Pareja no coincide',"danger",1000);
           setTimeout(() => {this.utilService.presentToast('Revisar!', 'danger', 500)}, 1000);  
-          //NO desenganchar para eso esta plexa alli es la unica parte donde se puede desenganchar 
-          //patch con la nueva pareja
-          //le faltaria plexa
-          //le faltaria in
-          //si seria conveniente desenganchar aqui ?    eso no lo tengo muy claro creo que solo en plexa se desengancha 
-          //caso practico lleno y cogio para el puerto pero vino al taller y por xy motivo lo coambiaron . eso muy cpoco se presenta 
-          //bueno entonces solo presentale el compañero si necesita desenganchar que vaya a plexa 
-          //pero solo a modo de lectura
           return;
         }
         this.movement2.data.imgscale = this.uploadedUrl;
@@ -415,32 +410,7 @@ export class PatchPage {
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
 
-  /*normalizeContainer(container: string): string | null {*/
-    /*if (!container || typeof container !== 'string') return null;*/
-    /*const clean = container.trim().toUpperCase();*/
-    /*if (clean.length !== 11) return null; */
-    /*const prefix = clean.slice(0, 4);   // TCSU*/
-    /*const numbers = clean.slice(4);     // 5000141*/
-    /*if (!/^\d{7}$/.test(numbers)) return null;*/
-    /*const formatted = `${prefix} ${numbers.slice(0, 6)}-${numbers.slice(6)}`; */
-    /*return formatted; // TCSU 500014-1*/
-  /*}         */
- 
-  /*ccoList: Cco[] = [];*/
-  /*ccoMap: CcoMap = {};*/
-  /*idIsotanq2:number=0;*/
-  /*findCcoIdByContainer(containerFormatted: string): number { */
-    /*if (!containerFormatted) return 0;*/
-    /*const match = this.ccoList.find(cco => {*/
-      /*const name = (cco?.data?.name || '').toUpperCase().trim();*/
-      /*return name === containerFormatted;                                                                                                           */
-    /*});     */
-    /*return match ? Number(match.id) : 0;                                                                                                            */
-  /*} */
-  
   goToTwins(){
-
-
     console.log('this.movement',this.movement)
     this.router.navigate(
       ['/app/tabs/replenishment-twin-getall'],
