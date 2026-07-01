@@ -511,6 +511,7 @@ export class AssetSupplyPostPage {
   }
   ccoList:any[]=[];          
   ionViewDidEnter() {        
+    this.resetForm();
     this.loadCcos();         
     //this.getAllPrices();     
     this.getAllCco();
@@ -716,6 +717,19 @@ export class AssetSupplyPostPage {
     });
   }
 
+  resetForm(): void {
+    this.uploadedUrl=''; 
+    this.form.reset({
+      id: 0,
+      deliveryin: '',
+      datein: '',
+      tripin: '',
+      shipin: '',
+    });
+    this.uploadProgress = 0; 
+    this.uploadedUrl= null;
+    this.uploading = false;
+  }
 
 
 }

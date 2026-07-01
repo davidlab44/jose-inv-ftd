@@ -187,6 +187,7 @@ export class PatchPage {
 
   movement2:any;
   ionViewDidEnter() {
+    this.resetForm();
     if(this.movement.data.twin && Number(this.movement.data.twin)>0){
       this.withdrawnService.getById(this.movement.data.twin).subscribe({
         next: res=> {

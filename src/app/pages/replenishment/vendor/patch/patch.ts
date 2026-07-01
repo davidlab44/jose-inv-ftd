@@ -157,7 +157,7 @@ export class PatchPage {
   movement2:any;
   hasTwin:Boolean=false;
   ionViewDidEnter() {
-
+    this.resetForm();
     this.loadCcos();
     this.getAllPrices();
     this.getAllCco();   
