@@ -126,11 +126,8 @@ export class PatchPage {
       shipin: this.movement?.data?.shipin ?? null,
     });
     this.getShip();
-    //this.loadGlpPrice();
     this.loadCcos();         
-    //this.getAllPrices();     
     this.getAllCco();
-
   }
 
   resetForm(): void {
@@ -160,20 +157,7 @@ export class PatchPage {
   prodrexList:any[]=[];
   ionViewDidEnter() {
     this.resetForm(); 
-    /*this.prodrexService.getAll().subscribe({*/
-      /*next: response=>{*/
-        /*this.prodrexList=response;*/
-        /*console.log("getProdRexList",response)*/
-      /*}*/
-    /*})*/
   }
-
-  /*searchProducts(hash: string, productList: any[]): any[] {*/
-    /*if (!hash || hash.trim() === '') return productList;*/
-    /*return productList.filter(product =>*/
-      /*product.name.toLowerCase().includes(hash.toLowerCase())*/
-    /*);*/
-  /*}*/
 
   onSearch(text: string) {
     this.searchSubject.next(text);
@@ -281,7 +265,7 @@ export class PatchPage {
         console.log('id:', this.ccoId);
        const ship=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
         this.shipId=ship.id;
-        console.log("ship ",ship)
+        console.log("ship obtenido",ship)
         if(this.shipId>0){
           console.log('shipId',this.shipId)
           this.shipNombreEsp=this.getShipNameById(this.shipId);
@@ -312,11 +296,11 @@ export class PatchPage {
     });
   }
 
-  /*thersIsSomeCCoLikeThis(ccoNamehash:string):boolean{*/
-    /*return (this.ccoList||[]).some(item=>*/
-      /*(item?.data?.name||'').match(/\d+-\d+$/)?.[0]===ccoNamehash*/
-    /*);*/
-  /*}*/
+  thersIsSomeCCoLikeThis(ccoNamehash:string):boolean{
+    return (this.ccoList||[]).some(item=>
+      (item?.data?.name||'').match(/\d+-\d+$/)?.[0]===ccoNamehash
+    );
+  }
 
 
   updateMovementFromForm() {
@@ -369,112 +353,6 @@ export class PatchPage {
     const ss = String(date.getSeconds()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
-
-  /*parseNumber(input: string): number {*/
-    /*if (!input) return 0; // por si es null o undefined*/
-    /*// Elimina comas (o cualquier otro separador que no sea dígito o punto)*/
-    /*const cleaned = input.replace(/,/g, '');*/
-    /*// Intenta convertir a número*/
-    /*const num = Number(cleaned);*/
-    /*// Si no es un número válido, devuelve 0*/
-    /*return isNaN(num) ? 0 : num;*/
-  /*}*/
-
-  /*getShipin(response:any){*/
-    /*return response;*/
-  /*}*/
-
-
-   /*normalizeOCR(str) {*/
-    /*if (!str) return '';*/
-    /*return str*/
-      /*.toLowerCase()*/
-      /*.replace(/[0]/g, 'o')*/
-      /*.replace(/[1]/g, 'i')*/
-      /*.replace(/[5]/g, 's')*/
-      /*.replace(/[8]/g, 'b')*/
-      /*.replace(/[^a-z0-9]/g, '')  // elimina espacios, guiones, etc*/
-      /*.trim();*/
-  /*}*/
-  /*levenshtein(a, b) {*/
-    /*const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);*/
-    /*for (let j = 0; j <= a.length; j++) matrix[0][j] = j;*/
-    /*for (let i = 1; i <= b.length; i++) {*/
-      /*for (let j = 1; j <= a.length; j++) {*/
-        /*if (b[i - 1] === a[j - 1]) {*/
-          /*matrix[i][j] = matrix[i - 1][j - 1];*/
-        /*} else {*/
-          /*matrix[i][j] = Math.min(*/
-            /*matrix[i - 1][j - 1] + 1,*/
-            /*matrix[i][j - 1] + 1,*/
-            /*matrix[i - 1][j] + 1*/
-          /*);*/
-        /*}*/
-      /*}*/
-    /*}*/
-    /*return matrix[b.length][a.length];*/
-  /*}*/
-  /*similarity(a, b) {*/
-    /*const dist = this.levenshtein(a, b);*/
-    /*const maxLen = Math.max(a.length, b.length);*/
-    /*if (maxLen === 0) return 1;*/
-    /*return 1 - dist / maxLen;*/
-  /*}*/
-  /*fuzzyMatch(a, b, threshold = 0.8) {*/
-    /*if (!a || !b) return false;*/
-    /*const na = this.normalizeOCR(a);*/
-    /*const nb = this.normalizeOCR(b);*/
-    /*if (na.includes(nb) || nb.includes(na)) return true;*/
-    /*const score = this.similarity(na, nb);*/
-    /*return score >= threshold;*/
-  /*}*/
-
-
-
-
-
-
-  /*---------- SHIP-----*/
-/*    getShipId(objA, objBList) {*/
-    /*console.log('objA',objA) */
-    /*console.log('objBList',objBList) */
-
-    /*const shipName = objA?.data?.shipin ?? null;*/
-    /*const shipIMO = objA?.data?.shipinimo ?? null;*/
-    /*let bestScore = 0;*/
-    /*let bestId = 0;*/
-    /*// 1️⃣ buscar por nombre*/
-    /*if (shipName) {*/
-      /*for (const ship of objBList) {*/
-        /*const name = ship?.data?.name;*/
-        /*if (!name) continue;*/
-        /*const score = this.similarity(*/
-          /*this.normalizeOCR(shipName),*/
-          /*this.normalizeOCR(name)*/
-        /*);*/
-        /*if (score > bestScore && score > 0.75) {*/
-          /*bestScore = score;*/
-          /*bestId = ship.id;*/
-        /*}*/
-      /*}*/
-      /*if (bestId !== 0) return bestId;*/
-    /*}*/
-    /*// fallback por IMO*/
-    /*if (shipIMO) {*/
-      /*for (const ship of objBList) {*/
-        /*const imo = ship?.data?.imo;*/
-        /*if (!imo) continue;*/
-        /*if (this.fuzzyMatch(shipIMO, imo, 0.9)) {*/
-          /*return ship.id;*/
-        /*}*/
-      /*}*/
-    /*}*/
-    /*return 0;*/
-  /*}*/
-
-
-
-
 
   shipList: any[] = [];
   getShip() {
