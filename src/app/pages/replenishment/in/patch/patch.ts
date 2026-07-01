@@ -133,6 +133,7 @@ export class PatchPage {
   }
 
   resetForm(): void {
+    this.uploadedUrl=''; 
     this.form.reset({
       id: 0,
       deliveryin: '',
@@ -341,6 +342,7 @@ export class PatchPage {
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
+        this.resetForm();
         this.utilService.presentToast("registro actualizado exitosamente","success",1000);
         this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
       },

@@ -127,6 +127,7 @@ export class PatchPage {
   }
 
   resetForm(): void {
+    this.uploadedUrl='';
     this.form.reset({
       id: 0,
       deliveryout: 0,
@@ -399,6 +400,7 @@ export class PatchPage {
   }
 
   private finishPatch() {
+    this.resetForm();
     this.utilService.presentToast("Actualizado correctamente", "success", 1000);
     this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'], { replaceUrl: true });
   }

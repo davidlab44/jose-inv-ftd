@@ -390,6 +390,7 @@ export class PatchPage {
     });
   }
   private finishPatch() {
+    this.resetForm();
     this.utilService.presentToast("Actualizado correctamente", "success", 1000);
     this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'], { replaceUrl: true });
   }

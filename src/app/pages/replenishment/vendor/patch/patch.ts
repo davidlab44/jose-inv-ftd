@@ -127,6 +127,7 @@ export class PatchPage {
   }
 
   resetForm(): void {
+    this.uploadedUrl='';
     this.form.reset({
       id: 0,
       categ: null,
@@ -183,13 +184,9 @@ export class PatchPage {
       this.hasTwin=true;
       this.withdrawnService.getById(this.movement.data.twin).subscribe({
         next: res=> {
-          console.log('twin consultado[0]',res[0])
           this.movement2=res[0];
           this.cco2Id=this.movement2.data.name;
-          console.log('this.cco2Id',this.cco2Id);
           this.cco2Name=this.ccoMap[this.cco2Id]?.name;
-          //this.cco2Name=this.ccoService.getName(this.ccoId)
-          console.log('this.cco2Name',this.cco2Name);
         }
       })
     }  
@@ -200,7 +197,6 @@ export class PatchPage {
   }
 
   applyFilter(text: string) {
-    console.log('text',text);
     if (!text || text.trim() === '') {
       this.filteredList = this.ccoList;
       return;
@@ -311,14 +307,10 @@ export class PatchPage {
   launchOcr(url: string) {
     this.ocrService.postVendor(url).subscribe({
       next: (res) => {
+        console.log('ocr response',res)
         this.ocrResponse = res;
         this.ccoName="TCSU "+res?.data?.isotanq;
-        console.log('');
         this.ccoId=this.ccoService.getIdByName(this.ccoName);     
-        console.log('ad correcto asignado:',this.ccoId)
-        //tengo que sacar el id , hay un metodo para eso 
-        //buscar ese metodo , ya existe ya debe existir  
-        console.log('OCR Response:', res);
         const normalizedDate = this.normalizeOCRDate(res?.data?.date);
         const seals = res?.data?.seal ?? [];
         // actualizar movement
@@ -366,73 +358,28 @@ export class PatchPage {
 
   patch() {
     this.updateMovementFromForm();
-    console.log('1')
-
     this.updateMovementFromForm();
     this.movement.data.img = this.uploadedUrl;
-    //this.movement.data.price = Number(this.form.value.price) || 0;
-    //withdrawn.data.price=this.getGlpPriceItemByDate('2026-06-11T16:26:07',1); 
     const now = new Date().toISOString().slice(0, 19);
     const item = this.getGlpPriceItemByDate(now, 1);
     //const item= this.getGlpPriceItemByDate('2026-05-20T16:26:07',1)
-    console.log('2')
     //this.movement.data.price=item.data.price + "," + String(item.data.cents).padStart(2, '0').toString();
     this.movement.data.price= this.price;
-    console.log('2c') 
-    console.log('movement.data',this.movement.data) 
-    console.log('2c2') 
-    console.log('item.data',item) 
     this.movement.data.id_replenishment_product=1;
-     console.log('2d') 
     let payload = this.movement.data;
     payload.name = this.ccoId;
     console.log("payload to patch =>", payload);
-    console.log('2a')
     this.updateMovementFromForm();
-    console.log('3')
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
-         console.log('4')
         //this.utilService.presentToast("registro actualizado exitosamente","success",1000);
           //this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
           const twinId = Number(payload?.twin || 0);
-          //si el que reconocio es diferente del que traia cuando llego 
-          //
-          //
-          //
-          //
-          //crear un metodo para saber si el data.name de este isotanque es el mismo del twin , si hay relacion 
-          //lo que voy a comprobar es que esten doblemente enlazados , porque si no 
-          //esta doblemente enlazado 
-          //si sr
-          //
-          //cuando no estaria doblemente enlazado 
-          //OJO 
-          //AQUI ESTA EL PROBLEMA 
-          //SIEMPRE SERIA POSITIVO 
-          //NUNCA SERIA NEGATIVO 
-          //
-          //
-          //
-          //
-          //PORQUE NOP HAY ALGO EN ESTA REMISION QUE ME SIRVA PARA ISDENTIFICAR SI VIENEN NJUNTOS O NO 
-          //
-          //
-          //
-          //
-          //
-          //
-          //separarlos
-          //insertar el nuevo 
-          //si es igual no hacer nada 
           if (twinId < 1) {
             this.finishPatch();
             return;
           }
-
-    
-          console.log('10')
           this.movement2.data.imgscale = this.uploadedUrl;
           this.movement2.data.wticket = this.movement.data.wticket;
           this.movement2.data.wgross = this.movement.data.wgross;
@@ -440,7 +387,6 @@ export class PatchPage {
           this.movement2.data.wtare = this.movement.data.wtare;
           this.withdrawnService.patch(this.movement2.id, this.movement2.data).subscribe({
             next: (response2) => {
-             console.log('11') 
               console.log("Twin patch response", response2);
               this.finishPatch();
             },
@@ -457,6 +403,7 @@ export class PatchPage {
   }
  
   private finishPatch() {
+    this.resetForm();
     this.utilService.presentToast("Actualizado correctamente", "success", 1000);
     this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'], { replaceUrl: true });
   }
@@ -495,7 +442,6 @@ export class PatchPage {
   ccoId: number = 0;   // id cco seleccionado a mostrar
   selectCco(item: any) {
     
-    console.log('item pasado:', item);
     this.cco = item;
     this.ccoName = item.data.name;
     this.ccoId = item.id;
