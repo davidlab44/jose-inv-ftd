@@ -157,7 +157,7 @@ export class PatchPage {
   movement2:any;
   hasTwin:Boolean=false;
   ionViewDidEnter() {
-    this.resetForm();
+    //this.resetForm();
     this.loadCcos();
     this.getAllPrices();
     this.getAllCco();   
@@ -595,6 +595,8 @@ export class PatchPage {
   } 
 
   getGlpPriceItemByDate(date:string,idReplenishmentProduct:number):any|null {
+    console.log('getGlppriceItemByDate',date)
+    console.log('getGlppriceItemByDate',idReplenishmentProduct)
     const target=new Date(date).getTime();
     for(const item of this.glpPriceList) {
       const data=item?.data;

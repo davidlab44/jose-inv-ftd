@@ -66,7 +66,7 @@
     </ion-row>
     <ion-row *ngFor="let u of userList" class="user-row">
       <ion-col size="9" (click)="selectUser(u)">
-        {{ u.data.name }}
+        <span style="cursor-pointer">{{u.data.name}}</span>
       </ion-col>
       <ion-col size="3" class="check-col">
         <ion-checkbox
@@ -90,7 +90,6 @@
       <ion-icon name="checkbox-outline"></ion-icon>&nbsp; 
     </ion-button>
   </div>
-
 
 </ion-content>
 

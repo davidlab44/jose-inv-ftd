@@ -260,7 +260,13 @@ export class AssetSupplyPostPage {
         this.setWithdrawnState(response[0]?.id,'in');
         if(this.ocrResponse.data.contenedores[1].length>1){
           const container2Id=this.ccoService.getIdByName(this.ocrResponse.data.contenedores[1])
-          this.cloneWithdrawn(payload,container2Id);
+          console.log('container2id', container2Id);
+          if(container2Id&&container2Id>0){
+            this.cloneWithdrawn(payload,container2Id);
+          }else{
+            console.log('SOLO SE ENCONTRO UN CONTENEDOR!')
+            //this.utilService.presentToast('') 
+          }
         }else{
 
         }
@@ -522,6 +528,7 @@ export class AssetSupplyPostPage {
       next:(map)=>{
         this.ccoMap=map;     
         this.ccoService.debugMapping(this.filteredList);
+        console.log('ccoMap', this.ccoMap)
       },    
       error:(err)=>{
         console.error('Error loading ccos',err); 
@@ -569,8 +576,6 @@ export class AssetSupplyPostPage {
 
 
 
-
-
   /*---- CCO2------ */
   filteredList2: any[] = [];     //lista filtrada
   onCco2Search(text: string) {
@@ -591,8 +596,6 @@ export class AssetSupplyPostPage {
     console.log('filteredList2', this.filteredList2);
   }
  
-
-
   cco2Name: string = '';   // nombre a mostrar
   cco2Id: number = 0;   // id cco seleccionado a mostrar
   select2Cco(item: any) {
@@ -625,27 +628,18 @@ export class AssetSupplyPostPage {
 
 
 
-
-
-
-
-
-
-
-
   /*onShipSelect(e:any){}*/
   /*shipList:any[]=[];*/
 /*------clone-------*/
 
  async  cloneWithdrawn(item: any,contenedor2Id) {
-    console.log("item pasado:", item);
+    console.log("item pasado para clonar:", item);
     //chatgpt => agregar al payload en data.twin el item.id
     const payload = this.buildClonePayload(item,contenedor2Id);
     console.log("Payload a enviar:", payload);
     this.withdrawnService.postClone(payload).subscribe({
       next: (response) => {
         console.log("Clone creado", response);
-        //chatgpt => hacer un patch a este "withdrawnItem" data.twin el que se creo
         this.selfPatch(item,response[0].id);
       },
       error: (err) => {

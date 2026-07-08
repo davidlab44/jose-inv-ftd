@@ -1,0 +1,132 @@
+ion-content{
+  --padding-top:8px;
+  --padding-bottom:80px;
+  --padding-start:8px;
+  --padding-end:8px;
+}
+
+.withdrawn-grid{
+  padding:0;
+}
+
+.withdrawn-row{
+  margin-bottom:6px;
+  border-radius:10px;
+  overflow:hidden;
+  min-height:52px;
+  color:#000;
+  font-size:14px;
+  font-weight:500;
+  box-shadow:0 1px 3px rgba(0,0,0,.15);
+}
+
+.withdrawn-row ion-col{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px 4px;
+  text-align:center;
+}
+
+.withdrawn-row ion-col:nth-child(2){
+  font-weight:700;
+  cursor:pointer;
+}
+
+.row-erp{
+  border-left:4px solid var(--ion-color-success);
+}
+
+.actions-col{
+  padding:0;
+}
+
+.btn-compact{
+  margin:0;
+  --padding-start:0;
+  --padding-end:0;
+  width:36px;
+  height:36px;
+}
+
+.btn-compact ion-icon{
+  font-size:22px;
+}
+
+.fab-premium{
+  --background:var(--ion-color-primary);
+  --background-hover:var(--ion-color-primary-shade);
+  --border-radius:50%;
+  --box-shadow:0 4px 12px rgba(0,0,0,.3);
+}
+
+.fab-premium ion-icon{
+  font-size:28px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+.cert-card{
+  margin:12px;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+.card-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.cco-pill{
+  display:inline-flex;
+  align-items:center;
+  padding:7px 16px;
+  border-radius:9999px;
+  font-weight:600;
+  color:#222;
+}
+.card-subtitle{
+  margin-top:6px;
+  font-size:12px;
+  color:#666;
+}
+.withdrawn-grid{
+  padding:0;
+}
+.withdrawn-row{
+  margin:6px 0;
+  min-height:46px;
+  border-radius:12px;
+  transition:.15s;
+}
+.withdrawn-row:hover{
+  filter:brightness(.98);
+}
+.row-erp{
+  border-left:5px solid #ff9800;
+}
+.actions-col{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.btn-compact{
+  width:34px;
+  height:34px;
+  margin:0;
+  --padding-start:2px;
+  --padding-end:2px;
+}
+.btn-compact ion-icon{
+  font-size:20px;
+}

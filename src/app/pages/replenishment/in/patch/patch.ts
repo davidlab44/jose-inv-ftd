@@ -156,7 +156,7 @@ export class PatchPage {
 
   prodrexList:any[]=[];
   ionViewDidEnter() {
-    this.resetForm(); 
+    //this.resetForm(); 
   }
 
   onSearch(text: string) {
@@ -302,7 +302,6 @@ export class PatchPage {
     );
   }
 
-
   updateMovementFromForm() {
     const f = this.form.value;
     this.movement.data = {
@@ -371,13 +370,13 @@ export class PatchPage {
       : 'Sin Nombre';
   }
 
-  /*onShipSelect(ev: any) {*/
-    /*const selectedId = ev.detail.value;*/
-    /*const selectedShip = this.shipList.find(s => s.id === selectedId);*/
-    /*console.log('ID seleccionado =>', selectedId);*/
-    /*console.log('Ship seleccionado =>', selectedShip);*/
-    /*this.movement.data.ship=selectedId;*/
-  /*}*/
+  onShipSelect(ev: any) {
+    const selectedId = ev.detail.value;
+    const selectedShip = this.shipList.find(s => s.id === selectedId);
+    console.log('ID seleccionado =>', selectedId);
+    console.log('Ship seleccionado =>', selectedShip);
+    this.movement.data.ship=selectedId;
+  }
 
   /*[>---- CCO------ <]*/
   onCcoSearch(text: string) {
@@ -424,29 +423,29 @@ export class PatchPage {
   }
   ccoName: string = '';   // nombre a mostrar
   ccoId: number = 0;   // id cco seleccionado a mostrar
-  /*selectCco(item: any) {*/
-    /*this.cco = item;*/
-    /*this.ccoName = item.data.name;*/
-    /*this.ccoId = item.id;*/
-    /*//actualizar movement (muy importante en tu flujo)*/
-    /*console.log('item pasado:', item);*/
-    /*console.log('cco name:', this.ccoName);*/
-    /*console.log('cco id:', this.ccoId);*/
-  /*}*/
-  /*cco:any;  */
-  /*isotanq:any;*/
-  /*ccos: any[] = []; */
-  /*loadCco() {                */
-    /*this.ccoService.getAll().subscribe({ */
-        /*next: (res) => {       */
-          /*console.log('Cco:', res);    */
-          /*this.ccos = res;*/
-        /*}, */
-        /*error: (err) => {      */
-          /*console.error(' Error al cargar cco:', err); */
-        /*} */
-      /*}); */
-   /*} */
+  selectCco(item: any) {
+    this.cco = item;
+    this.ccoName = item.data.name;
+    this.ccoId = item.id;
+    //actualizar movement (muy importante en tu flujo)
+    console.log('item pasado:', item);
+    console.log('cco name:', this.ccoName);
+    console.log('cco id:', this.ccoId);
+  }
+  cco:any;  
+  isotanq:any;
+  ccos: any[] = []; 
+  loadCco() {                
+    this.ccoService.getAll().subscribe({ 
+        next: (res) => {       
+          console.log('Cco:', res);    
+          this.ccos = res;
+        }, 
+        error: (err) => {      
+          console.error(' Error al cargar cco:', err); 
+        } 
+      }); 
+   } 
 
 
 

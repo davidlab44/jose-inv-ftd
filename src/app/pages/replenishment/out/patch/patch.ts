@@ -31,6 +31,24 @@ import { ShipService } from '../../../../services/logistic/ship.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
 
+export interface Cco {
+  id: number;
+  data: {
+    name?: string;
+    color?: string;
+  };
+}
+
+export interface CcoMap {
+  [key: number]: {
+    name: string;
+    color: string;
+  };
+}
+
+
+
+
 @Component({
   selector: 'page-patch',
   templateUrl: 'patch.html',
@@ -60,9 +78,10 @@ export class PatchPage {
   replenishmentList: any[] = [];
   replenishment:any;
   movement:any;
+  isotanq2Name:string=''; 
+  isotanq2Id:number=0; 
 
   constructor(
-    private barcodeService: BarcodeService,
     public alertCtrl: AlertController,
     public confData: ConferenceData,
     public loadingCtrl: LoadingController,
@@ -71,18 +90,7 @@ export class PatchPage {
     public toastCtrl: ToastController,
     public user: UserData,
     public config: Config,
-    private opportunityService: OpportunityService,
-    private posOrderService: PosOrderService,
-    private tableService: TableService,
-    private route: ActivatedRoute,
-    private sessionService:SessionService,
     private utilService:UtilService,
-    private productService:ProductService,
-    private categoryService:CategoryService,
-    private umService:UmService,
-    private dateService: DateService,
-    private rexService: RexService,
-    private prodrexService: ProdrexService,
     private userService: UserService,
     private fb: FormBuilder ,
     private photoService: PhotoService,
@@ -101,8 +109,19 @@ export class PatchPage {
     console.log("Item recibido shipout patch:", this.movement);
   }
 
+
+  ccoMap: CcoMap = {};
   ngOnInit() {
     this.initForm();
+    this.ccoService.ccoMap$.subscribe(map => {
+      this.ccoMap = map;
+      console.log('ccoMap1',this.ccoMap)
+    });
+
+    if (!Object.keys(this.ccoService.getMap()).length) {
+      this.ccoService.load().subscribe();
+      console.log('loading ccos')
+    }
   }
 
   initForm() {
@@ -140,54 +159,17 @@ export class PatchPage {
     this.uploading = false;
   }
 
-  /*ngOnInit() {*/
-    /*this.form = this.fb.group({*/
-      /*id: [this.movement?.id ?? null],*/
-      /*deliveryout: [this.movement?.data?.deliveryout ?? ''], */
-      /*dateout: [this.movement?.data?.dateout ?? ''], */
-      /*tripout: [this.movement?.data?.tripout ?? ''], */
-      /*shipout: [this.movement?.data?.shipout ?? 0], */
-    /*});*/
-  /*}*/
-
-  /*ionViewWillEnter() {*/
-    /*this.form = this.fb.group({*/
-      /*id: [this.movement?.id ?? null],*/
-      /*deliveryout: [this.movement?.data?.deliveryout ?? ''], */
-      /*dateout: [this.movement?.data?.dateout ?? ''], */
-      /*tripout: [this.movement?.data?.tripout ?? ''], */
-      /*shipout: [this.movement?.data?.shipout ?? 0], */
-    /*});*/
-    /*//shipList solo se utiliza cuando el ocrResponde , opopr eso esta aqui*/
-    /*this.getShip();*/
-  /*}*/
-
-  /*resetForm(): void {*/
-    /*this.form.reset({*/
-      /*id: 0,*/
-      /*deliveryout: 0,*/
-      /*dateout: 0,*/
-      /*tripout: '',*/
-      /*shipout: 0,*/
-    /*});*/
-    /*this.uploadProgress = 0; */
-    /*this.uploadedUrl= null;*/
-    /*this.uploading = false;*/
-  /*}*/
-
   slideOpts = {
     initialSlide: 0,
     slidesPerView: 1,
     speed: 300
   };
 
-  updateSchedule(){
-     
-  }
+  updateSchedule(){}
 
   movement2:any;
   ionViewDidEnter() {
-    this.resetForm();
+    //this.resetForm();
     if(this.movement.data.twin && Number(this.movement.data.twin)>0){
       this.withdrawnService.getById(this.movement.data.twin).subscribe({
         next: res=> {
@@ -196,25 +178,12 @@ export class PatchPage {
         }
       })
     }
-    /*this.prodrexService.getAll().subscribe({*/
-      /*next: response=>{*/
-        /*this.prodrexList=response;*/
-        /*console.log("getProdRexList",response)*/
-      /*}*/
-    /*})*/
+    this.isotanq2Id=this.movement.data.twin;
+    this.isotanq2Name= this.ccoService.getName(1);
+    console.log('isotanq2Id',this.isotanq2Id)
+    console.log('isotanq2Name',this.isotanq2Name)
+    console.log('ccomap en DidEnter', this.ccoService.getMap());
   }
-
-
-
-
-  //prodrexList:any[]=[];
-
-  /*searchProducts(hash: string, productList: any[]): any[] {*/
-    /*if (!hash || hash.trim() === '') return productList;*/
-    /*return productList.filter(product =>*/
-      /*product.name.toLowerCase().includes(hash.toLowerCase())*/
-    /*);*/
-  /*}*/
 
   onSearch(text: string) {
     /*this.searchSubject.next(text);*/
@@ -326,16 +295,12 @@ export class PatchPage {
           //tripout: res?.data?.tripout ?? '',
           tripout: 'TMSYP',
           shipout: 3,
-          //shipout: this.shipNombreEsp,
         };
         this.form.patchValue({
           deliveryout: res?.data?.deliveryout ?? 0,
           dateout: res?.data?.dateout ?? '',
           tripout: 'TMSYP',
           shipout: 3,
-          //shipout: this.shipNombreEsp,
-          //tripout: res?.data?.tripout ?? '',
-          //shipout: this.shipNombreEsp,
         });
         console.log("movement actualizado:", this.movement);
       },
@@ -362,14 +327,11 @@ export class PatchPage {
     const payload = {
       ...this.movement.data,
       shipout: 3 
-      //shipout: Number(this.form.value.shipout) || 0 
     };
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
-        //this.utilService.presentToast("registro actualizado exitosamente","success",1000);
-        //this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
         const twinId = Number(payload?.twin || 0);
         console.log('twin id es:',twinId);
         if (twinId < 1) {
@@ -422,34 +384,9 @@ export class PatchPage {
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
   }
 
-  /*parseNumber(input: string): number {*/
-    /*if (!input) return 0; // por si es null o undefined*/
-    /*// Elimina comas (o cualquier otro separador que no sea dígito o punto)*/
-    /*const cleaned = input.replace(/,/g, '');*/
-    /*// Intenta convertir a número*/
-    /*const num = Number(cleaned);*/
-    /*// Si no es un número válido, devuelve 0*/
-    /*return isNaN(num) ? 0 : num;*/
-  /*}*/
-
   getShipin(response:any){
     return response;
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
  normalizeOCR(str) {
@@ -555,6 +492,20 @@ getShipId(objA, objBList) {
   }
 
 
+  goToTwins(){
+    console.log('this.movement',this.movement)
+    this.router.navigate(
+      ['/app/tabs/replenishment-twin-getall'],
+       {
+         state:{
+           withdrawn:this.movement
+        }
+      }
+    );
+  }
+
+
+  
 
 
 

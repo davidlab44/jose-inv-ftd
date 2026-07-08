@@ -149,7 +149,7 @@ export class PatchPage {
   prodrexList:any[]=[];
   movement2:any;
   ionViewDidEnter() {
-    this.resetForm();
+    //this.resetForm();
     if(this.movement.data.twin && Number(this.movement.data.twin)>0){
       this.withdrawnService.getById(this.movement.data.twin).subscribe({
         next: res=> {
@@ -164,7 +164,6 @@ export class PatchPage {
         /*console.log("getProdRexList",response)*/
       /*}*/
     /*})*/
-
 
     this.loadCcos();                                                                                                                                
   }         

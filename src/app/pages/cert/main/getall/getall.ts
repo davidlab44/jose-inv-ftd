@@ -41,15 +41,6 @@ export class GetallPage implements OnInit{
     this.getAll();
   }
 
-  getAll(){
-    this.certService.getAll().subscribe({
-      next:response=>{
-        this.certList=response;
-        this.fillFullCertList();
-      }
-    });
-  }
-
   plexaUploader(item:any){
     this.router.navigate(
       ['/app/tabs/cert-main-post'],
@@ -58,9 +49,7 @@ export class GetallPage implements OnInit{
   }
 
   private buildCcoMap(ccoList:Cco[]):CcoMap{
-
     const map:CcoMap={};
-
     ccoList.forEach(cco=>{
       map[Number(cco.id)]={
         name:cco.data?.name ?? 'N/A',
@@ -71,18 +60,6 @@ export class GetallPage implements OnInit{
     return map;
   }
 
-  loadCcos(){
-    this.ccoService.getAll().subscribe({
-      next:ccos=>{
-        this.ccoList=ccos;
-        this.ccoMap=this.buildCcoMap(ccos);
-      },
-      error:err=>{
-        console.error('Error loading ccos',err);
-      }
-    });
-  }
-
   presentFilter(){
     this.displayToEnevis=!this.displayToEnevis;
   }
@@ -91,39 +68,6 @@ export class GetallPage implements OnInit{
     this.applyFilter(text);
   }
 
-  applyFilter(text:string){
-
-    if(!text?.trim()){
-      this.fillFullCertList();
-      return;
-    }
-
-    const search=text.trim().toLowerCase();
-
-    const ccoIds=this.ccoList
-      .filter(cco=>
-        String(cco?.data?.name||'')
-          .toLowerCase()
-          .includes(search)
-      )
-      .map(cco=>Number(cco.id));
-
-    this.fullCertList=this.sortCerts().filter(cert=>
-      ccoIds.includes(Number(cert?.data?.istq_id))
-    );
-  }
-
-  sortCerts():any[]{
-    return [...this.certList].sort((a,b)=>
-      a.data.istq_id-b.data.istq_id ||
-      a.data.type-b.data.type ||
-      Number(a.data.year)-Number(b.data.year)
-    );
-  }
-
-  fillFullCertList(){
-    this.fullCertList=this.sortCerts();
-  }
 
   openCert(cert:any,isotanqName:string){
 
@@ -146,4 +90,76 @@ export class GetallPage implements OnInit{
   formatName(name:string):string{
     return name?.replace(/^(.{4})\s+/,'$1-') || '';
   }
+
+
+
+getAll(){
+  this.certService.getAll().subscribe({
+    next:response=>{
+      this.certList=response;
+      this.fillFullCertList();
+    }
+  });
+}
+loadCcos(){
+  this.ccoService.getAll().subscribe({
+    next:ccos=>{
+      this.ccoList=ccos;
+      this.ccoMap=this.buildCcoMap(ccos);
+      this.fillFullCertList();
+    },
+    error:err=>{
+      console.error('Error loading ccos',err);
+    }
+  });
+}
+fillFullCertList(){
+  this.fullCertList=this.groupCertList(this.certList);
+}
+applyFilter(text:string){
+  const search=(text||'').trim().toLowerCase();
+  if(!search){
+    this.fillFullCertList();
+    return;
+  }
+  const grouped=this.groupCertList(this.certList);
+  this.fullCertList=grouped.filter(g=>
+    String(g.istq_id).includes(search) ||
+    String(g.name||'').toLowerCase().includes(search) ||
+    g.certs.some((c:any)=>
+      String(c.data.year||'').includes(search) ||
+      String(c.data.type==1?'total':'parcial').includes(search)
+    )
+  );
+}
+sortCerts(list:any[]=this.certList):any[]{
+  return [...list].sort((a,b)=>
+    (+a.data.istq_id)-(+b.data.istq_id) ||
+    (+a.data.type)-(+b.data.type) ||
+    (+a.data.year)-(+b.data.year)
+  );
+}
+private groupCertList(list:any[]=this.certList):any[]{
+  const map=new Map<number,any>();
+  for(const cert of this.sortCerts(list)){
+    const istq=+cert.data.istq_id;
+    let group=map.get(istq);
+    if(!group){
+      group={
+        istq_id:istq,
+        name:this.ccoMap[istq]?.name ?? 'N/A',
+        color:this.ccoMap[istq]?.color ?? '#ddd',
+        certs:[]
+      };
+      map.set(istq,group);
+    }
+    group.certs.push(cert);
+  }
+  return Array.from(map.values());
+}
+
+
+
+
+
 }
