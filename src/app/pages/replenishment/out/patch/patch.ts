@@ -179,7 +179,7 @@ export class PatchPage {
       })
     }
     this.isotanq2Id=this.movement.data.twin;
-    this.isotanq2Name= this.ccoService.getName(1);
+    this.isotanq2Name= this.ccoService.getName(this.isotanq2Id);
     console.log('isotanq2Id',this.isotanq2Id)
     console.log('isotanq2Name',this.isotanq2Name)
     console.log('ccomap en DidEnter', this.ccoService.getMap());
