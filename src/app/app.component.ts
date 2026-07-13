@@ -11,6 +11,9 @@ import { OpportunityService } from './services/opportunity.service';
 import { environment } from '../environments/environment';
 import { Category } from './interfaces/category';
 import { UserService } from './services/user.service';
+import { NetworkService } from '../app/services/local/network.service';
+import { skip } from 'rxjs/operators';
+import {UtilService } from '../app/services/util.service';
 
 @Component({
   selector: 'app-root',
@@ -253,10 +256,6 @@ export class AppComponent implements OnInit {
      },
    ];
 
-
-
-
-
   loggedIn = false;
   dark = false;
   public showMenu = true; 
@@ -273,7 +272,9 @@ export class AppComponent implements OnInit {
     private toastCtrl: ToastController,
     private opportunityService:OpportunityService,
     //private updates: SwUpdate,
-    private userService:UserService
+    private userService:UserService,
+    private network: NetworkService,
+    private utilService: UtilService
   ) {
     this.checkForUpdates();
     console.log("constructor")
@@ -335,7 +336,29 @@ export class AppComponent implements OnInit {
           /*this.showMenu=false*/
         /*}*/
       }
-    });    
+    });
+
+    console.log('ngOninitprincipal ')
+    this.network.online$.subscribe(online => {
+        console.log('Estado:', online);
+    });
+        this.network.online$
+        .pipe(skip(1))
+        .subscribe(async online => {
+
+            console.log('Estado:', online);
+
+            if (!online) {
+
+                await this.utilService.presentToast(
+                    'No Hay Internet',
+                    'danger',
+                    5000
+                );
+
+            }
+
+        });
   }
 
   ionViewDidEnter() {

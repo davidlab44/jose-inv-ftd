@@ -175,14 +175,15 @@ export class PatchPage {
         next: res=> {
           console.log('twin consultado[0]',res[0])
           this.movement2=res[0];
+          this.isotanq2Id=this.movement2.data.name;
+          this.isotanq2Name= this.ccoService.getName(this.isotanq2Id);
+          console.log('isotanq2Id',this.isotanq2Id)
+          console.log('isotanq2Name',this.isotanq2Name)
+          console.log('ccomap en DidEnter', this.ccoService.getMap());
+
         }
       })
     }
-    this.isotanq2Id=this.movement.data.twin;
-    this.isotanq2Name= this.ccoService.getName(this.isotanq2Id);
-    console.log('isotanq2Id',this.isotanq2Id)
-    console.log('isotanq2Name',this.isotanq2Name)
-    console.log('ccomap en DidEnter', this.ccoService.getMap());
   }
 
   onSearch(text: string) {

@@ -397,7 +397,7 @@ export class PatchPage {
           });
       },
       error: (err) => {
-        console.error("Withdrawn patch error", err);
+     console.error("Withdrawn patch error", err);
       }
     });
   }

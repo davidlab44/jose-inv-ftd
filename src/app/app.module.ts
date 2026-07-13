@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
@@ -17,6 +17,8 @@ import { registerLocaleData } from '@angular/common';
 
 /*** 👇 REGISTRAR LOCALE ANTES DE @NgModule ***/
 registerLocaleData(localeEsCO, 'es-CO');
+import { NtwkInterceptor } from '../app/intc/ntwk.interceptor';
+
 
 @NgModule({
   imports: [
@@ -31,7 +33,17 @@ registerLocaleData(localeEsCO, 'es-CO');
     })
   ],
   declarations: [AppComponent, ApplyComponent],
-  providers: [InAppBrowser],
+  providers: [
+    InAppBrowser,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: NtwkInterceptor,
+      multi: true
+    }
+  ],
+
+
+  //providers: [InAppBrowser],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
