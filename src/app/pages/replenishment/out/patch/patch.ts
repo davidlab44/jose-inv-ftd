@@ -109,7 +109,6 @@ export class PatchPage {
     console.log("Item recibido shipout patch:", this.movement);
   }
 
-
   ccoMap: CcoMap = {};
   ngOnInit() {
     this.initForm();

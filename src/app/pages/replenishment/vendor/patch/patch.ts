@@ -97,7 +97,7 @@ export class PatchPage {
       rotogate: [this.movement?.data?.rotogate ?? 0], 
       psi: [this.movement?.data?.psi ?? 0], 
       imported: [this.movement?.data?.id_replenishment_product ?? 0], 
-      price: [this.movement?.data?.price ?? 0], 
+      //price: [this.movement?.data?.price ?? 0], 
     });
     this.ccoName=this.ccoService.getName(this.movement.data.name); 
     this.searchSubject.pipe(
@@ -122,7 +122,7 @@ export class PatchPage {
       rotogate: this.movement?.data?.rotogate ?? 0,
       psi: this.movement?.data?.psi ?? 0,
       imported: this.movement?.data?.id_replenishment_product ?? 0,
-      price: this.movement?.data?.price ?? 0
+      //price: this.movement?.data?.price ?? 0
     });
   }
 
@@ -360,11 +360,18 @@ export class PatchPage {
     this.updateMovementFromForm();
     this.updateMovementFromForm();
     this.movement.data.img = this.uploadedUrl;
-    const now = new Date().toISOString().slice(0, 19);
-    const item = this.getGlpPriceItemByDate(now, 1);
-    //const item= this.getGlpPriceItemByDate('2026-05-20T16:26:07',1)
-    //this.movement.data.price=item.data.price + "," + String(item.data.cents).padStart(2, '0').toString();
-    this.movement.data.price= this.price;
+    const itemPrice = this.getGlpPriceItemByDate(this.movement.data.date, 1);
+    console.log("itemPrice",itemPrice)
+    if(itemPrice?.data) {
+      const { price, cents } = itemPrice.data;
+      this.movement.data.price = `${price}.${cents}`;
+    }else {
+      console.warn("No se encontró un precio válido para la fecha", this.movement.data.date);
+      this.utilService.presentToast('Revise la fecha ingresada Año-mes-dia','danger',2000)
+    }
+    const cop = itemPrice.data.price;
+    const cents = itemPrice.data.cents;
+    this.movement.data.price=`${cop}.${cents}`;
     this.movement.data.id_replenishment_product=1;
     let payload = this.movement.data;
     payload.name = this.ccoId;
@@ -457,9 +464,6 @@ export class PatchPage {
 
 
 
-
-
-
   /*---- CCO2------ */
   filteredList2: any[] = [];     //lista filtrada
   onCco2Search(text: string) {
@@ -481,7 +485,6 @@ export class PatchPage {
   }
  
 
-
   cco2Name: string = '';   // nombre a mostrar
   cco2Id: number = 0;   // id cco seleccionado a mostrar
   select2Cco(item: any) {
@@ -496,37 +499,6 @@ export class PatchPage {
   cco2:any;  
   isotanq2:any;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   isImportedGlp(ev: any) {
     const checked = ev.detail.checked;
     if(checked>0){
@@ -540,44 +512,42 @@ export class PatchPage {
       next: (response) => {
         this.glppricesList = response.slice().reverse();
         console.log("pricelist",this.glppricesList)
-        this.getMaxIdItem(this.glppricesList);
-        this.getMaxImportedItem(this.glppricesList);
+        //this.getMaxIdItem(this.glppricesList);
+        //this.getMaxImportedItem(this.glppricesList);
       }
     });
   }
-  price:string='';
-  getMaxIdItem(items: any[]) {
-    const filtered = items.filter(i => i.data?.id_replenishment_product === 1);
-    //if (!filtered.length) return;
-    this.lastGlpprice = filtered.reduce((max, item) =>
-      item.id > max.id ? item : max
-    );
-    if (this.movement?.data?.id_replenishment_product == 1) {
-      const price = Number(this.lastGlpprice.data.price) || 0;
-      const cents = String(this.lastGlpprice.data.cents ?? 0).padStart(2, '0');
-
-
-
-        this.price= `${price}.${cents}`
-      this.form.patchValue({
-        price: `${price}.${cents}`
-      });
-    }
-  }
-  getMaxImportedItem(items: any[]) {
-    const filtered = items.filter(i => i.data?.id_replenishment_product === 2);
-    if (!filtered.length) return;
-    this.lastImportedPrice = filtered.reduce((max, item) => item.id > max.id ? item : max);
-    console.log("getMaxImportedPrice",this.movement.data.id_replenishment_product)
-    if (this.movement?.data?.id_replenishment_product == 2) {
-        const price = Number(this.lastImportedPrice.data.price) || 0;
-        const cents = String(this.lastImportedPrice.data.cents ?? 0).padStart(2, '0');
-        this.form.patchValue({
-          price: `${price}.${cents}`
-        });
-    }
-  }
-
+  //price:string='';
+/*  getMaxIdItem(items: any[]) {*/
+    /*console.log("paso por getMaxIdItem()")*/
+    /*const filtered = items.filter(i => i.data?.id_replenishment_product === 1);*/
+    /*//if (!filtered.length) return;*/
+    /*this.lastGlpprice = filtered.reduce((max, item) =>*/
+      /*item.id > max.id ? item : max*/
+    /*);*/
+    /*if (this.movement?.data?.id_replenishment_product == 1) {*/
+      /*const price = Number(this.lastGlpprice.data.price) || 0;*/
+      /*const cents = String(this.lastGlpprice.data.cents ?? 0).padStart(2, '0');*/
+      /*this.price= `${price}.${cents}`*/
+      /*console.log("priceen getMaxIdItem",this.price)*/
+     /*[> this.form.patchValue({<]*/
+        /*[>price: `${price}.${cents}`<]*/
+      /*[>});<]*/
+    /*}*/
+  /*}*/
+  /*  getMaxImportedItem(items: any[]) {*/
+    /*const filtered = items.filter(i => i.data?.id_replenishment_product === 2);*/
+    /*if (!filtered.length) return;*/
+    /*this.lastImportedPrice = filtered.reduce((max, item) => item.id > max.id ? item : max);*/
+    /*console.log("get ultimo precio imprtd",this.movement.data.id_replenishment_product)*/
+    /*if (this.movement?.data?.id_replenishment_product == 2) {*/
+        /*const price = Number(this.lastImportedPrice.data.price) || 0;*/
+        /*const cents = String(this.lastImportedPrice.data.cents ?? 0).padStart(2, '0');*/
+        /*this.form.patchValue({*/
+          /*price: `${price}.${cents}`*/
+        /*});*/
+    /*}*/
+  /*}*/
 
 
   /*--------price-----------*/
