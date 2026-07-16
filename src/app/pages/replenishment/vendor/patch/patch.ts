@@ -15,6 +15,8 @@ import { CcoService } from '../../../../services/cc/cco.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { GlppricesService } from '../../../../services/replenishment/glpprices.service';
 import { Cco,CcoMap } from '../../../../interfaces/cco';
+import { CalendarOptions } from '@fullcalendar/core'; 
+import dayGridPlugin from '@fullcalendar/daygrid';
 
 @Component({
   selector: 'page-patch',

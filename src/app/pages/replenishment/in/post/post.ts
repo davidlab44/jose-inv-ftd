@@ -202,9 +202,9 @@ export class AssetSupplyPostPage {
         this.ocrResponse=res;
         this.shipId=this.getShipId(res);
         console.log('contenedores extraidos',res.data.contenedores)
-        this.ccoName="TCSU "+res.data.contenedores[0];
+        this.ccoName=res.data.contenedores[0];
         if(res.data.contenedores[1]){
-          this.cco2Name="TCSU "+res.data.contenedores[1];
+          this.cco2Name=res.data.contenedores[1];
         }
         this.ccoId=this.ccoService.getIdByName(this.ccoName);     
         console.log('name:', this.ccoName);
@@ -258,11 +258,14 @@ export class AssetSupplyPostPage {
         console.log("Withdrawn post response", response);
         this.utilService.presentToast("registro actualizado exitosamente","success",1000);
         this.setWithdrawnState(response[0]?.id,'in');
-        if(this.ocrResponse.data.contenedores[1].length>1){
+        console.log('typeOf',typeof(this.ocrResponse.data.contenedores))
+        if(this.ocrResponse.data.contenedores[1].length>0){
+          console.log('contenedores',this.ocrResponse.data.contenedores)
+          console.log('contenedores last',this.ocrResponse.data.contenedores[1])
           const container2Id=this.ccoService.getIdByName(this.ocrResponse.data.contenedores[1])
           console.log('container2id', container2Id);
           if(container2Id&&container2Id>0){
-            this.cloneWithdrawn(payload,container2Id);
+            this.cloneWithdrawn(response[0].id,payload,container2Id);
           }else{
             console.log('SOLO SE ENCONTRO UN CONTENEDOR!')
             //this.utilService.presentToast('') 
@@ -632,10 +635,12 @@ export class AssetSupplyPostPage {
   /*shipList:any[]=[];*/
 /*------clone-------*/
 
- async  cloneWithdrawn(item: any,contenedor2Id) {
+ async  cloneWithdrawn(idCont1:number,item: any,contenedor2Id) {
+    console.log("idCont1 pasado para clonar:", idCont1);
     console.log("item pasado para clonar:", item);
+    console.log("contenedor2Id pasado para clonar:", contenedor2Id);
     //chatgpt => agregar al payload en data.twin el item.id
-    const payload = this.buildClonePayload(item,contenedor2Id);
+    const payload = this.buildClonePayload(idCont1,item,contenedor2Id);
     console.log("Payload a enviar:", payload);
     this.withdrawnService.postClone(payload).subscribe({
       next: (response) => {
@@ -648,7 +653,7 @@ export class AssetSupplyPostPage {
     });
   }
 
-  buildClonePayload(item: any,container2Id): any {
+  buildClonePayload(idCont1:number,item: any,container2Id): any {
     //  Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)
     const d = item?.data?.data ?? item?.data ?? {};
     return {
@@ -664,7 +669,7 @@ export class AssetSupplyPostPage {
         date: d.date ?? null,
         name: container2Id,
         seal: [],
-        twin: item.id,
+        twin: idCont1,
         id_replenishment_product: 0,
         price: 0,
         imgin: null,
@@ -695,9 +700,9 @@ export class AssetSupplyPostPage {
   }
 
   async selfPatch(item:any,twin:number) {
-    item.data.twin=twin;
     console.log("item to selfpatch ",item)
-    console.log("d to selfpatch ",item)
+    console.log("twin to selfpatch ",twin)
+    item.twin=twin;
     this.withdrawnService.patch(item.id,item.data).subscribe({
       next: (response) => {
         console.log("Withdrawn selfpatch response", response);

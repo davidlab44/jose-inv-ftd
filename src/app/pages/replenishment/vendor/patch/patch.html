@@ -18,7 +18,6 @@
   </ion-toolbar>
 </ion-header>
 
-
 <ion-content class="ion-padding">
   <form [formGroup]="form">    
     
@@ -61,24 +60,17 @@
       </p>
 
 
-      <!--<div>-->
+  <!--<full-calendar [options]="calendarOptions"></full-calendar>-->
 
-          <!--<h2>top filtered list</h2>-->
-          <!--<pre>{{filteredList | json}} </pre>-->
-
-
-      <!--</div>-->
-      <!--<p>ImageUrl: {{movement.data.img}}</p>-->
-
-
-      <!--<pre>{{ocrResponse | json}}</pre>-->
-
+        <!--<ion-item>-->
+          <!--<ion-label position="floating">Fecha</ion-label>-->
+          <!--<ion-input formControlName="fecha"></ion-input>-->
+        <!--</ion-item>-->
         <ion-item>
-          <ion-label position="floating">Fecha</ion-label>
-          <ion-input formControlName="fecha"></ion-input>
+          <p>
+            {{ocrResponse.date}}
+          </p>
         </ion-item>
-
-
         <ion-grid>
           <ion-row>
             <!--  IZQUIERDA (input) -->
@@ -169,7 +161,6 @@
           <!--<ion-label position="floating">Precio</ion-label>-->
           <!--<ion-input formControlName="price"></ion-input>-->
         <!--</ion-item>-->
-
 
         <br>
 
