@@ -60,7 +60,7 @@
       </p>
 
 
-  <!--<full-calendar [options]="calendarOptions"></full-calendar>-->
+      <!--<full-calendar [options]="calendarOptions"></full-calendar>-->
 
         <!--<ion-item>-->
           <!--<ion-label position="floating">Fecha</ion-label>-->
@@ -68,7 +68,7 @@
         <!--</ion-item>-->
         <ion-item>
           <p>
-            {{ocrResponse.date}}
+            {{ ocrResponse?.data?.date || 'Sin fecha' }}
           </p>
         </ion-item>
         <ion-grid>
