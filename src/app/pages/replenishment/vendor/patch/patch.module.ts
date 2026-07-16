@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { PatchPage } from './patch';
 import { PatchPageRoutingModule } from './patch-routing.module';
-import { SharedModule } from '../../../../shared/shared.module'; // ✅ Correcto
+import { SharedModule } from '../../../../shared/shared.module';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { PipesModule } from '../../../../pipes/pipes.module';
@@ -14,7 +14,7 @@ import { PipesModule } from '../../../../pipes/pipes.module';
     FormsModule,
     IonicModule,
     PatchPageRoutingModule,
-    SharedModule, // ✅ Aquí es donde entra el componente
+    SharedModule,
     PipesModule,
     ReactiveFormsModule,
 

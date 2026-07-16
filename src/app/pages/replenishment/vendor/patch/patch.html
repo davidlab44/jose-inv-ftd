@@ -59,18 +59,37 @@
         </a>
       </p>
 
-
-      <!--<full-calendar [options]="calendarOptions"></full-calendar>-->
+      <!--<ion-datetime-->
+          <!--presentation="date-time"-->
+          <!--[(ngModel)]="vendorDate"-->
+          <!--[ngModelOptions]="{ standalone: true }"-->
+          <!--(ionChange)="onChange($event)">-->
+      <!--</ion-datetime>-->
 
         <!--<ion-item>-->
-          <!--<ion-label position="floating">Fecha</ion-label>-->
-          <!--<ion-input formControlName="fecha"></ion-input>-->
+          <!--<p>-->
+            <!--{{ ocrResponse?.data?.date || 'Sin fecha' }}-->
+          <!--</p>-->
         <!--</ion-item>-->
-        <ion-item>
-          <p>
-            {{ ocrResponse?.data?.date || 'Sin fecha' }}
-          </p>
-        </ion-item>
+
+      <ion-grid style="border:solid 1px #d5d5d5;border-radius:3%;"   >
+        <ion-row class="ion-align-items-center">
+          <ion-col size="6">
+            <ion-datetime
+              presentation="date-time"
+              [(ngModel)]="vendorDate"
+              [ngModelOptions]="{ standalone: true }"
+              (ionChange)="onChange($event)">
+            </ion-datetime>
+          </ion-col>
+          <ion-col size="6">
+            <p style="margin:0;">
+              {{ ocrResponse?.data?.date || 'Sin fecha' }}
+            </p>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
         <ion-grid>
           <ion-row>
             <!--  IZQUIERDA (input) -->

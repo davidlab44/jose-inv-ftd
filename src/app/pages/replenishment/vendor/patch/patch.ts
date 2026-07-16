@@ -15,8 +15,6 @@ import { CcoService } from '../../../../services/cc/cco.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { GlppricesService } from '../../../../services/replenishment/glpprices.service';
 import { Cco,CcoMap } from '../../../../interfaces/cco';
-import { CalendarOptions } from '@fullcalendar/core'; 
-import dayGridPlugin from '@fullcalendar/daygrid';
 
 @Component({
   selector: 'page-patch',
@@ -306,6 +304,7 @@ export class PatchPage {
   }
 
   ocrResponse:any;
+  vendorDate:any='2000-01-01T00:01:00';;
   launchOcr(url: string) {
     this.ocrService.postVendor(url).subscribe({
       next: (res) => {
@@ -337,6 +336,7 @@ export class PatchPage {
           sello3: seals[2] ?? ''
         });
         console.log("movement actualizado:", this.movement);
+        this.vendorDate=this.ocrResponse.data.date; 
       },
       error: (err) => {
         console.error('Error OCR:', err);
@@ -584,7 +584,9 @@ export class PatchPage {
     return null;
   }
 
-
+  onChange(event: any) {
+      console.log(event.detail.value);
+  }
 
 
 }
