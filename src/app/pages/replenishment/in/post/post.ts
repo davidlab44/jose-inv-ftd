@@ -640,9 +640,12 @@ export class AssetSupplyPostPage {
     console.log("item pasado para clonar:", item);
     console.log("contenedor2Id pasado para clonar:", contenedor2Id);
     //chatgpt => agregar al payload en data.twin el item.id
-    const payload = this.buildClonePayload(idCont1,item,contenedor2Id);
+    //const payload = this.buildClonePayload(idCont1,item,contenedor2Id);
+    item.name=contenedor2Id; 
+    item.twin=idCont1; 
+    const payload =item; 
     console.log("Payload a enviar:", payload);
-    this.withdrawnService.postClone(payload).subscribe({
+    this.withdrawnService.post(payload).subscribe({
       next: (response) => {
         console.log("Clone creado", response);
         this.selfPatch(item,response[0].id);
@@ -653,51 +656,51 @@ export class AssetSupplyPostPage {
     });
   }
 
-  buildClonePayload(idCont1:number,item: any,container2Id): any {
-    //  Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)
-    const d = item?.data?.data ?? item?.data ?? {};
-    return {
-      ext_id: null,
-      // ⚠️ Puedes cambiar esto a new Date().toISOString() si quieres que sea "nuevo"
-      created_at: item.created_at,
-      updated_at: item.created_at,
-      data: {
-        // RESET
-        kg: 0,
-        img: "",
-        psi: 0,
-        date: d.date ?? null,
-        name: container2Id,
-        seal: [],
-        twin: idCont1,
-        id_replenishment_product: 0,
-        price: 0,
-        imgin: null,
-        shipin: 0,
-        ticket: "",
-        tripin: "",
-        vendor: 0,
-        datein: "",
-        // MANTENER w*
-        wnet: d.wnet ?? 0,
-        wtare: d.wtare ?? 0,
-        wgross: d.wgross ?? 0,
-        wticket: d.wticket ?? 0,
-        // MANTENER *out
-        imgout: d.imgout ?? null,
-        dateout: d.dateout ?? null,
-        shipout: d.shipout ?? 0,
-        tripout: d.tripout ?? "",
-        deliveryout: d.deliveryout ?? 0,
-        // OTROS
-        imgscale: d.imgscale ?? null,
-        rotogate: 0,
-        deliveryin: 0
-      },
-      refdate: null,
-      state: "pre-in"
-    };
-  }
+  /*buildClonePayload(idCont1:number,item: any,container2Id): any {*/
+    /*//  Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)*/
+    /*const d = item?.data?.data ?? item?.data ?? {};*/
+    /*return {*/
+      /*ext_id: null,*/
+      /*// ⚠️ Puedes cambiar esto a new Date().toISOString() si quieres que sea "nuevo"*/
+      /*created_at: item.created_at,*/
+      /*updated_at: item.created_at,*/
+      /*data: {*/
+        /*// RESET*/
+        /*kg: 0,*/
+        /*img: "",*/
+        /*psi: 0,*/
+        /*date: d.date ?? null,*/
+        /*name: container2Id,*/
+        /*seal: [],*/
+        /*twin: idCont1,*/
+        /*id_replenishment_product: 0,*/
+        /*price: 0,*/
+        /*imgin: null,*/
+        /*shipin: 0,*/
+        /*ticket: "",*/
+        /*tripin: "",*/
+        /*vendor: 0,*/
+        /*datein: "",*/
+        /*// MANTENER w**/
+        /*wnet: d.wnet ?? 0,*/
+        /*wtare: d.wtare ?? 0,*/
+        /*wgross: d.wgross ?? 0,*/
+        /*wticket: d.wticket ?? 0,*/
+        /*// MANTENER *out*/
+        /*imgout: d.imgout ?? null,*/
+        /*dateout: d.dateout ?? null,*/
+        /*shipout: d.shipout ?? 0,*/
+        /*tripout: d.tripout ?? "",*/
+        /*deliveryout: d.deliveryout ?? 0,*/
+        /*// OTROS*/
+        /*imgscale: d.imgscale ?? null,*/
+        /*rotogate: 0,*/
+        /*deliveryin: 0*/
+      /*},*/
+      /*refdate: null,*/
+      /*state: "pre-in"*/
+    /*};*/
+  /*}*/
 
   async selfPatch(item:any,twin:number) {
     console.log("item to selfpatch ",item)
