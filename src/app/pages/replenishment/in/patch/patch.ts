@@ -246,7 +246,8 @@ export class PatchPage {
 
   contenedores:any[]=[];
   shipId:number=0;
-  shipNombreEsp:string | null; 
+  shipNombreEsp:string | null;
+  vendorDate:any='2000-01-01T00:01:00';;
   launchOcr(url: string) {
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
@@ -263,7 +264,7 @@ export class PatchPage {
           this.utilService.presentToast('no se reconocieron isotanques','danger',500);
         }
         console.log('id:', this.ccoId);
-       const ship=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
+        const ship=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
         this.shipId=ship.id;
         console.log("ship obtenido",ship)
         if(this.shipId>0){
@@ -289,6 +290,7 @@ export class PatchPage {
           shipin: this.ccoName,
         });
         console.log("movement actualizado:", this.movement);
+        this.vendorDate=res.data.date; 
       },
       error: (err) => {
         console.error('Error OCR:', err);
@@ -447,6 +449,9 @@ export class PatchPage {
       }); 
    } 
 
+  onChange(event: any) {
+      console.log(event.detail.value);
+  }
 
 
 

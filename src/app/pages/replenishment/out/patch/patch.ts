@@ -272,6 +272,7 @@ export class PatchPage {
 
   shipId:any;
   shipNombreEsp:string | null; 
+  vendorDate:any='2000-01-01T00:01:00';
   launchOcr(url: string) {
     this.ocrService.postOut(url).subscribe({
       next: (res) => {
@@ -303,6 +304,7 @@ export class PatchPage {
           shipout: 3,
         });
         console.log("movement actualizado:", this.movement);
+        this.vendorDate=res.data.date;
       },
       error: (err) => {
         console.error('Error OCR:', err);
@@ -504,6 +506,10 @@ getShipId(objA, objBList) {
     );
   }
 
+
+  onChange(event: any) {
+      console.log(event.detail.value);
+  }
 
   
 

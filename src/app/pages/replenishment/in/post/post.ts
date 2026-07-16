@@ -194,7 +194,7 @@ export class AssetSupplyPostPage {
 
   ocrResponse:any;
   shipNombreEsp:string | null; 
- 
+  vendorDate:any='2000-01-01T00:01:00'; 
   launchOcr(url:string){
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
@@ -221,6 +221,7 @@ export class AssetSupplyPostPage {
           this.shipNombreEsp='Seleccionar'
         }
         this.updateUi();
+        this.vendorDate=this.ocrResponse.data.date;
       },
       error: (err) => {
         console.error('Error OCR:', err);
@@ -731,6 +732,10 @@ export class AssetSupplyPostPage {
     this.uploadProgress = 0; 
     this.uploadedUrl= null;
     this.uploading = false;
+  }
+
+  onChange(event: any) {
+      console.log(event.detail.value);
   }
 
 
