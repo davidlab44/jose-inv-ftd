@@ -167,11 +167,9 @@ export class PatchPage {
   loadCcos() {
     this.ccoService.load().subscribe({
       next:(map)=>{
-
         this.ccoMap=map;
         this.ccoService.debugMapping(this.filteredList);
         this.getCco2();
-
       },
       error:(err)=>{
         console.error('Error loading ccos',err);
@@ -362,9 +360,22 @@ export class PatchPage {
     this.updateMovementFromForm();
     this.updateMovementFromForm();
     this.movement.data.img = this.uploadedUrl;
+    this.movement.data.date=this.vendorDate;
+    console.log('mi vendor date',this.vendorDate);
     const itemPrice = this.getGlpPriceItemByDate(this.movement.data.date, 1);
     console.log("itemPrice",itemPrice)
-    if(itemPrice?.data) {
+    console.log("movement.data",this.movement.data)
+    this.movement.data.date=this.vendorDate;
+
+
+    const date = this.movement.data.date;
+    if (!date || new Date(date).getFullYear() <= 2020) {
+      this.utilService.presentToast('fecha / año no valido','danger',800)
+      return;
+    }
+
+
+      if(itemPrice?.data) {
       const { price, cents } = itemPrice.data;
       this.movement.data.price = `${price}.${cents}`;
     }else {
@@ -514,43 +525,9 @@ export class PatchPage {
       next: (response) => {
         this.glppricesList = response.slice().reverse();
         console.log("pricelist",this.glppricesList)
-        //this.getMaxIdItem(this.glppricesList);
-        //this.getMaxImportedItem(this.glppricesList);
       }
     });
   }
-  //price:string='';
-/*  getMaxIdItem(items: any[]) {*/
-    /*console.log("paso por getMaxIdItem()")*/
-    /*const filtered = items.filter(i => i.data?.id_replenishment_product === 1);*/
-    /*//if (!filtered.length) return;*/
-    /*this.lastGlpprice = filtered.reduce((max, item) =>*/
-      /*item.id > max.id ? item : max*/
-    /*);*/
-    /*if (this.movement?.data?.id_replenishment_product == 1) {*/
-      /*const price = Number(this.lastGlpprice.data.price) || 0;*/
-      /*const cents = String(this.lastGlpprice.data.cents ?? 0).padStart(2, '0');*/
-      /*this.price= `${price}.${cents}`*/
-      /*console.log("priceen getMaxIdItem",this.price)*/
-     /*[> this.form.patchValue({<]*/
-        /*[>price: `${price}.${cents}`<]*/
-      /*[>});<]*/
-    /*}*/
-  /*}*/
-  /*  getMaxImportedItem(items: any[]) {*/
-    /*const filtered = items.filter(i => i.data?.id_replenishment_product === 2);*/
-    /*if (!filtered.length) return;*/
-    /*this.lastImportedPrice = filtered.reduce((max, item) => item.id > max.id ? item : max);*/
-    /*console.log("get ultimo precio imprtd",this.movement.data.id_replenishment_product)*/
-    /*if (this.movement?.data?.id_replenishment_product == 2) {*/
-        /*const price = Number(this.lastImportedPrice.data.price) || 0;*/
-        /*const cents = String(this.lastImportedPrice.data.cents ?? 0).padStart(2, '0');*/
-        /*this.form.patchValue({*/
-          /*price: `${price}.${cents}`*/
-        /*});*/
-    /*}*/
-  /*}*/
-
 
   /*--------price-----------*/
   glpPriceList: any[] = []; 
@@ -585,7 +562,10 @@ export class PatchPage {
   }
 
   onChange(event: any) {
-      console.log(event.detail.value);
+      console.log('event',event.detail.value);
+      this.vendorDate=event.detail.value;
+      this.movement.data.date=event.detail.value;
+      console.log('movement.data.date',this.movement.data.date);
   }
 
 

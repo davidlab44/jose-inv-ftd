@@ -194,7 +194,7 @@ export class AssetSupplyPostPage {
 
   ocrResponse:any;
   shipNombreEsp:string | null; 
- 
+  vendorDate:any='2000-01-01T00:01:00'; 
   launchOcr(url:string){
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
@@ -202,9 +202,9 @@ export class AssetSupplyPostPage {
         this.ocrResponse=res;
         this.shipId=this.getShipId(res);
         console.log('contenedores extraidos',res.data.contenedores)
-        this.ccoName="TCSU "+res.data.contenedores[0];
+        this.ccoName=res.data.contenedores[0];
         if(res.data.contenedores[1]){
-          this.cco2Name="TCSU "+res.data.contenedores[1];
+          this.cco2Name=res.data.contenedores[1];
         }
         this.ccoId=this.ccoService.getIdByName(this.ccoName);     
         console.log('name:', this.ccoName);
@@ -221,6 +221,7 @@ export class AssetSupplyPostPage {
           this.shipNombreEsp='Seleccionar'
         }
         this.updateUi();
+        this.vendorDate=this.ocrResponse.data.date;
       },
       error: (err) => {
         console.error('Error OCR:', err);
@@ -258,9 +259,18 @@ export class AssetSupplyPostPage {
         console.log("Withdrawn post response", response);
         this.utilService.presentToast("registro actualizado exitosamente","success",1000);
         this.setWithdrawnState(response[0]?.id,'in');
-        if(this.ocrResponse.data.contenedores[1].length>1){
+        console.log('typeOf',typeof(this.ocrResponse.data.contenedores))
+        if(this.ocrResponse.data.contenedores[1].length>0){
+          console.log('contenedores',this.ocrResponse.data.contenedores)
+          console.log('contenedores last',this.ocrResponse.data.contenedores[1])
           const container2Id=this.ccoService.getIdByName(this.ocrResponse.data.contenedores[1])
-          this.cloneWithdrawn(payload,container2Id);
+          console.log('container2id', container2Id);
+          if(container2Id&&container2Id>0){
+            this.cloneWithdrawn(response[0].id,payload,container2Id);
+          }else{
+            console.log('SOLO SE ENCONTRO UN CONTENEDOR!')
+            //this.utilService.presentToast('') 
+          }
         }else{
 
         }
@@ -511,6 +521,7 @@ export class AssetSupplyPostPage {
   }
   ccoList:any[]=[];          
   ionViewDidEnter() {        
+    this.resetForm();
     this.loadCcos();         
     //this.getAllPrices();     
     this.getAllCco();
@@ -521,6 +532,7 @@ export class AssetSupplyPostPage {
       next:(map)=>{
         this.ccoMap=map;     
         this.ccoService.debugMapping(this.filteredList);
+        console.log('ccoMap', this.ccoMap)
       },    
       error:(err)=>{
         console.error('Error loading ccos',err); 
@@ -568,8 +580,6 @@ export class AssetSupplyPostPage {
 
 
 
-
-
   /*---- CCO2------ */
   filteredList2: any[] = [];     //lista filtrada
   onCco2Search(text: string) {
@@ -590,8 +600,6 @@ export class AssetSupplyPostPage {
     console.log('filteredList2', this.filteredList2);
   }
  
-
-
   cco2Name: string = '';   // nombre a mostrar
   cco2Id: number = 0;   // id cco seleccionado a mostrar
   select2Cco(item: any) {
@@ -624,27 +632,23 @@ export class AssetSupplyPostPage {
 
 
 
-
-
-
-
-
-
-
-
   /*onShipSelect(e:any){}*/
   /*shipList:any[]=[];*/
 /*------clone-------*/
 
- async  cloneWithdrawn(item: any,contenedor2Id) {
-    console.log("item pasado:", item);
+ async  cloneWithdrawn(idCont1:number,item: any,contenedor2Id) {
+    console.log("idCont1 pasado para clonar:", idCont1);
+    console.log("item pasado para clonar:", item);
+    console.log("contenedor2Id pasado para clonar:", contenedor2Id);
     //chatgpt => agregar al payload en data.twin el item.id
-    const payload = this.buildClonePayload(item,contenedor2Id);
+    //const payload = this.buildClonePayload(idCont1,item,contenedor2Id);
+    item.name=contenedor2Id; 
+    item.twin=idCont1; 
+    const payload =item; 
     console.log("Payload a enviar:", payload);
-    this.withdrawnService.postClone(payload).subscribe({
+    this.withdrawnService.post(payload).subscribe({
       next: (response) => {
         console.log("Clone creado", response);
-        //chatgpt => hacer un patch a este "withdrawnItem" data.twin el que se creo
         this.selfPatch(item,response[0].id);
       },
       error: (err) => {
@@ -653,56 +657,56 @@ export class AssetSupplyPostPage {
     });
   }
 
-  buildClonePayload(item: any,container2Id): any {
-    //  Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)
-    const d = item?.data?.data ?? item?.data ?? {};
-    return {
-      ext_id: null,
-      // ⚠️ Puedes cambiar esto a new Date().toISOString() si quieres que sea "nuevo"
-      created_at: item.created_at,
-      updated_at: item.created_at,
-      data: {
-        // RESET
-        kg: 0,
-        img: "",
-        psi: 0,
-        date: d.date ?? null,
-        name: container2Id,
-        seal: [],
-        twin: item.id,
-        id_replenishment_product: 0,
-        price: 0,
-        imgin: null,
-        shipin: 0,
-        ticket: "",
-        tripin: "",
-        vendor: 0,
-        datein: "",
-        // MANTENER w*
-        wnet: d.wnet ?? 0,
-        wtare: d.wtare ?? 0,
-        wgross: d.wgross ?? 0,
-        wticket: d.wticket ?? 0,
-        // MANTENER *out
-        imgout: d.imgout ?? null,
-        dateout: d.dateout ?? null,
-        shipout: d.shipout ?? 0,
-        tripout: d.tripout ?? "",
-        deliveryout: d.deliveryout ?? 0,
-        // OTROS
-        imgscale: d.imgscale ?? null,
-        rotogate: 0,
-        deliveryin: 0
-      },
-      refdate: null,
-      state: "pre-in"
-    };
-  }
+  /*buildClonePayload(idCont1:number,item: any,container2Id): any {*/
+    /*//  Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)*/
+    /*const d = item?.data?.data ?? item?.data ?? {};*/
+    /*return {*/
+      /*ext_id: null,*/
+      /*// ⚠️ Puedes cambiar esto a new Date().toISOString() si quieres que sea "nuevo"*/
+      /*created_at: item.created_at,*/
+      /*updated_at: item.created_at,*/
+      /*data: {*/
+        /*// RESET*/
+        /*kg: 0,*/
+        /*img: "",*/
+        /*psi: 0,*/
+        /*date: d.date ?? null,*/
+        /*name: container2Id,*/
+        /*seal: [],*/
+        /*twin: idCont1,*/
+        /*id_replenishment_product: 0,*/
+        /*price: 0,*/
+        /*imgin: null,*/
+        /*shipin: 0,*/
+        /*ticket: "",*/
+        /*tripin: "",*/
+        /*vendor: 0,*/
+        /*datein: "",*/
+        /*// MANTENER w**/
+        /*wnet: d.wnet ?? 0,*/
+        /*wtare: d.wtare ?? 0,*/
+        /*wgross: d.wgross ?? 0,*/
+        /*wticket: d.wticket ?? 0,*/
+        /*// MANTENER *out*/
+        /*imgout: d.imgout ?? null,*/
+        /*dateout: d.dateout ?? null,*/
+        /*shipout: d.shipout ?? 0,*/
+        /*tripout: d.tripout ?? "",*/
+        /*deliveryout: d.deliveryout ?? 0,*/
+        /*// OTROS*/
+        /*imgscale: d.imgscale ?? null,*/
+        /*rotogate: 0,*/
+        /*deliveryin: 0*/
+      /*},*/
+      /*refdate: null,*/
+      /*state: "pre-in"*/
+    /*};*/
+  /*}*/
 
   async selfPatch(item:any,twin:number) {
-    item.data.twin=twin;
     console.log("item to selfpatch ",item)
-    console.log("d to selfpatch ",item)
+    console.log("twin to selfpatch ",twin)
+    item.twin=twin;
     this.withdrawnService.patch(item.id,item.data).subscribe({
       next: (response) => {
         console.log("Withdrawn selfpatch response", response);
@@ -716,6 +720,23 @@ export class AssetSupplyPostPage {
     });
   }
 
+  resetForm(): void {
+    this.uploadedUrl=''; 
+    this.form.reset({
+      id: 0,
+      deliveryin: '',
+      datein: '',
+      tripin: '',
+      shipin: '',
+    });
+    this.uploadProgress = 0; 
+    this.uploadedUrl= null;
+    this.uploading = false;
+  }
+
+  onChange(event: any) {
+      console.log(event.detail.value);
+  }
 
 
 }

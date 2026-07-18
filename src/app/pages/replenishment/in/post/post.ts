@@ -736,6 +736,8 @@ export class AssetSupplyPostPage {
 
   onChange(event: any) {
       console.log(event.detail.value);
+      this.vendorDate=event.detail.value;
+
   }
 
 

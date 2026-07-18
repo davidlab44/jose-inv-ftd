@@ -509,6 +509,8 @@ getShipId(objA, objBList) {
 
   onChange(event: any) {
       console.log(event.detail.value);
+      this.vendorDate=event.detail.value;
+      this.movement.data.date=event.detail.value;
   }
 
   

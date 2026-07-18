@@ -46,10 +46,33 @@
           <p>{{ uploadedUrl }}</p>
         </ion-card-content>
       </ion-card>
-        <ion-item>
-          <ion-label position="floating">Fecha remision (VACIOS) | 2026-02-25T00:00:00</ion-label>
-          <ion-input formControlName="datein"></ion-input>
-        </ion-item>
+      
+
+      <ion-grid style="border:solid 1px #d5d5d5;border-radius:3%;"   >
+        <ion-row class="ion-align-items-center">
+          <ion-col size="6">
+            <ion-datetime
+              presentation="date-time"
+              [(ngModel)]="vendorDate"
+              [ngModelOptions]="{ standalone: true }"
+              (ionChange)="onChange($event)">
+            </ion-datetime>
+          </ion-col>
+          <ion-col size="6">
+            <p style="margin:0;">
+              {{ ocrResponse?.data?.date || 'Sin fecha' }}
+            </p>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+
+        <!--<ion-item>-->
+          <!--<ion-label position="floating">Fecha remision (VACIOS) | 2026-02-25T00:00:00</ion-label>-->
+          <!--<ion-input formControlName="datein"></ion-input>-->
+        <!--</ion-item>-->
+
+
         <ion-item>
           <ion-label position="floating">Entrega Numero:</ion-label>
           <ion-input formControlName="deliveryin"></ion-input>
@@ -167,6 +190,9 @@
             </p>
           </ion-text>
         </ion-col>
+      </ion-row>
+      <ion-row>
+        <p>{{container2Id}}</p>
       </ion-row>
     </ion-grid>
 

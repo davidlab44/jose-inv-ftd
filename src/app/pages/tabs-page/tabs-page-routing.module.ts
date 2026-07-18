@@ -215,7 +215,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../replenishment/vendor/post/post.module').then(m => m.AssetSupplyPostModule)
+            loadChildren: ()=> import('../replenishment/vendor/post/post.module').then(m => m.AssetSupplyPostModule)
           }
         ]
       },
@@ -266,25 +266,14 @@ const routes: Routes = [
       },
 
       {
-        path: 'pchs-in-post',
+        path: 'prch-in-post',
         children: [
           {
             path: '',
-            loadChildren: () => import('../pchs/in/post/post.module').then(m => m.AssetSupplyPostModule)
+            loadChildren: () => import('../prch/in/post/post.module').then(m => m.AssetSupplyPostModule)
           }
         ]
       },
-
-      {
-        path: 'pchs-withdrawn-getall',
-        children: [
-          {
-            path: '',
-            loadChildren: () => import('../pchs/withdrawn/getall/getall.module').then(m => m.GetallModule)
-          }
-        ]
-      },
-
 
 
       {
@@ -307,18 +296,25 @@ const routes: Routes = [
         ]
       },
 
-
-
       {
-        path: 'pchs-main-post',
+        path: 'prch-main-getall',
         children: [
           {
             path: '',
-            loadChildren: () => import('../pchs/main/post/post.module').then(m => m.AssetSupplyPostModule)
+            loadChildren: () => import('../prch/main/getall/getall.module').then(m => m.GetallModule)
           }
         ]
       },
 
+      {
+        path: 'prch-main-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../prch/main/post/post.module').then(m => m.AssetSupplyPostModule)
+          }
+        ]
+      },
 
       {
         path: 'asset-supply-post',
@@ -329,8 +325,7 @@ const routes: Routes = [
           }
         ]
       },
-
-
+      
       {
         path: '',
         redirectTo: '/app/tabs/schedule',

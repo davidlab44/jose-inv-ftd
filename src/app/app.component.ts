@@ -221,7 +221,7 @@ export class AppComponent implements OnInit {
      },
      {
        title: 'Compras',
-       url: '/app/tabs/pchs-withdrawn-getall',
+       url: '/app/tabs/prch-main-getall',
        icon: 'document-text'
      },
      {
