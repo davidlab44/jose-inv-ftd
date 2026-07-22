@@ -290,7 +290,8 @@ export class PatchPage {
           shipin: this.ccoName,
         });
         console.log("movement actualizado:", this.movement);
-        this.vendorDate=res.data.date; 
+        this.vendorDate=res.data.datein;
+
       },
       error: (err) => {
         console.error('Error OCR:', err);

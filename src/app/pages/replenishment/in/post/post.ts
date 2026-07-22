@@ -221,7 +221,7 @@ export class AssetSupplyPostPage {
           this.shipNombreEsp='Seleccionar'
         }
         this.updateUi();
-        this.vendorDate=this.ocrResponse.data.date;
+        this.vendorDate=this.ocrResponse.data.datein;
       },
       error: (err) => {
         console.error('Error OCR:', err);

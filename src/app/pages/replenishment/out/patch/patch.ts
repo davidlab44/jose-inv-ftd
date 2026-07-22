@@ -47,8 +47,6 @@ export interface CcoMap {
 }
 
 
-
-
 @Component({
   selector: 'page-patch',
   templateUrl: 'patch.html',
@@ -179,7 +177,6 @@ export class PatchPage {
           console.log('isotanq2Id',this.isotanq2Id)
           console.log('isotanq2Name',this.isotanq2Name)
           console.log('ccomap en DidEnter', this.ccoService.getMap());
-
         }
       })
     }
@@ -304,7 +301,7 @@ export class PatchPage {
           shipout: 3,
         });
         console.log("movement actualizado:", this.movement);
-        this.vendorDate=res.data.date;
+        this.vendorDate=res.data.dateout;
       },
       error: (err) => {
         console.error('Error OCR:', err);
