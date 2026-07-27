@@ -264,7 +264,18 @@ export class PatchPage {
           this.utilService.presentToast('no se reconocieron isotanques','danger',500);
         }
         console.log('id:', this.ccoId);
+        console.log('res 4 abb:', res.data.tripin.slice(0,2).toUpperCase());
+        console.log('abb obtenida del trip:', res.data.tripin.slice(0,2).toUpperCase());
+        console.log('are equals:',  this.shipList[2].data.abb===res.data.tripin.slice(0,2).toUpperCase());
+        console.log('are equals:', res.data.tripin.slice(0,2).toUpperCase()==this.shipList[2].data.abb);
+
+
         const ship=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
+        console.log("ship obtenido",ship)
+        if(!ship){
+          this.utilService.presentToast('Ingrese el barco manualmente','primary',1500)
+          return;
+        }
         this.shipId=ship.id;
         console.log("ship obtenido",ship)
         if(this.shipId>0){

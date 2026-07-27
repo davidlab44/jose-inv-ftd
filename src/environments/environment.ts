@@ -1,20 +1,40 @@
-// The build system defaults to the dev environment which uses `environment.ts`, but if you do
-// `ng build --env=prod` then `environment.prod.ts` will be used instead.
-// The list of which env maps to which file can be found in `.angular-cli.json`.
-
 let env='dev';
 
 export const environment={
-  production:false,
+  production:true,
   apiHost:'https://invapi'+env+'.inbemetal.com',
   ocrUrl:'https://ocr.inbemetal.com',
   s3aws:env==='dev'
     ? 'https://s3dev.inbemetal.com/'
     : 'https://s3aws.inbemetal.com/',
+//  s3aws: 'https://s3aws.inbemetal.com/',
   db:"na",
   i:38,
   p:"tumae",
 };
+
+
+
+
+
+
+// The build system defaults to the dev environment which uses `environment.ts`, but if you do
+// `ng build --env=prod` then `environment.prod.ts` will be used instead.
+// The list of which env maps to which file can be found in `.angular-cli.json`.
+
+/*let env='dev';*/
+
+/*export const environment={*/
+  /*production:false,*/
+  /*apiHost:'https://invapi'+env+'.inbemetal.com',*/
+  /*ocrUrl:'https://ocr.inbemetal.com',*/
+  /*s3aws:env==='dev'*/
+    /*? 'https://s3dev.inbemetal.com/'*/
+    /*: 'https://s3aws.inbemetal.com/',*/
+  /*db:"na",*/
+  /*i:38,*/
+  /*p:"tumae",*/
+/*};*/
 
 
 /*

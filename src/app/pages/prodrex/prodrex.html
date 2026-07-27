@@ -4,7 +4,7 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-searchbar
-      placeholder="Buscar"
+      placeholder="Buscar x"
       (ionInput)="onSearch($event.target.value)">
     </ion-searchbar>
     <ion-buttons slot="end">
@@ -79,7 +79,7 @@
 
   <div *ngIf="hasOwner" style="width:100%;border-bottom: solid 1px #d5d5d5;padding: 10px;">
     <ion-row *ngFor="let u of userList" style="width:100%; justify-content:center; display:flex;">
-      <span *ngIf="u.id == ownerId" style="text-align:center; width:100%;">
+      <span *ngIf="u.id == ownerId" style="text-align:center; width:100%;cursor:pointer;">
         <b>{{ u.data.name }}</b>
       </span>
     </ion-row>

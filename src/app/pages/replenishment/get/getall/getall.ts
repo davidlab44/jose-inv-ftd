@@ -117,6 +117,7 @@ export class GetallPage implements OnInit {
         this.shipList=ships;
         console.log('shipList',ships);
         this.shipMap=this.buildShipMap(ships);
+        //this.fullWithdrawnList=this.sortWithdrawnByDateAndSum(this.withdrawnList).reverse();
       },
       error:(err)=>console.error(err)
     });
@@ -153,12 +154,7 @@ export class GetallPage implements OnInit {
       else if(data?.id_replenishment_product===2)
         totalImportado+=kg;
       const wticket=data?.wticket;
-      if(
-        wticket!==undefined &&
-        Number(data?.wnet)>0 &&
-        Number(data?.wgross)>0 &&
-        Number(data?.wtare)>0
-      ) {
+      if(wticket!==undefined&&Number(data?.wnet)>0&&Number(data?.wgross)>0&&Number(data?.wtare)>0){
         const key=String(wticket);
         if(map.has(key)) {
           const other=map.get(key);
@@ -178,6 +174,9 @@ export class GetallPage implements OnInit {
           map.set(key,item);
         }
       }
+      console.log('shipMap',this.shipMap)
+      data.shipoutName=this.shipMap[data.shipout]?.name ?? 'N/A';
+      data.shipinName=this.shipMap[data.shipin]?.name ?? 'N/A';
     }
     withdrawnList.sort((a,b)=>a._ts-b._ts);
     this.totalKg=total;
@@ -484,6 +483,17 @@ export class GetallPage implements OnInit {
         }
       }
     );
+  }
+
+  shipInName(p){}
+  shipOutName(p){}
+  diff(p){}
+
+  openLink(url: string): void {
+    if (!url) {
+      return;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
 }
