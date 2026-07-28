@@ -235,4 +235,32 @@ load(): Observable<CcoMap> {
 
 
 
+getNameByHash(hash: string): string {
+
+  const match = hash.match(/\d{6}-\d/);
+
+  if (!match) {
+    return 'N/A';
+  }
+
+  const target = match[0];
+
+  for (const key in this.ccoMap) {
+
+    const name = this.ccoMap[Number(key)]?.name ?? '';
+
+    const m = name.match(/\d{6}-\d/);
+
+    if (m && m[0] === target) {
+      return name;
+    }
+
+  }
+
+  return 'N/A';
+
+}
+
+
+
 }

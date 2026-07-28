@@ -202,10 +202,16 @@ export class AssetSupplyPostPage {
         this.ocrResponse=res;
         this.shipId=this.getShipId(res);
         console.log('contenedores extraidos',res.data.contenedores)
-        this.ccoName=res.data.contenedores[0];
-        if(res.data.contenedores[1]){
-          this.cco2Name=res.data.contenedores[1];
+        this.ccoName = this.ccoService.getNameByHash(res?.data?.contenedores?.[0] ?? '');
+        if ((res?.data?.contenedores?.[1]?.length ?? 0) > 0) {
+          this.cco2Name = this.ccoService.getNameByHash(
+            res.data.contenedores[1]
+          );
         }
+        /*this.ccoName=this.ccoService.getNameByHash(res.data.contenedores[0])*/
+        /*if(res.data.contenedores[1]){*/
+          /*this.cco2Name=res.data.contenedores[1];*/
+        /*}*/
         this.ccoId=this.ccoService.getIdByName(this.ccoName);     
         console.log('name:', this.ccoName);
         console.log('id:', this.ccoId);
@@ -260,9 +266,9 @@ export class AssetSupplyPostPage {
         this.utilService.presentToast("registro actualizado exitosamente","success",1000);
         this.setWithdrawnState(response[0]?.id,'in');
         console.log('typeOf',typeof(this.ocrResponse.data.contenedores))
-        if(this.ocrResponse.data.contenedores[1].length>0){
+        //if(this.ocrResponse.data.contenedores[1].length>0){
+        if ((this.ocrResponse?.data?.contenedores?.[1]?.length ?? 0) > 0) {
           console.log('contenedores',this.ocrResponse.data.contenedores)
-          console.log('contenedores last',this.ocrResponse.data.contenedores[1])
           const container2Id=this.ccoService.getIdByName(this.ocrResponse.data.contenedores[1])
           console.log('container2id', container2Id);
           if(container2Id&&container2Id>0){
@@ -271,8 +277,7 @@ export class AssetSupplyPostPage {
             console.log('SOLO SE ENCONTRO UN CONTENEDOR!')
             //this.utilService.presentToast('') 
           }
-        }else{
-
+        }else{ //no es necesario imprimir nada ya se imropimio 
         }
       },
       error: (err) => {

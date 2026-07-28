@@ -255,10 +255,13 @@ export class PatchPage {
         this.contenedores=res.data.contenedores;
         if(this.contenedores[0]&&this.contenedores[0].length>0){
           const hasOne = this.thersIsSomeCCoLikeThis(res.data.contenedores[0])
+          console.log("hasOne",hasOne)
           if(hasOne){
+            console.log("ccoName1:",this.ccoName)
             this.ccoName="TCSU "+res.data.contenedores[0];
             this.ccoId=this.ccoService.getIdByName(this.ccoName);     
-            console.log('cco Name:', this.ccoName);
+            console.log('ccoName2:', this.ccoName);
+            console.log('ccoId:', this.ccoId);
           }
         }else{
           this.utilService.presentToast('no se reconocieron isotanques','danger',500);
@@ -268,8 +271,6 @@ export class PatchPage {
         console.log('abb obtenida del trip:', res.data.tripin.slice(0,2).toUpperCase());
         console.log('are equals:',  this.shipList[2].data.abb===res.data.tripin.slice(0,2).toUpperCase());
         console.log('are equals:', res.data.tripin.slice(0,2).toUpperCase()==this.shipList[2].data.abb);
-
-
         const ship=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
         console.log("ship obtenido",ship)
         if(!ship){
@@ -310,7 +311,7 @@ export class PatchPage {
     });
   }
 
-  thersIsSomeCCoLikeThis(ccoNamehash:string):boolean{
+  thersIsSomeCCoLikeThis(ccoNamehash:string):boolean{ //esto hace la comparación contra la fuente de verdad
     return (this.ccoList||[]).some(item=>
       (item?.data?.name||'').match(/\d+-\d+$/)?.[0]===ccoNamehash
     );
