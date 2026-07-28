@@ -28,25 +28,6 @@
 </ion-header>
 
 
-<!--<ion-header translucent="true">-->
-  <!--<ion-toolbar>-->
-    <!--<ion-buttons *ngIf="!showSearchbar" slot="start">-->
-      <!--<ion-menu-button></ion-menu-button>-->
-    <!--</ion-buttons>-->
-    <!--<ion-searchbar-->
-      <!--placeholder="Buscar"-->
-      <!--(ionInput)="onSearch($event.target.value)">-->
-    <!--</ion-searchbar>-->
-    <!--<ion-buttons slot="end">-->
-      <!--<ion-button *ngIf="!showSearchbar" (click)="presentFilter()">-->
-        <!--<span *ngIf="ios">Filter</span>-->
-        <!--<span *ngIf="!ios">-->
-          <!--<ion-icon slot="icon-only" name="options"></ion-icon>-->
-        <!--</span>-->
-      <!--</ion-button>-->
-    <!--</ion-buttons>-->
-  <!--</ion-toolbar>-->
-<!--</ion-header>-->
 <ion-content>
 
   <ion-item class="range-container" lines="none">
@@ -107,22 +88,22 @@
         <tr>
           <th></th>
           <th>Fecha Ing</th>
-          <th>Rem vacío</th>
-          <th>Img In</th>
+          <th>Rem v.</th>
+          <th>In</th>
           <th>Trip In</th>
           <th>Ship In</th>
           <th>Fecha</th>
           <th>Isotanq</th>
           <th>Ticket</th>
-          <th>Img</th>
+          <th>Plx</th>
           <th>Kg</th>
           <th>Precio</th>
           <th>PSI</th>
-          <th>Rotogate</th>
+          <th>Rt</th>
           <th>Sellos</th>
           <th>Date Out</th>
           <th>Rem M LL</th>
-          <th>Img Out</th>
+          <th>Out</th>
           <th>Trip Out</th>
           <th>Ship Out</th>
           <th>Diff</th>
@@ -130,7 +111,8 @@
           <th>Wtare</th>
           <th>Wnet</th>
           <th>WTicket</th>
-          <th>Img Scale</th>
+          <th>W</th>
+          <th></th>
         </tr>
       </thead>
 
@@ -138,9 +120,18 @@
         <tr
           *ngFor="let p of fullWithdrawnList"
           [ngClass]="{ 'row-erp': p.state === 'erp' }"
-          >
+          [style.background-color]="p.data.color || '#d5d5d5'">
+
+          <!--Color picker  -->
+          <td class="color-cell">
+            <input
+              type="color"
+              [(ngModel)]="p.data.color"
+              (click)="onColorPickerOpen(p, p.data.color)"
+              (change)="onColorChange(p, $event.target.value)">
+          </td>
+
           <!-- Fecha Ing -->
-          <td></td>
           <td>{{ p.data.datein | date:'dd/MM/yyyy' }}</td>
           <!-- Rem vacío -->
           <td>{{ p.data.deliveryin }}</td>
@@ -152,7 +143,7 @@
           <!-- Trip In -->
           <td>{{ p.data.tripin }}</td>
           <!-- Ship In -->
-          <td>{{ p.data.shipInName }}</td>
+          <td>{{ p.data.shipinName }}</td>
           <!-- Fecha -->
           <td>{{ p.data.date | date:'dd/MM/yyyy' }}</td>
           <!-- Isotanq -->
@@ -169,7 +160,6 @@
               <ion-icon name="open-outline"></ion-icon>
             </ion-button>
           </td>
-          <!--<td>{{ p.data.img }}</td>-->
           <!-- Kg -->
           <td>{{ p.data.kg }}</td>
           <!-- Precio -->
@@ -219,117 +209,47 @@
           </td>
 
 
+          <td class="text-cell">
+            <textarea
+              rows="1"
+              [ngModel]="p.data.note"
+              placeholder=" "
+              (input)="autoResize($event)"
+              (focus)="autoResize($event)"
+              (blur)="onTextBlur(p, $event)">
+            </textarea>
+          </td>
+
+          <!--<td class="text-cell">-->
+            <!--<textarea-->
+              <!--rows="1"-->
+              <!--[ngModel]="p.data.note"-->
+              <!--(input)="autoResize($event)"-->
+              <!--(focus)="autoResize($event)"-->
+              <!--(blur)="collapse($event)"-->
+              <!--(change)="onTextChange(p, $event.target.value)"-->
+              <!--placeholder=" ">-->
+            <!--</textarea>-->
+          <!--</td>-->
+
+          <!--<td class="text-cell">-->
+            <!--<input-->
+              <!--type="text"-->
+              <!--[ngModel]="p.data.note"-->
+              <!--(change)="onTextChange(p, $event.target.value)"-->
+              <!--placeholder="">-->
+          <!--</td>-->
+
+
           <!--<td>{{ p.data.imgscale }}</td>-->
         </tr>
       </tbody>
     </table>
   </div>
 
-  <!--<div class="table-wrapper">-->
-    <!--<div class="table-container">-->
-      <!--<table>-->
-        <!--<thead>-->
-          <!--<tr>-->
-            <!--<th (click)="sortData('data.date')">ERP</th>-->
-            <!--<th (click)="sortData('data.date')">Fecha V</th>-->
-            <!--<th (click)="sortData('isotanq_name')">Isotanq</th>-->
-            <!--<th (click)="sortData('data.ticket')">Ticket</th>-->
-            <!--<th class="link"></th>-->
-            <!--<th (click)="sortData('data.kg')"><span style="font-size:x-small;" >{{totalKg | number:'1.0-2' }} kg </span></th>-->
-            <!--<th (click)="sortData('data.price')">Price</th>-->
-            <!--<th (click)="sortData('data.psi')">PSI</th>-->
-            <!--<th (click)="sortData('data.rotogate')">Rotogate</th>-->
-            <!--<th class="link">Seal</th>-->
-            <!--<th (click)="sortData('data.datein')">Fe ing M</th>-->
-            <!--<th (click)="sortData('data.deliveryin')">Rem vacío</th>-->
-            <!--<th class="link"></th>-->
-            <!--<th (click)="sortData('data.tripin')">Trip In</th>-->
-            <!--<th (click)="sortData('shipin_name')">Ship In</th>-->
-            <!--<th (click)="sortData('data.dateout')">Date Out</th>-->
-            <!--<th (click)="sortData('data.deliveryout')">Rem M LL</th>-->
-            <!--<th class="link"></th>-->
-            <!--<th (click)="sortData('data.tripout')">Trip Out</th>-->
-            <!--<th (click)="sortData('shipout_name')">Ship Out</th>-->
-            <!--<th (click)="sortData('diff')">Diff</th>-->
-            <!--<th (click)="sortData('data.wgross')">Wgross</th>-->
-            <!--<th (click)="sortData('data.wtare')">Wtare</th>-->
-            <!--<th (click)="sortData('data.wnet')">Wnet</th>-->
-            <!--<th (click)="sortData('data.wticket')">WTicket</th>-->
-            <!--<th></th>-->
-          <!--</tr>-->
-        <!--</thead>-->
-        <!--<tbody>-->
-            <!--<tr *ngFor="let item of filteredList; trackBy: trackById" [ngClass]="{ 'row-erp': item.state === 'erp' }">-->
-            <!--<td>-->
-              <!--<ion-toggle-->
-                <!--[checked]="item.state === 'erp'"-->
-                <!--(ionChange)="toggleState(item, $event)">-->
-              <!--</ion-toggle>-->
-            <!--</td>-->
-            <!--<td>{{ item.data.date | date:'dd/MM/yyyy' }}</td>-->
-            <!--<td-->
-              <!--[style.background]="ccoMap[+item.data.name]?.color || '#eee'"-->
-              <!--(click)="copyToClipboard(ccoMap[+item.data.name]?.name)"-->
-            <!-->-->
-              <!--{{ ccoMap[+item.data.name]?.name || 'N/A' }}-->
-            <!--</td>-->
-            <!--<td>{{ item.data.ticket }}</td>-->
-            <!--<td>-->
-              <!--<a *ngIf="item.data.img" [href]="item.data.img" target="_blank">Ver</a>-->
-            <!--</td>-->
-            <!--<td>{{ item.data.kg }}</td>-->
-            <!--<td>{{ item.data.price }}</td>-->
-            <!--<td [ngClass]="{-->
-              <!--'low': item.data.psi < 100,-->
-              <!--'ok': item.data.psi >= 100-->
-            <!--}">-->
-              <!--{{ item.data.psi }}-->
-            <!--</td>-->
-            <!--<td>{{ item.data.rotogate }}</td>-->
-            <!--<td>-->
-              <!--{{ item.data.seal?.join(', ') }}-->
-            <!--</td>-->
-            <!--<td>{{ item.data.datein | date:'dd/MM/yyyy' }}</td>-->
-            <!--<td>{{ item.data.deliveryin }}</td>-->
-            <!--<td>-->
-              <!--<a *ngIf="item.data.imgin" [href]="item.data.imgin" target="_blank">Ver</a>-->
-            <!--</td>-->
-            <!--<td>{{ item.data.tripin }}</td>-->
-            <!--<td>{{ shipMap[item.data.shipin]?.name || 'N/A' }}</td>-->
-            <!--<td>{{ item.data.dateout | date:'dd/MM/yyyy' }}</td>-->
-            <!--<td>{{ item.data.deliveryout }}</td>-->
-            <!--<td>-->
-              <!--<a *ngIf="item.data.imgout" [href]="item.data.imgout" target="_blank">Ver</a>-->
-            <!--</td>-->
-            <!--<td>{{ item.data.tripout }}</td>-->
-            <!--<td>{{ shipMap[item.data.shipout]?.name || 'N/A' }}</td>-->
-            <!--<td *ngIf="item.data.diff!=0">{{ item.data.diff }}</td>-->
-            <!--<td *ngIf="item.data.diff==0"></td>-->
-            <!--<td>{{ item.data.wgross | number }}</td>-->
-            <!--<td>{{ item.data.wtare | number }}</td>-->
-            <!--<td>{{ item.data.wnet | number }}</td>-->
-            <!--<td>{{ item.data.wticket }}</td>-->
-            <!--<td>-->
-              <!--<a *ngIf="item.data.imgscale" [href]="item.data.imgscale" target="_blank">Ver</a>-->
-            <!--</td>           -->
-          <!--</tr>-->
-        <!--</tbody>-->
-      <!--</table>-->
-    <!--</div>-->
-  <!--</div>-->
-
-
-
   <div class="kg-total">
     <h6>Total kilos retirados: {{ totalKg }}</h6>
   </div>
 
-
-
-  <!--<div>-->
-    <!--<ion-button (click)="exportToExcel()" size="small">-->
-      <!--Exportar Excell-->
-    <!--</ion-button>-->
-  <!--</div>-->
 </ion-content>
 

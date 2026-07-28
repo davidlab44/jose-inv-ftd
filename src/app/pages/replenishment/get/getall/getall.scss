@@ -473,3 +473,106 @@ ion-button {
     color: #585858;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.color-cell input[type="color"] {
+  width: 15px;
+  height: 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  background: transparent;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.text-cell textarea {
+
+  width: 18px;
+  min-width: 18px;
+  max-width: 100px;
+
+  min-height: 22px;
+  height: 22px;
+
+  resize: none;
+  overflow: hidden;
+
+  padding: 2px 4px;
+  box-sizing: border-box;
+
+  transition: width .15s ease;
+
+  font: inherit;
+  line-height: 18px;
+}
+
+.text-cell textarea:focus,
+.text-cell textarea:not(:placeholder-shown) {
+  width: 100px;
+}
+
+/*.text-cell input[type="text"] {*/
+  /*width: 18px;*/
+  /*min-width: 18px;*/
+  /*max-width: 100px;*/
+
+  /*padding: 2px 4px;*/
+  /*transition: width .15s ease;*/
+  /*box-sizing: border-box;*/
+/*}*/
+
+/*.text-cell input[type="text"]:focus,*/
+/*.text-cell input[type="text"]:not(:placeholder-shown) {*/
+  /*width: 100px;*/
+/*}*/
+
+
+
+
+
+

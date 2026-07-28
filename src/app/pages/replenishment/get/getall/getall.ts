@@ -98,7 +98,6 @@ export class GetallPage implements OnInit {
   ) {}
 
 
-
 ionViewWillLeave() {
     this.menu.enable(true);
 }
@@ -482,20 +481,20 @@ ionViewWillLeave() {
         console.error('Error al copiar:',err);
       });
   }
-  patch(withdrawn:any,page:any) {
-    console.log('item to patch',withdrawn);
-    console.log('ruta',page);
-    const pageRoute='/app/tabs/replenishment-'+page+'-patch';
-    console.log('pageRoute',pageRoute);
-    this.router.navigate(
-      [pageRoute],
-      {
-        state:{
-          item:withdrawn
-        }
-      }
-    );
-  }
+/*  patch(withdrawn:any,page:any) {*/
+    /*console.log('item to patch',withdrawn);*/
+    /*console.log('ruta',page);*/
+    /*const pageRoute='/app/tabs/replenishment-'+page+'-patch';*/
+    /*console.log('pageRoute',pageRoute);*/
+    /*this.router.navigate(*/
+      /*[pageRoute],*/
+      /*{*/
+        /*state:{*/
+          /*item:withdrawn*/
+        /*}*/
+      /*}*/
+    /*);*/
+  /*}*/
 
   shipInName(p){}
   shipOutName(p){}
@@ -512,6 +511,71 @@ ionViewWillLeave() {
     this.location.back();
   }
 
+
+onColorPickerOpen(item: any, color: string): void {
+  console.log('onColorPickerOpen');
+  console.log('item:', item);
+  console.log('color:', color);
+}
+
+onColorChange(item: any, color: string): void {
+  console.log('onColorChange');
+  console.log('item:', item);
+  console.log('color:', color);
+  item.data.color=color;
+  this.patchItem(item)
+}
+
+
+ 
+  patchItem(item:any) {
+    console.log("item to patch",item)
+    this.withdrawnService.patch(item.id,item.data).subscribe({
+      next: (response) => {
+        console.log("Withdrawn patch response", response);
+        //this.utilService.presentToast("registro actualizado exitosamente","success",1000);
+      },
+      error: (err) => {
+        console.error("Withdrawn patch error", err);
+      }
+    });
+  }
+
+  /** Ajusta automáticamente la altura del textarea,  mientras el usuario escribe. */
+  autoResize(event: Event): void {
+    const textarea = event.target as HTMLTextAreaElement;
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  }
+
+  /**
+   * Se ejecuta cuando el usuario termina de editar.
+   * Contrae nuevamente el textarea.
+   * Normaliza el texto.
+   * Actualiza el modelo.
+   * Guarda en PostgreSQL.
+   */
+  onTextBlur(item: any, event: Event): void {
+    const textarea = event.target as HTMLTextAreaElement;
+    // Volver a una sola línea visual
+    textarea.style.height = '';
+    // Normalizar
+    const normalized = this.normalizeText(textarea.value);
+    // Actualizar modelo
+    item.data.note = normalized;
+    console.log("Item:", item);
+    console.log("Texto normalizado:", normalized);
+    this.patchItem(item);
+  }
+
+  /** Normaliza el texto antes de almacenarlo. */
+  private normalizeText(text: string): string {
+    return text
+      .normalize("NFC")
+      .trim()
+      .replace(/\s+/g, " ")
+      .replace(/[^\w\s\-./]/g, "");
+  }
 
 
 }
