@@ -75,7 +75,8 @@ export class PatchPage {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state?.item) {
       this.movement = navigation.extras.state.item;
-      this.uploadedUrl = this.movement.data.img;
+      this.uploadedUrl=this.movement.data.img;
+      this.vendorDate=this.movement.data.date;
       //this.imported=this.movement.id_replenishment_product;
     } else {
       // Si recargaron la página, puedes cargar el item desde un servicio o API

@@ -143,7 +143,7 @@
           <!-- Trip In -->
           <td>{{ p.data.tripin }}</td>
           <!-- Ship In -->
-          <td>{{ p.data.shipinName }}</td>
+          <td>{{ p.data.shipinName | slice:0:7 }}</td>
           <!-- Fecha -->
           <td>{{ p.data.date | date:'dd/MM/yyyy' }}</td>
           <!-- Isotanq -->
