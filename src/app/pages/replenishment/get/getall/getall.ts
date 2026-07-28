@@ -1,4 +1,6 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
+import { Location } from '@angular/common'; 
+import { MenuController } from '@ionic/angular';
 import { ConferenceData } from '../../../../providers/conference-data';
 import { UserData } from '../../../../providers/user-data';
 import { OpportunityService } from '../../../../services/opportunity.service';
@@ -91,13 +93,23 @@ export class GetallPage implements OnInit {
     private withdrawnService:WithdrawnService,
     private ccoService:CcoService,
     private shipService:ShipService,
+    private menu: MenuController,
+    private location: Location
   ) {}
+
+
+
+ionViewWillLeave() {
+    this.menu.enable(true);
+}
+
   ngOnInit() {
     this.initCurrentMonthRange();
     this.loadShips();
     this.loadCcos();
   }
   ionViewWillEnter() {
+    this.menu.enable(false);
     this.getAll();
   }
   loadCcos() {
@@ -495,5 +507,11 @@ export class GetallPage implements OnInit {
     }
     window.open(url, '_blank', 'noopener,noreferrer');
   }
+
+  goBack() {
+    this.location.back();
+  }
+
+
 
 }

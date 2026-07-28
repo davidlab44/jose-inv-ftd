@@ -279,8 +279,12 @@ export class AppComponent implements OnInit {
     this.checkForUpdates();
     console.log("constructor")
     this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe((event: any) => {
+ 
+    console.log("event url",event.url);
+    console.log("urlAfterRedirects",event.urlAfterRedirects);
+
       if (event.url === '/app/tabs/replenishment-get-getall') {
-        this.showMenu = false; // 🔥 ocultar menú
+        this.showMenu = false; //  ocultar menú
       } else {
         this.showMenu = true;
       }
