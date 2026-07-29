@@ -323,10 +323,7 @@ export class PatchPage {
   patch() {
     this.updateMovementFromForm();
     this.movement.data.imgout = this.uploadedUrl;
-    const payload = {
-      ...this.movement.data,
-      shipout: 3 
-    };
+    const payload = { ...this.movement.data,shipout: 3  };
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
@@ -338,7 +335,7 @@ export class PatchPage {
           return;
         }
         console.log('twin id es:',twinId);
-        this.movement2.data.imgscale = this.uploadedUrl;
+        this.movement2.data.imgout = this.uploadedUrl;
         this.movement2.data.dateout = this.movement.data.dateout;
         this.movement2.data.deliveryout = this.movement.data.deliveryout;
         this.movement2.data.tripout = this.movement.data.tripout;

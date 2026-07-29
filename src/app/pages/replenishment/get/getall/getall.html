@@ -1,20 +1,15 @@
-
-
 <ion-header translucent="true">
   <ion-toolbar>
-
     <!-- Botón personalizado (NO ion-menu-button) -->
     <ion-buttons slot="start">
       <ion-button fill="clear" (click)="goBack()">
         <ion-icon slot="icon-only" name="menu"></ion-icon>
       </ion-button>
     </ion-buttons>
-
     <ion-searchbar
       placeholder="Buscar"
       (ionInput)="onSearch($event.target.value)">
     </ion-searchbar>
-
     <ion-buttons slot="end">
       <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
         <span *ngIf="ios">Filter</span>
@@ -23,13 +18,10 @@
         </span>
       </ion-button>
     </ion-buttons>
-
   </ion-toolbar>
 </ion-header>
 
-
 <ion-content>
-
   <ion-item class="range-container" lines="none">
     <div class="date-boxes">
       <div class="date-box">
@@ -194,76 +186,6 @@
           </tr>
         </ng-container>
       </tbody>
-
-      <!--      <tbody>-->
-        <!--<tr-->
-          <!--*ngFor="let p of fullWithdrawnList"-->
-          <!--[ngClass]="{ 'row-erp': p.state === 'erp' }"-->
-          <!--[style.background-color]="p.data.color || '#d5d5d5'">-->
-          <!--<td class="color-cell">-->
-            <!--<input-->
-              <!--type="color"-->
-              <!--[(ngModel)]="p.data.color"-->
-              <!--(click)="onColorPickerOpen(p, p.data.color)"-->
-              <!--(change)="onColorChange(p, $event.target.value)">-->
-          <!--</td>-->
-          <!--<td>{{ p.data.datein | date:'dd/MM/yyyy' }}</td>-->
-          <!--<td>{{ p.data.deliveryin }}</td>-->
-          <!--<td class="icon-cell">-->
-            <!--<ion-button *ngIf="p.data.imgin" fill="clear" size="small" (click)="openLink(p.data.imgin)">-->
-              <!--<ion-icon name="open-outline"></ion-icon>-->
-            <!--</ion-button>-->
-          <!--</td>-->
-          <!--<td>{{ p.data.tripin }}</td>-->
-          <!--<td>{{ p.data.shipinName | slice:0:7 }}</td>-->
-          <!--<td>{{ p.data.date | date:'dd/MM/yyyy' }}</td>-->
-          <!--<td-->
-            <!--[style.background]="ccoMap[+p.data.name]?.color || '#eee'"-->
-            <!--(click)="discoverTwins(p)">-->
-            <!--{{ ccoMap[+p.data.name]?.name || 'N/A' }}-->
-          <!--</td>-->
-          <!--<td>{{ p.data.ticket }}</td>-->
-          <!--<td class="icon-cell">-->
-            <!--<ion-button *ngIf="p.data.img" fill="clear" size="small" (click)="openLink(p.data.img)">-->
-              <!--<ion-icon name="open-outline"></ion-icon>-->
-            <!--</ion-button>-->
-          <!--</td>-->
-          <!--<td>{{ p.data.kg }}</td>-->
-          <!--<td>{{ p.data.price }}</td>-->
-          <!--<td>{{ p.data.psi }}</td>-->
-          <!--<td>{{ p.data.rotogate }}</td>-->
-          <!--<td>{{ p.data.seal?.join(', ') }}</td>-->
-          <!--<td>{{ p.data.dateout | date:'dd/MM/yyyy' }}</td>-->
-          <!--<td>{{ p.data.deliveryout }}</td>-->
-          <!--<td class="icon-cell">-->
-            <!--<ion-button *ngIf="p.data.imgout" fill="clear" size="small" (click)="openLink(p.data.imgout)">-->
-              <!--<ion-icon name="open-outline"></ion-icon>-->
-            <!--</ion-button>-->
-          <!--</td>-->
-          <!--<td>{{ p.data.tripout }}</td>-->
-          <!--<td>{{ p.data.shipoutName }}</td>-->
-          <!--<td>{{ p.data.diff }}</td>-->
-          <!--<td>{{ p.data.wgross }}</td>-->
-          <!--<td>{{ p.data.wtare }}</td>-->
-          <!--<td>{{ p.data.wnet }}</td>-->
-          <!--<td>{{ p.data.wticket }}</td>-->
-          <!--<td class="icon-cell">-->
-            <!--<ion-button *ngIf="p.data.imgscale" fill="clear" size="small" (click)="openLink(p.data.imgscale)">-->
-              <!--<ion-icon name="open-outline"></ion-icon>-->
-            <!--</ion-button>-->
-          <!--</td>-->
-          <!--<td class="text-cell">-->
-            <!--<textarea-->
-              <!--rows="1"-->
-              <!--[ngModel]="p.data.note"-->
-              <!--placeholder=" "-->
-              <!--(input)="autoResize($event)"-->
-              <!--(focus)="autoResize($event)"-->
-              <!--(blur)="onTextBlur(p, $event)">-->
-            <!--</textarea>-->
-          <!--</td>-->
-        <!--</tr>-->
-      <!--</tbody>-->
     </table>
   </div>
 
