@@ -32,8 +32,6 @@
 
   <ion-item class="range-container" lines="none">
     <div class="date-boxes">
-
-      <!-- START -->
       <div class="date-box">
         <div class="controls tight">
           <ion-button fill="clear" class="nav-btn" (click)="changeStartDay(-1)">
@@ -45,8 +43,6 @@
           </ion-button>
         </div>
       </div>
-
-      <!-- END -->
       <div class="date-box">
         <div class="controls tight">
           <ion-button fill="clear" class="nav-btn" (click)="changeEndDay(-1)">
@@ -60,7 +56,6 @@
       </div>
     </div>
   </ion-item>
-
   <ion-segment (ionChange)="quickRange($event)">
     <ion-segment-button style="font-size:xx-small"  value="month">30 días</ion-segment-button>
     <ion-segment-button style="font-size:xx-small"  value="week">7 días</ion-segment-button>
@@ -80,8 +75,6 @@
     </ion-range>
   </ion-item>
   <br>
-  
-
   <div class="withdrawn-table-container">
     <table class="withdrawn-table">
       <thead>
@@ -115,135 +108,162 @@
           <th></th>
         </tr>
       </thead>
-
       <tbody>
-        <tr
-          *ngFor="let p of fullWithdrawnList"
-          [ngClass]="{ 'row-erp': p.state === 'erp' }"
-          [style.background-color]="p.data.color || '#d5d5d5'">
+        <ng-container *ngFor="let p of fullWithdrawnList">
+          <tr
+            [ngClass]="{ 'row-erp': p.state === 'erp' }"
+            [style.background-color]="p.data.color || '#d5d5d5'">
+            <td class="color-cell">
+              <input
+                type="color"
+                [(ngModel)]="p.data.color"
+                (click)="onColorPickerOpen(p, p.data.color)"
+                (change)="onColorChange(p, $event.target.value)">
+            </td>
+            <td>{{ p.data.datein | date:'dd/MM/yyyy' }}</td>
+            <td>{{ p.data.deliveryin }}</td>
+            <td class="icon-cell">
+              <ion-button
+                *ngIf="p.data.imgin"
+                fill="clear"
+                size="small"
+                (click)="openLink(p.data.imgin)">
+                <ion-icon name="open-outline"></ion-icon>
+              </ion-button>
+            </td>
+            <td>{{ p.data.tripin }}</td>
+            <td>{{ p.data.shipinName | slice:0:7 }}</td>
+            <td>{{ p.data.date | date:'dd/MM/yyyy' }}</td>
+            <td
+              [style.background]="ccoMap[+p.data.name]?.color || '#eee'"
+              (click)="discoverTwins(p)">
+              {{ ccoMap[+p.data.name]?.name || 'N/A' }}
+            </td>
+            <td>{{ p.data.ticket }}</td>
+            <td class="icon-cell">
+              <ion-button
+                *ngIf="p.data.img"
+                fill="clear"
+                size="small"
+                (click)="openLink(p.data.img)">
+                <ion-icon name="open-outline"></ion-icon>
+              </ion-button>
+            </td>
+            <td>{{ p.data.kg }}</td>
+            <td>{{ p.data.price }}</td>
+            <td>{{ p.data.psi }}</td>
+            <td>{{ p.data.rotogate }}</td>
+            <td>{{ p.data.seal?.join(', ') }}</td>
+            <td>{{ p.data.dateout | date:'dd/MM/yyyy' }}</td>
+            <td>{{ p.data.deliveryout }}</td>
+            <td class="icon-cell">
+              <ion-button
+                *ngIf="p.data.imgout"
+                fill="clear"
+                size="small"
+                (click)="openLink(p.data.imgout)">
+                <ion-icon name="open-outline"></ion-icon>
+              </ion-button>
+            </td>
+            <td>{{ p.data.tripout }}</td>
+            <td>{{ p.data.shipoutName }}</td>
+            <td>{{ p.data.diff }}</td>
+            <td>{{ p.data.wgross }}</td>
+            <td>{{ p.data.wtare }}</td>
+            <td>{{ p.data.wnet }}</td>
+            <!-- WTicket -->
+            <td>{{ p.data.wticket }}</td>
+            <td class="icon-cell">
+              <ion-button *ngIf="p.data.imgscale" fill="clear" size="small" (click)="openLink(p.data.imgscale)">
+                <ion-icon name="open-outline"></ion-icon>
+              </ion-button>
+            </td>
+            <td class="text-cell">
+              <textarea
+                rows="1"
+                [ngModel]="p.data.note"
+                placeholder=" "
+                (input)="autoResize($event)"
+                (focus)="autoResize($event)"
+                (blur)="onTextBlur(p, $event)">
+              </textarea>
+            </td>
+          </tr>
+          <tr *ngIf="p.showSeparator" class="movement-separator">
+            <td colspan="27"></td>
+          </tr>
+        </ng-container>
+      </tbody>
 
-          <!--Color picker  -->
-          <td class="color-cell">
-            <input
-              type="color"
-              [(ngModel)]="p.data.color"
-              (click)="onColorPickerOpen(p, p.data.color)"
-              (change)="onColorChange(p, $event.target.value)">
-          </td>
-
-          <!-- Fecha Ing -->
-          <td>{{ p.data.datein | date:'dd/MM/yyyy' }}</td>
-          <!-- Rem vacío -->
-          <td>{{ p.data.deliveryin }}</td>
-          <td class="icon-cell">
-            <ion-button *ngIf="p.data.imgin" fill="clear" size="small" (click)="openLink(p.data.imgin)">
-              <ion-icon name="open-outline"></ion-icon>
-            </ion-button>
-          </td>
-          <!-- Trip In -->
-          <td>{{ p.data.tripin }}</td>
-          <!-- Ship In -->
-          <td>{{ p.data.shipinName | slice:0:7 }}</td>
-          <!-- Fecha -->
-          <td>{{ p.data.date | date:'dd/MM/yyyy' }}</td>
-          <!-- Isotanq -->
-          <td
-            [style.background]="ccoMap[+p.data.name]?.color || '#eee'"
-            (click)="discoverTwins(p)">
-            {{ ccoMap[+p.data.name]?.name || 'N/A' }}
-          </td>
-          <!-- Ticket -->
-          <td>{{ p.data.ticket }}</td>
-          <!-- Img -->
-          <td class="icon-cell">
-            <ion-button *ngIf="p.data.img" fill="clear" size="small" (click)="openLink(p.data.img)">
-              <ion-icon name="open-outline"></ion-icon>
-            </ion-button>
-          </td>
-          <!-- Kg -->
-          <td>{{ p.data.kg }}</td>
-          <!-- Precio -->
-          <td>{{ p.data.price }}</td>
-          <!-- PSI -->
-          <td>{{ p.data.psi }}</td>
-          <!-- Rotogate -->
-          <td>{{ p.data.rotogate }}</td>
-          <!-- Sellos -->
-          <td>{{ p.data.seal?.join(', ') }}</td>
-          <!-- Date Out -->
-          <td>{{ p.data.dateout | date:'dd/MM/yyyy' }}</td>
-          <!-- Rem M LL -->
-          <td>{{ p.data.deliveryout }}</td>
-          <!-- Img Out -->
-
-
-          <td class="icon-cell">
-            <ion-button *ngIf="p.data.imgout" fill="clear" size="small" (click)="openLink(p.data.imgout)">
-              <ion-icon name="open-outline"></ion-icon>
-            </ion-button>
-          </td>
-
-
-
-          <!--<td>{{ p.data.imgout }}</td>-->
-          <!-- Trip Out -->
-          <td>{{ p.data.tripout }}</td>
-          <!-- Ship Out -->
-          <td>{{ p.data.shipoutName }}</td>
-          <!-- Diff -->
-          <td>{{ p.data.diff }}</td>
-          <!-- Wgross -->
-          <td>{{ p.data.wgross }}</td>
-          <!-- Wtare -->
-          <td>{{ p.data.wtare }}</td>
-          <!-- Wnet -->
-          <td>{{ p.data.wnet }}</td>
-          <!-- WTicket -->
-          <td>{{ p.data.wticket }}</td>
-          <!-- Img Scale -->
-
-          <td class="icon-cell">
-            <ion-button *ngIf="p.data.imgscale" fill="clear" size="small" (click)="openLink(p.data.imgscale)">
-              <ion-icon name="open-outline"></ion-icon>
-            </ion-button>
-          </td>
-
-
-          <td class="text-cell">
-            <textarea
-              rows="1"
-              [ngModel]="p.data.note"
-              placeholder=" "
-              (input)="autoResize($event)"
-              (focus)="autoResize($event)"
-              (blur)="onTextBlur(p, $event)">
-            </textarea>
-          </td>
-
+      <!--      <tbody>-->
+        <!--<tr-->
+          <!--*ngFor="let p of fullWithdrawnList"-->
+          <!--[ngClass]="{ 'row-erp': p.state === 'erp' }"-->
+          <!--[style.background-color]="p.data.color || '#d5d5d5'">-->
+          <!--<td class="color-cell">-->
+            <!--<input-->
+              <!--type="color"-->
+              <!--[(ngModel)]="p.data.color"-->
+              <!--(click)="onColorPickerOpen(p, p.data.color)"-->
+              <!--(change)="onColorChange(p, $event.target.value)">-->
+          <!--</td>-->
+          <!--<td>{{ p.data.datein | date:'dd/MM/yyyy' }}</td>-->
+          <!--<td>{{ p.data.deliveryin }}</td>-->
+          <!--<td class="icon-cell">-->
+            <!--<ion-button *ngIf="p.data.imgin" fill="clear" size="small" (click)="openLink(p.data.imgin)">-->
+              <!--<ion-icon name="open-outline"></ion-icon>-->
+            <!--</ion-button>-->
+          <!--</td>-->
+          <!--<td>{{ p.data.tripin }}</td>-->
+          <!--<td>{{ p.data.shipinName | slice:0:7 }}</td>-->
+          <!--<td>{{ p.data.date | date:'dd/MM/yyyy' }}</td>-->
+          <!--<td-->
+            <!--[style.background]="ccoMap[+p.data.name]?.color || '#eee'"-->
+            <!--(click)="discoverTwins(p)">-->
+            <!--{{ ccoMap[+p.data.name]?.name || 'N/A' }}-->
+          <!--</td>-->
+          <!--<td>{{ p.data.ticket }}</td>-->
+          <!--<td class="icon-cell">-->
+            <!--<ion-button *ngIf="p.data.img" fill="clear" size="small" (click)="openLink(p.data.img)">-->
+              <!--<ion-icon name="open-outline"></ion-icon>-->
+            <!--</ion-button>-->
+          <!--</td>-->
+          <!--<td>{{ p.data.kg }}</td>-->
+          <!--<td>{{ p.data.price }}</td>-->
+          <!--<td>{{ p.data.psi }}</td>-->
+          <!--<td>{{ p.data.rotogate }}</td>-->
+          <!--<td>{{ p.data.seal?.join(', ') }}</td>-->
+          <!--<td>{{ p.data.dateout | date:'dd/MM/yyyy' }}</td>-->
+          <!--<td>{{ p.data.deliveryout }}</td>-->
+          <!--<td class="icon-cell">-->
+            <!--<ion-button *ngIf="p.data.imgout" fill="clear" size="small" (click)="openLink(p.data.imgout)">-->
+              <!--<ion-icon name="open-outline"></ion-icon>-->
+            <!--</ion-button>-->
+          <!--</td>-->
+          <!--<td>{{ p.data.tripout }}</td>-->
+          <!--<td>{{ p.data.shipoutName }}</td>-->
+          <!--<td>{{ p.data.diff }}</td>-->
+          <!--<td>{{ p.data.wgross }}</td>-->
+          <!--<td>{{ p.data.wtare }}</td>-->
+          <!--<td>{{ p.data.wnet }}</td>-->
+          <!--<td>{{ p.data.wticket }}</td>-->
+          <!--<td class="icon-cell">-->
+            <!--<ion-button *ngIf="p.data.imgscale" fill="clear" size="small" (click)="openLink(p.data.imgscale)">-->
+              <!--<ion-icon name="open-outline"></ion-icon>-->
+            <!--</ion-button>-->
+          <!--</td>-->
           <!--<td class="text-cell">-->
             <!--<textarea-->
               <!--rows="1"-->
               <!--[ngModel]="p.data.note"-->
+              <!--placeholder=" "-->
               <!--(input)="autoResize($event)"-->
               <!--(focus)="autoResize($event)"-->
-              <!--(blur)="collapse($event)"-->
-              <!--(change)="onTextChange(p, $event.target.value)"-->
-              <!--placeholder=" ">-->
+              <!--(blur)="onTextBlur(p, $event)">-->
             <!--</textarea>-->
           <!--</td>-->
-
-          <!--<td class="text-cell">-->
-            <!--<input-->
-              <!--type="text"-->
-              <!--[ngModel]="p.data.note"-->
-              <!--(change)="onTextChange(p, $event.target.value)"-->
-              <!--placeholder="">-->
-          <!--</td>-->
-
-
-          <!--<td>{{ p.data.imgscale }}</td>-->
-        </tr>
-      </tbody>
+        <!--</tr>-->
+      <!--</tbody>-->
     </table>
   </div>
 

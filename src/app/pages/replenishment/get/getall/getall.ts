@@ -147,54 +147,153 @@ ionViewWillLeave() {
         }
       });
   }
-  sortWithdrawnByDateAndSum(withdrawnList:any[]):any[] {
-    let total=0;
-    let totalOpc=0;
-    let totalImportado=0;
-    const map=new Map<string,any>();
-    for(let i=0;i<withdrawnList.length;i++) {
-      const item=withdrawnList[i];
-      const data=item.data;
-      if(!item.data)
-        item.data={};
-      item.data.diff=0;
-      const kg=Number(data?.kg)||0;
-      total+=kg;
-      if(data?.id_replenishment_product===1)
-        totalOpc+=kg;
-      else if(data?.id_replenishment_product===2)
-        totalImportado+=kg;
-      const wticket=data?.wticket;
-      if(wticket!==undefined&&Number(data?.wnet)>0&&Number(data?.wgross)>0&&Number(data?.wtare)>0){
-        const key=String(wticket);
-        if(map.has(key)) {
-          const other=map.get(key);
-          const match=
-            Number(other.data?.wnet)===Number(data?.wnet) &&
-            Number(other.data?.wgross)===Number(data?.wgross) &&
-            Number(other.data?.wtare)===Number(data?.wtare);
-          if(match) {
-            const diff=
-              (Number(other.data?.kg)||0)+
-              (Number(data?.kg)||0)-
-              Number(data?.wnet);
-            item.data={ ...item.data,diff };
-            other.data={ ...other.data,diff };
-          }
-        } else {
-          map.set(key,item);
+
+
+sortWithdrawnByDateAndSum(withdrawnList: any[]): any[] {
+
+  let total = 0;
+  let totalOpc = 0;
+  let totalImportado = 0;
+
+  const map = new Map<string, any>();
+
+  for (let i = 0; i < withdrawnList.length; i++) {
+
+    const item = withdrawnList[i];
+    const data = item.data;
+
+    if (!item.data)
+      item.data = {};
+
+    item.data.diff = 0;
+
+    const kg = Number(data?.kg) || 0;
+
+    total += kg;
+
+    if (data?.id_replenishment_product === 1)
+      totalOpc += kg;
+    else if (data?.id_replenishment_product === 2)
+      totalImportado += kg;
+
+    const wticket = data?.wticket;
+
+    if (
+      wticket !== undefined &&
+      Number(data?.wnet) > 0 &&
+      Number(data?.wgross) > 0 &&
+      Number(data?.wtare) > 0
+    ) {
+
+      const key = String(wticket);
+
+      if (map.has(key)) {
+
+        const other = map.get(key);
+
+        const match =
+          Number(other.data?.wnet) === Number(data?.wnet) &&
+          Number(other.data?.wgross) === Number(data?.wgross) &&
+          Number(other.data?.wtare) === Number(data?.wtare);
+
+        if (match) {
+
+          const diff =
+            (Number(other.data?.kg) || 0) +
+            (Number(data?.kg) || 0) -
+            Number(data?.wnet);
+
+          item.data = { ...item.data, diff };
+          other.data = { ...other.data, diff };
+
         }
+
+      } else {
+
+        map.set(key, item);
+
       }
-      console.log('shipMap',this.shipMap)
-      data.shipoutName=this.shipMap[data.shipout]?.name ?? 'N/A';
-      data.shipinName=this.shipMap[data.shipin]?.name ?? 'N/A';
+
     }
-    withdrawnList.sort((a,b)=>a._ts-b._ts);
-    this.totalKg=total;
-    this.totalGlpOpc=totalOpc;
-    this.totalGlpImportado=totalImportado;
-    return withdrawnList;
+
+    data.shipoutName = this.shipMap[data.shipout]?.name ?? 'N/A';
+    data.shipinName  = this.shipMap[data.shipin]?.name  ?? 'N/A';
+
   }
+
+  withdrawnList.sort((a, b) => a._ts - b._ts);
+
+  // -------------------------------
+  // Marcar separadores de movimiento
+  // -------------------------------
+
+  for (let i = 0; i < withdrawnList.length; i++) {
+
+    const current = withdrawnList[i];
+    const next = withdrawnList[i + 1];
+
+    current.showSeparator =
+      !next ||
+      current.data.twin !== next.id;
+
+  }
+
+  this.totalKg = total;
+  this.totalGlpOpc = totalOpc;
+  this.totalGlpImportado = totalImportado;
+
+  return withdrawnList;
+
+}
+
+  /*sortWithdrawnByDateAndSum(withdrawnList:any[]):any[] {*/
+    /*let total=0;*/
+    /*let totalOpc=0;*/
+    /*let totalImportado=0;*/
+    /*const map=new Map<string,any>();*/
+    /*for(let i=0;i<withdrawnList.length;i++) {*/
+      /*const item=withdrawnList[i];*/
+      /*const data=item.data;*/
+      /*if(!item.data)*/
+        /*item.data={};*/
+      /*item.data.diff=0;*/
+      /*const kg=Number(data?.kg)||0;*/
+      /*total+=kg;*/
+      /*if(data?.id_replenishment_product===1)*/
+        /*totalOpc+=kg;*/
+      /*else if(data?.id_replenishment_product===2)*/
+        /*totalImportado+=kg;*/
+      /*const wticket=data?.wticket;*/
+      /*if(wticket!==undefined&&Number(data?.wnet)>0&&Number(data?.wgross)>0&&Number(data?.wtare)>0){*/
+        /*const key=String(wticket);*/
+        /*if(map.has(key)) {*/
+          /*const other=map.get(key);*/
+          /*const match=*/
+            /*Number(other.data?.wnet)===Number(data?.wnet) &&*/
+            /*Number(other.data?.wgross)===Number(data?.wgross) &&*/
+            /*Number(other.data?.wtare)===Number(data?.wtare);*/
+          /*if(match) {*/
+            /*const diff=*/
+              /*(Number(other.data?.kg)||0)+*/
+              /*(Number(data?.kg)||0)-*/
+              /*Number(data?.wnet);*/
+            /*item.data={ ...item.data,diff };*/
+            /*other.data={ ...other.data,diff };*/
+          /*}*/
+        /*} else {*/
+          /*map.set(key,item);*/
+        /*}*/
+      /*}*/
+      /*console.log('shipMap',this.shipMap)*/
+      /*data.shipoutName=this.shipMap[data.shipout]?.name ?? 'N/A';*/
+      /*data.shipinName=this.shipMap[data.shipin]?.name ?? 'N/A';*/
+    /*}*/
+    /*withdrawnList.sort((a,b)=>a._ts-b._ts);*/
+    /*this.totalKg=total;*/
+    /*this.totalGlpOpc=totalOpc;*/
+    /*this.totalGlpImportado=totalImportado;*/
+    /*return withdrawnList;*/
+  /*}*/
   trackByGroup(index:number,group:any):string {
     return group.refdate+'-'+index;
   }
