@@ -45,7 +45,7 @@ export class SchedulePage{
   exitList: any[] = [];
   queryText:any
   todayDate:any
-  barcodeRouted:any;
+  itemRouted:any;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -120,13 +120,13 @@ export class SchedulePage{
   const state = history.state;
 
   if (state?.item) {
-    this.barcodeRouted = state.item;
-    console.log('routed', this.barcodeRouted);
+    this.itemRouted = state.item;
+    console.log('item routed', this.itemRouted);
     if (
-      Number(this.barcodeRouted?.data?.barcode) &&
-      Number(this.barcodeRouted.data.barcode) > 0
+      Number(this.itemRouted?.data?.barcode) &&
+      Number(this.itemRouted.data.barcode) > 0
     ) {
-      this.getProductById(Number(this.barcodeRouted.data.barcode));
+      this.getProductById(Number(this.itemRouted.id));
     }
   }
     this.loadProdrex();
@@ -359,15 +359,16 @@ export class SchedulePage{
   }
 
   confirmAction() {
-    console.log('product to...',this.prdct);
+    console.log('product to patch',this.prdct);
     this.prdct.data.qty= this.prdct.data.qty-this.extraQty;
     //console.log('4product to update qty',this.prdct);
      this.productService.updateProductQty(this.prdct.id,this.prdct).subscribe({
       next: (r)=>{
         console.log('patchProduct qty response',r)
-        if(this.rgxService.isInteger(this.prdct.id)){this.utilService.presentToast('Producto no valido','danger');}
-        if(this.rgxService.isInteger(this.extraQty)){this.utilService.presentToast('Cantidad no valida','danger');}
-        if(this.rgxService.isInteger(this.prdct.id)){this.utilService.presentToast('Remisión no valida','danger');}
+        //if(this.rgxService.isInteger(this.prdct.id)){this.utilService.presentToast('Producto no valido','danger')}
+        //if(this.rgxService.isInteger(this.extraQty)){this.utilService.presentToast('Cantidad no valida','danger')}
+        console.log("Remisión no valida",this.prdct.id)
+        //if(this.rgxService.isInteger(this.prdct.id)){this.utilService.presentToast('Remisión no valida','danger')}
         this.prodrexService.addProdrexItem(this.prdct.id,this.extraQty,this.rexDocument[0].id).subscribe({
           next: (res) =>{
             console.log("res",res)
@@ -383,16 +384,16 @@ export class SchedulePage{
     });
   }
 
-  updateProductQty(productId:number,data:any){
-    this.productService.updateProductQty(productId, data).subscribe({
-      next: (res) => {
-        //console.log('Cantidad actualizada:', res);
-      },
-      error: (err) => {
-        console.error('Error al actualizar cantidad:', err);
-      }
-    });
-  }
+/*  updateProductQty(productId:number,data:any){*/
+    /*this.productService.updateProductQty(productId, data).subscribe({*/
+      /*next: (res) => {*/
+        /*//console.log('Cantidad actualizada:', res);*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error('Error al actualizar cantidad:', err);*/
+      /*}*/
+    /*});*/
+  /*}*/
 
   openReport(){
     this.router.navigate(['/app/tabs/prodrex']);
