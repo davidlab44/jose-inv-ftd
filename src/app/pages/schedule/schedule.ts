@@ -364,11 +364,10 @@ export class SchedulePage{
     //console.log('4product to update qty',this.prdct);
      this.productService.updateProductQty(this.prdct.id,this.prdct).subscribe({
       next: (r)=>{
-        console.log('patchProduct qty response',r)
-        //if(this.rgxService.isInteger(this.prdct.id)){this.utilService.presentToast('Producto no valido','danger')}
-        //if(this.rgxService.isInteger(this.extraQty)){this.utilService.presentToast('Cantidad no valida','danger')}
-        console.log("Remisión no valida",this.prdct.id)
-        //if(this.rgxService.isInteger(this.prdct.id)){this.utilService.presentToast('Remisión no valida','danger')}
+        console.log('patchProduct qty response',r) //parece que isInteger() esta alreves si algo revisalo 
+        if(this.rgxService.isInteger(this.prdct.id)){this.utilService.presentToast('Producto no valido','danger');}
+        if(this.rgxService.isInteger(this.extraQty)){this.utilService.presentToast('Cantidad no valida','danger');}
+        if(this.rgxService.isInteger(this.prdct.id)){this.utilService.presentToast('Remisión no valida','danger');}
         this.prodrexService.addProdrexItem(this.prdct.id,this.extraQty,this.rexDocument[0].id).subscribe({
           next: (res) =>{
             console.log("res",res)
