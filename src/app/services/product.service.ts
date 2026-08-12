@@ -10,7 +10,10 @@ import { BehaviorSubject, of } from 'rxjs';
 })
 export class ProductService {
 
-  private apiUrl = environment.apiHost; 
+  private apiUrl = environment.pimApiHost; 
+  private entity = "prdt"; 
+  //private apiUrl = environment.apiHost; 
+  //private pimApiUrl = environment.pimApiHost; 
   private cache: any[] | null = null;
   private storageKey = 'productos_cache';
 
@@ -34,7 +37,7 @@ export class ProductService {
 
   // 🔵 LLAMADA AL SERVIDOR (solo para Page A)
   refreshFromServer() {
-    return this.http.get<any[]>(`${this.apiUrl}/product`).pipe(
+    return this.http.get<any[]>(`${this.apiUrl}/${this.entity}`).pipe(
       tap(resp => {
         this.cache = resp;          // guarda en memoria
         this.saveToStorage(resp);   // guarda para sobrevivir F5
@@ -57,31 +60,31 @@ export class ProductService {
   }
 
    getAll(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/product`);
+    return this.http.get<any[]>(`${this.apiUrl}/${this.entity}`);
    }
   
    getAllProducts(limit = 20): Observable<any[]> {
-      return this.http.get<any[]>(`${this.apiUrl}/product?limit=${limit}`);
+      return this.http.get<any[]>(`${this.apiUrl}/${this.entity}?limit=${limit}`);
    }
 
   searchProducts(hash: string): Observable<any[]> {
     return this.http.get<any[]>(
-      `${this.apiUrl}/product?data->>name=ilike.*${hash}*&limit=20`
+      `${this.apiUrl}/${this.entity}?data->>name=ilike.*${hash}*&limit=20`
     );
   }
 
   getProductById(id: number): Observable<any> {
-    const url = `${this.apiUrl}/product?id=eq.${id}`;
+    const url = `${this.apiUrl}/${this.entity}?id=eq.${id}`;
     return this.http.get<any[]>(url);
   }
 
   getProductByBarcode(barcode: number): Observable<any> {
-    const url = `${this.apiUrl}/product?data->>barcode=eq.${barcode}&limit=1`;
+    const url = `${this.apiUrl}/${this.entity}?data->>barcode=eq.${barcode}&limit=1`;
     return this.http.get<any[]>(url);
   }
 
   post(data:any): Observable<any> {
-    const url = `${this.apiUrl}/product?select=*`;
+    const url = `${this.apiUrl}/${this.entity}?select=*`;
     const item = {
       data: data
     };
@@ -95,7 +98,7 @@ export class ProductService {
 
   updateProductQty(id: number, updatedProduct: any): Observable<any> {
     //console.log('request updateProductQty',updatedProduct);
-    const url = `${this.apiUrl}/product?id=eq.${id}`;
+    const url = `${this.apiUrl}/${this.entity}?id=eq.${id}`;
     const body = { data: updatedProduct.data };
     console.log('request url',url)
     console.log('request id',id)
@@ -106,7 +109,7 @@ export class ProductService {
   }
 
   patch(id: number, updatedElement: any): Observable<any> {
-    const url = `${this.apiUrl}/product?id=eq.${id}`;
+    const url = `${this.apiUrl}/${this.entity}?id=eq.${id}`;
     const body = {
       data: updatedElement
     };
@@ -120,7 +123,7 @@ export class ProductService {
   }
 
   delete(id: number): Observable<any> {
-    const url = `${this.apiUrl}/product?id=eq.${id}`;
+    const url = `${this.apiUrl}/${this.entity}?id=eq.${id}`;
     return this.http.delete(url, {
       headers: { 'Content-Type': 'application/json' }
     });

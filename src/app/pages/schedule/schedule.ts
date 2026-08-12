@@ -24,6 +24,7 @@ import { RexService } from '../../services/rex.service';
 import { ProdrexService } from '../../services/prodrex.service';
 import { Product, defaultProduct } from '../../interfaces/product';
 import { UserService} from '../../services/user.service';
+import { RgxService} from '../../services/local/frm/rgx.service';
 
 @Component({
   selector: 'page-schedule',
@@ -65,7 +66,8 @@ export class SchedulePage{
     private umService: UmService,     
     private prodrexService: ProdrexService,
     private rexService: RexService,
-    private userService:UserService
+    private userService:UserService,
+    private rgxService:RgxService
   ) {
     (window as any).productService=this.productService
   }
@@ -357,12 +359,15 @@ export class SchedulePage{
   }
 
   confirmAction() {
-    console.log('3product to update qty',this.prdct);
+    console.log('product to...',this.prdct);
     this.prdct.data.qty= this.prdct.data.qty-this.extraQty;
     //console.log('4product to update qty',this.prdct);
      this.productService.updateProductQty(this.prdct.id,this.prdct).subscribe({
       next: (r)=>{
         console.log('patchProduct qty response',r)
+        if(this.rgxService.isInteger(this.prdct.id)){this.utilService.presentToast('Producto no valido','danger');}
+        if(this.rgxService.isInteger(this.extraQty)){this.utilService.presentToast('Cantidad no valida','danger');}
+        if(this.rgxService.isInteger(this.prdct.id)){this.utilService.presentToast('Remisión no valida','danger');}
         this.prodrexService.addProdrexItem(this.prdct.id,this.extraQty,this.rexDocument[0].id).subscribe({
           next: (res) =>{
             console.log("res",res)

@@ -315,7 +315,7 @@ export class AssetSupplyPatchPage {
       return;
     }
 
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'inv');
 
     progress$.subscribe({
       next: (p) => this.uploadProgress = p,
@@ -349,7 +349,7 @@ export class AssetSupplyPatchPage {
       return;
     }
 
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'inv');
 
     progress$.subscribe(p => this.uploadProgress = p);
     url$.subscribe(url => {

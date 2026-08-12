@@ -95,7 +95,7 @@ export class PatchPage {
       sello2: [this.movement?.data.seal[1] ?? ''],
       sello3: [this.movement?.data.seal[2] ?? ''],
       kg: [this.movement?.data?.kg ?? ''],
-      rotogate: [this.movement?.data?.rotogate ?? 0], 
+      rotogage: [this.movement?.data?.rotogage ?? 0], 
       psi: [this.movement?.data?.psi ?? 0], 
       imported: [this.movement?.data?.id_replenishment_product ?? 0], 
       //price: [this.movement?.data?.price ?? 0], 
@@ -120,7 +120,7 @@ export class PatchPage {
       sello2: this.movement?.data?.seal?.[1] ?? '',
       sello3: this.movement?.data?.seal?.[2] ?? '',
       kg: this.movement?.data?.kg ?? '',
-      rotogate: this.movement?.data?.rotogate ?? 0,
+      rotogage: this.movement?.data?.rotogage ?? 0,
       psi: this.movement?.data?.psi ?? 0,
       imported: this.movement?.data?.id_replenishment_product ?? 0,
       //price: this.movement?.data?.price ?? 0
@@ -252,7 +252,7 @@ export class PatchPage {
       console.error('No se pudo obtener la imagen');
       return;
     }
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
     progress$.subscribe({
       next: (p) => this.uploadProgress = p,
       error: (err) => {
@@ -284,7 +284,7 @@ export class PatchPage {
       this.uploading = false;
       return;
     }
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
     progress$.subscribe(p => this.uploadProgress = p);
     url$.subscribe({
       next: (url) => {
@@ -320,7 +320,7 @@ export class PatchPage {
           kg: Number(res?.data?.kg ?? 0),
           ticket: res?.data?.ticket ?? 0,
           psi: Number(res?.data?.psi ?? 0),
-          rotogate: Number(res?.data?.rotogate ?? 0),
+          rotogage: Number(res?.data?.rotogage ?? 0),
           seal: seals
         };
         //actualizar form para que UI refleje los cambios
@@ -329,7 +329,7 @@ export class PatchPage {
           kg: Number(res?.data?.kg ?? 0),
           ticket: res?.data?.ticket ?? 0,
           psi: Number(res?.data?.psi ?? 0),
-          rotogate: Number(res?.data?.rotogate ?? 0),
+          rotogage: Number(res?.data?.rotogage ?? 0),
           sello1: seals[0] ?? '',
           sello2: seals[1] ?? '',
           sello3: seals[2] ?? ''
@@ -352,7 +352,7 @@ export class PatchPage {
       ticket: f.ticket,
       kg: Number(f.kg),
       psi: Number(f.psi),
-      rotogate: Number(f.rotogate),
+      rotogage: Number(f.rotogage),
       seal: [f.sello1, f.sello2, f.sello3].filter(Boolean)
     };
   }
@@ -394,28 +394,28 @@ export class PatchPage {
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
-        //this.utilService.presentToast("registro actualizado exitosamente","success",1000);
-          //this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
-          const twinId = Number(payload?.twin || 0);
-          if (twinId < 1) {
-            this.finishPatch();
-            return;
-          }
-          this.movement2.data.imgscale = this.uploadedUrl;
-          this.movement2.data.wticket = this.movement.data.wticket;
-          this.movement2.data.wgross = this.movement.data.wgross;
-          this.movement2.data.wnet = this.movement.data.wnet;
-          this.movement2.data.wtare = this.movement.data.wtare;
-          this.withdrawnService.patch(this.movement2.id, this.movement2.data).subscribe({
-            next: (response2) => {
-              console.log("Twin patch response", response2);
-              this.finishPatch();
-            },
-            error: (err) => {
-              console.error("Twin patch error", err);
-              this.utilService.presentToast("Error actualizando el movimiento twin", "danger", 1500);
-            }
-          });
+        this.utilService.presentToast("registro actualizado exitosamente","success",1000);
+          this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
+          /*const twinId = Number(payload?.twin || 0);*/
+          /*if (twinId < 1) {*/
+            /*this.finishPatch();*/
+            /*return;*/
+          /*}*/
+          /*this.movement2.data.imgscale = this.uploadedUrl;*/
+          /*this.movement2.data.wticket = this.movement.data.wticket;*/
+          /*this.movement2.data.wgross = this.movement.data.wgross;*/
+          /*this.movement2.data.wnet = this.movement.data.wnet;*/
+          /*this.movement2.data.wtare = this.movement.data.wtare;*/
+          /*this.withdrawnService.patch(this.movement2.id, this.movement2.data).subscribe({*/
+            /*next: (response2) => {*/
+              /*console.log("Twin patch response", response2);*/
+              /*this.finishPatch();*/
+            /*},*/
+            /*error: (err) => {*/
+              /*console.error("Twin patch error", err);*/
+              /*this.utilService.presentToast("Error actualizando el movimiento twin", "danger", 1500);*/
+            /*}*/
+          /*});*/
       },
       error: (err) => {
      console.error("Withdrawn patch error", err);

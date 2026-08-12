@@ -39,7 +39,7 @@ private s3: S3Client;
     return { bytes, mimeType };
   }
 
-  uploadBase64Image(base64: string): { progress$: Observable<number>, url$: Observable<string> } {
+  uploadBase64Image(base64: string,bucket:string): { progress$: Observable<number>, url$: Observable<string> } {
     const progressSubject = new BehaviorSubject<number>(0);
     const urlSubject = new BehaviorSubject<string>('');
     (async () => {
@@ -49,7 +49,7 @@ private s3: S3Client;
         const parallelUploads3 = new Upload({
           client: this.s3,
           params: {
-            Bucket: 'fotos',
+            Bucket: bucket,
             Key: key,
             Body: bytes,
             ContentType: mimeType
@@ -65,7 +65,7 @@ private s3: S3Client;
         });
         await parallelUploads3.done();
         progressSubject.next(100);
-        urlSubject.next(`${environment.s3aws}fotos/${key}`);
+        urlSubject.next(`${environment.s3aws}${bucket}/${key}`);
         progressSubject.complete();
         urlSubject.complete();
       } catch (err) {
@@ -75,10 +75,6 @@ private s3: S3Client;
     })();
     return { progress$: progressSubject.asObservable(), url$: urlSubject.asObservable() };
   }
-
-
-
-
 
 
 
@@ -145,94 +141,94 @@ uploadToCertBucket(
 
 
 
-  async testUploadImage(base64Image: string): Promise<string | null> {
-    console.log("📤 Subiendo imagen...");
+  /*async testUploadImage(base64Image: string): Promise<string | null> {*/
+    /*console.log("📤 Subiendo imagen...");*/
 
-    // 🔎 Separar metadata del base64
-    const matches = base64Image.match(/^data:(.+);base64,(.*)$/);
-    if (!matches) {
-      console.error("❌ La cadena no es un base64 válido");
-      return null;
-    }
+    /*// 🔎 Separar metadata del base64*/
+    /*const matches = base64Image.match(/^data:(.+);base64,(.*)$/);*/
+    /*if (!matches) {*/
+      /*console.error("❌ La cadena no es un base64 válido");*/
+      /*return null;*/
+    /*}*/
 
-    const mimeType = matches[1]; // ej. "image/jpeg"
-    const base64Data = matches[2];
+    /*const mimeType = matches[1]; // ej. "image/jpeg"*/
+    /*const base64Data = matches[2];*/
 
-    // 📦 Convertir base64 → Uint8Array
-    const binary = atob(base64Data);
-    const len = binary.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
+    /*// 📦 Convertir base64 → Uint8Array*/
+    /*const binary = atob(base64Data);*/
+    /*const len = binary.length;*/
+    /*const bytes = new Uint8Array(len);*/
+    /*for (let i = 0; i < len; i++) {*/
+      /*bytes[i] = binary.charCodeAt(i);*/
+    /*}*/
 
-    const key = `img_${Date.now()}.jpg`; // 👈 nombre único
-    console.log("🖼 MIME:", mimeType);
-    console.log("📏 Tamaño (bytes):", bytes.length);
-    console.log("📌 Key (archivo en bucket):", key);
-    try {
-      await this.s3.send(
-        new PutObjectCommand({
-          Bucket: "fotos",
-          Key: key,
-          Body: bytes,          // 👈 pasamos los bytes
-          ContentType: mimeType // ej. "image/jpeg"
-        })
-      );
-      console.log("✅ Imagen subida correctamente");
-      return `${environment.s3aws}fotos/${key}`;
-    } catch (err: any) {
-      console.error("❌ Error en testUploadImage");
-      console.error("📝 Mensaje:", err.message);
-      console.error("📂 Nombre del error:", err.name);
-      console.error("📜 Stack completo:", err.stack);
+    /*const key = `img_${Date.now()}.jpg`; // 👈 nombre único*/
+    /*console.log("🖼 MIME:", mimeType);*/
+    /*console.log("📏 Tamaño (bytes):", bytes.length);*/
+    /*console.log("📌 Key (archivo en bucket):", key);*/
+    /*try {*/
+      /*await this.s3.send(*/
+        /*new PutObjectCommand({*/
+          /*Bucket: "fotos",*/
+          /*Key: key,*/
+          /*Body: bytes,          // 👈 pasamos los bytes*/
+          /*ContentType: mimeType // ej. "image/jpeg"*/
+        /*})*/
+      /*);*/
+      /*console.log("✅ Imagen subida correctamente");*/
+      /*return `${environment.s3aws}fotos/${key}`;*/
+    /*} catch (err: any) {*/
+      /*console.error("❌ Error en testUploadImage");*/
+      /*console.error("📝 Mensaje:", err.message);*/
+      /*console.error("📂 Nombre del error:", err.name);*/
+      /*console.error("📜 Stack completo:", err.stack);*/
 
-      if (err.$metadata) {
-        console.error("📡 Metadata AWS:", err.$metadata);
-      }
+      /*if (err.$metadata) {*/
+        /*console.error("📡 Metadata AWS:", err.$metadata);*/
+      /*}*/
 
-      return null;
-    }
-  }
+      /*return null;*/
+    /*}*/
+  /*}*/
 
 
-  async testUploadText(): Promise<string | null> {  //solo para pruebas minimal
-    console.log("📤 Subiendo archivo de texto hardcoded...");
-    const content = "Hola mundo desde Angular + MinIO 🚀";
-    const encoder = new TextEncoder();
-    const uint8Array = encoder.encode(content); // 👈 cuerpo como bytes
-    const key = `test_${Date.now()}.txt`;
-    // Logs de depuración
-    console.log("📄 Contenido:", content);
-    console.log("📦 Uint8Array creado:", uint8Array);
-    console.log("📏 Tamaño:", uint8Array.length, "bytes");
-    console.log("📌 Key (archivo en bucket):", key);
+  /*async testUploadText(): Promise<string | null> {  //solo para pruebas minimal*/
+    /*console.log("📤 Subiendo archivo de texto hardcoded...");*/
+    /*const content = "Hola mundo desde Angular + MinIO 🚀";*/
+    /*const encoder = new TextEncoder();*/
+    /*const uint8Array = encoder.encode(content); // 👈 cuerpo como bytes*/
+    /*const key = `test_${Date.now()}.txt`;*/
+    /*// Logs de depuración*/
+    /*console.log("📄 Contenido:", content);*/
+    /*console.log("📦 Uint8Array creado:", uint8Array);*/
+    /*console.log("📏 Tamaño:", uint8Array.length, "bytes");*/
+    /*console.log("📌 Key (archivo en bucket):", key);*/
 
-    try {
-      await this.s3.send(
-        new PutObjectCommand({
-          Bucket: "fotos",
-          Key: key,
-          Body: uint8Array, // 👈 sin Blob, solo bytes
-          ContentType: "text/plain",
-        })
-      );
+    /*try {*/
+      /*await this.s3.send(*/
+        /*new PutObjectCommand({*/
+          /*Bucket: "fotos",*/
+          /*Key: key,*/
+          /*Body: uint8Array, // 👈 sin Blob, solo bytes*/
+          /*ContentType: "text/plain",*/
+        /*})*/
+      /*);*/
 
-      console.log("✅ Texto subido correctamente");
-      return `http://192.168.40.47/fotos/${key}`;
-    } catch (err: any) {
-      console.error("❌ Error en testUploadText");
-      console.error("📝 Mensaje:", err.message);
-      console.error("📂 Nombre del error:", err.name);
-      console.error("📜 Stack completo:", err.stack);
+      /*console.log("✅ Texto subido correctamente");*/
+      /*return `http://192.168.40.47/fotos/${key}`;*/
+    /*} catch (err: any) {*/
+      /*console.error("❌ Error en testUploadText");*/
+      /*console.error("📝 Mensaje:", err.message);*/
+      /*console.error("📂 Nombre del error:", err.name);*/
+      /*console.error("📜 Stack completo:", err.stack);*/
 
-      if (err.$metadata) {
-        console.error("📡 Metadata AWS:", err.$metadata);
-      }
+      /*if (err.$metadata) {*/
+        /*console.error("📡 Metadata AWS:", err.$metadata);*/
+      /*}*/
 
-      return null;
-    }
-  }
+      /*return null;*/
+    /*}*/
+  /*}*/
 
   // Método para seleccionar una imagen desde la galería
   async pickImage(): Promise<string | null> {

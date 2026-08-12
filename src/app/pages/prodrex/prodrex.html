@@ -3,8 +3,7 @@
     <ion-buttons *ngIf="!showSearchbar" slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-searchbar
-      placeholder="Buscar x"
+    <ion-searchbar placeholder="Buscar"
       (ionInput)="onSearch($event.target.value)">
     </ion-searchbar>
     <ion-buttons slot="end">
@@ -66,7 +65,7 @@
     </ion-row>
     <ion-row *ngFor="let u of userList" class="user-row">
       <ion-col size="9" (click)="selectUser(u)">
-        <span style="cursor-pointer">{{u.data.name}}</span>
+        <span style="cursor:pointer;">{{u.data.name}}</span>
       </ion-col>
       <ion-col size="3" class="check-col">
         <ion-checkbox

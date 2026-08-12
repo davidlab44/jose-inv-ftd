@@ -3,6 +3,7 @@ let env='prod';
 export const environment={
   production:true,
   apiHost:'https://invapi'+env+'.inbemetal.com',
+  pimApiHost:'https://pimapi'+env+'.inbemetal.com',
   ocrUrl:'https://ocr.inbemetal.com',
   s3aws:env==='dev'
     ? 'https://s3dev.inbemetal.com/'

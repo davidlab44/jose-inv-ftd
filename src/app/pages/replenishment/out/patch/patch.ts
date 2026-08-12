@@ -219,7 +219,7 @@ export class PatchPage {
       console.error('No se pudo obtener la imagen');
       return;
     }
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
     progress$.subscribe({
       next: (p) => this.uploadProgress = p,
       error: (err) => {
@@ -250,7 +250,7 @@ export class PatchPage {
       this.uploading = false;
       return;
     }
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image);
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
     progress$.subscribe(p => this.uploadProgress = p);
     url$.subscribe({
       next: (url) => {
