@@ -110,7 +110,7 @@ export class AssetSupplyReadprdctPage {
         }
 
         this.filteredCategories = this.categories.filter(cat => {
-            const nombre = cat?.data?.nombre?.toLowerCase() || "";
+            const nombre = cat?.data?.name_es_CO?.toLowerCase() || "";
             const coincide = nombre.includes(text.toLowerCase());
             return coincide;
           });
@@ -228,7 +228,7 @@ export class AssetSupplyReadprdctPage {
 
       const cat = this.categories.find(c => Number(c.id) === Number(id));
 
-      const nombre = cat?.data?.nombre;
+      const nombre = cat?.data?.name_es_CO;
 
       return typeof nombre === 'string' && nombre.trim() !== ''
         ? nombre

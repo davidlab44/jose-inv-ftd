@@ -111,7 +111,7 @@ export class ReadprdPage {
         }
 
         this.filteredCategories = this.categories.filter(cat => {
-            const nombre = cat?.data?.nombre?.toLowerCase() || "";
+            const nombre = cat?.data?.name_es_CO?.toLowerCase() || "";
             const coincide = nombre.includes(text.toLowerCase());
             return coincide;
           });
