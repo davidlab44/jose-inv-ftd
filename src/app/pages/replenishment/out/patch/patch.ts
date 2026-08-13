@@ -101,7 +101,7 @@ export class PatchPage {
     if (navigation?.extras?.state?.item) {
       this.movement = navigation.extras.state.item;
       this.uploadedUrl = this.movement.data.imgout;
-      this.vendorDate=this.movement.data.dateout;
+      this.uiDate=this.movement.data.dateout;
     } else {
       console.warn('No se recibió item por NavigationExtras.state');
     }
@@ -270,7 +270,7 @@ export class PatchPage {
 
   shipId:any;
   shipNombreEsp:string | null; 
-  vendorDate:any='2000-01-01T00:01:00';
+  uiDate:any='2000-01-01T00:01:00';
   launchOcr(url: string) {
     this.ocrService.postOut(url).subscribe({
       next: (res) => {
@@ -302,7 +302,7 @@ export class PatchPage {
           shipout: 3,
         });
         console.log("movement actualizado:", this.movement);
-        this.vendorDate=res.data.dateout;
+        this.uiDate=res.data.dateout;
       },
       error: (err) => {
         console.error('Error OCR:', err);
@@ -324,7 +324,7 @@ export class PatchPage {
   patch() {
     this.updateMovementFromForm();
     this.movement.data.imgout = this.uploadedUrl;
-    this.movement.data.dateout=this.vendorDate;
+    this.movement.data.dateout=this.uiDate;
     console.log('antes del payload',this.movement)
    
     const payload = { ...this.movement.data,shipout: 3  };
@@ -507,7 +507,7 @@ getShipId(objA, objBList) {
 
   onChange(event: any) {
       console.log('onchange event',event.detail.value);
-      this.vendorDate=event.detail.value;
+      this.uiDate=event.detail.value;
       this.movement.data.date=event.detail.value;
   }
 

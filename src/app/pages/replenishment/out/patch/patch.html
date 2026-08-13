@@ -48,14 +48,14 @@
           <ion-col size="6">   
             <ion-datetime
               presentation="date-time"
-              [(ngModel)]="vendorDate"
+              [(ngModel)]="uiDate"
               [ngModelOptions]="{ standalone: true }"
               (ionChange)="onChange($event)">
             </ion-datetime>    
           </ion-col>           
           <ion-col size="6">   
             <p style="margin:0;">             
-              {{ vendorDate || 'Sin fecha' }}
+              {{ uiDate || 'Sin fecha' }}
             </p>               
           </ion-col>           
         </ion-row>             

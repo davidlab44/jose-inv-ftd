@@ -97,6 +97,9 @@ export class PatchPage {
     if (navigation?.extras?.state?.item) {
       this.movement = navigation.extras.state.item;
       this.uploadedUrl = this.movement.data.imgin;
+      this.vendorDate=this.movement.data.datein;
+      //this.ship.data.name=this.movement.data.shipin;
+      //this.shipNameEsp=
     } else {
       console.warn('No se recibió item por NavigationExtras.state');
     }
@@ -257,16 +260,12 @@ export class PatchPage {
           const hasOne = this.thersIsSomeCCoLikeThis(res.data.contenedores[0])
           console.log("hasOne",hasOne)
           if(hasOne){
-            console.log("ccoName1:",this.ccoName)
             this.ccoName="TCSU "+res.data.contenedores[0];
-            this.ccoId=this.ccoService.getIdByName(this.ccoName);     
-            console.log('ccoName2:', this.ccoName);
-            console.log('ccoId:', this.ccoId);
+            this.movement.data.name=this.ccoService.getIdByName(this.ccoName);     
           }
         }else{
           this.utilService.presentToast('no se reconocieron isotanques','danger',500);
         }
-        console.log('id:', this.ccoId);
         console.log('res 4 abb:', res.data.tripin.slice(0,2).toUpperCase());
         console.log('abb obtenida del trip:', res.data.tripin.slice(0,2).toUpperCase());
         console.log('are equals:',  this.shipList[2].data.abb===res.data.tripin.slice(0,2).toUpperCase());
@@ -331,13 +330,17 @@ export class PatchPage {
   patch() {
     this.updateMovementFromForm();
     this.movement.data.imgin = this.uploadedUrl;
+    this.movement.data.datein=this.vendorDate;
+    if(!this.ccoName&&this.ccoName.length<2){this.utilService.presentToast('revise isotanque','danger'); return;}
+    //this.movement.data.name=this.ccoService.getIdByName(this.ccoName); 
     const payload = {
       ...this.movement.data,
       shipin: Number(this.form.value.shipin) || 0 
     };
-    payload.shipin=this.shipId
+    //console.log('shipId',this.shipId)
+    console.log('uploadedUrl',this.uploadedUrl)
+    //payload.shipin=this.shipId
     payload.imgin=this.uploadedUrl;
-    payload.name= this.ccoId; 
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
@@ -390,7 +393,8 @@ export class PatchPage {
     const selectedShip = this.shipList.find(s => s.id === selectedId);
     console.log('ID seleccionado =>', selectedId);
     console.log('Ship seleccionado =>', selectedShip);
-    this.movement.data.ship=selectedId;
+    this.movement.data.shipin=selectedId;
+    //this.shipId=selectedId;
   }
 
   /*[>---- CCO------ <]*/
@@ -418,6 +422,7 @@ export class PatchPage {
       next:(map)=>{
         this.ccoMap=map;     
         this.ccoService.debugMapping(this.filteredList);
+        this.ccoName = this.ccoService.getName(this.movement.data.name)
       },    
       error:(err)=>{
         console.error('Error loading ccos',err); 
@@ -437,15 +442,13 @@ export class PatchPage {
     });
   }
   ccoName: string = '';   // nombre a mostrar
-  ccoId: number = 0;   // id cco seleccionado a mostrar
   selectCco(item: any) {
     this.cco = item;
-    this.ccoName = item.data.name;
-    this.ccoId = item.id;
+    //this.ccoName = item.data.name;
+    this.movement.data.name = item.id;
     //actualizar movement (muy importante en tu flujo)
     console.log('item pasado:', item);
-    console.log('cco name:', this.ccoName);
-    console.log('cco id:', this.ccoId);
+    this.ccoName=this.getCcoNameById(item.id);
   }
   cco:any;  
   isotanq:any;
@@ -466,6 +469,14 @@ export class PatchPage {
       console.log(event.detail.value);
       this.vendorDate=event.detail.value;
       this.movement.data.date=event.detail.value;
+  }
+
+
+  getCcoNameById(id:number):string{
+    const name= this.ccoService.getName(id);
+    console.log("name obtenido",name)
+
+    return name;
   }
 
 
