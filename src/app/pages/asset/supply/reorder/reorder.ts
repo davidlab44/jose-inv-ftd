@@ -291,7 +291,7 @@ export class AssetSupplyReorderPage {
 
       const cat = this.categories.find(c => Number(c.id) === Number(id));
 
-      const nombre = cat?.data?.nombre;
+      const nombre = cat?.data?.name_es_CO;
 
       return typeof nombre === 'string' && nombre.trim() !== ''
         ? nombre

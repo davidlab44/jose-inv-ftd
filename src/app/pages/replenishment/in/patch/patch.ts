@@ -97,7 +97,7 @@ export class PatchPage {
     if (navigation?.extras?.state?.item) {
       this.movement = navigation.extras.state.item;
       this.uploadedUrl = this.movement.data.imgin;
-      this.vendorDate=this.movement.data.datein;
+      this.uiDate=this.movement.data.datein;
       //this.ship.data.name=this.movement.data.shipin;
       //this.shipNameEsp=
     } else {
@@ -250,7 +250,7 @@ export class PatchPage {
   contenedores:any[]=[];
   shipId:number=0;
   shipNombreEsp:string | null;
-  vendorDate:any='2000-01-01T00:01:00';;
+  uiDate:any='2000-01-01T00:01:00';;
   launchOcr(url: string) {
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
@@ -301,7 +301,7 @@ export class PatchPage {
           shipin: this.ccoName,
         });
         console.log("movement actualizado:", this.movement);
-        this.vendorDate=res.data.datein;
+        this.uiDate=res.data.datein;
 
       },
       error: (err) => {
@@ -330,7 +330,7 @@ export class PatchPage {
   patch() {
     this.updateMovementFromForm();
     this.movement.data.imgin = this.uploadedUrl;
-    this.movement.data.datein=this.vendorDate;
+    this.movement.data.datein=this.uiDate;
     if(!this.ccoName&&this.ccoName.length<2){this.utilService.presentToast('revise isotanque','danger'); return;}
     //this.movement.data.name=this.ccoService.getIdByName(this.ccoName); 
     const payload = {
@@ -467,7 +467,7 @@ export class PatchPage {
 
   onChange(event: any) {
       console.log(event.detail.value);
-      this.vendorDate=event.detail.value;
+      this.uiDate=event.detail.value;
       this.movement.data.date=event.detail.value;
   }
 
