@@ -270,39 +270,37 @@ export class PatchPage {
         console.log('abb obtenida del trip:', res.data.tripin.slice(0,2).toUpperCase());
         console.log('are equals:',  this.shipList[2].data.abb===res.data.tripin.slice(0,2).toUpperCase());
         console.log('are equals:', res.data.tripin.slice(0,2).toUpperCase()==this.shipList[2].data.abb);
-        const ship=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
-        console.log("ship obtenido",ship)
-        if(!ship){
+        const shipin=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
+        console.log("ship obtenido",shipin)
+        if(!shipin){
           this.utilService.presentToast('Ingrese el barco manualmente','primary',1500)
           return;
         }
-        this.shipId=ship.id;
-        console.log("ship obtenido",ship)
-        if(this.shipId>0){
-          console.log('shipId',this.shipId)
-          this.shipNombreEsp=this.getShipNameById(this.shipId);
-          console.log('shipNombreEsp',this.shipNombreEsp)
-          this.shipNombreEsp=this.getShipNameById(this.shipId);
-        }else{
-          this.shipNombreEsp='Seleccionar'
-        }
-        const normalizedDate = this.normalizeOCRDate(res?.data?.date);
-        this.movement.data = {
-          ...this.movement.data,
-          deliveryin: res?.data?.deliveryin ?? '',
-          datein: res?.data?.datein ?? '',
-          tripin: res?.data?.tripin ?? '',
-          shipin: this.ccoName,
-        };
-        this.form.patchValue({
-          deliveryin: res?.data?.deliveryin ?? '',
-          datein: res?.data?.datein ?? '',
-          tripin: res?.data?.tripin ?? '',
-          shipin: this.ccoName,
-        });
-        console.log("movement actualizado:", this.movement);
-        this.uiDate=res.data.datein;
+        if(shipin.id>0){
+          this.movement.data.shipin=shipin.id
+          console.log('shipinId1',this.movement.data.shipin)
+          this.shipNombreEsp=this.getShipNameById(this.movement.data.shipin)
+          const normalizedDate = this.normalizeOCRDate(res?.data?.date);
+          this.movement.data = {
+            ...this.movement.data,
+            deliveryin: res?.data?.deliveryin ?? '',
+            datein: res?.data?.datein ?? '',
+            tripin: res?.data?.tripin ?? '',
+            shipin: this.movement.data.shipin ?? '',
+          };
 
+          console.log('movement antes de patch', this.movement.data)
+          this.form.patchValue({
+            deliveryin: res?.data?.deliveryin ?? '',
+            datein: res?.data?.datein ?? '',
+            tripin: res?.data?.tripin ?? '',
+            shipin: this.getShipNameById(this.movement.data.shipin) ?? 'Unable',
+          });
+          console.log("movement actualizado:", this.movement);
+          this.uiDate=res.data.datein;
+        }else{
+          console.log('shipinIdELSE',shipin.id)
+        }
       },
       error: (err) => {
         console.error('Error OCR:', err);
@@ -316,30 +314,26 @@ export class PatchPage {
     );
   }
 
-  updateMovementFromForm() {
-    const f = this.form.value;
-    this.movement.data = {
-      ...this.movement.data,
-      deliveryin: f.deliveryin ?? '',
-      datein: f.datein ?? '',
-      tripin: f.tripin ?? '',
-      shipin: Number(f.shipin ?? 0),
-    };
-  }
+  /*updateMovementFromForm() {*/
+    /*const f = this.form.value;*/
+    /*this.movement.data = {*/
+      /*...this.movement.data,*/
+      /*deliveryin: f.deliveryin ?? '',*/
+      /*datein: f.datein ?? '',*/
+      /*tripin: f.tripin ?? '',*/
+      /*shipin: Number(f.shipin ?? 0),*/
+    /*};*/
+  /*}*/
 
   patch() {
-    this.updateMovementFromForm();
+    console.log('movement en el patch ', this.movement)
+    //this.updateMovementFromForm();
     this.movement.data.imgin = this.uploadedUrl;
     this.movement.data.datein=this.uiDate;
     if(!this.ccoName&&this.ccoName.length<2){this.utilService.presentToast('revise isotanque','danger'); return;}
     //this.movement.data.name=this.ccoService.getIdByName(this.ccoName); 
-    const payload = {
-      ...this.movement.data,
-      shipin: Number(this.form.value.shipin) || 0 
-    };
-    //console.log('shipId',this.shipId)
+    const payload = {...this.movement.data};
     console.log('uploadedUrl',this.uploadedUrl)
-    //payload.shipin=this.shipId
     payload.imgin=this.uploadedUrl;
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
@@ -376,6 +370,9 @@ export class PatchPage {
     this.shipService.getAll().subscribe(resp => {
       this.shipList = resp;
       console.log('shipList',this.shipList);
+      this.form.patchValue({
+        shipin: this.getShipNameById(this.movement.data.shipin) ?? null,
+      });
     });
   }
 
@@ -391,7 +388,6 @@ export class PatchPage {
   onShipSelect(ev: any) {
     const selectedId = ev.detail.value;
     const selectedShip = this.shipList.find(s => s.id === selectedId);
-    console.log('ID seleccionado =>', selectedId);
     console.log('Ship seleccionado =>', selectedShip);
     this.movement.data.shipin=selectedId;
     //this.shipId=selectedId;
