@@ -63,7 +63,7 @@ export const defaultWithdrawnData: WithdrawnData = {
   ticket: '',
   wticket: 0,
   vendor: 0,
-  rotogate: 0,
+  rotogage: 0,
   deliveryin: '',
   deliveryout:'',
 };  
@@ -93,7 +93,7 @@ export interface WithdrawnData {
   ticket: string;
   wticket: number;
   vendor: number;
-  rotogate: number;
+  rotogage: number;
   deliveryin: string;
   deliveryout: string;
 }

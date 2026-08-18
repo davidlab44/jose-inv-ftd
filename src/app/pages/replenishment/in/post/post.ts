@@ -1,5 +1,4 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
 import { ConferenceData } from '../../../../providers/conference-data';
@@ -24,15 +23,14 @@ import { DateService } from '../../../../services/local/date.service';
 import { RexService } from '../../../../services/rex.service';
 import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
-import { ReplenishmentService } from '../../../../services/replenishment/replenishment.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PhotoService } from '../../../../services/asset/photo.service';
 import { OcrService } from '../../../../services/ai/ocr.service';
-import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
-import { AllocService } from '../../../../services/replenishment/alloc.service';
-import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
-import { ShipService } from '../../../../services/logistic/ship.service';
-import { Cco,CcoMap } from '../../../../interfaces/cco';
 import { CcoService } from '../../../../services/cc/cco.service';
+import { ShipService } from '../../../../services/logistic/ship.service';
+import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
+import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
+import { Cco,CcoMap } from '../../../../interfaces/cco';
 
 @Component({
   selector: 'page-post',
@@ -40,27 +38,39 @@ import { CcoService } from '../../../../services/cc/cco.service';
   styleUrls: ['./post.scss'],
 })
 
-export class AssetSupplyPostPage {
+export class PostPage {
 
   ios: boolean;
   hasOwner:boolean=false;
   segment = 'all';
   showSearchbar: boolean;
+  opportunities = [];
   storedObject: any;
+  posOrders: any[] = [];
+  posOrderLineList: any[] = [];
+  pendingCommands: any[] = [];
+  deliveredList: any[] = [];
   filteredProductList: any[] = [];
   maxQtyDeliveredItems: any[] = [];
   queryText:any
+  mesas: any[] = [];
   activeSession: Session | null = null;
   sessionId: number | null = null;
   searchSubject = new Subject<string>();
-  searchCcoSubject = new Subject<string>(); 
   todayDate:any;
   form!: FormGroup;
   replenishmentList: any[] = [];
-  uploadProgress = 0;
-  uploadedUrl: string | null = null;
-  uploading = false;
-  shipId:any;
+  replenishment:any;
+  ocrResponse:any;
+  withdrawnList:any[]=[];
+  movement: any = {
+   data:{
+    name:0
+   },
+   data2:{
+     name:0
+   }
+  };
 
   constructor(
     private barcodeService: BarcodeService,
@@ -86,53 +96,99 @@ export class AssetSupplyPostPage {
     private prodrexService: ProdrexService,
     private userService: UserService,
     private fb: FormBuilder ,
-    private replenishmentService : ReplenishmentService,
     private photoService: PhotoService,
-    private ocrService: OcrService,
-    private ccoService: CcoService,
-    private allocService: AllocService,
+    private ocrService : OcrService,
     private shipService : ShipService,
-    private withdrawnService: WithdrawnService
+    private withdrawnService : WithdrawnService,
+    private ccoService : CcoService,
   ) {}
 
+  searchCcoSubject = new Subject<string>(); 
   hash:string='';
   table:any
   rexDocument:any;
   item:any;
-  withdrawnList:any[]=[];
   ngOnInit() {
+
+    this.movement.date='2026'
+    console.log('fake movement',this.movement)
     const nav = history.state;
     this.item = nav.item;
     this.withdrawnList = nav.list;
     this.form = this.fb.group({
       datein: [''],
       deliveryin: [''],
+      cco: [''],
       tripin: [''],
       shipin: [''],
     });
     const ahora = new Date();
-    //this.todayDate=this.formatFechaLatam(ahora);
-    //this.displayLast()
     this.searchCcoSubject.pipe( 
       debounceTime(300), 
       distinctUntilChanged()
     ).subscribe(text => {  
       this.applyFilter(text);
     });
-
   }
 
-  slideOpts = {
-    initialSlide: 0,
-    slidesPerView: 1,
-    speed: 300
-  };
+  ionViewWillEnter() {
+    this.form.patchValue({
+      deliveryin: '',
+      datein: '',
+      cco: '',
+      tripin: '',
+      shipin: '',
+    });
+    this.getShip();
+    this.loadCcos();         
+    this.getAllCco();
+  }
+
+  resetForm(): void {
+    this.uploadedUrl=''; 
+    this.form.reset({
+      id: 0,
+      deliveryin: '',
+      datein: '',
+      tripin: '',
+      shipin: '',
+    });
+    this.uploadProgress = 0; 
+    this.uploadedUrl= null;
+    this.uploading = false;
+  }
 
   updateSchedule(){}
 
-  ionViewWillEnter() {
-    this.getShip(); 
+  ionViewDidEnter() {}
+
+  onSearch(text: string) {
+    this.searchSubject.next(text);
   }
+
+  formatFechaLatam(dateInput: string | Date | number): string {
+    if (!dateInput) return '';
+    const date = new Date(dateInput);
+    const opciones: Intl.DateTimeFormatOptions = {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    };
+    const fechaTexto = new Intl.DateTimeFormat('es-ES', opciones).format(date);
+    let horas = date.getHours();
+    const minutos = String(date.getMinutes()).padStart(2, '0');
+    const segundos = String(date.getSeconds()).padStart(2, '0');
+    const ampm = horas >= 12 ? 'PM' : 'AM';
+    horas = horas % 12;
+    if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
+    const horasTexto = String(horas).padStart(2, '0');
+    return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
+  }
+
+  uploadProgress = 0;
+  uploadedUrl: string | null = null;
+  uploading = false;
+
   async takePhotoAndUpload() {
     this.uploading = true;
     this.uploadProgress = 0;
@@ -179,7 +235,6 @@ export class AssetSupplyPostPage {
     url$.subscribe({
       next: (url) => {
         this.uploadedUrl = url;
-        // lanzar OCR cuando la URL esté disponible
         this.launchOcr(url);
       },
       error: (err) => {
@@ -192,42 +247,63 @@ export class AssetSupplyPostPage {
     });
   }
 
-  ocrResponse:any;
-  shipNombreEsp:string | null; 
-  vendorDate:any='2000-01-01T00:01:00'; 
-  launchOcr(url:string){
+  contenedores:any[]=[];
+  shipId:number=0;
+  shipNombreEsp:string | null;
+  uiDate:any='2000-01-01T00:01:00';;
+  launchOcr(url: string) {
+    console.time('PROCESS');
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
-        console.log('ocr response',res)
-        this.ocrResponse=res;
-        this.shipId=this.getShipId(res);
-        console.log('contenedores extraidos',res.data.contenedores)
-        this.ccoName = this.ccoService.getNameByHash(res?.data?.contenedores?.[0] ?? '');
-        if ((res?.data?.contenedores?.[1]?.length ?? 0) > 0) {
-          this.cco2Name = this.ccoService.getNameByHash(
-            res.data.contenedores[1]
-          );
-        }
-        /*this.ccoName=this.ccoService.getNameByHash(res.data.contenedores[0])*/
-        /*if(res.data.contenedores[1]){*/
-          /*this.cco2Name=res.data.contenedores[1];*/
-        /*}*/
-        this.ccoId=this.ccoService.getIdByName(this.ccoName);     
-        console.log('name:', this.ccoName);
-        console.log('id:', this.ccoId);
-        console.log('OCR Response:', this.ocrResponse);
-        console.log('ocrResponse.data:', this.ocrResponse.data);
-        console.log('shipId:', this.shipId);
-        if(this.shipId>0){
-          console.log('shipId',this.shipId)
-          this.shipNombreEsp=this.getShipNameById(this.shipId);
-          console.log('shipNombreEsp',this.shipNombreEsp)
-          this.shipNombreEsp=this.getShipNameById(this.shipId);
+        console.log('ocrResponse:', res);
+        console.timeEnd('PROCESS');
+        this.contenedores=res.data.contenedores;
+        if(this.contenedores[0]&&this.contenedores[0].length>0){
+          const hasOne = this.thersIsSomeCCoLikeThis(res.data.contenedores[0])
+          console.log("hasOne",hasOne)
+          if(hasOne){
+            this.form.patchValue({
+              cco:"TCSU "+res.data.contenedores[0]
+            });
+            this.movement.data.name=this.ccoService.getIdByName("TCSU "+res.data.contenedores[0]);
+            this.ccoName4Search="TCSU "+res.data.contenedores[0];
+          }            
         }else{
-          this.shipNombreEsp='Seleccionar'
+          this.utilService.presentToast('no se reconocieron isotanques','danger',500);
         }
-        this.updateUi();
-        this.vendorDate=this.ocrResponse.data.datein;
+        console.log('res 4 abb:', res.data.tripin.slice(0,2).toUpperCase());
+        console.log('abb obtenida del trip:', res.data.tripin.slice(0,2).toUpperCase());
+        console.log('are equals:',  this.shipList[2].data.abb===res.data.tripin.slice(0,2).toUpperCase());
+        console.log('are equals:', res.data.tripin.slice(0,2).toUpperCase()==this.shipList[2].data.abb);
+        const shipin=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
+        console.log("ship obtenido",shipin)
+        if(!shipin){
+          this.utilService.presentToast('Ingrese el barco manualmente','primary',1500)
+          return;
+        }
+        if(shipin.id>0){
+          this.movement.data.shipin=shipin.id
+          this.shipNombreEsp=this.getShipNameById(this.movement.data.shipin)
+          const normalizedDate = this.normalizeOCRDate(res?.data?.date);
+          this.movement.data = {
+            ...this.movement.data,
+            deliveryin: res?.data?.deliveryin ?? '',
+            datein: res?.data?.datein ?? '',
+            tripin: res?.data?.tripin ?? '',
+            shipin: this.movement.data.shipin ?? '',
+          };
+          console.log('movement antes de patch', this.movement.data)
+          this.form.patchValue({
+            deliveryin: res?.data?.deliveryin ?? '',
+            datein: res?.data?.datein ?? '',
+            tripin: res?.data?.tripin ?? '',
+            shipin: this.getShipNameById(this.movement.data.shipin) ?? 'Unable',
+          });
+          console.log("movement actualizado:", this.movement);
+          this.uiDate=res.data.datein;
+        }else{
+          console.log('shipinIdELSE',shipin.id)
+        }
       },
       error: (err) => {
         console.error('Error OCR:', err);
@@ -235,69 +311,37 @@ export class AssetSupplyPostPage {
     });
   }
 
-  updateUi(){
-    const data = this.ocrResponse.data;
-    const normalizedDate = this.normalizeOCRDate(data.date);
-    this.form.patchValue({
-      datein: data.datein ?? null,
-      deliveryin: data.deliveryin ?? null,
-      tripin: data.tripin ?? null,
-      shipin: data.shipin ?? null,
-    });
-    //this.isotanq = this.validateIsotanqName(data.isotanq, this.ccos);
+  thersIsSomeCCoLikeThis(ccoNamehash:string):boolean{ //esto hace la comparación contra la fuente de verdad
+    return (this.ccoList||[]).some(item=>
+      (item?.data?.name||'').match(/\d+-\d+$/)?.[0]===ccoNamehash
+    );
   }
 
-  post() {
-    const formData: Partial<WithdrawnData> = this.form.value;
-    const withdrawn: Withdrawn = createDefaultWithdrawn();
-    withdrawn.data = {
-      ...withdrawn.data,
-      ...formData,
-    };
-    withdrawn.data.shipin=this.shipId
-    withdrawn.data.imgin=this.uploadedUrl;
-    withdrawn.data.id_replenishment_product=1;
-    let payload = withdrawn.data;
-    payload.name= this.ccoId;
-    console.log("payload to post =>", payload);
-    this.withdrawnService.post(payload).subscribe({
-      next: (response) => {
-        console.log("Withdrawn post response", response);
-        this.utilService.presentToast("registro actualizado exitosamente","success",1000);
-        this.setWithdrawnState(response[0]?.id,'in');
-        console.log('typeOf',typeof(this.ocrResponse.data.contenedores))
-        //if(this.ocrResponse.data.contenedores[1].length>0){
-        if ((this.ocrResponse?.data?.contenedores?.[1]?.length ?? 0) > 0) {
-          console.log('contenedores',this.ocrResponse.data.contenedores)
-          const container2Id=this.ccoService.getIdByName(this.ocrResponse.data.contenedores[1])
-          console.log('container2id', container2Id);
-          if(container2Id&&container2Id>0){
-            this.cloneWithdrawn(response[0].id,payload,container2Id);
-          }else{
-            console.log('SOLO SE ENCONTRO UN CONTENEDOR!')
-            //this.utilService.presentToast('') 
-          }
-        }else{ //no es necesario imprimir nada ya se imropimio 
-        }
-      },
-      error: (err) => {
-        console.error("Withdrawn post error", err);
-      }
-    });
-  }
 
-  setWithdrawnState(id:number,state:string){
-    this.withdrawnService.updateWithdrawnState(id,state).subscribe({
-      next: response => {
-        console.log('Response from server:',response);
-        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true });  
-      },
-      error: err => {
-        console.error('Error updating state:', err);
-      }
-    });
-  }
-
+  /*post2() {*/
+    /*console.log('movement en el post ', this.movement)*/
+    /*//this.updateMovementFromForm();*/
+    /*this.movement.data.imgin = this.uploadedUrl;*/
+    /*this.movement.data.datein=this.uiDate;*/
+    /*if(!this.ccoName&&this.ccoName.length<2){this.utilService.presentToast('revise isotanque','danger'); return;}*/
+    /*//this.movement.data.name=this.ccoService.getIdByName(this.ccoName); */
+    /*const payload = {...this.movement.data};*/
+    /*console.log('uploadedUrl',this.uploadedUrl)*/
+    /*payload.imgin=this.uploadedUrl;*/
+    /*console.log("payload to patch =>", payload);*/
+    /*this.withdrawnService.post(payload).subscribe({*/
+      /*next: (response) => {*/
+        /*console.log("Withdrawn patch response", response);*/
+        /*this.resetForm();*/
+        /*this.utilService.presentToast("registro actualizado exitosamente","success",1000);*/
+        /*this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  */
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error("Withdrawn patch error", err);*/
+      /*}*/
+    /*});*/
+  /*}*/
+  
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;
     const date = new Date(dateStr);
@@ -312,6 +356,177 @@ export class AssetSupplyPostPage {
     const mi = String(date.getMinutes()).padStart(2, '0');
     const ss = String(date.getSeconds()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
+  }
+
+  shipList: any[] = [];
+  getShip() {
+    this.shipService.getAll().subscribe(resp => {
+      this.shipList = resp;
+      console.log('shipList',this.shipList);
+    });
+  }
+
+  getShipNameById(id: number | null | undefined): string {
+    if (id == null) return 'Sin nombre';
+    const cco = this.shipList.find(c => Number(c.id) === Number(id));
+    const nombre = cco?.data?.name;
+    return typeof nombre === 'string' && nombre.trim() !== ''
+      ? nombre
+      : 'Sin Nombre';
+  }
+
+  onShipSelect(ev: any) {
+    const selectedId = ev.detail.value;
+    const selectedShip = this.shipList.find(s => s.id === selectedId);
+    console.log('Ship seleccionado =>', selectedShip);
+    this.movement.data.shipin=selectedId;
+    //this.shipId=selectedId;
+  }
+
+  /*[>---- CCO------ <]*/
+  onCcoSearch(text: string) {
+    console.log('text to search',text)
+    this.applyFilter(text);  
+  }  
+  applyFilter(text: string) {
+    if (!text || text.trim() === '') {
+      this.filteredList = this.ccoList;
+      return;
+    }
+    const search = text.trim().toLowerCase();
+    this.filteredList = this.ccoList.filter(item => {
+      const name = (item?.data?.name || '').toLowerCase();
+
+      return name.includes(search);
+    });
+    console.log('filteredList', this.filteredList);
+  }
+  ccoList:any[]=[];          
+  ccoMap:CcoMap={};                
+  loadCcos() {               
+    this.ccoService.load().subscribe({
+      next:(map)=>{
+        this.ccoMap=map;     
+        this.ccoService.debugMapping(this.filteredList);
+        //this.ccoName = this.ccoService.getName(this.movement.data.name)
+      },    
+      error:(err)=>{
+        console.error('Error loading ccos',err); 
+      }     
+    });     
+  }   
+  filteredList: any[] = [];     //lista filtrada
+  getAllCco(){
+    this.ccoService.getAll().subscribe({
+      next: (response: any[]) => {
+        console.log('cco List', response);
+        this.ccoList = response;
+      },
+      error: (err: any) => {
+        console.error('Error cargando CCO', err);
+      }
+    });
+  }
+  ccoName4Search: string = '';   
+  selectCco(item: any) {
+    this.cco = item;
+    console.log('item pasado:', item);
+    this.ccoName4Search=this.getCcoNameById(item.id);
+    this.movement.data.name = item.id;
+    this.filteredList=[];
+  }
+  cco:any;  
+  isotanq:any;
+  ccos: any[] = []; 
+  loadCco() {                
+    this.ccoService.getAll().subscribe({ 
+        next: (res) => {       
+          console.log('Cco:', res);    
+          this.ccos = res;
+        }, 
+        error: (err) => {      
+          console.error(' Error al cargar cco:', err); 
+        } 
+      }); 
+   } 
+
+  onChange(event: any) {
+      console.log(event.detail.value);
+      this.uiDate=event.detail.value;
+      this.movement.data.date=event.detail.value;
+  }
+
+
+  getCcoNameById(id:number):string{
+    const name= this.ccoService.getName(id);
+    console.log("name obtenido",name)
+    return name;
+  }
+
+  /*updateUi(){*/
+    /*const data = this.ocrResponse.data;*/
+    /*const normalizedDate = this.normalizeOCRDate(data.date);*/
+    /*this.form.patchValue({*/
+      /*datein: data.datein ?? null,*/
+      /*deliveryin: data.deliveryin ?? null,*/
+      /*tripin: data.tripin ?? null,*/
+      /*shipin: data.shipin ?? null,*/
+    /*});*/
+    /*//this.isotanq = this.validateIsotanqName(data.isotanq, this.ccos);*/
+  /*}*/
+
+  withdrawn:any;
+  post() {
+
+
+
+    const payload: Withdrawn = createDefaultWithdrawn();
+    payload.data.shipin=this.movement.data.shipin;
+    payload.data.name=this.movement.data.name;  
+    payload.data.deliveryin=this.form.value.deliveryin;  
+    payload.data.datein=this.uiDate;  
+    console.log('payload',payload)
+    /*this.withdrawnService.post(payload).subscribe({*/
+      /*next: (response) => {*/
+        /*console.log("Withdrawn post response", response);*/
+        /*this.utilService.presentToast("registro actualizado exitosamente","success",1000);*/
+        /*this.setWithdrawnState(response[0]?.id,'in');*/
+
+        /*[>        console.log('typeOf',typeof(this.ocrResponse.data.contenedores))<]*/
+        /*[>//if(this.ocrResponse.data.contenedores[1].length>0){<]*/
+        /*[>if ((this.ocrResponse?.data?.contenedores?.[1]?.length ?? 0) > 0) {<]*/
+          /*[>console.log('contenedores',this.ocrResponse.data.contenedores)<]*/
+          /*[>const container2Id=this.ccoService.getIdByName(this.ocrResponse.data.contenedores[1])<]*/
+          /*[>console.log('container2id', container2Id);<]*/
+          /*[>if(container2Id&&container2Id>0){<]*/
+            /*[>this.cloneWithdrawn(response[0].id,payload,container2Id);<]*/
+          /*[>}else{<]*/
+            /*[>console.log('SOLO SE ENCONTRO UN CONTENEDOR!')<]*/
+            /*[>//this.utilService.presentToast('') <]*/
+          /*[>}<]*/
+        /*[>}else{ //no es necesario imprimir nada ya se imropimio <]*/
+        /*[>}<]*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error("Withdrawn post error", err);*/
+      /*}*/
+    /*});*/
+
+
+
+
+  }
+
+  setWithdrawnState(id:number,state:string){
+    this.withdrawnService.updateWithdrawnState(id,state).subscribe({
+      next: response => {
+        console.log('Response from server:',response);
+        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true });  
+      },
+      error: err => {
+        console.error('Error updating state:', err);
+      }
+    });
   }
 
   normalizeOCR(str) {
@@ -360,20 +575,9 @@ export class AssetSupplyPostPage {
 
 
 
-  /*  -------  ship --------- */  
-  shipList: any[] = [];
   shipMap: Record<string, number> = {};
   imoMap: Record<string, number> = {};
   idMap: Record<number, any> = {};
-  getShip() {
-    this.shipService.getAll().subscribe(res => {
-      console.log("respouesta res",res)
-      this.shipList=res;
-      this.buildShipMaps(res);
-      console.log('shipMap', this.shipMap);
-      console.log('imoMap', this.imoMap);
-    });
-  }
   buildShipMap(shipList: any[]): Record<string, number> {
     const map: Record<string, number> = {};
     for (let i = 0; i < shipList.length; i++) {
@@ -482,108 +686,7 @@ export class AssetSupplyPostPage {
     return 0;
   }
 
-  getShipNameById(id: number | null | undefined): string {
-    if (id == null) return 'Sin nombre';
-    const ship = this.idMap[id];
-    const name = ship?.data?.name;
-    return name?.trim() ? name : 'Sin Nombre';
-  }
-
-  onShipSelect(ev: any) {
-    const selectedId = ev.detail.value;
-    const selectedShip = this.idMap[selectedId];
-    console.log('ID seleccionado =>', selectedId);
-    console.log('Ship seleccionado =>', selectedShip);
-    this.shipId=selectedId;
-  }
-  
-  onSearch(text: string) { 
-    this.searchSubject.next(text);  
-  } 
-
-/* ---------end ship ----------*/
-
-
-
-
-  /*---- CCO------ */
-  onCcoSearch(text: string) {
-    console.log('text to search',text)
-    this.applyFilter(text);  
-  }  
-  applyFilter(text: string) {
-    if (!text || text.trim() === '') {
-      this.filteredList = this.ccoList;
-      return;
-    }
-    const search = text.trim().toLowerCase();
-    this.filteredList = this.ccoList.filter(item => {
-      const name = (item?.data?.name || '').toLowerCase();
-
-      return name.includes(search);
-    });
-    console.log('filteredList', this.filteredList);
-  }
-  ccoList:any[]=[];          
-  ionViewDidEnter() {        
-    this.resetForm();
-    this.loadCcos();         
-    //this.getAllPrices();     
-    this.getAllCco();
-  }
-  ccoMap:CcoMap={};                
-  loadCcos() {               
-    this.ccoService.load().subscribe({
-      next:(map)=>{
-        this.ccoMap=map;     
-        this.ccoService.debugMapping(this.filteredList);
-        console.log('ccoMap', this.ccoMap)
-      },    
-      error:(err)=>{
-        console.error('Error loading ccos',err); 
-      }     
-    });     
-  }   
-  filteredList: any[] = [];     //lista filtrada
-  getAllCco(){
-    this.ccoService.getAll().subscribe({
-      next: (response: any[]) => {
-        console.log('cco List', response);
-        this.ccoList = response;
-      },
-      error: (err: any) => {
-        console.error('Error cargando CCO', err);
-      }
-    });
-  }
-  ccoName: string = '';   // nombre a mostrar
   ccoId: number = 0;   // id cco seleccionado a mostrar
-  selectCco(item: any) {
-    this.cco = item;
-    this.ccoName = item.data.name;
-    this.ccoId = item.id;
-    //actualizar movement (muy importante en tu flujo)
-    console.log('item pasado:', item);
-    console.log('cco name:', this.ccoName);
-    console.log('cco id:', this.ccoId);
-  }
-  cco:any;  
-  isotanq:any;
-  ccos: any[] = []; 
-  loadCco() {                
-    this.ccoService.getAll().subscribe({ 
-        next: (res) => {       
-          console.log('Cco:', res);    
-          this.ccos = res;
-        }, 
-        error: (err) => {      
-          console.error(' Error al cargar cco:', err); 
-        } 
-      }); 
-   } 
-
-
-
 
   /*---- CCO2------ */
   filteredList2: any[] = [];     //lista filtrada
@@ -608,45 +711,14 @@ export class AssetSupplyPostPage {
   cco2Name: string = '';   // nombre a mostrar
   cco2Id: number = 0;   // id cco seleccionado a mostrar
   select2Cco(item: any) {
-    this.cco2 = item;
-    this.cco2Name = item.data.name;
-    this.cco2Id = item.id;
-    //actualizar movement (muy importante en tu flujo)
-    console.log('item pasado cco2:', item);
-    console.log('cco2 name:', this.cco2Name);
-    console.log('cco2 id :', this.cco2Id);
+    this.movement.data2.name = item.id;
+    console.log('movement.data2 :', this.movement);
   }
-  cco2:any;  
-  isotanq2:any;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /*onShipSelect(e:any){}*/
-  /*shipList:any[]=[];*/
-/*------clone-------*/
 
  async  cloneWithdrawn(idCont1:number,item: any,contenedor2Id) {
     console.log("idCont1 pasado para clonar:", idCont1);
     console.log("item pasado para clonar:", item);
     console.log("contenedor2Id pasado para clonar:", contenedor2Id);
-    //chatgpt => agregar al payload en data.twin el item.id
-    //const payload = this.buildClonePayload(idCont1,item,contenedor2Id);
     item.name=contenedor2Id; 
     item.twin=idCont1; 
     const payload =item; 
@@ -662,51 +734,6 @@ export class AssetSupplyPostPage {
     });
   }
 
-  /*buildClonePayload(idCont1:number,item: any,container2Id): any {*/
-    /*//  Soporta tanto data plano como data.data (por si hay registros viejos mal guardados)*/
-    /*const d = item?.data?.data ?? item?.data ?? {};*/
-    /*return {*/
-      /*ext_id: null,*/
-      /*// ⚠️ Puedes cambiar esto a new Date().toISOString() si quieres que sea "nuevo"*/
-      /*created_at: item.created_at,*/
-      /*updated_at: item.created_at,*/
-      /*data: {*/
-        /*// RESET*/
-        /*kg: 0,*/
-        /*img: "",*/
-        /*psi: 0,*/
-        /*date: d.date ?? null,*/
-        /*name: container2Id,*/
-        /*seal: [],*/
-        /*twin: idCont1,*/
-        /*id_replenishment_product: 0,*/
-        /*price: 0,*/
-        /*imgin: null,*/
-        /*shipin: 0,*/
-        /*ticket: "",*/
-        /*tripin: "",*/
-        /*vendor: 0,*/
-        /*datein: "",*/
-        /*// MANTENER w**/
-        /*wnet: d.wnet ?? 0,*/
-        /*wtare: d.wtare ?? 0,*/
-        /*wgross: d.wgross ?? 0,*/
-        /*wticket: d.wticket ?? 0,*/
-        /*// MANTENER *out*/
-        /*imgout: d.imgout ?? null,*/
-        /*dateout: d.dateout ?? null,*/
-        /*shipout: d.shipout ?? 0,*/
-        /*tripout: d.tripout ?? "",*/
-        /*deliveryout: d.deliveryout ?? 0,*/
-        /*// OTROS*/
-        /*imgscale: d.imgscale ?? null,*/
-        /*rotogate: 0,*/
-        /*deliveryin: 0*/
-      /*},*/
-      /*refdate: null,*/
-      /*state: "pre-in"*/
-    /*};*/
-  /*}*/
 
   async selfPatch(item:any,twin:number) {
     console.log("item to selfpatch ",item)
@@ -725,25 +752,10 @@ export class AssetSupplyPostPage {
     });
   }
 
-  resetForm(): void {
-    this.uploadedUrl=''; 
-    this.form.reset({
-      id: 0,
-      deliveryin: '',
-      datein: '',
-      tripin: '',
-      shipin: '',
-    });
-    this.uploadProgress = 0; 
-    this.uploadedUrl= null;
-    this.uploading = false;
-  }
 
-  onChange(event: any) {
-      console.log(event.detail.value);
-      this.vendorDate=event.detail.value;
 
-  }
+
+
 
 
 }
