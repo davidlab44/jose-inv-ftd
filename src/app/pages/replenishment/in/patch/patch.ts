@@ -98,8 +98,6 @@ export class PatchPage {
       this.movement = navigation.extras.state.item;
       this.uploadedUrl = this.movement.data.imgin;
       this.uiDate=this.movement.data.datein;
-      //this.ship.data.name=this.movement.data.shipin;
-      //this.shipNameEsp=
     } else {
       console.warn('No se recibió item por NavigationExtras.state');
     }
@@ -153,14 +151,10 @@ export class PatchPage {
     speed: 300
   };
 
-  updateSchedule(){
-     
-  }
+  updateSchedule(){}
 
   prodrexList:any[]=[];
-  ionViewDidEnter() {
-    //this.resetForm(); 
-  }
+  ionViewDidEnter() {}
 
   onSearch(text: string) {
     this.searchSubject.next(text);
@@ -250,11 +244,13 @@ export class PatchPage {
   contenedores:any[]=[];
   shipId:number=0;
   shipNombreEsp:string | null;
-  uiDate:any='2000-01-01T00:01:00';;
+  uiDate:any='2000-01-01T00:01:00';
   launchOcr(url: string) {
+    console.time('PROCESS');
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
         console.log('ocrResponse:', res);
+        console.timeEnd('PROCESS');
         this.contenedores=res.data.contenedores;
         if(this.contenedores[0]&&this.contenedores[0].length>0){
           const hasOne = this.thersIsSomeCCoLikeThis(res.data.contenedores[0])
@@ -314,24 +310,11 @@ export class PatchPage {
     );
   }
 
-  /*updateMovementFromForm() {*/
-    /*const f = this.form.value;*/
-    /*this.movement.data = {*/
-      /*...this.movement.data,*/
-      /*deliveryin: f.deliveryin ?? '',*/
-      /*datein: f.datein ?? '',*/
-      /*tripin: f.tripin ?? '',*/
-      /*shipin: Number(f.shipin ?? 0),*/
-    /*};*/
-  /*}*/
-
   patch() {
     console.log('movement en el patch ', this.movement)
-    //this.updateMovementFromForm();
     this.movement.data.imgin = this.uploadedUrl;
     this.movement.data.datein=this.uiDate;
     if(!this.ccoName&&this.ccoName.length<2){this.utilService.presentToast('revise isotanque','danger'); return;}
-    //this.movement.data.name=this.ccoService.getIdByName(this.ccoName); 
     const payload = {...this.movement.data};
     console.log('uploadedUrl',this.uploadedUrl)
     payload.imgin=this.uploadedUrl;
@@ -464,14 +447,12 @@ export class PatchPage {
   onChange(event: any) {
       console.log(event.detail.value);
       this.uiDate=event.detail.value;
-      this.movement.data.date=event.detail.value;
+      this.movement.data.datein=event.detail.value;
   }
-
 
   getCcoNameById(id:number):string{
     const name= this.ccoService.getName(id);
     console.log("name obtenido",name)
-
     return name;
   }
 

@@ -247,7 +247,6 @@ export class PostPage {
     });
   }
 
-  contenedores:any[]=[];
   shipId:number=0;
   shipNombreEsp:string | null;
   uiDate:any='2000-01-01T00:01:00';;
@@ -257,8 +256,8 @@ export class PostPage {
       next: (res) => {
         console.log('ocrResponse:', res);
         console.timeEnd('PROCESS');
-        this.contenedores=res.data.contenedores;
-        if(this.contenedores[0]&&this.contenedores[0].length>0){
+        this.ocrResponse=res.data;
+        if(this.ocrResponse.contenedores[0]&&this.ocrResponse.contenedores[0].length>0){
           const hasOne = this.thersIsSomeCCoLikeThis(res.data.contenedores[0])
           console.log("hasOne",hasOne)
           if(hasOne){
@@ -267,10 +266,10 @@ export class PostPage {
             });
             this.movement.data.name=this.ccoService.getIdByName("TCSU "+res.data.contenedores[0]);
             this.ccoName4Search="TCSU "+res.data.contenedores[0];
-          }            
+         }            
         }else{
           this.utilService.presentToast('no se reconocieron isotanques','danger',500);
-        }
+        }       
         console.log('res 4 abb:', res.data.tripin.slice(0,2).toUpperCase());
         console.log('abb obtenida del trip:', res.data.tripin.slice(0,2).toUpperCase());
         console.log('are equals:',  this.shipList[2].data.abb===res.data.tripin.slice(0,2).toUpperCase());
@@ -317,31 +316,6 @@ export class PostPage {
     );
   }
 
-
-  /*post2() {*/
-    /*console.log('movement en el post ', this.movement)*/
-    /*//this.updateMovementFromForm();*/
-    /*this.movement.data.imgin = this.uploadedUrl;*/
-    /*this.movement.data.datein=this.uiDate;*/
-    /*if(!this.ccoName&&this.ccoName.length<2){this.utilService.presentToast('revise isotanque','danger'); return;}*/
-    /*//this.movement.data.name=this.ccoService.getIdByName(this.ccoName); */
-    /*const payload = {...this.movement.data};*/
-    /*console.log('uploadedUrl',this.uploadedUrl)*/
-    /*payload.imgin=this.uploadedUrl;*/
-    /*console.log("payload to patch =>", payload);*/
-    /*this.withdrawnService.post(payload).subscribe({*/
-      /*next: (response) => {*/
-        /*console.log("Withdrawn patch response", response);*/
-        /*this.resetForm();*/
-        /*this.utilService.presentToast("registro actualizado exitosamente","success",1000);*/
-        /*this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  */
-      /*},*/
-      /*error: (err) => {*/
-        /*console.error("Withdrawn patch error", err);*/
-      /*}*/
-    /*});*/
-  /*}*/
-  
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;
     const date = new Date(dateStr);
@@ -380,10 +354,8 @@ export class PostPage {
     const selectedShip = this.shipList.find(s => s.id === selectedId);
     console.log('Ship seleccionado =>', selectedShip);
     this.movement.data.shipin=selectedId;
-    //this.shipId=selectedId;
   }
 
-  /*[>---- CCO------ <]*/
   onCcoSearch(text: string) {
     console.log('text to search',text)
     this.applyFilter(text);  
@@ -396,7 +368,6 @@ export class PostPage {
     const search = text.trim().toLowerCase();
     this.filteredList = this.ccoList.filter(item => {
       const name = (item?.data?.name || '').toLowerCase();
-
       return name.includes(search);
     });
     console.log('filteredList', this.filteredList);
@@ -453,9 +424,8 @@ export class PostPage {
   onChange(event: any) {
       console.log(event.detail.value);
       this.uiDate=event.detail.value;
-      this.movement.data.date=event.detail.value;
+      this.movement.data.datein=event.detail.value;
   }
-
 
   getCcoNameById(id:number):string{
     const name= this.ccoService.getName(id);
@@ -463,64 +433,58 @@ export class PostPage {
     return name;
   }
 
-  /*updateUi(){*/
-    /*const data = this.ocrResponse.data;*/
-    /*const normalizedDate = this.normalizeOCRDate(data.date);*/
-    /*this.form.patchValue({*/
-      /*datein: data.datein ?? null,*/
-      /*deliveryin: data.deliveryin ?? null,*/
-      /*tripin: data.tripin ?? null,*/
-      /*shipin: data.shipin ?? null,*/
-    /*});*/
-    /*//this.isotanq = this.validateIsotanqName(data.isotanq, this.ccos);*/
-  /*}*/
+  updateUi(){
+    const data = this.ocrResponse;
+    const normalizedDate = this.normalizeOCRDate(data.date);
+    this.form.patchValue({
+      datein: data.datein ?? null,
+      deliveryin: data.deliveryin ?? null,
+      tripin: data.tripin ?? null,
+      shipin: data.shipin ?? null,
+    });
+  }
 
   withdrawn:any;
   post() {
-
-
-
     const payload: Withdrawn = createDefaultWithdrawn();
     payload.data.shipin=this.movement.data.shipin;
     payload.data.name=this.movement.data.name;  
     payload.data.deliveryin=this.form.value.deliveryin;  
     payload.data.datein=this.uiDate;  
     console.log('payload',payload)
-    /*this.withdrawnService.post(payload).subscribe({*/
-      /*next: (response) => {*/
-        /*console.log("Withdrawn post response", response);*/
-        /*this.utilService.presentToast("registro actualizado exitosamente","success",1000);*/
-        /*this.setWithdrawnState(response[0]?.id,'in');*/
-
-        /*[>        console.log('typeOf',typeof(this.ocrResponse.data.contenedores))<]*/
-        /*[>//if(this.ocrResponse.data.contenedores[1].length>0){<]*/
-        /*[>if ((this.ocrResponse?.data?.contenedores?.[1]?.length ?? 0) > 0) {<]*/
-          /*[>console.log('contenedores',this.ocrResponse.data.contenedores)<]*/
-          /*[>const container2Id=this.ccoService.getIdByName(this.ocrResponse.data.contenedores[1])<]*/
-          /*[>console.log('container2id', container2Id);<]*/
-          /*[>if(container2Id&&container2Id>0){<]*/
-            /*[>this.cloneWithdrawn(response[0].id,payload,container2Id);<]*/
-          /*[>}else{<]*/
-            /*[>console.log('SOLO SE ENCONTRO UN CONTENEDOR!')<]*/
-            /*[>//this.utilService.presentToast('') <]*/
-          /*[>}<]*/
-        /*[>}else{ //no es necesario imprimir nada ya se imropimio <]*/
-        /*[>}<]*/
-      /*},*/
-      /*error: (err) => {*/
-        /*console.error("Withdrawn post error", err);*/
-      /*}*/
-    /*});*/
-
-
-
-
+    this.withdrawnService.post(payload.data).subscribe({
+      next: (response) => {
+        console.log("post response", response);
+        this.utilService.presentToast("registro actualizado exitosamente","success",1000);
+        this.setWithdrawnState(response[0]?.id,'in');
+        console.log('typeOf',typeof(this.ocrResponse.contenedores))
+        if((this.ocrResponse?.contenedores?.[1]?.length ?? 0) > 0) {
+          console.log('contenedores',this.ocrResponse.contenedores)
+          const container2Id=this.ccoService.getIdByName(this.ocrResponse.contenedores[1])
+          console.log('container2id', container2Id);
+          if(container2Id&&container2Id>0){
+            this.cloneWithdrawn(response[0].id,payload,container2Id);
+          }else{
+            console.log('container2id no valido')
+          }
+        }else{ 
+          this.updateUi()
+          this.utilService.presentToast("registro actualizado exitosamente","success",1000);  
+          this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true });  
+        }
+      },
+      error: (err) => {
+        console.error("Withdrawn post error", err);
+      }
+    });
   }
 
   setWithdrawnState(id:number,state:string){
     this.withdrawnService.updateWithdrawnState(id,state).subscribe({
       next: response => {
         console.log('Response from server:',response);
+        this.updateUi();
+        this.utilService.presentToast("state actualizado exitosamente","success",1000);  
         this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true });  
       },
       error: err => {
@@ -528,51 +492,6 @@ export class PostPage {
       }
     });
   }
-
-  normalizeOCR(str) {
-    if (!str) return '';
-    return str
-      .toLowerCase()
-      .replace(/[0]/g, 'o')
-      .replace(/[1]/g, 'i')
-      .replace(/[5]/g, 's')
-      .replace(/[8]/g, 'b')
-      .replace(/[^a-z0-9]/g, '')  // elimina espacios, guiones, etc
-      .trim();
-  }
-  levenshtein(a, b) {
-    const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);
-    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-    for (let i = 1; i <= b.length; i++) {
-      for (let j = 1; j <= a.length; j++) {
-        if (b[i - 1] === a[j - 1]) {
-          matrix[i][j] = matrix[i - 1][j - 1];
-        } else {
-          matrix[i][j] = Math.min(
-            matrix[i - 1][j - 1] + 1,
-            matrix[i][j - 1] + 1,
-            matrix[i - 1][j] + 1
-          );
-        }
-      }
-    }
-    return matrix[b.length][a.length];
-  }
-  similarity(a, b) {
-    const dist = this.levenshtein(a, b);
-    const maxLen = Math.max(a.length, b.length);
-    if (maxLen === 0) return 1;
-    return 1 - dist / maxLen;
-  }
-  fuzzyMatch(a, b, threshold = 0.8) {
-    if (!a || !b) return false;
-    const na = this.normalizeOCR(a);
-    const nb = this.normalizeOCR(b);
-    if (na.includes(nb) || nb.includes(na)) return true;
-    const score = this.similarity(na, nb);
-    return score >= threshold;
-  }
-
 
 
   shipMap: Record<string, number> = {};
@@ -614,76 +533,6 @@ export class PostPage {
       .replace(/\s+/g, '')   // quitarespacios
       .replace(/[^A-Z0-9]/g, '') // limpiar ruido OCR
       .trim();
-  }
-
-  getShipId(res: any): number {
-    console.log("🔎 getShipId input:", res);
-    const shipName = res?.data?.shipin ?? null;
-    const shipIMO  = res?.data?.shipinimo ?? null;
-    console.log("➡️ shipName:", shipName, "shipIMO:", shipIMO);
-    //  1. O(1) por nombre
-    if (shipName) {
-
-      const normName = this.normalize(shipName);
-      //\ccconst normName = this.normalize(shipName);
-      const id = this.shipMap[normName];
-      console.log("🔹 O(1) name lookup:", normName, "=>", id);
-      if (id) {
-        console.log(" return by name O(1):", id);
-        return id;
-      }
-    }
-    //  2. O(1) por IMO
-    if (shipIMO) {
-      const normIMO = this.normalize(shipIMO);
-      const id = this.imoMap[normIMO];
-      console.log("🔹 O(1) IMO lookup:", normIMO, "=>", id);
-      if (id) {
-        console.log(" return by IMO O(1):", id);
-        return id;
-      }
-    }
-    // 3. Fuzzy SOLO si falla
-    let bestScore = 0;
-    let bestId = 0;
-    if (shipName) {
-      const normA = this.normalizeOCR(shipName);
-      console.log("Fuzzy name start:", normA);
-      for (const ship of this.shipList) {
-        const name = ship?.data?.name;
-        if (!name) continue;
-        const score = this.similarity(normA, this.normalizeOCR(name));
-        if (score > bestScore && score > 0.75) {
-          bestScore = score;
-          bestId = ship.id;
-        }
-      }
-      console.log("🔸 best fuzzy name:", bestId, "score:", bestScore);
-      if (bestId !== 0) {
-        console.log(" return by fuzzy name:", bestId);
-        return bestId;
-      }
-    }
-    // 4. Fallback fuzzy IMO
-    if (shipIMO) {
-      console.log("🔸 Fuzzy IMO start:", shipIMO);
-      let foundId = 0;
-      for (const ship of this.shipList) {
-        const imo = ship?.data?.imo;
-        if (!imo) continue;
-        if (this.fuzzyMatch(shipIMO, imo, 0.9)) {
-          foundId = ship.id;
-          break;
-        }
-      }
-      console.log("🔸 fuzzy IMO result:", foundId);
-      if (foundId) {
-        console.log("return by fuzzy IMO:", foundId);
-        return foundId;
-      }
-    }
-    console.log("no match, return 0");
-    return 0;
   }
 
   ccoId: number = 0;   // id cco seleccionado a mostrar
@@ -742,9 +591,10 @@ export class PostPage {
     this.withdrawnService.patch(item.id,item.data).subscribe({
       next: (response) => {
         console.log("Withdrawn selfpatch response", response);
-        this.utilService.presentToast("movimiento actualizado",'success',500)
-        //this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
- 
+        //this.utilService.presentToast("movimiento actualizado",'success',500)
+/*        this.updateUi();*/
+        /*this.utilService.presentToast("state actualizado exitosamente","success",1000);  */
+        /*this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true }); */
       },
       error: (err) => {
         console.error("Withdrawn selfpatch error", err);

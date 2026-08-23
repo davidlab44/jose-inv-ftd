@@ -8,16 +8,14 @@ import { Observable } from 'rxjs';
 })
 export class UmService {
 
-  private apiUrl = environment.apiHost; // https://invapi.chrisantemogourmet.com
+  private apiUrl = environment.apiHost;
 
   constructor(private http: HttpClient) {}
 
-  // 🔹 Obtener todas las categorías
   getAllUms(): Observable<any> {
     return this.http.get(`${this.apiUrl}/um`);
   }
 
-  // 🔹 Obtener una categoría por id
   getUmById(id: number): Observable<any> {
     const url = `${this.apiUrl}/um?id=eq.${id}`;
     return this.http.get<any[]>(url);

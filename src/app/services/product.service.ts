@@ -12,11 +12,8 @@ export class ProductService {
 
   private apiUrl = environment.pimApiHost; 
   private entity = "prdt"; 
-  //private apiUrl = environment.apiHost; 
-  //private pimApiUrl = environment.pimApiHost; 
   private cache: any[] | null = null;
   private storageKey = 'productos_cache';
-
   private productos$ = new BehaviorSubject<any[] | null>(null);
 
   constructor(private http: HttpClient) {
@@ -35,7 +32,7 @@ export class ProductService {
     localStorage.setItem(this.storageKey, JSON.stringify(data));
   }
 
-  // 🔵 LLAMADA AL SERVIDOR (solo para Page A)
+  //  LLAMADA AL SERVIDOR (solo para Page A)
   refreshFromServer() {
     return this.http.get<any[]>(`${this.apiUrl}/${this.entity}`).pipe(
       tap(resp => {
@@ -46,7 +43,7 @@ export class ProductService {
     );
   }
 
-  // 🟢 Page B usa esto → NO refresca
+  //  Page B usa esto → NO refresca
   getCachedOrServer() {
     if (this.cache) {
       return of(this.cache); // referencia directa

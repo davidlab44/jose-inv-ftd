@@ -240,6 +240,11 @@ export class AppComponent implements OnInit {
        icon: 'add-circle'
      },
      {
+       title: 'Nuevo producto',
+       url: '/app/tabs/asset-stock-post',
+       icon: 'add-circle'
+     },
+     {
        title: 'Registrar retiro',
        url: '/app/tabs/replenishment-withdrawn-post',
        icon: 'swap-horizontal'

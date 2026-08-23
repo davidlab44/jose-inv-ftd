@@ -305,9 +305,11 @@ export class PatchPage {
   ocrResponse:any;
   vendorDate:any='2000-01-01T00:01:00';;
   launchOcr(url: string) {
+    console.time('time');
     this.ocrService.postVendor(url).subscribe({
       next: (res) => {
         console.log('ocr response',res)
+        console.timeEnd('time');
         this.ocrResponse = res;
         this.ccoName="TCSU "+res?.data?.isotanq;
         this.ccoId=this.ccoService.getIdByName(this.ccoName);     
@@ -376,7 +378,7 @@ export class PatchPage {
     }
 
 
-      if(itemPrice?.data) {
+   if(itemPrice?.data) {
       const { price, cents } = itemPrice.data;
       this.movement.data.price = `${price}.${cents}`;
     }else {

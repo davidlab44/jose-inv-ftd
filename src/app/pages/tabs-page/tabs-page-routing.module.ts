@@ -148,6 +148,24 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'asset-stock-categ',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../asset/stock/categ/categ.module').then(m => m.CategModule)
+          }
+        ]
+      },
+      {
+        path: 'asset-stock-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../asset/stock/post/post.module').then(m => m.AssetSupplyPostModule)
+          }
+        ]
+      },
+      {
         path: 'asset-supply-patch',
         children: [
           {
