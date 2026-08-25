@@ -235,8 +235,8 @@ export class AppComponent implements OnInit {
        icon: 'pie-chart'
      },
      {
-       title: 'Registrar producto',
-       url: '/app/tabs/asset-supply-post',
+       title: 'Nuevo producto by categ',
+       url: '/app/tabs/asset-stock-categ',
        icon: 'add-circle'
      },
      {
@@ -244,6 +244,15 @@ export class AppComponent implements OnInit {
        url: '/app/tabs/asset-stock-post',
        icon: 'add-circle'
      },
+     {
+       title: 'Manual prdct register',
+       url: '/app/tabs/asset-supply-post',
+       icon: 'add-circle'
+     },
+
+
+
+
      {
        title: 'Registrar retiro',
        url: '/app/tabs/replenishment-withdrawn-post',

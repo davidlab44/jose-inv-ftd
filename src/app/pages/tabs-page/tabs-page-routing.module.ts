@@ -152,7 +152,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../asset/stock/categ/categ.module').then(m => m.CategModule)
+            loadChildren: () => import('../asset/stock/categ/readprd.module').then(m =>m.ReadprdModule )
           }
         ]
       },

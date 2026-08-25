@@ -1,14 +1,13 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
-import { Router } from '@angular/router';
-import { tap } from 'rxjs/operators';
-import { AlertController, IonList, LoadingController, ModalController, ToastController, Config, Platform, ViewDidEnter  } from '@ionic/angular';
+import { Component, ViewChild } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { AlertController, LoadingController, ModalController, ToastController, Config, IonSearchbar } from '@ionic/angular';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
 import { ConferenceData } from '../../providers/conference-data';
 import { UserData } from '../../providers/user-data';
 import { OpportunityService } from '../../services/opportunity.service';
 import { PosOrderService } from '../../services/pos-order.service';
 import { TableService } from '../../services/table.service';
-import { environment } from '../../../environments/environment';
-import { ActivatedRoute } from '@angular/router'
 import { Session } from '../../interfaces/session';
 import { SessionService } from '../../services/session.service';
 import { UtilService } from '../../services/util.service';
@@ -17,24 +16,18 @@ import { BarcodeService } from '../../services/barcode.service';
 import { CategoryService } from '../../services/category.service';
 import { UmService } from '../../services/um.service';
 import { Product } from '../../interfaces/product';
-import { BrowserMultiFormatReader } from '@zxing/browser';
-import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { RexService } from '../../services/rex.service';
-import { IonSearchbar } from '@ionic/angular';
-import { RateClientComponent } from '../../pages/modal/rate-client/rate-client.component';   
+import { RateClientComponent } from '../../pages/modal/rate-client/rate-client.component';
 import { ExcelService } from '../../services/local/excel.service';
-
+declare const require: any;
+const shared = require('./readprd.js');
 @Component({
   selector: 'page-readprd',
   templateUrl: 'readprd.html',
-  styleUrls: ['./readprd.scss'],
+  styleUrls: ['./readprd.scss']
 })
 export class ReadprdPage {
-
-
-
-@ViewChild('searchbar', { static: false }) searchbar!: IonSearchbar;
+  @ViewChild('searchbar', { static: false }) searchbar!: IonSearchbar;
   ios: boolean;
   segment = 'all';
   showSearchbar: boolean;
@@ -46,12 +39,20 @@ export class ReadprdPage {
   deliveredList: any[] = [];
   filteredProductList: any[] = [];
   maxQtyDeliveredItems: any[] = [];
-  queryText:any
+  queryText: any;
   mesas: any[] = [];
   activeSession: Session | null = null;
   sessionId: number | null = null;
   searchSubject = new Subject<string>();
-
+  filteredCategories: any[] = [];
+  filteredProductsByCategory: any[] = [];
+  hash: string = '';
+  table: any;
+  posCategId: number = 0;
+  productList: any[] = [];
+  productListFull: any[] = [];
+  categories: any[] = [];
+  ums: any[] = [];
   constructor(
     private barcodeService: BarcodeService,
     public alertCtrl: AlertController,
@@ -61,219 +62,106 @@ export class ReadprdPage {
     public router: Router,
     public toastCtrl: ToastController,
     public user: UserData,
-    private modalController: ModalController, 
+    private modalController: ModalController,
     public config: Config,
     private opportunityService: OpportunityService,
     private posOrderService: PosOrderService,
     private tableService: TableService,
     private route: ActivatedRoute,
-    private sessionService:SessionService,
-    private utilService:UtilService,
-    private productService:ProductService,
-    private categoryService:CategoryService,
-    private umService:UmService,
+    private sessionService: SessionService,
+    private utilService: UtilService,
+    private productService: ProductService,
+    private categoryService: CategoryService,
+    private umService: UmService,
     private rexService: RexService,
-    private excelService:ExcelService,
+    private excelService: ExcelService
   ) {}
-
-
-  filteredCategories: any[] = [];
-  filteredProductsByCategory: any[] = [];
-
-  async ngOnInit(){
+  ngOnInit() {
     this.refreshView();
   }
-
-  async ionViewWillEnter(){
+  ionViewWillEnter() {
     this.refreshView();
   }
-
-  hash:string='';
-  table:any
-  async refreshView() {
-    console.log("ngOnInit")
-    await this.loadCategories();
-    await this.loadUms();
+  refreshView() {
+    this.loadCategories();
+    this.loadUms();
     this.getAllProducts();
     this.getAllProductsFull();
-
     this.searchSubject.pipe(
       debounceTime(500),
       distinctUntilChanged(),
-
       tap(text => {
-
         const query = text.trim().toLowerCase();
-        if (query.length === 0) {
+        if (!query.length) {
           this.productList = this.productListFull.slice(0, 20);
-          console.log("Restaurando primeros 20 productos:", this.productList);
-          return; 
+          return;
         }
-
-        this.filteredCategories = this.categories.filter(cat => {
-            const nombre = cat?.data?.name_es_CO?.toLowerCase() || "";
-            const coincide = nombre.includes(text.toLowerCase());
-            return coincide;
-          });
-
-        const ids = this.filteredCategories.map(c => Number(c.id));
-
-        this.filteredProductsByCategory = this.productListFull.filter(prod =>
-          ids.includes(Number(prod?.data?.categ?.[0]))
-        );
-
-        console.log("Productos filtrados por categoría:", this.filteredProductsByCategory);
+        const f = shared.filterByCategory(this.categories, this.productListFull, text);
+        this.filteredCategories = f.filteredCategories;
+        this.filteredProductsByCategory = f.filteredProductsByCategory;
       }),
-
-      // 4. SEGUIR HACIENDO BÚSQUEDA REMOTA
       switchMap(text => this.productService.searchProducts(text))
-
-    )
-    .subscribe({
+    ).subscribe({
       next: results => {
-
-        // 1. Unir ambos arreglos
-        const combined = [...results, ...this.filteredProductsByCategory];
-
-        // 2. Eliminar duplicados por id
-        this.productList = combined.filter(
-          (item, index, self) =>
-            index === self.findIndex(p => p.id === item.id)
-        );
-
-        console.log("productList (sin duplicados):", this.productList);
+        this.productList = shared.mergeProducts(results, this.filteredProductsByCategory);
       },
-      error: err => console.error("Error en búsqueda:", err)
+      error: err => console.error('Error en búsqueda:', err)
     });
-
   }
-
-
-
-
-  updateSchedule(){
-  }
-
+  updateSchedule() {}
   ionViewDidEnter() {}
-
-  posCategId:number=0
-  productList:any[]=[];
-   getAllProducts() {
+  getAllProducts() {
     this.productService.getAllProducts().subscribe({
-      next: response => {
-        this.productList=response;
-        console.log('products By Cat',this.productList)
+      next: r => {
+        this.productList = r;
       },
-      error: error => console.error('Error:', error),
-      complete: () => {}
+      error: e => console.error('Error:', e)
     });
-   }
-
-   productListFull:any[]=[];
-   getAllProductsFull() {
-      this.productService.getAll().subscribe({
-        next: response => {
-          this.productListFull=response;
-          console.log('products full',this.productListFull)
-        },
-        error: error => console.error('Error:', error),
-        complete: () => {}
-      });
-    }
-
-  searchProducts(hash: string, productList: any[]): any[] {
-    if (!hash || hash.trim() === '') return productList;
-    return productList.filter(product =>
-      product.name.toLowerCase().includes(hash.toLowerCase())
-    );
   }
-
-  categories: any[] = [];    
-    loadCategories() { 
-      this.categoryService.getAllCategories().subscribe({ 
-        next: (res) => {       
-          this.categories = res;          
-          console.log("categories",this.categories)
-          this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.categories = this.categoryService.getCategoriesFromLocal(); 
-        } 
-      }); 
-    }   
-        
-    ums: any[] = []; 
-        
-    loadUms() {                
-      this.umService.getAllUms().subscribe({ 
-        next: (res) => {       
-          console.log('✅ Ums:', res);    
-          this.ums = res; 
-          this.umService.saveUmsToLocal(res); 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.ums = this.umService.getUmsFromLocal(); 
-        } 
-      }); 
-    }     
-      
-    getCategoryNameById(id: number | null | undefined): string {
-      if (id === null || id === undefined) {
-        return 'Sin categoría';
+  getAllProductsFull() {
+    this.productService.getAll().subscribe({
+      next: r => {
+        this.productListFull = r;
+      },
+      error: e => console.error('Error:', e)
+    });
+  }
+  searchProducts(hash: string, list: any[]): any[] {
+    return shared.searchProducts(hash, list);
+  }
+  loadCategories() {
+    this.categoryService.getAllCategories().subscribe({
+      next: r => {
+        this.categories = r;
+        this.categoryService.saveCategoriesToLocal(r);
+      },
+      error: e => {
+        console.error('Error categorías:', e);
+        this.categories = this.categoryService.getCategoriesFromLocal();
       }
-
-      if (!Array.isArray(this.categories) || this.categories.length === 0) {
-        return 'Sin categoría';
+    });
+  }
+  loadUms() {
+    this.umService.getAllUms().subscribe({
+      next: r => {
+        this.ums = r;
+        this.umService.saveUmsToLocal(r);
+      },
+      error: e => {
+        console.error('Error UMs:', e);
+        this.ums = this.umService.getUmsFromLocal();
       }
-
-      const cat = this.categories.find(c => Number(c.id) === Number(id));
-
-      const nombre = cat?.data?.name_es_CO;
-
-      return typeof nombre === 'string' && nombre.trim() !== ''
-        ? nombre
-        : 'Sin categoría';
-    }
-
-
+    });
+  }
+  getCategoryNameById(id: number | null | undefined): string {
+    return shared.getCategoryNameById(this.categories, id);
+  }
   getUmNameById(id: number | string | null | undefined): string {
-    // Validar ID recibido
-    //console.log("id recibido",id)
-    if (id === null || id === undefined) {
-      return 'Sin UM1';
-    }
-
-    const idNum = Number(id);
-    if (isNaN(idNum)) {
-      return 'Sin UM2';
-    }
-
-    // Validar que this.ums exista y tenga elementos
-    if (!Array.isArray(this.ums) || this.ums.length === 0) {
-      return 'Sin UM3';
-    }
-
-    // Buscar la UM por ID
-    const um = this.ums.find(u => Number(u.id) === idNum);
-    if (!um) {
-      return 'Sin UM4';
-    }
-
-    // Extraer el nombre si existe y es válido
-    const nombre = um?.data?.name;
-    if (typeof nombre === 'string' && nombre.trim() !== '') {
-      return nombre;
-    }
-
-    return 'Sin UM5';
+    return shared.getUmNameById(this.ums, id);
   }
-
   onSearch(text: string) {
     this.searchSubject.next(text);
   }
-
   enviar() {
     const items = [
       {
@@ -295,82 +183,38 @@ export class ReadprdPage {
         }
       }
     ];
+    return items;
   }
-
-  out(item:any){
-    console.log("item to modifyqty",item);
-    this.router.navigate(
-      ['/app/tabs/asset-supply-out'],
-      { state: { item } }
-    );
+  out(item: any) {
+    this.router.navigate(['/app/tabs/asset-supply-out'], { state: { item } });
   }
-   
-  patch(item:any){
-    console.log("item to patch",item);
-    this.router.navigate(
-      ['/app/tabs/asset-supply-patch'],
-      { state: { item } }
-    );
+  patch(item: any) {
+    this.router.navigate(['/app/tabs/asset-supply-patch'], { state: { item } });
     this.clearSearch();
   }
-
-  clearSearch(): void {
-    console.log('searchSubject',this.searchSubject.next )
-    this.searchbar.ionClear;
-    this.searchSubject.next(''); // restaura lista
+  clearSearch() {
+    this.searchSubject.next('');
   }
-
-  delete(p){
+  delete(p: any) {
     this.productService.delete(p.id).subscribe({
-      next: (response)=>{
-        console.log("delete response",response);
-
-      } 
-    })
+      next: r => console.log('delete response', r)
+    });
   }
-
-  manualOutbound(item:any){
-    this.router.navigate(
-      ['/app/tabs/schedule'],
-      { state: { item } }    
-    ); 
+  manualOutbound(item: any) {
+    this.router.navigate(['/app/tabs/schedule'], { state: { item } });
   }
-
   printSelectedBarcodes(p: Product) {
-    console.log("producto recibido",p)
     const paddedId = p.id.toString().padStart(6, '0');
-    const selectedBarcodes = [paddedId];
-    this.barcodeService.printIn50mmPortablePrinterBt(p.data.name,selectedBarcodes,p.id.toString());
+    this.barcodeService.printIn50mmPortablePrinterBt(p.data.name, [paddedId], p.id.toString());
   }
-
-  async openModal(p) { 
+  async openModal(p: any) {
     const modal = await this.modalController.create({
       component: RateClientComponent,
-      componentProps: { //items: ['Item 1', 'Item 2', 'Item 3', 'Item 4'] 
-        items:p
-      }
+      componentProps: { items: p }
     });
-    return await modal.present();
+    return modal.present();
   }
-
-
-
-  downloadExcel(){
-    this.excelService.exportInventory(
-      this.productList,
-      this.ums,
-      this.categories,
-      'products'
-    );
+  downloadExcel() {
+    this.excelService.exportInventory(this.productList, this.ums, this.categories, 'products');
   }
-
-
-
 }
-
-
-
-
-
-
-
