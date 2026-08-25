@@ -1,106 +1,57 @@
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  #barcode, #barcode * {
-    visibility: visible;
-  }
+.product-form {
+  max-width: 700px;
+  margin: 2rem auto;
 }
 
-.subheader-toolbar {
-  --min-height: 32px;   /* más delgado que un toolbar normal */
+header {
+  margin-bottom: 2rem;
 }
 
-.subheader-title {
-  text-align: center;
-  font-size: 12px;      /* más pequeño */
-  font-weight: 500;     /* opcional, un poco más marcado */
-  width: 100%;          /* asegura centrado perfecto */
-  margin: 0;
-  padding: 0;
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
 }
 
-.user-table {
-  margin: 10px;
-
-  .header {
-    font-weight: bold;
-    background: #f1f1f1;
-    padding: 8px 0;
-    border-bottom: 1px solid #ccc;
-  }
-
-  .user-row {
-    align-items: center;
-    padding: 6px 0;
-    border-bottom: 1px solid #e0e0e0;
-  }
-
-  .check-col {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+label {
+  font-weight: 600;
 }
 
-/* Contenedor con scroll horizontal suave en iOS */
-.table-container {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch; /* importante para iOS */
-  background: transparent;
+.required {
+  margin-left: 0.25rem;
 }
 
-/* Forzamos que la tabla tenga un ancho mínimo para que aparezca scroll si la pantalla es pequeña */
-.wide-table {
-  min-width: 720px; /* ajústalo según cuántas columnas tengas */
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
+input,
+select {
+  padding: 0.75rem;
+  font-size: 1rem;
 }
 
-/* Header */
-.wide-table thead th {
-  position: sticky;
-  top: 0;
-  background: #ffffff; /* color del header */
-  z-index: 10;
-  text-align: left;
-  padding: 10px 12px;
-  font-weight: 700;
-  border-bottom: 1px solid #e0e0e0;
-  font-size: 13px;
+select[multiple] {
+  min-height: 180px;
 }
 
-/* Celdas */
-.wide-table tbody td {
-  padding: 10px 12px;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
-  vertical-align: middle;
-  white-space: nowrap; /* evita que los contenidos se rompan en varias líneas */
+small {
+  opacity: 0.7;
 }
 
-/* Alternado de filas (opcional) */
-.wide-table tbody tr:nth-child(odd) {
-  background: rgba(0,0,0,0.02);
+.error {
+  font-size: 0.85rem;
 }
 
-/* Primera columna fija (sticky a la izquierda) */
-.sticky-col {
-  position: sticky;
-  left: 0;
-  background: #fff;
-  z-index: 11;   /* mayor que thead para que quede encima */
-  box-shadow: 2px 0 4px rgba(0,0,0,0.03); /* pequeña separación visual */
+button {
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
 }
 
-/* Ajustes para pantallas muy pequeñas: puedes reducir la min-width o los paddings */
-@media (max-width: 420px) {
-  .wide-table { min-width: 600px; }
-  .wide-table thead th,
-  .wide-table tbody td { padding: 8px 10px; font-size: 13px; }
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
-
-
+pre {
+  margin-top: 1rem;
+  padding: 1rem;
+  overflow: auto;
+}
