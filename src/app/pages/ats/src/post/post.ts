@@ -149,7 +149,6 @@ export class AssetSupplyPostPage {
     this.productService.getCachedOrServer().subscribe({
       next: (data) => {
         console.log('[SEARCH][2.1] productListCaos recibido:', data);
-
         this.productListCaos = data || [];
         this.filteredProductList = [];
 
