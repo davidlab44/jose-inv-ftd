@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';   
 import {
   FormBuilder,
   FormControl,
@@ -33,29 +34,12 @@ interface CategoryDefinition {
   onupdate_product_attributes?: Record<string, unknown>;
 }
 
-
-
-
-
-
 @Component({
   selector: 'page-post',
   templateUrl: 'post.html',
   styleUrls: ['./post.scss'],
 })
 
-
-
-/*@Component({*/
-  /*selector: 'app-dynamic-product-form',*/
-  /*standalone: true,*/
-  /*imports: [*/
-    /*CommonModule,*/
-    /*ReactiveFormsModule*/
-  /*],*/
-  /*templateUrl: './dynamic-product-form.component.html',*/
-  /*styleUrl: './dynamic-product-form.component.css'*/
-/*})*/
 export class AssetSupplyPostPage implements OnInit {
 
   form!: FormGroup;
@@ -67,186 +51,205 @@ export class AssetSupplyPostPage implements OnInit {
    *
    * this.categoryService.getCategory('welding')
    */
-  category: CategoryDefinition = {
-    name: 'welding',
 
-    name_es_CO: 'Soldadura',
+  
+  /*category: CategoryDefinition = {*/
+    /*name: 'welding',*/
 
-    desc: 'Welding equipment, electrodes, torches, consumables, parts, components, accessories, and related supplies used for welding, cutting, brazing, fabrication, and maintenance operations.',
+    /*name_es_CO: 'Soldadura',*/
 
-    oncreate_product_attributes: {
+    /*desc: 'Welding equipment, electrodes, torches, consumables, parts, components, accessories, and related supplies used for welding, cutting, brazing, fabrication, and maintenance operations.',*/
 
-      application: {
-        type: 'enum',
-        required: true,
-        values: [
-          'fabrication',
-          'repair',
-          'maintenance',
-          'structural_welding',
-          'pipe_welding',
-          'sheet_metal',
-          'brazing',
-          'cutting',
-          'hardfacing',
-          'general'
-        ],
-        semantic_weight: 60,
-        desc: 'Main welding or fabrication application.'
-      },
+    /*oncreate_product_attributes: {*/
 
-      subcategories: {
-        type: 'array',
-        required: true,
-        values: [
-          'electrode',
-          'welding_wire',
-          'filler_rod',
-          'torch',
-          'nozzle',
-          'contact_tip',
-          'holder',
-          'ground_clamp',
-          'regulator',
-          'hose',
-          'flux',
-          'anti_spatter',
-          'welding_machine',
-          'cutting_consumable',
-          'accessory'
-        ],
-        semantic_weight: 80,
-        desc: 'Welding product families.'
-      },
+      /*application: {*/
+        /*type: 'enum',*/
+        /*required: true,*/
+        /*values: [*/
+          /*'fabrication',*/
+          /*'repair',*/
+          /*'maintenance',*/
+          /*'structural_welding',*/
+          /*'pipe_welding',*/
+          /*'sheet_metal',*/
+          /*'brazing',*/
+          /*'cutting',*/
+          /*'hardfacing',*/
+          /*'general'*/
+        /*],*/
+        /*semantic_weight: 60,*/
+        /*desc: 'Main welding or fabrication application.'*/
+      /*},*/
 
-      process: {
-        type: 'array',
-        required: true,
-        values: [
-          'smaw',
-          'gmaw_mig',
-          'fcaw',
-          'gtaw_tig',
-          'saw',
-          'oxy_fuel',
-          'plasma_cutting',
-          'brazing',
-          'general'
-        ],
-        semantic_weight: 90,
-        desc: 'Compatible welding or thermal processes.'
-      },
+      /*subcategories: {*/
+        /*type: 'array',*/
+        /*required: true,*/
+        /*values: [*/
+          /*'electrode',*/
+          /*'welding_wire',*/
+          /*'filler_rod',*/
+          /*'torch',*/
+          /*'nozzle',*/
+          /*'contact_tip',*/
+          /*'holder',*/
+          /*'ground_clamp',*/
+          /*'regulator',*/
+          /*'hose',*/
+          /*'flux',*/
+          /*'anti_spatter',*/
+          /*'welding_machine',*/
+          /*'cutting_consumable',*/
+          /*'accessory'*/
+        /*],*/
+        /*semantic_weight: 80,*/
+        /*desc: 'Welding product families.'*/
+      /*},*/
 
-      material_compatibility: {
-        type: 'array',
-        required: false,
-        values: [
-          'carbon_steel',
-          'stainless_steel',
-          'aluminum',
-          'cast_iron',
-          'copper',
-          'bronze',
-          'nickel_alloy',
-          'mixed'
-        ],
-        semantic_weight: 75,
-        desc: 'Base materials intended to be processed.'
-      },
+      /*process: {*/
+        /*type: 'array',*/
+        /*required: true,*/
+        /*values: [*/
+          /*'smaw',*/
+          /*'gmaw_mig',*/
+          /*'fcaw',*/
+          /*'gtaw_tig',*/
+          /*'saw',*/
+          /*'oxy_fuel',*/
+          /*'plasma_cutting',*/
+          /*'brazing',*/
+          /*'general'*/
+        /*],*/
+        /*semantic_weight: 90,*/
+        /*desc: 'Compatible welding or thermal processes.'*/
+      /*},*/
 
-      electrode_class: {
-        type: 'string',
-        required: false,
-        semantic_weight: 75,
-        desc: 'Electrode, wire or filler classification such as E6013, E7018 or ER70S-6.'
-      },
+      /*material_compatibility: {*/
+        /*type: 'array',*/
+        /*required: false,*/
+        /*values: [*/
+          /*'carbon_steel',*/
+          /*'stainless_steel',*/
+          /*'aluminum',*/
+          /*'cast_iron',*/
+          /*'copper',*/
+          /*'bronze',*/
+          /*'nickel_alloy',*/
+          /*'mixed'*/
+        /*],*/
+        /*semantic_weight: 75,*/
+        /*desc: 'Base materials intended to be processed.'*/
+      /*},*/
 
-      diameter_mm: {
-        type: 'number',
-        required: false,
-        semantic_weight: 55,
-        desc: 'Nominal consumable or component diameter in millimeters.'
-      },
+      /*electrode_class: {*/
+        /*type: 'string',*/
+        /*required: false,*/
+        /*semantic_weight: 75,*/
+        /*desc: 'Electrode, wire or filler classification such as E6013, E7018 or ER70S-6.'*/
+      /*},*/
 
-      current_a: {
-        type: 'number',
-        required: false,
-        semantic_weight: 50,
-        desc: 'Nominal or recommended welding current in amperes.'
-      },
+      /*diameter_mm: {*/
+        /*type: 'number',*/
+        /*required: false,*/
+        /*semantic_weight: 55,*/
+        /*desc: 'Nominal consumable or component diameter in millimeters.'*/
+      /*},*/
 
-      voltage_v: {
-        type: 'number',
-        required: false,
-        semantic_weight: 40,
-        desc: 'Nominal operating voltage in volts.'
-      },
+      /*current_a: {*/
+        /*type: 'number',*/
+        /*required: false,*/
+        /*semantic_weight: 50,*/
+        /*desc: 'Nominal or recommended welding current in amperes.'*/
+      /*},*/
 
-      polarity: {
-        type: 'enum',
-        required: false,
-        values: [
-          'ac',
-          'dcen',
-          'dcep',
-          'ac_dc',
-          'not_applicable'
-        ],
-        semantic_weight: 45,
-        desc: 'Recommended welding polarity.'
-      },
+      /*voltage_v: {*/
+        /*type: 'number',*/
+        /*required: false,*/
+        /*semantic_weight: 40,*/
+        /*desc: 'Nominal operating voltage in volts.'*/
+      /*},*/
 
-      gas_type: {
-        type: 'array',
-        required: false,
-        values: [
-          'argon',
-          'co2',
-          'argon_co2',
-          'oxygen',
-          'acetylene',
-          'propane',
-          'nitrogen',
-          'none'
-        ],
-        semantic_weight: 55,
-        desc: 'Compatible shielding, cutting or fuel gases.'
-      },
+      /*polarity: {*/
+        /*type: 'enum',*/
+        /*required: false,*/
+        /*values: [*/
+          /*'ac',*/
+          /*'dcen',*/
+          /*'dcep',*/
+          /*'ac_dc',*/
+          /*'not_applicable'*/
+        /*],*/
+        /*semantic_weight: 45,*/
+        /*desc: 'Recommended welding polarity.'*/
+      /*},*/
 
-      certification: {
-        type: 'array',
-        required: false,
-        values: [
-          'aws',
-          'asme',
-          'iso',
-          'en',
-          'ntc',
-          'none'
-        ],
-        semantic_weight: 50,
-        desc: 'Applicable welding standards.'
-      },
+      /*gas_type: {*/
+        /*type: 'array',*/
+        /*required: false,*/
+        /*values: [*/
+          /*'argon',*/
+          /*'co2',*/
+          /*'argon_co2',*/
+          /*'oxygen',*/
+          /*'acetylene',*/
+          /*'propane',*/
+          /*'nitrogen',*/
+          /*'none'*/
+        /*],*/
+        /*semantic_weight: 55,*/
+        /*desc: 'Compatible shielding, cutting or fuel gases.'*/
+      /*},*/
 
-      cert_value: {
-        type: 'array',
-        required: false,
-        semantic_weight: 50,
-        desc: 'Specific certification or classification identifiers.'
-      },
+      /*certification: {*/
+        /*type: 'array',*/
+        /*required: false,*/
+        /*values: [*/
+          /*'aws',*/
+          /*'asme',*/
+          /*'iso',*/
+          /*'en',*/
+          /*'ntc',*/
+          /*'none'*/
+        /*],*/
+        /*semantic_weight: 50,*/
+        /*desc: 'Applicable welding standards.'*/
+      /*},*/
 
-      brand: {
-        type: 'string',
-        required: true,
-        semantic_weight: 12,
-        desc: 'Brand that manufactures and commercializes the product.'
-      }
-    }
-  };
+      /*cert_value: {*/
+        /*type: 'array',*/
+        /*required: false,*/
+        /*semantic_weight: 50,*/
+        /*desc: 'Specific certification or classification identifiers.'*/
+      /*},*/
 
+      /*brand: {*/
+        /*type: 'string',*/
+        /*required: true,*/
+        /*semantic_weight: 12,*/
+        /*desc: 'Brand that manufactures and commercializes the product.'*/
+      /*}*/
+    /*}*/
+  /*};*/
+
+
+
+category!: CategoryDefinition;
+
+  categ:any
   constructor(
-    private fb: FormBuilder
-  ) {}
+    private fb: FormBuilder,
+    private router: Router,
+  ) {
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras?.state?.item) {
+      this.categ = navigation.extras.state.item.data;
+      this.category = this.categ as CategoryDefinition;
+      //this.imported=this.movement.id_replenishment_product;
+    } else {
+      // Si recargaron la página, puedes cargar el item desde un servicio o API
+      console.warn('No se recibió item por NavigationExtras.state');
+    }
+    console.log("Item recibidox:", this.categ);
+  }
 
   ngOnInit(): void {
     this.buildForm();

@@ -148,6 +148,33 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'ats-ats-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../ats/ats/post/post.module').then(m =>m.AssetSupplyPostModule )
+          }
+        ]
+      },
+      {
+        path: 'ats-src-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../ats/src/post/post.module').then(m =>m.AssetSupplyPostModule )
+          }
+        ]
+      },
+     {
+        path: 'ats-bom-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../ats/bom/post/post.module').then(m =>m.AssetSupplyPostModule )
+          }
+        ]
+      },
+      {
         path: 'asset-stock-categ',
         children: [
           {

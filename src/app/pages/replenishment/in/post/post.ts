@@ -450,6 +450,8 @@ export class PostPage {
     payload.data.shipin=this.movement.data.shipin;
     payload.data.name=this.movement.data.name;  
     payload.data.deliveryin=this.form.value.deliveryin;  
+    payload.data.tripin=this.form.value.tripin;  
+    payload.data.imgin=this.uploadedUrl;  
     payload.data.datein=this.uiDate;  
     console.log('payload',payload)
     this.withdrawnService.post(payload.data).subscribe({

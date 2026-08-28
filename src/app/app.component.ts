@@ -184,8 +184,23 @@ export class AppComponent implements OnInit {
 
 
    appPages9 = [
-     {
-       title: 'Inicio',
+    {
+       title: 'Crear ATS',
+       url: '/app/tabs/ats-ats-post',
+       icon: 'add'
+    },
+    {
+       title: 'Crear Ats Source',
+       url: '/app/tabs/ats-src-post',
+       icon: 'add'
+    },
+    {
+       title: 'Crear BOM',
+       url: '/app/tabs/ats-bom-post',
+       icon: 'add'
+    },
+    {
+       title: 'Almacen',
        url: '/app/tabs/schedule',
        icon: 'calendar'
      },
