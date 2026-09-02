@@ -148,6 +148,24 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'ats-blg-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../ats/blg/getall/getall.module').then(m =>m.GetallModule )
+          }
+        ]
+      },
+      {
+        path: 'ats-blg-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../ats/blg/post/post.module').then(m =>m.AssetSupplyPostModule )
+          }
+        ]
+      },
+      {
         path: 'ats-ats-post',
         children: [
           {
@@ -165,7 +183,7 @@ const routes: Routes = [
           }
         ]
       },
-     {
+      {
         path: 'ats-bom-post',
         children: [
           {

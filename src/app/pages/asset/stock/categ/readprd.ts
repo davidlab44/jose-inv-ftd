@@ -134,6 +134,7 @@ export class ReadprdPage {
       next: r => {
         this.categories = r;
         this.categoryService.saveCategoriesToLocal(r);
+        console.log('categories',r);
       },
       error: e => {
         console.error('Error categorías:', e);

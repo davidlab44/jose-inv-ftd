@@ -4,12 +4,6 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
 
-    <ion-searchbar
-      placeholder="Buscar"
-      [value]="hash"
-      (ionInput)="onSearch($event.detail.value)">
-    </ion-searchbar>
-
     <ion-buttons slot="end">
       <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
         <span *ngIf="ios">Filter</span>
@@ -19,25 +13,20 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
-
-  <ion-list *ngIf="filteredProductList.length > 0">
-    <ion-item
-      button
-      detail="false"
-      *ngFor="let p of filteredProductList"
-      (click)="selectProduct(p)">
-      <ion-label>
-        {{ p.data.name }}
-      </ion-label>
-    </ion-item>
-  </ion-list>
 </ion-header>
+
+
+
+
+
+
+
 
 <ion-content class="ion-padding">
   <form [formGroup]="form">
     <ion-list>
       <ion-item>
-        <ion-label position="floating">Name</ion-label>
+        <ion-label position="floating">Crear tarea</ion-label>
         <ion-input formControlName="name"></ion-input>
       </ion-item>
       <ion-item>
@@ -125,3 +114,127 @@
   <br>
   <br>
 </ion-content>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<ion-content class="ion-padding">-->
+  <!--<form [formGroup]="form">-->
+    <!--<ion-list>-->
+
+         <!--<ion-grid>                                                                                                                                   -->
+           <!--<ion-row>           -->
+             <!--<ion-col size=6>-->
+                <!--<ion-searchbar placeholder="Buscarx" [value]="hash" (ionInput)="onSearch($event.detail.value)">-->
+                <!--</ion-searchbar>                -->
+                <!--<ion-item button detail="false" *ngFor="let p of filteredTaskList" (click)="selectProduct(p)">-->
+                  <!--<ion-label>-->
+                    <!--{{ p.data.name }}               -->
+                  <!--</ion-label>-->
+               <!--</ion-item>-->
+             <!--</ion-col>-->
+             <!--<ion-col size=6>-->
+               <!--<ion-searchbar placeholder="Buscar" [value]="hash" (ionInput)="onSearch($event.detail.value)">-->
+               <!--</ion-searchbar>                -->
+               <!--<ion-item button detail="false" *ngFor="let p of filteredTaskList" (click)="selectProduct(p)">-->
+                  <!--<ion-label>-->
+                    <!--{{ p.data.name }}               -->
+                  <!--</ion-label>-->
+               <!--</ion-item>-->
+             <!--</ion-col>-->
+             <!--<ion-col size=6>-->
+               <!--<ion-searchbar placeholder="Buscar" [value]="hash" (ionInput)="onSearch($event.detail.value)"></ion-searchbar>-->
+               <!--<ion-item button detail="false" *ngFor="let p of filteredTaskList" (click)="selectProduct(p)">-->
+                  <!--<ion-label>-->
+                    <!--{{ p.data.name }}               -->
+                  <!--</ion-label>-->
+               <!--</ion-item>-->
+             <!--</ion-col>-->
+           <!--</ion-row>-->
+         <!--</ion-grid>-->
+
+    <!--</ion-list>-->
+    <!--<br>-->
+    <!--<ion-grid class="bom-grid">-->
+      <!--<ion-row *ngFor="let p of bomList">-->
+        <!--<ion-col size="2" class="product-category">-->
+          <!--categ-->
+        <!--</ion-col>-->
+        <!--<ion-col size="5" class="product-name">-->
+          <!--{{ p.data.name }}-->
+        <!--</ion-col>-->
+        <!--<ion-col size="1" class="qty-container" >-->
+          <!--<span (click)="restartQty(p)" class="qty-control" >-->
+            <!--{{ p.data.qty || 0 }}-->
+          <!--</span>-->
+        <!--</ion-col>-->
+
+        <!--<ion-col size="1" class="control-col">-->
+          <!--<ion-button type="button" color="primary" (click)="incrementQty(p,1,$event)">-->
+            <!--+1-->
+          <!--</ion-button>-->
+        <!--</ion-col>-->
+        <!--<ion-col size="1" class="control-col">-->
+          <!--<ion-button type="button" color="primary" (click)="incrementQty(p,10,$event)">-->
+            <!--+10-->
+          <!--</ion-button>-->
+        <!--</ion-col>-->
+        <!--<ion-col size="1" class="control-col">-->
+          <!--<ion-button type="button" color="primary" (click)="incrementQty(p,100,$event)">-->
+            <!--+100-->
+          <!--</ion-button>-->
+        <!--</ion-col>-->
+        <!--[><ion-col size="1" class="control-col"><]-->
+          <!--[><button type="button" color="danger" (click)="incrementQty(p, 1, $event)"><]-->
+            <!--[>+1<]-->
+          <!--[></button><]-->
+        <!--[></ion-col><]-->
+        <!--[><ion-col size="1" class="control-col"><]-->
+          <!--[><button<]-->
+            <!--[>type="button"<]-->
+            <!--[>class="qty-control"<]-->
+            <!--[>(click)="incrementQty(p, 10, $event)"><]-->
+            <!--[>+10<]-->
+          <!--[></button><]-->
+        <!--[></ion-col><]-->
+        <!--[><ion-col size="1" class="control-col"><]-->
+          <!--[><button<]-->
+            <!--[>type="button"<]-->
+            <!--[>class="qty-control qty-control-large"<]-->
+            <!--[>(click)="incrementQty(p, 100, $event)"><]-->
+            <!--[>+100<]-->
+          <!--[></button><]-->
+        <!--[></ion-col><]-->
+<!--[>        <ion-col size="1" class="control-col"><]-->
+          <!--[><ion-button type="button" color="primary" (click)="clearQty(p, $event)"><]-->
+            <!--[><ion-icon name="refresh-circle-outline"></ion-icon><]-->
+          <!--[></ion-button><]-->
+        <!--[></ion-col><]-->
+        <!--<br>-->
+        <!--<ion-col size="1" class="control-col">-->
+          <!--<ion-button-->
+            <!--type="button"-->
+            <!--color="danger"-->
+            <!--(click)="removeById(p, $event)">-->
+            <!--<ion-icon name="trash-outline"></ion-icon>-->
+          <!--</ion-button>-->
+        <!--</ion-col>-->
+        <!--<br>-->
+      <!--</ion-row>-->
+    <!--</ion-grid>-->
+    <!--<ion-button expand="block" (click)="guardar()">-->
+      <!--Guardar-->
+    <!--</ion-button>-->
+  <!--</form>-->
+  <!--<br>-->
+  <!--<br>-->
+<!--</ion-content> -->

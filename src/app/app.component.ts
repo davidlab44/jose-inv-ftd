@@ -171,8 +171,6 @@ export class AppComponent implements OnInit {
      },
    ];
 
-
-
    //enevis
    appPages8 = [
      {
@@ -182,15 +180,24 @@ export class AppComponent implements OnInit {
      },
    ];
 
-
    appPages9 = [
     {
-       title: 'Crear ATS',
+       title: 'Asignar tarea',
+       url: '/app/tabs/ats-blg-getall',
+       icon: 'add'
+    },
+    {
+       title: 'Asignar tarea',
+       url: '/app/tabs/ats-blg-post',
+       icon: 'add'
+    },
+    {
+       title: 'Crear tarea',
        url: '/app/tabs/ats-ats-post',
        icon: 'add'
     },
     {
-       title: 'Crear Ats Source',
+       title: 'Crear sub tarea',
        url: '/app/tabs/ats-src-post',
        icon: 'add'
     },

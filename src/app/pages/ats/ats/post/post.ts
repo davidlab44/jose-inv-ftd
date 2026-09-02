@@ -46,7 +46,7 @@ export class AssetSupplyPostPage {
   posOrderLineList: any[] = [];
   pendingCommands: any[] = [];
   deliveredList: any[] = [];
-  filteredProductList: any[] = [];
+  filteredTaskList: any[] = [];
   maxQtyDeliveredItems: any[] = [];
   queryText:any
   mesas: any[] = [];
@@ -95,7 +95,6 @@ export class AssetSupplyPostPage {
   rexDocument:any;
 
   ngOnInit() {
-    this.loadCategories();
     this.loadUms();
     this.form = this.fb.group({
       name: [''],
@@ -120,15 +119,15 @@ export class AssetSupplyPostPage {
   guardar() {
     const data: any = this.form.value;
     data.img = this.uploadedUrl; 
-    data.bop= this.bomList;
-    delete data.category;
+    data.bom= this.bomList;
+    //delete data.category;
     console.log('Product to post =>', data);
     this.srcService.post(data).subscribe({
       next: (response) => {
         console.log("ats post response", response);
         if(response && response.length>0){
-          this.utilService.presentToast(response.toString())
-          this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });    
+          //this.utilservice.presenttoast(response.tostring())
+          //this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceurl: true });    
         }
       }
     });
@@ -143,20 +142,16 @@ export class AssetSupplyPostPage {
 
   updateSchedule(){}
 
-  productListCaos:any[]=[];
+  taskList:any[]=[];
   ionViewWillEnter() {
-
-    this.productService.getCachedOrServer().subscribe({
+    this.srcService.getAll().subscribe({
       next: (data) => {
-        console.log('[SEARCH][2.1] productListCaos recibido:', data);
-
-        this.productListCaos = data || [];
-        this.filteredProductList = [];
-
-        console.log('[SEARCH][3] productListCaos asignado -> cantidad:', this.productListCaos.length);
+        this.taskList = data || [];
+        this.filteredTaskList = [];
+        console.log('task list:', this.taskList.length);
       },
       error: (err) => {
-        console.error('[SEARCH][ERROR] error cargando productListCaos:', err);
+        console.error(' error cargando task:', err);
       }
     });
   }
@@ -184,16 +179,13 @@ export class AssetSupplyPostPage {
       console.log('elemento name',name)
       const validName = typeof name === 'string';
       const match = validName && name.toLowerCase().includes(term);
-      if (match) {
-        console.log(`[SEARCH][7] MATCH index=${index} name=`, name, 'producto=', product);
-      }
+      /*  if (match) {*/
+        /*console.log(`[SEARCH][7] MATCH index=${index} name=`, name, 'producto=', product);*/
+      /*}*/
       return match;
     });
-
     console.log('[SEARCH][8] coincidencias totales antes de limitar:', matches.length);
-
     const visibleResults = matches.slice(0, 20);
-
     return visibleResults;
   }
 
@@ -201,15 +193,13 @@ export class AssetSupplyPostPage {
     const value = text ?? '';
     this.hash = value;
     this.searchSubject.next(value);
-    this.filteredProductList = this.searchProducts(value, this.productListCaos);
+    this.filteredTaskList = this.searchProducts(value, this.taskList);
   }
-
 
   bomList:any[]=[];
   selectProduct(p: any) {
     p.data.qty=1;
     this.bomList.push(p)
-    
     console.log('bomlist',this.bomList)
       /*this.    .getAllCategories().subscribe({ */
         /*next: (res) => { */
@@ -222,7 +212,7 @@ export class AssetSupplyPostPage {
         /*} */
       /*}); */
     this.hash = p?.name ?? '';
-    this.filteredProductList = [];
+    this.filteredTaskList = [];
   }
 
   formatFechaLatam(dateInput: string | Date | number): string {
@@ -244,25 +234,25 @@ export class AssetSupplyPostPage {
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
-  categories: any[] = [];    
-  loadCategories() { 
-      this.categoryService.getAllCategories().subscribe({ 
-        next: (res) => {       
-          this.categories = res;          
-          this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.categories = this.categoryService.getCategoriesFromLocal(); 
-        } 
-      }); 
-   }   
+  /*categories: any[] = [];    */
+  /*loadCategories() { */
+      /*this.categoryService.getAllCategories().subscribe({ */
+        /*next: (res) => {       */
+          /*this.categories = res;          */
+          /*this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage */
+        /*}, */
+        /*error: (err) => {      */
+          /*console.error('❌ Error al cargar categorías:', err); */
+          /*this.categories = this.categoryService.getCategoriesFromLocal(); */
+        /*} */
+      /*}); */
+   /*}   */
        
    ums: any[] = []; 
    loadUms() {                
      this.umService.getAllUms().subscribe({ 
         next: (res) => {       
-          console.log('Ums:', res);    
+          console.log('Ums unidades de medida :', res);    
           this.ums = res; 
           this.umService.saveUmsToLocal(res); 
         }, 
@@ -298,7 +288,8 @@ export class AssetSupplyPostPage {
   }
 
   restartQty(p:any){
-   p.data.qty=1; 
+   p.data.qty=1;
+   console.log('TEST ESBUILD 001');
   }
 
 

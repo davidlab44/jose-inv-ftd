@@ -95,7 +95,7 @@ export class AssetSupplyPostPage {
   rexDocument:any;
 
   ngOnInit() {
-    this.loadCategories();
+    //this.loadCategories();
     this.loadUms();
     this.form = this.fb.group({
       name: [''],
@@ -120,19 +120,18 @@ export class AssetSupplyPostPage {
   guardar() {
     const data: any = this.form.value;
     data.img = this.uploadedUrl; 
-    data.bop= this.bomList;
-    delete data.category;
+    data.bom= this.bomList;
+    //delete data.category;
     console.log('Product to post =>', data);
     this.srcService.post(data).subscribe({
       next: (response) => {
         console.log("ats post response", response);
         if(response && response.length>0){
-          this.utilService.presentToast(response.toString())
-          this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });    
+          //this.utilservice.presenttoast(response.tostring())
+          //this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceurl: true });    
         }
       }
     });
-
   }
 
   slideOpts = {
@@ -148,7 +147,7 @@ export class AssetSupplyPostPage {
 
     this.productService.getCachedOrServer().subscribe({
       next: (data) => {
-        console.log('[SEARCH][2.1] productListCaos recibido:', data);
+        console.log('[SEARCH][2.1] productListx recibido:', data);
         this.productListCaos = data || [];
         this.filteredProductList = [];
 
@@ -243,25 +242,25 @@ export class AssetSupplyPostPage {
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
-  categories: any[] = [];    
-  loadCategories() { 
-      this.categoryService.getAllCategories().subscribe({ 
-        next: (res) => {       
-          this.categories = res;          
-          this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.categories = this.categoryService.getCategoriesFromLocal(); 
-        } 
-      }); 
-   }   
+  /*categories: any[] = [];    */
+  /*loadCategories() { */
+      /*this.categoryService.getAllCategories().subscribe({ */
+        /*next: (res) => {       */
+          /*this.categories = res;          */
+          /*this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage */
+        /*}, */
+        /*error: (err) => {      */
+          /*console.error('❌ Error al cargar categorías:', err); */
+          /*this.categories = this.categoryService.getCategoriesFromLocal(); */
+        /*} */
+      /*}); */
+   /*}   */
        
    ums: any[] = []; 
    loadUms() {                
      this.umService.getAllUms().subscribe({ 
         next: (res) => {       
-          console.log('Ums:', res);    
+          console.log('Ums unidades de medida :', res);    
           this.ums = res; 
           this.umService.saveUmsToLocal(res); 
         }, 
@@ -297,7 +296,8 @@ export class AssetSupplyPostPage {
   }
 
   restartQty(p:any){
-   p.data.qty=1; 
+   p.data.qty=1;
+   console.log('TEST ESBUILD 001');
   }
 
 

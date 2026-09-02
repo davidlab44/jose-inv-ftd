@@ -1,195 +1,135 @@
 <ion-content>
-
-
   <ion-list>
+    <section class="product-form">
+      <header>
+        <h2>{{ category.name_es_CO }}</h2>
+        <p>{{ category.desc }}</p>
+      </header>
+      <form [formGroup]="form" (ngSubmit)="submit()">
 
+        @for (attribute of requiredAttributes; track attribute.key) {
 
+          <div class="field">
 
+            <label [for]="attribute.key">
+              {{ label(attribute.key) }}
+              @if (attribute.config.required) {
+                <span class="required">*</span>
+              }
+            </label>
 
-<section class="product-form">
+            <!-- STRING -->
+            @if (attribute.config.type === 'string') {
+              <input
+                [id]="attribute.key"
+                type="text"
+                [formControlName]="attribute.key"
+                [placeholder]="attribute.config.desc ?? ''"
+              />
+            }
+            <!-- NUMBER -->
+            @else if (attribute.config.type === 'number') {
+              <input
+                [id]="attribute.key"
+                type="number"
+                [formControlName]="attribute.key"
+              />
+            }
+            <!-- ENUM -->
+            @else if (attribute.config.type === 'enum') {
+              <select [id]="attribute.key" [formControlName]="attribute.key"
+              >
 
-  <header>
-    <h2>
-      {{ category.name_es_CO }}
-    </h2>
+                <option value=""> Seleccione...</option>
 
-    <p>
-      {{ category.desc }}
-    </p>
-  </header>
+                @for (
+                  option of attribute.config.values ?? [];
+                  track option
+                ) {
 
+                  <option [value]="option">
+                    {{ label(option) }}
+                  </option>
 
-  <form
-    [formGroup]="form"
-    (ngSubmit)="submit()"
-  >
+                }
 
-    @for (attribute of requiredAttributes; track attribute.key) {
-
-      <div class="field">
-
-        <label [for]="attribute.key">
-
-          {{ label(attribute.key) }}
-
-          @if (attribute.config.required) {
-            <span class="required">*</span>
-          }
-
-        </label>
-
-
-        <!-- STRING -->
-
-        @if (attribute.config.type === 'string') {
-
-          <input
-            [id]="attribute.key"
-            type="text"
-            [formControlName]="attribute.key"
-            [placeholder]="attribute.config.desc ?? ''"
-          />
-
-        }
-
-
-        <!-- NUMBER -->
-
-        @else if (attribute.config.type === 'number') {
-
-          <input
-            [id]="attribute.key"
-            type="number"
-            [formControlName]="attribute.key"
-          />
-
-        }
-
-
-        <!-- ENUM -->
-
-        @else if (attribute.config.type === 'enum') {
-
-          <select
-            [id]="attribute.key"
-            [formControlName]="attribute.key"
-          >
-
-            <option value="">
-              Seleccione...
-            </option>
-
-            @for (
-              option of attribute.config.values ?? [];
-              track option
-            ) {
-
-              <option [value]="option">
-                {{ label(option) }}
-              </option>
+              </select>
 
             }
+            <!-- ARRAY -->
+            @else if (attribute.config.type === 'array') {
+              @if (attribute.config.values?.length) {
+                <select
+                  [id]="attribute.key"
+                  [formControlName]="attribute.key"
+                  multiple
+                >
+                  @for (
+                    option of attribute.config.values ?? [];
+                    track option
+                  ) {
+                    <option [value]="option">
+                      {{ label(option) }}
+                    </option>
+                  }
+                </select>
+              }
 
-          </select>
+              @else {
 
-        }
+                <!--
+                  Array sin "values", por ejemplo cert_value.
+                  Aunque actualmente cert_value no es required,
+                  dejamos preparado el componente.
+                -->
 
-
-        <!-- ARRAY -->
-
-        @else if (attribute.config.type === 'array') {
-
-          @if (attribute.config.values?.length) {
-
-            <select
-              [id]="attribute.key"
-              [formControlName]="attribute.key"
-              multiple
-            >
-
-              @for (
-                option of attribute.config.values ?? [];
-                track option
-              ) {
-
-                <option [value]="option">
-                  {{ label(option) }}
-                </option>
+                <input
+                  [id]="attribute.key"
+                  type="text"
+                  [formControlName]="attribute.key"
+                  placeholder="Ingrese valores"
+                />
 
               }
 
-            </select>
-
-          }
-
-          @else {
-
-            <!--
-              Array sin "values", por ejemplo cert_value.
-              Aunque actualmente cert_value no es required,
-              dejamos preparado el componente.
-            -->
-
-            <input
-              [id]="attribute.key"
-              type="text"
-              [formControlName]="attribute.key"
-              placeholder="Ingrese valores"
-            />
-
-          }
-
-        }
+            }
 
 
-        @if (attribute.config.desc) {
+            @if (attribute.config.desc) {
+              <small>
+                {{ attribute.config.desc }}
+              </small>
 
-          <small>
-            {{ attribute.config.desc }}
-          </small>
-
-        }
+            }
 
 
-        @if (
-          form.get(attribute.key)?.invalid &&
-          form.get(attribute.key)?.touched
-        ) {
+            @if (
+              form.get(attribute.key)?.invalid &&
+              form.get(attribute.key)?.touched
+            ) {
 
-          <div class="error">
-            Este campo es obligatorio.
+              <div class="error">
+                Este campo es obligatorio.
+              </div>
+
+            }
+
           </div>
 
         }
 
-      </div>
+        <button type="submit" [disabled]="form.invalid">
+          Crear producto
+        </button>
+      </form>
+<!--      <h3>Resultado</h3>-->
+      <!--<pre>{{ form.getRawValue() | json }}</pre>-->
+    </section>
 
-    }
-
-
-    <button
-      type="submit"
-      [disabled]="form.invalid"
-    >
-      Crear producto
-    </button>
-
-  </form>
-
-
-  <h3>Resultado</h3>
-
-  <pre>{{ form.getRawValue() | json }}</pre>
-
-</section>
-
-
-
-
-
-
+  <!--<ion-button expand="block" (click)="guardar()">-->
+    <!--Guardar-->
+  <!--</ion-button>-->
   </ion-list>
-
 </ion-content>
 
 
