@@ -103,4 +103,10 @@
 }
 
 
+ion-content {
+  --background: #ffffff;
+  &.ocr-success {
+    --background: #b1fc97;
+  }
+}
 

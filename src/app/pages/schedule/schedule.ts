@@ -289,7 +289,7 @@ export class SchedulePage{
       },
       error: (err) => {
         console.error('❌ Error al cargar categorías:', err);
-        this.categories = this.categoryService.getCategoriesFromLocal();
+        //this.categories = this.categoryService.getCategoriesFromLocal();
       }
     });
   }
@@ -322,7 +322,7 @@ export class SchedulePage{
   }
 
   getCategoryNameById(id: number): string {
-    const cat = this.categories.find(c => c.id === id);
+    const cat = this.categories.find(c => c.ext_id === id);
     return cat ? cat.data?.name || 'Sin categoría' : 'Sin categoría';
   }
 

@@ -6,7 +6,7 @@ const umService = require('../../services/um.service.js');
 function getCategoryNameById(categories, id) {
   debugger;
   if (id == null || !Array.isArray(categories) || !categories.length) return 'Sin categoría';
-  const nombre = categories.find(c => Number(c.id) === Number(id))?.data?.name_es_CO;
+  const nombre = categories.find(c => Number(c.ext_id) === Number(id))?.data?.name_es_CO;
   return typeof nombre === 'string' && nombre.trim() ? nombre : 'Sin categoría';
 }
 function getUmNameById(ums, id) {
@@ -30,7 +30,7 @@ function filterByCategory(categories, products, text) {
   const filteredCategories = categories.filter(cat =>
     (cat?.data?.name_es_CO?.toLowerCase() || '').includes(text.toLowerCase())
   );
-  const ids = filteredCategories.map(c => Number(c.id));
+  const ids = filteredCategories.map(c => Number(c.ext_id));
   const filteredProductsByCategory = products.filter(prod =>
     ids.includes(Number(prod?.data?.categ?.[0]))
   );

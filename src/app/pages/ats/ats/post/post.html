@@ -1,8 +1,16 @@
+
+
 <ion-header translucent="true">
   <ion-toolbar>
     <ion-buttons *ngIf="!showSearchbar" slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
+
+    <ion-searchbar
+      placeholder="Buscar"
+      [value]="hash"
+      (ionInput)="onSearch($event.detail.value)">
+    </ion-searchbar>
 
     <ion-buttons slot="end">
       <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
@@ -13,7 +21,41 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
+
+  <ion-list *ngIf="filteredTaskList.length > 0">
+    <ion-item
+      button
+      detail="false"
+      *ngFor="let p of filteredTaskList"
+      (click)="selectProduct(p)">
+      <ion-label>
+        {{ p.data.name }}
+      </ion-label>
+    </ion-item>
+  </ion-list>
 </ion-header>
+
+
+
+
+
+
+<!--<ion-header translucent="true">-->
+  <!--<ion-toolbar>-->
+    <!--<ion-buttons *ngIf="!showSearchbar" slot="start">-->
+      <!--<ion-menu-button></ion-menu-button>-->
+    <!--</ion-buttons>-->
+
+    <!--<ion-buttons slot="end">-->
+      <!--<ion-button *ngIf="!showSearchbar" (click)="presentFilter()">-->
+        <!--<span *ngIf="ios">Filter</span>-->
+        <!--<span *ngIf="!ios">-->
+          <!--<ion-icon slot="icon-only" name="options"></ion-icon>-->
+        <!--</span>-->
+      <!--</ion-button>-->
+    <!--</ion-buttons>-->
+  <!--</ion-toolbar>-->
+<!--</ion-header>-->
 
 
 
@@ -52,7 +94,6 @@
             {{ p.data.qty || 0 }}
           </span>
         </ion-col>
-
         <ion-col size="1" class="control-col">
           <ion-button type="button" color="primary" (click)="incrementQty(p,1,$event)">
             +1
@@ -68,33 +109,6 @@
             +100
           </ion-button>
         </ion-col>
-
-        <!--<ion-col size="1" class="control-col">-->
-          <!--<button type="button" color="danger" (click)="incrementQty(p, 1, $event)">-->
-            <!--+1-->
-          <!--</button>-->
-        <!--</ion-col>-->
-        <!--<ion-col size="1" class="control-col">-->
-          <!--<button-->
-            <!--type="button"-->
-            <!--class="qty-control"-->
-            <!--(click)="incrementQty(p, 10, $event)">-->
-            <!--+10-->
-          <!--</button>-->
-        <!--</ion-col>-->
-        <!--<ion-col size="1" class="control-col">-->
-          <!--<button-->
-            <!--type="button"-->
-            <!--class="qty-control qty-control-large"-->
-            <!--(click)="incrementQty(p, 100, $event)">-->
-            <!--+100-->
-          <!--</button>-->
-        <!--</ion-col>-->
-<!--        <ion-col size="1" class="control-col">-->
-          <!--<ion-button type="button" color="primary" (click)="clearQty(p, $event)">-->
-            <!--<ion-icon name="refresh-circle-outline"></ion-icon>-->
-          <!--</ion-button>-->
-        <!--</ion-col>-->
         <br>
         <ion-col size="1" class="control-col">
           <ion-button

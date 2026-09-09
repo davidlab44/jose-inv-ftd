@@ -109,7 +109,7 @@ export class ReadprdctPage {
             return coincide;
           });
 
-        const ids = this.filteredCategories.map(c => Number(c.id));
+        const ids = this.filteredCategories.map(c => Number(c.ext_id));
 
         this.filteredProductsByCategory = this.productListFull.filter(prod =>
           ids.includes(Number(prod?.data?.categ?.[0]))
@@ -139,19 +139,6 @@ export class ReadprdctPage {
       error: err => console.error("Error en búsqueda:", err)
     });
 
-
-  /*  this.searchSubject.pipe(*/
-      /*debounceTime(1000),          */
-      /*distinctUntilChanged(),      */
-      /*switchMap(text => this.productService.searchProducts(text))*/
-    /*)*/
-    /*.subscribe({*/
-      /*next: results => {*/
-        /*console.log("Resultados de búsqueda:", results);*/
-        /*this.productList = results;*/
-      /*},*/
-      /*error: err => console.error("Error en búsqueda:", err)*/
-    /*});*/
   }
 
   updateSchedule(){
@@ -201,7 +188,7 @@ export class ReadprdctPage {
         }, 
         error: (err) => {      
           console.error('❌ Error al cargar categorías:', err); 
-          this.categories = this.categoryService.getCategoriesFromLocal(); 
+          //this.categories = this.categoryService.getCategoriesFromLocal(); 
         } 
       }); 
     }   
@@ -231,7 +218,7 @@ export class ReadprdctPage {
         return 'Sin categoría';
       }
 
-      const cat = this.categories.find(c => Number(c.id) === Number(id));
+      const cat = this.categories.find(c => Number(c.ext_id) === Number(id));
 
       const nombre = cat?.data?.nombre;
 
@@ -277,33 +264,29 @@ export class ReadprdctPage {
     this.searchSubject.next(text);
   }
 
-  enviar() {
-    const items = [
-      {
-        ext_id: 101,
-        data: {
-          nombre: 'Producto de prueba',
-          precio: 249.90,
-          categoria: 'Electrónica',
-          stock: 12
-        }
-      },
-      {
-        ext_id: 102,
-        data: {
-          nombre: 'Audífonos Bluetooth',
-          precio: 89.50,
-          categoria: 'Accesorios',
-          stock: 50
-        }
-      }
-    ];
+  /*enviar() {*/
+    /*const items = [*/
+      /*{*/
+        /*ext_id: 101,*/
+        /*data: {*/
+          /*nombre: 'Producto de prueba',*/
+          /*precio: 249.90,*/
+          /*categoria: 'Electrónica',*/
+          /*stock: 12*/
+        /*}*/
+      /*},*/
+      /*{*/
+        /*ext_id: 102,*/
+        /*data: {*/
+          /*nombre: 'Audífonos Bluetooth',*/
+          /*precio: 89.50,*/
+          /*categoria: 'Accesorios',*/
+          /*stock: 50*/
+        /*}*/
+      /*}*/
+    /*];*/
 
-    /*this.rexService.addProdrexItems(items).subscribe({*/
-      /*next: (resp) => console.log('Respuesta OK:', resp),*/
-      /*error: (err) => console.error('Error al enviar:', err)*/
-    /*});*/
-  }
+  /*}*/
 
   manualOutbound(item:any){
     this.router.navigate(

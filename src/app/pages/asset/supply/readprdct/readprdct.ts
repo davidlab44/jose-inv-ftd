@@ -115,7 +115,7 @@ export class AssetSupplyReadprdctPage {
             return coincide;
           });
 
-        const ids = this.filteredCategories.map(c => Number(c.id));
+        const ids = this.filteredCategories.map(c => Number(c.ext_id));
 
         this.filteredProductsByCategory = this.productListFull.filter(prod =>
           ids.includes(Number(prod?.data?.categ?.[0]))
@@ -203,38 +203,34 @@ export class AssetSupplyReadprdctPage {
         
     ums: any[] = []; 
         
-    loadUms() {                
-      this.umService.getAllUms().subscribe({ 
-        next: (res) => {       
-          console.log('✅ Ums:', res);    
-          this.ums = res; 
-          this.umService.saveUmsToLocal(res); 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.ums = this.umService.getUmsFromLocal(); 
-        } 
-      }); 
-    }     
-      
-    getCategoryNameById(id: number | null | undefined): string {
-      if (id === null || id === undefined) {
-        return 'Sin categoría';
-      }
-
-      if (!Array.isArray(this.categories) || this.categories.length === 0) {
-        return 'Sin categoría';
-      }
-
-      const cat = this.categories.find(c => Number(c.id) === Number(id));
-
-      const nombre = cat?.data?.name_es_CO;
-
-      return typeof nombre === 'string' && nombre.trim() !== ''
-        ? nombre
-        : 'Sin categoría';
+  loadUms() {                
+    this.umService.getAllUms().subscribe({ 
+      next: (res) => {       
+        console.log('✅ Ums:', res);    
+        this.ums = res; 
+        this.umService.saveUmsToLocal(res); 
+      }, 
+      error: (err) => {      
+        console.error('❌ Error al cargar categorías:', err); 
+        this.ums = this.umService.getUmsFromLocal(); 
+      } 
+    }); 
+  }     
+  
+  getCategoryNameById(id: number | null | undefined): string {
+    if (id === null || id === undefined) {
+      return 'Sin categoría';
     }
 
+    if (!Array.isArray(this.categories) || this.categories.length === 0) {
+      return 'Sin categoría';
+    }
+    const cat = this.categories.find(c => Number(c.ext_id) === Number(id));
+    const nombre = cat?.data?.name_es_CO;
+    return typeof nombre === 'string' && nombre.trim() !== ''
+      ? nombre
+      : 'Sin categoría';
+  }
 
   getUmNameById(id: number | string | null | undefined): string {
     // Validar ID recibido
@@ -242,29 +238,21 @@ export class AssetSupplyReadprdctPage {
     if (id === null || id === undefined) {
       return 'Sin UM1';
     }
-
     const idNum = Number(id);
     if (isNaN(idNum)) {
       return 'Sin UM2';
     }
-
-    // Validar que this.ums exista y tenga elementos
     if (!Array.isArray(this.ums) || this.ums.length === 0) {
       return 'Sin UM3';
     }
-
-    // Buscar la UM por ID
     const um = this.ums.find(u => Number(u.id) === idNum);
     if (!um) {
       return 'Sin UM4';
     }
-
-    // Extraer el nombre si existe y es válido
     const nombre = um?.data?.name;
     if (typeof nombre === 'string' && nombre.trim() !== '') {
       return nombre;
     }
-
     return 'Sin UM5';
   }
 
@@ -272,28 +260,28 @@ export class AssetSupplyReadprdctPage {
     this.searchSubject.next(text);
   }
 
-  enviar() {
-    const items = [
-      {
-        ext_id: 101,
-        data: {
-          nombre: 'Producto de prueba',
-          precio: 249.90,
-          categoria: 'Electrónica',
-          stock: 12
-        }
-      },
-      {
-        ext_id: 102,
-        data: {
-          nombre: 'Audífonos Bluetooth',
-          precio: 89.50,
-          categoria: 'Accesorios',
-          stock: 50
-        }
-      }
-    ];
-  }
+  /*enviar() {*/
+    /*const items = [*/
+      /*{*/
+        /*ext_id: 101,*/
+        /*data: {*/
+          /*nombre: 'Producto de prueba',*/
+          /*precio: 249.90,*/
+          /*categoria: 'Electrónica',*/
+          /*stock: 12*/
+        /*}*/
+      /*},*/
+      /*{*/
+        /*ext_id: 102,*/
+        /*data: {*/
+          /*nombre: 'Audífonos Bluetooth',*/
+          /*precio: 89.50,*/
+          /*categoria: 'Accesorios',*/
+          /*stock: 50*/
+        /*}*/
+      /*}*/
+    /*];*/
+  /*}*/
 
   out(item:any){
     console.log("item to modifyqty",item);

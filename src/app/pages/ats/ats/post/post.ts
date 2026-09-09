@@ -122,7 +122,7 @@ export class AssetSupplyPostPage {
     data.bom= this.bomList;
     //delete data.category;
     console.log('Product to post =>', data);
-    this.srcService.post(data).subscribe({
+    this.atsService.post(data).subscribe({
       next: (response) => {
         console.log("ats post response", response);
         if(response && response.length>0){

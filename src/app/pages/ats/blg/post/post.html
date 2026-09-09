@@ -3,7 +3,6 @@
     <ion-buttons *ngIf="!showSearchbar" slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-
     <ion-buttons slot="end">
       <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
         <span *ngIf="ios">Filter</span>
@@ -16,13 +15,12 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="form">
     <ion-list>
        <ion-grid> 
          <ion-row>
-           <ion-col size=6>
-             <span (click)="resetList(bomList)">&nbsp;&nbsp;&nbsp;<ion-icon name="reload-outline"></ion-icon></span>
-             <div *ngIf="bomList.length==0">
+           <ion-col size=8>
+             <span (click)="resetList(selectedTasksList)">&nbsp;&nbsp;&nbsp;<ion-icon name="reload-outline"></ion-icon></span>
+             <div *ngIf="selectedTasksList.length==0">
                <ion-searchbar placeholder="Buscar" [value]="hash" (ionInput)="onSearch($event.detail.value)">
                </ion-searchbar>
                <ion-item button detail="false" *ngFor="let p of filteredTaskList" (click)="selectTask(p)">
@@ -31,59 +29,64 @@
                   </ion-label>
                </ion-item>
              </div>
-             <div *ngIf="bomList.length>0" ><br>
-               <div *ngFor="let t of bomList" >
-                 <span>data.name: {{t.data.name}}</span>
-               </div>   
-
-
-               <ion-grid class="bom-grid">
-                 <ion-row *ngFor="let p of bomList">
-                  <ion-col size="2" class="product-category">
-                    categ
-                  </ion-col>
-                  <ion-col size="5" class="product-name">
-                    {{ p.data.name }}
-                  </ion-col>
-                  <ion-col size="1" class="qty-container" >
-                    <span (click)="restartQty(p)" class="qty-control" >
-                      {{ p.data.qty || 0 }}
-                    </span>
-                  </ion-col>
-                  <ion-col size="1" class="control-col">
-                    <ion-button type="button" color="primary" (click)="incrementQty(p,1,$event)">
-                      +1
-                    </ion-button>
-                  </ion-col>
-                  <ion-col size="1" class="control-col">
-                    <ion-button type="button" color="primary" (click)="incrementQty(p,10,$event)">
-                      +10
-                    </ion-button>
-                  </ion-col>
-                  <ion-col size="1" class="control-col">
-                    <ion-button type="button" color="primary" (click)="incrementQty(p,100,$event)">
-                      +100
-                    </ion-button>
-                  </ion-col>
-                  <br>
-                  <ion-col size="1" class="control-col">
-                    <ion-button
-                      type="button"
-                      color="danger"
-                      (click)="removeById(p, $event)">
-                      <ion-icon name="trash-outline"></ion-icon>
-                    </ion-button>
-                   </ion-col>
-                   <br>
-                 </ion-row>
-               </ion-grid>
-             </div><br>
-             <div *ngFor="let u of filteredUserList" >
-               <span>data.name: {{u.data.name}}</span>
-             </div> 
+             <div *ngIf="selectedTasksList.length>0"><br>
+               <div *ngFor="let p of selectedTasksList">
+                 <ion-grid class="bom-grid">
+                   <ion-row *ngFor="let p of selectedTasksList">
+                    <ion-col size="3" class="product-category">
+                      categ
+                    </ion-col>
+                    <ion-col size="5" class="product-name">
+                      {{ p.data.name }}
+                    </ion-col>
+                    <ion-col size="2" >
+                      <span (click)="restartQty(p)">
+                        {{ p.data.qty || 0 }}
+                      </span>
+                    </ion-col>
+                    <ion-col size="2" class="product-category">
+                      {{p.data.umName}}
+                    </ion-col>
+                  </ion-row> 
+                  <ion-row> 
+                    <ion-col size="3" class="control-col">
+                      <ion-button type="button" color="primary" (click)="incrementQty(p,1,$event)">
+                        +1
+                      </ion-button>
+                    </ion-col>
+                    <ion-col size="3" class="control-col">
+                      <ion-button type="button" color="primary" (click)="incrementQty(p,10,$event)">
+                        +10
+                      </ion-button>
+                    </ion-col>
+                    <ion-col size="3" class="control-col">
+                      <ion-button type="button" color="primary" (click)="incrementQty(p,100,$event)">
+                        +100
+                      </ion-button>
+                    </ion-col>
+                    <ion-col size="3" class="control-col">
+                      <ion-button type="button" color="primary" (click)="incrementQty(p,1000,$event)">
+                        +1k
+                      </ion-button>
+                    </ion-col>
+                   </ion-row>
+                 </ion-grid>
+               </div> 
+             </div>
+             <br>
+             <div *ngFor="let u of selectedUsersList" >
+               <span>&nbsp;&nbsp; {{u.data.name}}</span><br>
+               <span>&nbsp;&nbsp;<br></span>
+             </div>
+             <br><br><br>
+             <div *ngIf="selectedTasksList.length>0&&selectedUsersList.length>0">
+               <ion-button expand="block" (click)="guardar()">
+                 Guardar
+               </ion-button>
+             </div>  
            </ion-col>
-           <ion-col size=6>
-             <span (click)="resetList(bomList)">&nbsp;&nbsp;<ion-icon name="reload-outline"></ion-icon></span>
+           <ion-col size=4>
+             <span (click)="resetList(selectedTasksList)">&nbsp;&nbsp;<ion-icon name="reload-outline"></ion-icon></span>
              <ion-item button detail="false" *ngFor="let p of userList" (click)="selectUser(p)">
                 <ion-label>
                   {{ p.data.name }} 
@@ -93,11 +96,6 @@
          </ion-row>
        </ion-grid>
     </ion-list>
-    <br>
-    <ion-button expand="block" (click)="guardar()">
-      Guardar
-    </ion-button>
-  </form>
   <br>
   <br>
 </ion-content> 

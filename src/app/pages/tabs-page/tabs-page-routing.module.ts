@@ -94,15 +94,6 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'readprdct',
-        children: [
-          {
-            path: '',
-            loadChildren: () => import('../readprdct/readprdct.module').then(m => m.ReadprdctModule)
-          }
-        ]
-      },
-      {
         path: 'readren',
         children: [
           {
@@ -173,6 +164,15 @@ const routes: Routes = [
             loadChildren: () => import('../ats/ats/post/post.module').then(m =>m.AssetSupplyPostModule )
           }
         ]
+      },
+      {
+        path: 'ats-src-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../ats/src/getall/getall.module').then(m =>m.GetallModule )
+          }
+        ]   
       },
       {
         path: 'ats-src-post',

@@ -95,7 +95,7 @@ export class AssetSupplyPostPage {
   rexDocument:any;
 
   ngOnInit() {
-    //this.loadCategories();
+    this.loadCategories();
     this.loadUms();
     this.form = this.fb.group({
       name: [''],
@@ -144,13 +144,11 @@ export class AssetSupplyPostPage {
 
   productListCaos:any[]=[];
   ionViewWillEnter() {
-
     this.productService.getCachedOrServer().subscribe({
       next: (data) => {
         console.log('[SEARCH][2.1] productListx recibido:', data);
         this.productListCaos = data || [];
         this.filteredProductList = [];
-
         console.log('[SEARCH][3] productListCaos asignado -> cantidad:', this.productListCaos.length);
       },
       error: (err) => {
@@ -202,23 +200,14 @@ export class AssetSupplyPostPage {
     this.filteredProductList = this.searchProducts(value, this.productListCaos);
   }
 
-
   bomList:any[]=[];
   selectProduct(p: any) {
+    console.log('p seleccionado',p)
     p.data.qty=1;
+    p.data.categName=this.categoryService.getUmNameById(p.data.categ[0],this.categs);
+    p.data.umName=this.umService.getUmNameById(p.data.um,this.ums);
     this.bomList.push(p)
-    
     console.log('bomlist',this.bomList)
-      /*this.    .getAllCategories().subscribe({ */
-        /*next: (res) => { */
-          /*this.categories = res; */
-          /*this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage */
-        /*}, */
-        /*error: (err) => {      */
-          /*console.error('❌ Error al cargar categorías:', err); */
-          /*this.categories = this.categoryService.getCategoriesFromLocal(); */
-        /*} */
-      /*}); */
     this.hash = p?.name ?? '';
     this.filteredProductList = [];
   }
@@ -242,19 +231,19 @@ export class AssetSupplyPostPage {
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
-  /*categories: any[] = [];    */
-  /*loadCategories() { */
-      /*this.categoryService.getAllCategories().subscribe({ */
-        /*next: (res) => {       */
-          /*this.categories = res;          */
-          /*this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage */
-        /*}, */
-        /*error: (err) => {      */
-          /*console.error('❌ Error al cargar categorías:', err); */
-          /*this.categories = this.categoryService.getCategoriesFromLocal(); */
-        /*} */
-      /*}); */
-   /*}   */
+  categs: any[] = [];    
+  loadCategories() { 
+      this.categoryService.getAllCategories().subscribe({ 
+        next: (res) => {       
+          this.categs = res;          
+          this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
+        }, 
+        error: (err) => {      
+          console.error('❌ Error al cargar categorías:', err); 
+          //this.categs = this.categoryService.getCategoriesFromLocal(); 
+        } 
+      }); 
+   }   
        
    ums: any[] = []; 
    loadUms() {                

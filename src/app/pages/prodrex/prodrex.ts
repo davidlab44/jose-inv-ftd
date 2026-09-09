@@ -188,50 +188,46 @@ export class ProdrexPage {
   }
 
   categories: any[] = [];    
-    loadCategories() { 
-      this.categoryService.getAllCategories().subscribe({ 
-        next: (res) => {       
-          this.categories = res;          
-          this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.categories = this.categoryService.getCategoriesFromLocal(); 
-        } 
-      }); 
-    }   
-    ums: any[] = []; 
-    loadUms() {                
-      this.umService.getAllUms().subscribe({ 
-        next: (res) => {       
-          console.log('✅ Ums:', res);    
-          this.ums = res; 
-          this.umService.saveUmsToLocal(res); 
-        }, 
-        error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
-          this.ums = this.umService.getUmsFromLocal(); 
-        } 
-      }); 
-    }     
-      
-    getCategoryNameById(id: number | null | undefined): string {
-      if (id === null || id === undefined) {
-        return 'Sin categoría';
-      }
-
-      if (!Array.isArray(this.categories) || this.categories.length === 0) {
-        return 'Sin categoría';
-      }
-
-      const cat = this.categories.find(c => Number(c.id) === Number(id));
-
-      const nombre = cat?.datos?.nombre;
-
-      return typeof nombre === 'string' && nombre.trim() !== ''
-        ? nombre
-        : 'Sin categoría';
+  loadCategories() { 
+    this.categoryService.getAllCategories().subscribe({ 
+      next: (res) => {       
+        this.categories = res;          
+        this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
+      }, 
+      error: (err) => {      
+        console.error('❌ Error al cargar categorías:', err); 
+        this.categories = this.categoryService.getCategoriesFromLocal(); 
+      } 
+    }); 
+  }   
+  ums: any[] = []; 
+  loadUms() {                
+    this.umService.getAllUms().subscribe({ 
+      next: (res) => {       
+        console.log('✅ Ums:', res);    
+        this.ums = res; 
+        this.umService.saveUmsToLocal(res); 
+      }, 
+      error: (err) => {      
+        console.error('❌ Error al cargar categorías:', err); 
+        this.ums = this.umService.getUmsFromLocal(); 
+      } 
+    }); 
+  }     
+    
+  getCategoryNameById(id: number | null | undefined): string {
+    if (id === null || id === undefined) {
+      return 'Sin categoría';
     }
+    if (!Array.isArray(this.categories) || this.categories.length === 0) {
+      return 'Sin categoría';
+    }
+    const cat = this.categories.find(c => Number(c.ext_id) === Number(id));
+    const nombre = cat?.datos?.nombre;
+    return typeof nombre === 'string' && nombre.trim() !== ''
+      ? nombre
+      : 'Sin categoría';
+  }
 
 
   getUmNameById(id: number | string | null | undefined): string {

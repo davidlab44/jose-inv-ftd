@@ -11,7 +11,7 @@
       "schematics": {},
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser-esbuild",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "www",
             "index": "src/index.html",
@@ -94,34 +94,20 @@
           },
           "defaultConfiguration": ""
         },
-
-
-
-
-
-
-
-
-
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "buildTarget": "app:build",
-            "proxyConfig": "proxy.conf.json",
-            "prebundle": false
+            "browserTarget": "app:build",
+            "disableHostCheck": true,
+            "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
             "production": {
-              "buildTarget": "app:build:production"
+              "browserTarget": "app:build:production"
             },
             "ci": {}
           }
         },
-
-
-
-
-
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {

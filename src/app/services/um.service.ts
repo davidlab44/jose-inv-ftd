@@ -4,12 +4,47 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 declare const require:any;
 const shared=require('./um.service.js');
+
 @Injectable({providedIn:'root'})
+
 export class UmService {
+  
   private apiUrl=environment.apiHost;
+  
   constructor(private http:HttpClient){}
-  getAllUms():Observable<any>{return this.http.get(shared.urlAllUms(this.apiUrl));}
+  
+  getAllUms():Observable<any>{
+    return this.http.get(shared.urlAllUms(this.apiUrl));
+  }
+  
   getUmById(id:number):Observable<any>{return this.http.get<any[]>(shared.urlUmById(this.apiUrl,id));}
+  
   saveUmsToLocal(ums:any[]):void{localStorage.setItem('ums',JSON.stringify(ums));}
+
   getUmsFromLocal():any[]{const data=localStorage.getItem('ums');return data?JSON.parse(data):[];}
+
+
+  getUmNameById(id: number | string | null | undefined, umList:any[]): string {
+    if (id === null || id === undefined) {
+      return 'Sin UM1';
+    }
+    const idNum = Number(id);
+    if (isNaN(idNum)) {
+      return 'Sin UM2';
+    }
+    if (!Array.isArray(umList) || umList.length === 0) {
+      return 'Sin UM3';
+    }
+    const um = umList.find(u => Number(u.id) === idNum);
+    if (!um) {
+      return 'Sin UM4';
+    }
+    const nombre = um?.data?.name;
+    if (typeof nombre === 'string' && nombre.trim() !== '') {
+      return nombre;
+    }
+    return 'Sin UM5';
+  }
+
+
 }

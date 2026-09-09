@@ -71,6 +71,7 @@ export class PostPage {
      name:0
    }
   };
+  ocrSuccess = false;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -109,7 +110,6 @@ export class PostPage {
   rexDocument:any;
   item:any;
   ngOnInit() {
-
     this.movement.date='2026'
     console.log('fake movement',this.movement)
     const nav = history.state;

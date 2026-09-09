@@ -45,7 +45,6 @@
         </ion-card-content>
       </ion-card>
 
-
       <ion-grid style="border:solid 1px #d5d5d5;border-radius:3%;"   >
         <ion-row class="ion-align-items-center">
           <ion-col size="6">
@@ -82,19 +81,39 @@
           <!--<ion-input formControlName="shipin"></ion-input>-->
         <!--</ion-item>-->
         <br><br>
-        <ion-item  *ngIf="shipList?.length"  >
-          <ion-label>Motonave {{shipNombreEsp}} </ion-label>
+
+
+        <ion-item *ngIf="shipList?.length">
+          <ion-label>Motonave {{ shipNombreEsp }}</ion-label>
+
           <ion-select
             interface="popover"
             formControlName="shipin"
             (ionChange)="onShipSelect($event)">
+
             <ion-select-option
               *ngFor="let ship of shipList"
               [value]="ship.id">
               {{ ship.data?.name | uppercase }}
             </ion-select-option>
+
           </ion-select>
         </ion-item>
+
+
+<!--        <ion-item  *ngIf="shipList?.length"  >-->
+          <!--<ion-label>Motonave {{shipNombreEsp}} </ion-label>-->
+          <!--<ion-select-->
+            <!--interface="popover"-->
+            <!--formControlName="shipin"-->
+            <!--(ionChange)="onShipSelect($event)">-->
+            <!--<ion-select-option-->
+              <!--*ngFor="let ship of shipList"-->
+              <!--[value]="ship.id">-->
+              <!--{{ ship.data?.name | uppercase }}-->
+            <!--</ion-select-option>-->
+          <!--</ion-select>-->
+        <!--</ion-item>-->
         <br>
     </ion-list>
     <br>

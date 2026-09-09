@@ -1,6 +1,6 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
+import { AlertController,IonList,LoadingController,ModalController,ToastController,Config } from '@ionic/angular';
 import { ConferenceData } from '../../../../providers/conference-data';
 import { UserData } from '../../../../providers/user-data';
 import { OpportunityService } from '../../../../services/opportunity.service';
@@ -119,9 +119,11 @@ export class AssetSupplyPostPage {
 
   guardar() {
     const data: any = this.form.value;
-    data.img = ""; 
-    data.id_ats= this.blg.id_ats;
-    data.id_usr= this.blg.id_usr;
+    data.img = "";
+    console.log('selectedTasksList',this.selectedTasksList)
+    console.log('id',this.selectedTasksList[0].id)
+    data.id_ats= this.selectedTasksList[0].id;
+    data.users=  // todo_opt only send the ids 
     //delete data.category;
     console.log('Product to post =>', data);
     this.blgService.post(data).subscribe({
@@ -148,7 +150,7 @@ export class AssetSupplyPostPage {
     this.srcService.getAll().subscribe({
       next: (data) => {
         this.taskList = data || [];
-        this.filteredTaskList = [];
+        //this.filteredTaskList = [];
         console.log('task list:', this.taskList.length);
       },
       error: (err) => {
@@ -197,18 +199,26 @@ export class AssetSupplyPostPage {
     this.filteredTaskList = this.searchProducts(value, this.taskList);
   }
 
-  bomList:any[]=[];
+  selectedTasksList:any[]=[];
   selectTask(p: any) {
-    this.bomList.push(p)
-    console.log('bomlist',this.bomList)
+    p.data.qty=1;
+    let umName=this.umService.getUmNameById(p.id,this.ums);
+    console.log('um name',umName);
+    p.data.umName=umName;
+    this.selectedTasksList.push(p)
+    console.log('selectedTasksList',this.selectedTasksList);
     this.filteredTaskList = [];
   }
 
-  filteredUserList:any[]=[];
+  selectedUsersList:any[]=[];
   selectUser(p: any) {
-    this.filteredUserList.push(p)
-    console.log('filteredUserList',this.filteredUserList)
+    console.log('selectedUser p ',p )
+    if (!this.selectedUsersList.some(item => item.id === p.id)) {
+      this.selectedUsersList.push(p);
+    }
+    console.log('selectedUsersList', this.selectedUsersList);
   }
+
 
   formatFechaLatam(dateInput: string | Date | number): string {
     if (!dateInput) return '';
@@ -242,7 +252,7 @@ export class AssetSupplyPostPage {
         /*} */
       /*}); */
    /*}   */
-       
+
    ums: any[] = []; 
    loadUms() {                
      this.umService.getAllUms().subscribe({ 
@@ -268,14 +278,12 @@ export class AssetSupplyPostPage {
         }, 
         error: (err) => {      
           console.error('Error al cargar categorías:', err); 
-          this.ums = this.umService.getUmsFromLocal(); 
         } 
       }); 
    }     
 
   incrementQty(p: any, amount: number, event: Event) {
     event.stopPropagation();
-    console.log('--------------------------------');
     console.log('[QTY] Producto:', p);
     console.log('[QTY] Incremento:', amount);
     console.log('[QTY] Qty anterior:', p.data.qty);
@@ -294,19 +302,17 @@ export class AssetSupplyPostPage {
   }
 
   removeById(p:any) {
-    this.bomList = this.bomList.filter(item=>item.id !== p.id)
+    this.selectedTasksList = this.selectedTasksList.filter(item=>item.id !== p.id)
   }
 
   restartQty(p:any){
-   p.data.qty=1;
-   console.log('TEST ESBUILD 001');
+   console.log('p.data.qty',p);
+   p.data.qty=0;
   }
 
-
-
-resetList(list: any[]) {
-  list.length = 0;
-}
+  resetList(list: any[]) {
+    list.length = 0;
+  }
 
 
 }

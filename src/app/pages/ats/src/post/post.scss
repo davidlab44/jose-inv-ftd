@@ -34,7 +34,7 @@
   display: flex;
   align-items: center;
 
-  font-size: 13px;
+  font-size: 11px;
   opacity: 0.7;
 }
 
@@ -188,4 +188,13 @@
 .qty-control:active {
   transform: scale(0.90);
   background: rgba(56, 128, 255, 0.12);
+}
+
+
+
+
+
+
+.peque{
+  font-size:10px;
 }

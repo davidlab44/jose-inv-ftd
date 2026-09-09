@@ -79,18 +79,7 @@ export class GetallPage implements OnInit {
     public toastCtrl:ToastController,
     public user:UserData,
     public config:Config,
-    //private opportunityService:OpportunityService,
-    //private posOrderService:PosOrderService,
-    //private tableService:TableService,
-    //private route:ActivatedRoute,
-    //private sessionService:SessionService,
     private utilService:UtilService,
-    //private productService:ProductService,
-    //private categoryService:CategoryService,
-    //private dateService:DateService,
-    //private rexService:RexService,
-    //private prodrexService:ProdrexService,
-    //private userService:UserService,
     private withdrawnService:WithdrawnService,
     private ccoService:CcoService,
     private shipService:ShipService,
@@ -99,9 +88,9 @@ export class GetallPage implements OnInit {
   ) {}
 
 
-ionViewWillLeave() {
-    this.menu.enable(true);
-}
+  ionViewWillLeave() {
+      this.menu.enable(true);
+  }
 
   ngOnInit() {
     this.initCurrentMonthRange();
@@ -135,113 +124,77 @@ ionViewWillLeave() {
     });
   }
 
-getAll() {
-
-  const since = this.dayOfYearToISO(this.startDay);
-  const until = this.dayOfYearToISO(this.endDay, true);
-
-  this.withdrawnService
-    .getIntervalByAdate(since, until)
-    .subscribe({
-
-      next: response => {
-
-        this.withdrawnList = response;
-
-        // Enriquecer datos (diff, nombres, totales...)
-        this.prepareWithdrawnList(this.withdrawnList);
-
-        // Construir lista visual por movimientos
-        this.fullWithdrawnList =
-          this.buildMovementList(this.withdrawnList);
-
-        console.log(this.fullWithdrawnList);
-
-      }
-
-    });
-
-}
-
-private prepareWithdrawnList(withdrawnList: any[]): void {
-
-  let total = 0;
-  let totalOpc = 0;
-  let totalImportado = 0;
-
-  const map = new Map<string, any>();
-
-  for (const item of withdrawnList) {
-
-    if (!item.data)
-      item.data = {};
-
-    const data = item.data;
-
-    data.diff = 0;
-
-    const kg = Number(data.kg) || 0;
-
-    total += kg;
-
-    if (data.id_replenishment_product === 1)
-      totalOpc += kg;
-    else if (data.id_replenishment_product === 2)
-      totalImportado += kg;
-
-    const wticket = data.wticket;
-
-    if (
-      wticket !== undefined &&
-      Number(data.wnet) > 0 &&
-      Number(data.wgross) > 0 &&
-      Number(data.wtare) > 0
-    ) {
-
-      const key = String(wticket);
-
-      if (map.has(key)) {
-
-        const other = map.get(key);
-
-        const match =
-          Number(other.data.wnet) === Number(data.wnet) &&
-          Number(other.data.wgross) === Number(data.wgross) &&
-          Number(other.data.wtare) === Number(data.wtare);
-
-        if (match) {
-
-          const diff =
-            (Number(other.data.kg) || 0) +
-            (Number(data.kg) || 0) -
-            Number(data.wnet);
-
-          other.data.diff = diff;
-          data.diff = diff;
-
+  getAll() {
+    const since = this.dayOfYearToISO(this.startDay);
+    const until = this.dayOfYearToISO(this.endDay, true);
+    this.withdrawnService
+      .getIntervalByAdate(since, until)
+      .subscribe({
+        next: response => {
+          this.withdrawnList = response;
+          // Enriquecer datos (diff, nombres, totales...)
+          this.prepareWithdrawnList(this.withdrawnList);
+          // Construir lista visual por movimientos
+          this.fullWithdrawnList = this.buildMovementList(this.withdrawnList);
+          console.log(this.fullWithdrawnList);
         }
-
-      } else {
-
-        map.set(key, item);
-
-      }
-
-    }
-
-    data.shipoutName =
-      this.shipMap[data.shipout]?.name ?? 'N/A';
-
-    data.shipinName =
-      this.shipMap[data.shipin]?.name ?? 'N/A';
-
+      });
   }
 
-  this.totalKg = total;
-  this.totalGlpOpc = totalOpc;
-  this.totalGlpImportado = totalImportado;
+  private prepareWithdrawnList(withdrawnList: any[]): void {
+    let total = 0;
+    let totalOpc = 0;
+    let totalImportado = 0;
+    const map = new Map<string, any>();
+    for (const item of withdrawnList) {
+      if (!item.data)
+        item.data = {};
+      const data = item.data;
+      data.diff = 0;
+      const kg = Number(data.kg) || 0;
+      total += kg;
+      if (data.id_replenishment_product === 1)
+        totalOpc += kg;
+      else if (data.id_replenishment_product === 2)
+        totalImportado += kg;
+      const wticket = data.wticket;
+      if (
+        wticket !== undefined &&
+        Number(data.wnet) > 0 &&
+        Number(data.wgross) > 0 &&
+        Number(data.wtare) > 0
+      ) {
+        const key = String(wticket);
+        if (map.has(key)) {
+          const other = map.get(key);
 
-}
+          const match =
+            Number(other.data.wnet) === Number(data.wnet) &&
+            Number(other.data.wgross) === Number(data.wgross) &&
+            Number(other.data.wtare) === Number(data.wtare);
+          if (match) {
+            const diff =
+              (Number(other.data.kg) || 0) +
+              (Number(data.kg) || 0) -
+              Number(data.wnet);
+            other.data.diff = diff;
+            data.diff = diff;
+          }
+        } else {
+          map.set(key, item);
+        }
+      }
+      data.shipoutName =
+        this.shipMap[data.shipout]?.name ?? 'N/A';
+      data.shipinName =
+        this.shipMap[data.shipin]?.name ?? 'N/A';
+    }
+
+    this.totalKg = total;
+    this.totalGlpOpc = totalOpc;
+    this.totalGlpImportado = totalImportado;
+
+  }
 
 
 

@@ -114,9 +114,22 @@ export class PatchPage {
       deliveryin: [''],
       datein: [''],
       tripin: [''],
-      shipin: [0],
+      shipin: [null],
     });
   }
+
+
+/*  initForm() {*/
+    /*this.form = this.fb.group({*/
+      /*id: [null],*/
+      /*deliveryin: [''],*/
+      /*datein: [''],*/
+      /*tripin: [''],*/
+      /*shipin: [0],*/
+    /*});*/
+  /*}*/
+
+
 
   ionViewWillEnter() {
     this.form.patchValue({
@@ -124,12 +137,28 @@ export class PatchPage {
       deliveryin: this.movement?.data?.deliveryin ?? '',
       datein: this.movement?.data?.datein ?? '',
       tripin: this.movement?.data?.tripin ?? '',
-      shipin: this.movement?.data?.shipin ?? null,
+      shipin: this.movement?.data?.shipin != null
+        ? Number(this.movement.data.shipin)
+        : null,
     });
     this.getShip();
-    this.loadCcos();         
+    this.loadCcos();
     this.getAllCco();
   }
+
+
+  /*ionViewWillEnter() {*/
+    /*this.form.patchValue({*/
+      /*id: this.movement?.id ?? null,*/
+      /*deliveryin: this.movement?.data?.deliveryin ?? '',*/
+      /*datein: this.movement?.data?.datein ?? '',*/
+      /*tripin: this.movement?.data?.tripin ?? '',*/
+      /*shipin: this.movement?.data?.shipin ?? null,*/
+    /*});*/
+    /*this.getShip();*/
+    /*this.loadCcos();         */
+    /*this.getAllCco();*/
+  /*}*/
 
   resetForm(): void {
     this.uploadedUrl=''; 
@@ -284,7 +313,6 @@ export class PatchPage {
             tripin: res?.data?.tripin ?? '',
             shipin: this.movement.data.shipin ?? '',
           };
-
           console.log('movement antes de patch', this.movement.data)
           this.form.patchValue({
             deliveryin: res?.data?.deliveryin ?? '',
@@ -314,6 +342,8 @@ export class PatchPage {
     console.log('movement en el patch ', this.movement)
     this.movement.data.imgin = this.uploadedUrl;
     this.movement.data.datein=this.uiDate;
+    this.movement.data.tripin=this.form.value.tripin;
+    this.movement.data.deliveryin=this.form.value.deliveryin;
     if(!this.ccoName&&this.ccoName.length<2){this.utilService.presentToast('revise isotanque','danger'); return;}
     const payload = {...this.movement.data};
     console.log('uploadedUrl',this.uploadedUrl)
@@ -353,9 +383,10 @@ export class PatchPage {
     this.shipService.getAll().subscribe(resp => {
       this.shipList = resp;
       console.log('shipList',this.shipList);
-      this.form.patchValue({
-        shipin: this.getShipNameById(this.movement.data.shipin) ?? null,
-      });
+/*      this.form.patchValue({*/
+        /*shipin: this.getShipNameById(this.movement.data.shipin) ?? null,*/
+      /*});*/
+      this.shipNombreEsp=this.getShipNameById(this.movement.data.shipin)
     });
   }
 

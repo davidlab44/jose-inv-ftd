@@ -182,9 +182,9 @@ export class AppComponent implements OnInit {
 
    appPages9 = [
     {
-       title: 'Asignar tarea',
+       title: 'Tareas activas',
        url: '/app/tabs/ats-blg-getall',
-       icon: 'add'
+       icon: 'document-text'
     },
     {
        title: 'Asignar tarea',
@@ -197,15 +197,20 @@ export class AppComponent implements OnInit {
        icon: 'add'
     },
     {
+       title: 'Listado sub tareas',
+       url: '/app/tabs/ats-src-getall',
+       icon: 'Document-text'
+    },
+    {
        title: 'Crear sub tarea',
        url: '/app/tabs/ats-src-post',
        icon: 'add'
     },
-    {
-       title: 'Crear BOM',
-       url: '/app/tabs/ats-bom-post',
-       icon: 'add'
-    },
+/*    {*/
+       /*title: 'Crear BOM',*/
+       /*url: '/app/tabs/ats-bom-post',*/
+       /*icon: 'add'*/
+    /*},*/
     {
        title: 'Almacen',
        url: '/app/tabs/schedule',

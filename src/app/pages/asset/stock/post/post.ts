@@ -45,6 +45,10 @@ export class AssetSupplyPostPage implements OnInit {
     private router: Router,
     private productService: ProductService
   ) {
+  }
+
+
+  receiveDataFromRouter(){
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state?.item) {
       this.categFull = navigation.extras.state.item;
@@ -57,11 +61,16 @@ export class AssetSupplyPostPage implements OnInit {
       // Si recargaron la página, puedes cargar el item desde un servicio o API
       console.warn('No se recibió item por NavigationExtras.state');
     }
-    console.log("Item recibidox3:", this.categ);
+    console.log("Item recibidox3h:", this.categ);
   }
 
   ngOnInit(): void {
+    this.receiveDataFromRouter();
     this.buildForm();
+  }
+
+  ionViewWillEnter(){
+    //this.receiveDataFromRouter();
   }
 
   get requiredAttributes(): Array<{
