@@ -252,10 +252,12 @@ export class PostPage {
   uiDate:any='2000-01-01T00:01:00';;
   launchOcr(url: string) {
     console.time('PROCESS');
+    this.startTimer1();
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
         console.log('ocrResponse:', res);
         console.timeEnd('PROCESS');
+        this.stopTimer1();
         this.ocrResponse=res.data;
         if(this.ocrResponse.contenedores[0]&&this.ocrResponse.contenedores[0].length>0){
           const hasOne = this.thersIsSomeCCoLikeThis(res.data.contenedores[0])
@@ -303,6 +305,7 @@ export class PostPage {
         }else{
           console.log('shipinIdELSE',shipin.id)
         }
+        //this.stopTimer();
       },
       error: (err) => {
         console.error('Error OCR:', err);
@@ -604,10 +607,28 @@ export class PostPage {
     });
   }
 
-
-
-
-
+  private timerId: any = null;
+  startTimer1(): void {
+    this.stopTimer1();
+    let seconds = 89;
+    console.log('1:29');
+    this.timerId = setInterval(() => {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      console.log(`${minutes}:${secs.toString().padStart(2, '0')}`);
+      if (seconds === 0) {
+        this.stopTimer1();
+        return;
+      }
+      seconds--;
+    }, 1000);
+  }
+  stopTimer1(): void {
+    if (this.timerId !== null) {
+      clearInterval(this.timerId);
+      this.timerId = null;
+    }
+  }
 
 
 }
