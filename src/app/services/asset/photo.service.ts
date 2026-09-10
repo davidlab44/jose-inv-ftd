@@ -39,6 +39,83 @@ private s3: S3Client;
     return { bytes, mimeType };
   }
 
+  /*uploadBase64Image(base64: string, bucket: string): { progress$: Observable<number>, url$: Observable<string> } {*/
+    /*const progressSubject = new BehaviorSubject<number>(0);*/
+    /*const urlSubject = new BehaviorSubject<string>('');*/
+    /*(async () => {*/
+      /*try {*/
+        /*console.log('[IMG] Iniciando resize...');*/
+        /*base64 = await this.resizeImg(base64);*/
+        /*console.log('[IMG] Resize terminado');*/
+        /*const { bytes, mimeType } = this.base64ToUint8Array(base64);*/
+        /*const key = `img_${Date.now()}.${mimeType.split('/')[1] || 'jpg'}`;*/
+        /*console.log('[IMG] Subiendo:', key);*/
+        /*const parallelUploads3 = new Upload({*/
+          /*client: this.s3,*/
+          /*params: {*/
+            /*Bucket: bucket,*/
+            /*Key: key,*/
+            /*Body: bytes,*/
+            /*ContentType: mimeType*/
+          /*},*/
+          /*queueSize: 4,*/
+          /*partSize: 1024 * 1024 * 5*/
+        /*});*/
+        /*parallelUploads3.on('httpUploadProgress', (progress) => {*/
+          /*if (progress.loaded && progress.total) {*/
+            /*const percent = Math.round((progress.loaded / progress.total) * 100);*/
+            /*progressSubject.next(percent);*/
+          /*}*/
+        /*});*/
+        /*await parallelUploads3.done();*/
+        /*progressSubject.next(100);*/
+        /*urlSubject.next(`${environment.s3aws}${bucket}/${key}`);*/
+        /*progressSubject.complete();*/
+        /*urlSubject.complete();*/
+      /*} catch (err) {*/
+        /*console.error('[IMG] Error:', err);*/
+        /*progressSubject.error(err);*/
+        /*urlSubject.error(err);*/
+      /*}*/
+    /*})();*/
+    /*return {*/
+      /*progress$: progressSubject.asObservable(),*/
+      /*url$: urlSubject.asObservable()*/
+    /*};*/
+  /*}*/
+
+  /*resizeImg(base64: string, maxWidth: number = 1000, quality: number = 0.85): Promise<string> {*/
+    /*return new Promise((resolve, reject) => {*/
+      /*const img = new Image();*/
+      /*img.onload = () => {*/
+        /*if (img.width <= maxWidth) {*/
+          /*resolve(base64);*/
+          /*return;*/
+        /*}*/
+        /*const ratio = maxWidth / img.width;*/
+        /*const newWidth = maxWidth;*/
+        /*const newHeight = Math.round(img.height * ratio);*/
+        /*console.log('[RESIZE] Original:', img.width, 'x', img.height);*/
+        /*console.log('[RESIZE] Nueva:', newWidth, 'x', newHeight);*/
+        /*const canvas = document.createElement('canvas');*/
+        /*canvas.width = newWidth;*/
+        /*canvas.height = newHeight;*/
+        /*const ctx = canvas.getContext('2d');*/
+        /*if (!ctx) {*/
+          /*reject(new Error('No se pudo crear el contexto canvas'));*/
+          /*return;*/
+        /*}*/
+        /*ctx.drawImage(img, 0, 0, newWidth, newHeight);*/
+        /*const resizedBase64 = canvas.toDataURL('image/jpeg', quality);*/
+        /*resolve(resizedBase64);*/
+      /*};*/
+      /*img.onerror = () => reject(new Error('No se pudo cargar la imagen'));*/
+      /*img.src = base64;*/
+    /*});*/
+  /*}*/
+
+
+
   uploadBase64Image(base64: string,bucket:string): { progress$: Observable<number>, url$: Observable<string> } {
     const progressSubject = new BehaviorSubject<number>(0);
     const urlSubject = new BehaviorSubject<string>('');
@@ -78,157 +155,67 @@ private s3: S3Client;
 
 
 
-uploadToCertBucket(
-  base64:string,
-  cco:string,
-  year:number,
-  type:'parcial'|'total'
-):{progress$:Observable<number>,url$:Observable<string>}{
+  uploadToCertBucket(
+    base64:string,
+    cco:string,
+    year:number,
+    type:'parcial'|'total'
+  ):{progress$:Observable<number>,url$:Observable<string>}{
 
-  const progressSubject=new BehaviorSubject<number>(0);
-  const urlSubject=new BehaviorSubject<string>('');
+    const progressSubject=new BehaviorSubject<number>(0);
+    const urlSubject=new BehaviorSubject<string>('');
 
-  (async()=>{
+    (async()=>{
 
-    try{
+      try{
 
-      const {bytes}=this.base64ToUint8Array(base64);
+        const {bytes}=this.base64ToUint8Array(base64);
 
-      const key=`${cco}/${type}/${year}.pdf`;
+        const key=`${cco}/${type}/${year}.pdf`;
 
-      const upload=new Upload({
-        client:this.s3,
-        params:{
-          Bucket:'cert',
-          Key:key,
-          Body:bytes,
-          ContentType:'application/pdf'
-        },
-        queueSize:4,
-        partSize:1024*1024*5
-      });
+        const upload=new Upload({
+          client:this.s3,
+          params:{
+            Bucket:'cert',
+            Key:key,
+            Body:bytes,
+            ContentType:'application/pdf'
+          },
+          queueSize:4,
+          partSize:1024*1024*5
+        });
 
-      upload.on('httpUploadProgress',p=>{
-        if(p.loaded&&p.total)
-          progressSubject.next(Math.round((p.loaded/p.total)*100));
-      });
+        upload.on('httpUploadProgress',p=>{
+          if(p.loaded&&p.total)
+            progressSubject.next(Math.round((p.loaded/p.total)*100));
+        });
 
-      await upload.done();
+        await upload.done();
 
-      progressSubject.next(100);
-      urlSubject.next(`${environment.s3aws}cert/${key}`);
+        progressSubject.next(100);
+        urlSubject.next(`${environment.s3aws}cert/${key}`);
 
-      progressSubject.complete();
-      urlSubject.complete();
+        progressSubject.complete();
+        urlSubject.complete();
 
-    }catch(err){
+      }catch(err){
 
-      progressSubject.error(err);
-      urlSubject.error(err);
+        progressSubject.error(err);
+        urlSubject.error(err);
 
-    }
+      }
 
-  })();
+    })();
 
-  return{
-    progress$:progressSubject.asObservable(),
-    url$:urlSubject.asObservable()
-  };
+    return{
+      progress$:progressSubject.asObservable(),
+      url$:urlSubject.asObservable()
+    };
 
-}
-
-
+  }
 
 
 
-  /*async testUploadImage(base64Image: string): Promise<string | null> {*/
-    /*console.log("📤 Subiendo imagen...");*/
-
-    /*// 🔎 Separar metadata del base64*/
-    /*const matches = base64Image.match(/^data:(.+);base64,(.*)$/);*/
-    /*if (!matches) {*/
-      /*console.error("❌ La cadena no es un base64 válido");*/
-      /*return null;*/
-    /*}*/
-
-    /*const mimeType = matches[1]; // ej. "image/jpeg"*/
-    /*const base64Data = matches[2];*/
-
-    /*// 📦 Convertir base64 → Uint8Array*/
-    /*const binary = atob(base64Data);*/
-    /*const len = binary.length;*/
-    /*const bytes = new Uint8Array(len);*/
-    /*for (let i = 0; i < len; i++) {*/
-      /*bytes[i] = binary.charCodeAt(i);*/
-    /*}*/
-
-    /*const key = `img_${Date.now()}.jpg`; // 👈 nombre único*/
-    /*console.log("🖼 MIME:", mimeType);*/
-    /*console.log("📏 Tamaño (bytes):", bytes.length);*/
-    /*console.log("📌 Key (archivo en bucket):", key);*/
-    /*try {*/
-      /*await this.s3.send(*/
-        /*new PutObjectCommand({*/
-          /*Bucket: "fotos",*/
-          /*Key: key,*/
-          /*Body: bytes,          // 👈 pasamos los bytes*/
-          /*ContentType: mimeType // ej. "image/jpeg"*/
-        /*})*/
-      /*);*/
-      /*console.log("✅ Imagen subida correctamente");*/
-      /*return `${environment.s3aws}fotos/${key}`;*/
-    /*} catch (err: any) {*/
-      /*console.error("❌ Error en testUploadImage");*/
-      /*console.error("📝 Mensaje:", err.message);*/
-      /*console.error("📂 Nombre del error:", err.name);*/
-      /*console.error("📜 Stack completo:", err.stack);*/
-
-      /*if (err.$metadata) {*/
-        /*console.error("📡 Metadata AWS:", err.$metadata);*/
-      /*}*/
-
-      /*return null;*/
-    /*}*/
-  /*}*/
-
-
-  /*async testUploadText(): Promise<string | null> {  //solo para pruebas minimal*/
-    /*console.log("📤 Subiendo archivo de texto hardcoded...");*/
-    /*const content = "Hola mundo desde Angular + MinIO 🚀";*/
-    /*const encoder = new TextEncoder();*/
-    /*const uint8Array = encoder.encode(content); // 👈 cuerpo como bytes*/
-    /*const key = `test_${Date.now()}.txt`;*/
-    /*// Logs de depuración*/
-    /*console.log("📄 Contenido:", content);*/
-    /*console.log("📦 Uint8Array creado:", uint8Array);*/
-    /*console.log("📏 Tamaño:", uint8Array.length, "bytes");*/
-    /*console.log("📌 Key (archivo en bucket):", key);*/
-
-    /*try {*/
-      /*await this.s3.send(*/
-        /*new PutObjectCommand({*/
-          /*Bucket: "fotos",*/
-          /*Key: key,*/
-          /*Body: uint8Array, // 👈 sin Blob, solo bytes*/
-          /*ContentType: "text/plain",*/
-        /*})*/
-      /*);*/
-
-      /*console.log("✅ Texto subido correctamente");*/
-      /*return `http://192.168.40.47/fotos/${key}`;*/
-    /*} catch (err: any) {*/
-      /*console.error("❌ Error en testUploadText");*/
-      /*console.error("📝 Mensaje:", err.message);*/
-      /*console.error("📂 Nombre del error:", err.name);*/
-      /*console.error("📜 Stack completo:", err.stack);*/
-
-      /*if (err.$metadata) {*/
-        /*console.error("📡 Metadata AWS:", err.$metadata);*/
-      /*}*/
-
-      /*return null;*/
-    /*}*/
-  /*}*/
 
   // Método para seleccionar una imagen desde la galería
   async pickImage(): Promise<string | null> {
@@ -294,13 +281,10 @@ uploadToCertBucket(
 
         // Dibujar la imagen en el canvas con las nuevas dimensiones
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
         // Obtener la imagen comprimida en formato base64 con la calidad ajustada
         const newBase64Image = canvas.toDataURL('image/jpeg', quality);
-
         resolve(newBase64Image);
       };
-
       img.onerror = () => {
         reject("Error al cargar la imagen.");
       };
@@ -308,16 +292,6 @@ uploadToCertBucket(
   }
 
 
-
-
-
-
-
-
-
-
-  /////////////////////////////////////////////////////////
-  //
     async takePicture(): Promise<string | null> {
       try {
         const image = await Camera.getPhoto({

@@ -464,7 +464,6 @@ export class PatchPage {
   ccoName: string = '';   // nombre a mostrar
   ccoId: number = 0;   // id cco seleccionado a mostrar
   selectCco(item: any) {
-    
     this.cco = item;
     this.ccoName = item.data.name;
     this.ccoId = item.id;
@@ -472,7 +471,6 @@ export class PatchPage {
     if (this.movement?.data) {
       this.movement.data.name = item.id;
     }
-    
     console.log('item pasado:', item);
     console.log('cco name:', this.ccoName);
     console.log('cco id:', this.ccoId);
