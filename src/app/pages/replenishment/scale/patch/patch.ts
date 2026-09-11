@@ -64,6 +64,7 @@ export class PatchPage {
   uploadProgress = 0;
   uploadedUrl: string | null = null;
   uploading = false;
+  ocrSuccess:boolean=false;
 
   constructor(
     private barcodeService: BarcodeService,
@@ -277,14 +278,17 @@ export class PatchPage {
   }
 
   ocrResponse:any;
-  //isotanq2Name:string='';
   isotanq1Name:string='';
   isotanq1Id:number=0;
   launchOcr(url: string) {
+    this.ocrSuccess=true;
+    this.startTimer();
     this.ocrService.postScale(url).subscribe({
       next: (res) => {
+        this.ocrSuccess=false
+        this.stopTimer();
+        console.log('ocrResponse',res)
         this.ocrResponse = res;
-
         if(res.data.isotanques[0]){
           this.isotanq1Id=this.ccoService.getIdByName(res.data.isotanques[0]);
           this.isotanq1Name=this.ccoMap[this.isotanq1Id]?.name;
@@ -422,7 +426,33 @@ export class PatchPage {
       }
     );
   }
+ 
+  private timerId: any = null;
+  startTimer(): void {       
+    this.stopTimer();
+    let seconds = 89;        
+    console.log('1:29');     
+    this.timerId = setInterval(() => {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;      
+      console.log(`${minutes}:${secs.toString().padStart(2, '0')}`);                                                                                
+      if (seconds === 0) {   
+        this.stopTimer();    
+        return;              
+      }
+      seconds--;
+    }, 1000);
+  }   
+  stopTimer(): void {        
+    if (this.timerId !== null) {      
+      clearInterval(this.timerId);    
+      this.timerId = null;   
+    }     
+  }       
 
+  extractShipName(text: string): string {
+    return text?.replace(/^IMO\s+\d+\s*/i, '').trim() ?? '';                                                                                        
+  } 
 
 
 }

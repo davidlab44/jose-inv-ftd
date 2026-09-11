@@ -78,6 +78,7 @@ export class PatchPage {
   movement:any;
   isotanq2Name:string=''; 
   isotanq2Id:number=0; 
+  ocrSuccess:boolean=false;
 
   constructor(
     public alertCtrl: AlertController,
@@ -272,16 +273,18 @@ export class PatchPage {
   shipNombreEsp:string | null; 
   uiDate:any='2000-01-01T00:01:00';
   launchOcr(url: string) {
+    this.startTimer();
+    this.ocrSuccess = true;
     this.ocrService.postOut(url).subscribe({
       next: (res) => {
+        this.stopTimer();
+        this.ocrSuccess = false;
         console.log('OCR Response:', res);
         this.shipId=this.getShipId(res,this.shipList);
         if(this.shipId>0){
           console.log('shipId',this.shipId)
           this.shipNombreEsp=this.getShipNameById(this.shipId);
-
           console.log('shipNombreEsp',this.shipNombreEsp)
-          console.log('shipNombreEsp2',this.shipNombreEsp)
           this.shipNombreEsp=this.getShipNameById(this.shipId);
         }else{
           this.shipNombreEsp='Seleccionar'
@@ -389,82 +392,82 @@ export class PatchPage {
   }
 
 
- normalizeOCR(str) {
-  if (!str) return '';
-  return str
-    .toLowerCase()
-    .replace(/[0]/g, 'o')
-    .replace(/[1]/g, 'i')
-    .replace(/[5]/g, 's')
-    .replace(/[8]/g, 'b')
-    .replace(/[^a-z0-9]/g, '')  // elimina espacios, guiones, etc
-    .trim();
-}
-levenshtein(a, b) {
-  const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);
-  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-  for (let i = 1; i <= b.length; i++) {
-    for (let j = 1; j <= a.length; j++) {
-      if (b[i - 1] === a[j - 1]) {
-        matrix[i][j] = matrix[i - 1][j - 1];
-      } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j] + 1
+   normalizeOCR(str) {
+    if (!str) return '';
+    return str
+      .toLowerCase()
+      .replace(/[0]/g, 'o')
+      .replace(/[1]/g, 'i')
+      .replace(/[5]/g, 's')
+      .replace(/[8]/g, 'b')
+      .replace(/[^a-z0-9]/g, '')  // elimina espacios, guiones, etc
+      .trim();
+  }
+  levenshtein(a, b) {
+    const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);
+    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        if (b[i - 1] === a[j - 1]) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    return matrix[b.length][a.length];
+  }
+  similarity(a, b) {
+    const dist = this.levenshtein(a, b);
+    const maxLen = Math.max(a.length, b.length);
+    if (maxLen === 0) return 1;
+    return 1 - dist / maxLen;
+  }
+  fuzzyMatch(a, b, threshold = 0.8) {
+    if (!a || !b) return false;
+    const na = this.normalizeOCR(a);
+    const nb = this.normalizeOCR(b);
+    if (na.includes(nb) || nb.includes(na)) return true;
+    const score = this.similarity(na, nb);
+    return score >= threshold;
+  }
+  getShipId(objA, objBList) {
+    const shipName = objA?.data?.shipout ?? null;
+    const shipIMO = objA?.data?.shipoutimo ?? null;
+    let bestScore = 0;
+    let bestId = 0;
+    // 1️⃣ buscar por nombre
+    if (shipName) {
+      for (const ship of objBList) {
+        const name = ship?.data?.name;
+        if (!name) continue;
+        const score = this.similarity(
+          this.normalizeOCR(shipName),
+          this.normalizeOCR(name)
         );
+        if (score > bestScore && score > 0.75) {
+          bestScore = score;
+          bestId = ship.id;
+        }
+      }
+      if (bestId !== 0) return bestId;
+    }
+    // 2️⃣ fallback por IMO
+    if (shipIMO) {
+      for (const ship of objBList) {
+        const imo = ship?.data?.imo;
+        if (!imo) continue;
+        if (this.fuzzyMatch(shipIMO, imo, 0.9)) {
+          return ship.id;
+        }
       }
     }
+    return 0;
   }
-  return matrix[b.length][a.length];
-}
-similarity(a, b) {
-  const dist = this.levenshtein(a, b);
-  const maxLen = Math.max(a.length, b.length);
-  if (maxLen === 0) return 1;
-  return 1 - dist / maxLen;
-}
-fuzzyMatch(a, b, threshold = 0.8) {
-  if (!a || !b) return false;
-  const na = this.normalizeOCR(a);
-  const nb = this.normalizeOCR(b);
-  if (na.includes(nb) || nb.includes(na)) return true;
-  const score = this.similarity(na, nb);
-  return score >= threshold;
-}
-getShipId(objA, objBList) {
-  const shipName = objA?.data?.shipout ?? null;
-  const shipIMO = objA?.data?.shipoutimo ?? null;
-  let bestScore = 0;
-  let bestId = 0;
-  // 1️⃣ buscar por nombre
-  if (shipName) {
-    for (const ship of objBList) {
-      const name = ship?.data?.name;
-      if (!name) continue;
-      const score = this.similarity(
-        this.normalizeOCR(shipName),
-        this.normalizeOCR(name)
-      );
-      if (score > bestScore && score > 0.75) {
-        bestScore = score;
-        bestId = ship.id;
-      }
-    }
-    if (bestId !== 0) return bestId;
-  }
-  // 2️⃣ fallback por IMO
-  if (shipIMO) {
-    for (const ship of objBList) {
-      const imo = ship?.data?.imo;
-      if (!imo) continue;
-      if (this.fuzzyMatch(shipIMO, imo, 0.9)) {
-        return ship.id;
-      }
-    }
-  }
-  return 0;
-}
 
   shipList: any[] = [];
   getShip() {
@@ -504,14 +507,38 @@ getShipId(objA, objBList) {
     );
   }
 
-
   onChange(event: any) {
       console.log('onchange event',event.detail.value);
       this.uiDate=event.detail.value;
       this.movement.data.date=event.detail.value;
   }
 
-  
+  private timerId: any = null;
+  startTimer(): void {
+    this.stopTimer();
+    let seconds = 89;
+    console.log('1:29');
+    this.timerId = setInterval(() => {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      console.log(`${minutes}:${secs.toString().padStart(2, '0')}`);
+      if (seconds === 0) {
+        this.stopTimer();
+        return;
+      }
+      seconds--;
+    }, 1000);
+  }
+  stopTimer(): void {
+    if (this.timerId !== null) {
+      clearInterval(this.timerId);
+      this.timerId = null;
+    }
+  }
+
+  extractShipName(text: string): string {
+    return text?.replace(/^IMO\s+\d+\s*/i, '').trim() ?? '';
+  }
 
 
 

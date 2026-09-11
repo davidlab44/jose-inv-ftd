@@ -5,6 +5,8 @@ import { environment } from '../../../environments/environment';
 import { tap } from 'rxjs/operators';
 import { BehaviorSubject, of } from 'rxjs';
 import { map } from 'rxjs/operators';
+import Fuse from 'fuse.js';
+
 
 @Injectable({
   providedIn: 'root'
@@ -80,33 +82,42 @@ export class ShipService {
 
 
 
-findShipByAbbreviation(shipList: any[], abbreviation: string): any {
-
-   console.log("param list",shipList)
-   console.log("param abb",abbreviation)
-  if (!shipList?.length || !abbreviation) return null;
-
-  const abb = abbreviation
-    .trim()
-    .toUpperCase()
-    .replace(/\s+/g, '');
-
-  for (const shipElement of shipList) {
-
-    const shipAbb = (shipElement?.data?.abb || '')
+  findShipByAbbreviation(shipList: any[], abbreviation: string): any {
+    console.log("param list",shipList)
+    console.log("param abb",abbreviation)
+    if (!shipList?.length || !abbreviation) return null;
+    const abb = abbreviation
       .trim()
       .toUpperCase()
       .replace(/\s+/g, '');
+    for (const shipElement of shipList) {
+      const shipAbb = (shipElement?.data?.abb || '')
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, '');
 
-    if (shipAbb === abb) {
-      return shipElement;
+      if (shipAbb === abb) {
+        return shipElement;
+      }
     }
+    return null;
   }
 
-  return null;
+
+
+findBestShipId(hash: string, shipList: any[]): number | null {
+  if (!hash || !shipList?.length) return null;
+  const fuse = new Fuse(shipList, {
+    keys: ['data.name'],
+    includeScore: true,
+    threshold: 0.6,
+    ignoreLocation: true
+  });
+  const results = fuse.search(hash);
+  if (!results.length) return null;
+  console.log('[FUZZY]', hash, '=>', results[0].item.data.name, 'score:', results[0].score);
+  return results[0].item.id;
 }
-
-
 
 
 }

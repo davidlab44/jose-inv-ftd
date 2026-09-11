@@ -62,6 +62,8 @@ export class PatchPage {
   replenishmentList: any[] = [];
   replenishment:any;
   movement:any;
+  ocrSuccess: boolean = false;
+
 
   constructor(
     private barcodeService: BarcodeService,
@@ -276,8 +278,13 @@ export class PatchPage {
   uiDate:any='2000-01-01T00:01:00';
   launchOcr(url: string) {
     console.time('PROCESS');
+    this.startTimer1();
+    this.ocrSuccess=true;
+
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
+        this.stopTimer1();
+        this.ocrSuccess=false;
         console.log('ocrResponse:', res);
         console.timeEnd('PROCESS');
         this.contenedores=res.data.contenedores;
@@ -295,14 +302,19 @@ export class PatchPage {
         console.log('abb obtenida del trip:', res.data.tripin.slice(0,2).toUpperCase());
         console.log('are equals:',  this.shipList[2].data.abb===res.data.tripin.slice(0,2).toUpperCase());
         console.log('are equals:', res.data.tripin.slice(0,2).toUpperCase()==this.shipList[2].data.abb);
-        const shipin=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
+        //const shipin=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
+
+        const hash=this.extractShipName(res.data.shipin);
+        const shipin=this.shipService.findBestShipId(hash,this.shipList)
+
+
         console.log("ship obtenido",shipin)
         if(!shipin){
           this.utilService.presentToast('Ingrese el barco manualmente','primary',1500)
           return;
         }
-        if(shipin.id>0){
-          this.movement.data.shipin=shipin.id
+        if(shipin>0){
+          this.movement.data.shipin=shipin
           console.log('shipinId1',this.movement.data.shipin)
           this.shipNombreEsp=this.getShipNameById(this.movement.data.shipin)
           const normalizedDate = this.normalizeOCRDate(res?.data?.date);
@@ -323,7 +335,7 @@ export class PatchPage {
           console.log("movement actualizado:", this.movement);
           this.uiDate=res.data.datein;
         }else{
-          console.log('shipinIdELSE',shipin.id)
+          console.log('shipinIdELSE',shipin)
         }
       },
       error: (err) => {
@@ -486,6 +498,36 @@ export class PatchPage {
     console.log("name obtenido",name)
     return name;
   }
+
+
+
+  private timerId: any = null;
+  startTimer1(): void {
+    this.stopTimer1();
+    let seconds = 89;
+    console.log('1:29');
+    this.timerId = setInterval(() => {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      console.log(`${minutes}:${secs.toString().padStart(2, '0')}`);
+      if (seconds === 0) {
+        this.stopTimer1();
+        return;
+      }
+      seconds--;
+    }, 1000);
+  }
+  stopTimer1(): void {
+    if (this.timerId !== null) {
+      clearInterval(this.timerId);
+      this.timerId = null;
+    }
+  }
+
+  extractShipName(text: string): string {
+    return text?.replace(/^IMO\s+\d+\s*/i, '').trim() ?? '';
+  }
+
 
 
 

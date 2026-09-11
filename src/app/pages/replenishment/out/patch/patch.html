@@ -16,7 +16,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" [class.ocr-success]="ocrSuccess" >
   <form [formGroup]="form">    
     <input type="hidden" formControlName="id">
     <ion-list>

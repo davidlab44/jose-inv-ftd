@@ -71,7 +71,8 @@ export class PostPage {
      name:0
    }
   };
-  ocrSuccess = false;
+  ocrSuccess: boolean = false;
+
 
   constructor(
     private barcodeService: BarcodeService,
@@ -253,8 +254,10 @@ export class PostPage {
   launchOcr(url: string) {
     console.time('PROCESS');
     this.startTimer1();
+    this.ocrSuccess=true;
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
+        this.ocrSuccess=false;
         console.log('ocrResponse:', res);
         console.timeEnd('PROCESS');
         this.stopTimer1();
@@ -276,14 +279,16 @@ export class PostPage {
         console.log('abb obtenida del trip:', res.data.tripin.slice(0,2).toUpperCase());
         console.log('are equals:',  this.shipList[2].data.abb===res.data.tripin.slice(0,2).toUpperCase());
         console.log('are equals:', res.data.tripin.slice(0,2).toUpperCase()==this.shipList[2].data.abb);
-        const shipin=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
+        //const shipin=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
+        const hash=this.extractShipName(res.data.shipin);
+        const shipin=this.shipService.findBestShipId(hash,this.shipList)
         console.log("ship obtenido",shipin)
         if(!shipin){
           this.utilService.presentToast('Ingrese el barco manualmente','primary',1500)
           return;
         }
-        if(shipin.id>0){
-          this.movement.data.shipin=shipin.id
+        if(shipin>0){
+          this.movement.data.shipin=shipin
           this.shipNombreEsp=this.getShipNameById(this.movement.data.shipin)
           const normalizedDate = this.normalizeOCRDate(res?.data?.date);
           this.movement.data = {
@@ -303,7 +308,7 @@ export class PostPage {
           console.log("movement actualizado:", this.movement);
           this.uiDate=res.data.datein;
         }else{
-          console.log('shipinIdELSE',shipin.id)
+          console.log('shipinIdELSE',shipin)
         }
         //this.stopTimer();
       },
@@ -630,6 +635,9 @@ export class PostPage {
     }
   }
 
+  extractShipName(text: string): string {
+    return text?.replace(/^IMO\s+\d+\s*/i, '').trim() ?? '';
+  }
 
 }
 
