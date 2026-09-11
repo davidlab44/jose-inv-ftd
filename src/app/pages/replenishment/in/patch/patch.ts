@@ -304,9 +304,22 @@ export class PatchPage {
         console.log('are equals:', res.data.tripin.slice(0,2).toUpperCase()==this.shipList[2].data.abb);
         //const shipin=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
 
+        this.movement.data = {
+          ...this.movement.data,
+          deliveryin: res?.data?.deliveryin ?? '',
+          datein: res?.data?.datein ?? '',
+          tripin: res?.data?.tripin ?? '',
+          shipin: this.movement.data.shipin ?? '',
+        };
+        console.log('movement antes de patch', this.movement.data)
+        this.form.patchValue({
+          deliveryin: res?.data?.deliveryin ?? '',
+          datein: res?.data?.datein ?? '',
+          tripin: res?.data?.tripin ?? '',
+        });
+
         const hash=this.extractShipName(res.data.shipin);
         const shipin=this.shipService.findBestShipId(hash,this.shipList)
-
 
         console.log("ship obtenido",shipin)
         if(!shipin){
@@ -318,18 +331,8 @@ export class PatchPage {
           console.log('shipinId1',this.movement.data.shipin)
           this.shipNombreEsp=this.getShipNameById(this.movement.data.shipin)
           const normalizedDate = this.normalizeOCRDate(res?.data?.date);
-          this.movement.data = {
-            ...this.movement.data,
-            deliveryin: res?.data?.deliveryin ?? '',
-            datein: res?.data?.datein ?? '',
-            tripin: res?.data?.tripin ?? '',
-            shipin: this.movement.data.shipin ?? '',
-          };
           console.log('movement antes de patch', this.movement.data)
           this.form.patchValue({
-            deliveryin: res?.data?.deliveryin ?? '',
-            datein: res?.data?.datein ?? '',
-            tripin: res?.data?.tripin ?? '',
             shipin: this.getShipNameById(this.movement.data.shipin) ?? 'Unable',
           });
           console.log("movement actualizado:", this.movement);

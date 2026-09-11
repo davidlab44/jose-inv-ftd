@@ -137,7 +137,6 @@
     </ion-row>
   </ion-grid>
 
-
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button class="fab-premium" (click)="plexaUploader('no estoy pasando nada')">
       <ion-icon name="add"></ion-icon>
@@ -255,13 +254,8 @@
         {{ p.data.deliveryin }}
       </ion-col>
       <!-- ISOTANQ -->
-      <ion-col size="2" [style.background]="ccoMap[+p.data.name]?.color || '#eee'" (click)="discoverTwins(p)"  style="font-size:x-small;"> {{ ccoMap[+p.data.name]?.name || 'N/A' }} </ion-col>
-<!--      <ion-col size="1">-->
-        <!--{{ p.data.ticket }}-->
-      <!--</ion-col>-->
-      <!--<ion-col size="1">-->
-        <!--{{ p.data.kg }}-->
-      <!--</ion-col>-->
+      <!--<ion-col size="2" [style.background]="ccoMap[+p.data.name]?.color || '#eee'" (click)="discoverTwins(p)"  style="font-size:x-small;"> {{ ccoMap[+p.data.name]?.name || 'N/A' }} </ion-col>-->
+      <ion-col size="2" (click)="discoverTwins(p)" style="font-size:small;"> {{ ccoMap[+p.data.name]?.name || 'N/A' }} </ion-col>
       <ion-col size="1" class="actions-col">
        <ion-button
           fill="clear"
