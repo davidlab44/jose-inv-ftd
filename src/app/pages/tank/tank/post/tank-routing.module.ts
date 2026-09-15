@@ -1,18 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { TankPage } from './tank';
 
-import { AssetSupplyPostPage } from './post';
-
-const routes: Routes = [
-  {
-    path: '',
-    component: AssetSupplyPostPage
-  }
-];
+const routes: Routes = [{ path: '', component: TankPage }];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class AssetSupplyPostPageRoutingModule { }
-
+export class TankPageRoutingModule {}

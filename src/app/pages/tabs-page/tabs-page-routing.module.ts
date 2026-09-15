@@ -379,7 +379,15 @@ const routes: Routes = [
           }
         ]
       },
-      
+      {
+        path: 'tank-tank-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../tank/tank/post/tank.module').then(m => m.TankPageModule)
+          }
+        ]
+      },
       {
         path: '',
         redirectTo: '/app/tabs/schedule',

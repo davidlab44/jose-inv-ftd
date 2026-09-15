@@ -180,122 +180,118 @@ export class AppComponent implements OnInit {
      },
    ];
 
-   appPages9 = [
-    {
-       title: 'Tareas activas',
-       url: '/app/tabs/ats-blg-getall',
-       icon: 'document-text'
-    },
-    {
-       title: 'Asignar tarea',
-       url: '/app/tabs/ats-blg-post',
-       icon: 'add'
-    },
-    {
-       title: 'Crear tarea',
-       url: '/app/tabs/ats-ats-post',
-       icon: 'add'
-    },
-    {
-       title: 'Listado sub tareas',
-       url: '/app/tabs/ats-src-getall',
-       icon: 'Document-text'
-    },
-    {
-       title: 'Crear sub tarea',
-       url: '/app/tabs/ats-src-post',
-       icon: 'add'
-    },
-/*    {*/
-       /*title: 'Crear BOM',*/
-       /*url: '/app/tabs/ats-bom-post',*/
-       /*icon: 'add'*/
-    /*},*/
-    {
-       title: 'Almacen',
-       url: '/app/tabs/schedule',
-       icon: 'calendar'
-     },
-     {
-       title: 'Productos',   
-       url: '/app/tabs/readprd',       
-       icon: 'construct'
-     },
-     {
-       title: 'Reabastecimiento',
-       url: '/app/tabs/asset-supply-reorder',
-       icon: 'layers'
-     },
-     {
-       title: 'Entrada',
-       url: '/app/tabs/kitchen',
-       icon: 'arrow-down'
-     },
-     {
-       title: 'Ingresos de mercancia',
-       url: '/app/tabs/readren',
-       icon: 'chevron-forward-circle'
-     },
-     {
-       title: 'Listar productos ',
-       url: '/app/tabs/asset-supply-readprdct',
-       icon: 'document-text'
-     },
-     {
-       title: 'Certificados',
-       url: '/app/tabs/cert-main-getall',
-       icon: 'ribbon'
-     },
-     {
-       title: 'Compras',
-       url: '/app/tabs/prch-main-getall',
-       icon: 'document-text'
-     },
-     {
-       title: 'Glp precios',
-       url: '/app/tabs/glpprices',
-       icon: 'cash'
-     },
-     {
-       title: 'Bolsas | Cupo | Quota',
-       url: '/app/tabs/replenishment-allocated',
-       icon: 'pie-chart'
-     },
-     {
-       title: 'Nuevo producto by categ',
-       url: '/app/tabs/asset-stock-categ',
-       icon: 'add-circle'
-     },
-     {
-       title: 'Nuevo producto',
-       url: '/app/tabs/asset-stock-post',
-       icon: 'add-circle'
-     },
-     {
-       title: 'Manual prdct register',
-       url: '/app/tabs/asset-supply-post',
-       icon: 'add-circle'
-     },
-
-
-
-
-     {
-       title: 'Registrar retiro',
-       url: '/app/tabs/replenishment-withdrawn-post',
-       icon: 'swap-horizontal'
-     },
-     {
-       title: 'Plexa',
-       url: '/app/tabs/replenishment-withdrawn-getall',
-       icon: 'git-commit'
-     },
-     {
-       title: 'Kilos retirados',
-       url: '/app/tabs/replenishment-get-getall',
-       icon: 'scale'
-     },
-   ];
+ appPages9 = [
+   {
+     title: 'Tareas activas',
+     url: '/app/tabs/ats-blg-getall',
+     icon: 'document-text'
+   },
+   {
+     title: 'Asignar tarea',
+     url: '/app/tabs/ats-blg-post',
+     icon: 'add'
+   },
+   {
+     title: 'Crear tarea',
+     url: '/app/tabs/ats-ats-post',
+     icon: 'add'
+   },
+   {
+     title: 'Listado sub tareas',
+     url: '/app/tabs/ats-src-getall',
+     icon: 'Document-text'
+   },
+   {
+     title: 'Crear sub tarea',
+     url: '/app/tabs/ats-src-post',
+     icon: 'add'
+   },
+   {
+     title: 'Isotanque',
+     url: '/app/tabs/tank-tank-post',
+     icon: 'add'
+   },
+   {
+     title: 'Almacen',
+     url: '/app/tabs/schedule',
+     icon: 'calendar'
+   },
+   {
+     title: 'Productos',   
+     url: '/app/tabs/readprd',       
+     icon: 'construct'
+   },
+   {
+     title: 'Reabastecimiento',
+     url: '/app/tabs/asset-supply-reorder',
+     icon: 'layers'
+   },
+   {
+     title: 'Entrada',
+     url: '/app/tabs/kitchen',
+     icon: 'arrow-down'
+   },
+   {
+     title: 'Ingresos de mercancia',
+     url: '/app/tabs/readren',
+     icon: 'chevron-forward-circle'
+   },
+   {
+     title: 'Listar productos ',
+     url: '/app/tabs/asset-supply-readprdct',
+     icon: 'document-text'
+   },
+   {
+     title: 'Certificados',
+     url: '/app/tabs/cert-main-getall',
+     icon: 'ribbon'
+   },
+   {
+     title: 'Compras',
+     url: '/app/tabs/prch-main-getall',
+     icon: 'document-text'
+   },
+   {
+     title: 'Glp precios',
+     url: '/app/tabs/glpprices',
+     icon: 'cash'
+   },
+   {
+     title: 'Bolsas | Cupo | Quota',
+     url: '/app/tabs/replenishment-allocated',
+     icon: 'pie-chart'
+   },
+   {
+     title: 'Nuevo producto by categ',
+     url: '/app/tabs/asset-stock-categ',
+     icon: 'add-circle'
+   },
+   {
+     title: 'Nuevo producto',
+     url: '/app/tabs/asset-stock-post',
+     icon: 'add-circle'
+   },
+   {
+     title: 'Manual prdct register',
+     url: '/app/tabs/asset-supply-post',
+     icon: 'add-circle'
+   },
+   {
+     title: 'Registrar retiro',
+     url: '/app/tabs/replenishment-withdrawn-post',
+     icon: 'swap-horizontal'
+   },
+   {
+     title: 'Plexa',
+     url: '/app/tabs/replenishment-withdrawn-getall',
+     icon: 'git-commit'
+   },
+   {
+     title: 'Kilos retirados',
+     url: '/app/tabs/replenishment-get-getall',
+     icon: 'scale'
+   },
+ ];
 
   loggedIn = false;
   dark = false;

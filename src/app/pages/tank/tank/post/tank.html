@@ -1,0 +1,62 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-title>Tank</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="tank-page">
+    <div class="viewer">
+      <div #rendererContainer class="renderer"
+        (click)="onCanvasClick($event)"
+        (pointerdown)="pointerDown($event)"
+        (pointermove)="pointerMove($event)">
+      </div>
+      <div class="dimensions">6.00 m largo · Ø {{tankDiameter}} m · R {{tankRadius}} m · circ. {{circumference}} m</div>
+      <div class="area-badge">{{totalArea | number:'1.2-2'}} m²</div>
+      <div class="viewer-help">Arrastra para rotar · Click para marcar/desmarcar</div>
+    </div>
+
+    <ion-card class="panel">
+      <ion-card-header>
+        <ion-card-title>Intervención</ion-card-title>
+        <ion-card-subtitle>{{selectedZones.length}} zonas · {{totalArea | number:'1.2-2'}} m²</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <div class="side-key">
+          <div><b>1</b> extremo frontal</div>
+          <div><b>2</b> lateral derecho</div>
+          <div><b>3</b> extremo posterior</div>
+          <div><b>4</b> lateral izquierdo</div>
+          <div><b>5</b> abajo</div>
+          <div><b>6</b> arriba</div>
+        </div>
+
+        <ion-item>
+          <ion-label position="stacked">Tipo de intervención</ion-label>
+          <ion-select [(ngModel)]="intervention" interface="popover">
+            <ion-select-option value="anticorrosive_paint">Pintura anticorrosiva</ion-select-option>
+            <ion-select-option value="surface_preparation">Preparación superficial</ion-select-option>
+            <ion-select-option value="repair">Reparación</ion-select-option>
+            <ion-select-option value="welding">Soldadura</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Nota</ion-label>
+          <ion-textarea [(ngModel)]="note" rows="4" placeholder="Ej: Corrosión superficial. Aplicar anticorrosivo..."></ion-textarea>
+        </ion-item>
+
+        <div class="selected-list" *ngIf="selectedZones.length">
+          <div><strong>Lados:</strong> {{selectedSides.join(', ')}}</div>
+          <div><strong>Zonas:</strong> {{selectedZoneNames}}</div>
+        </div>
+
+        <ion-button expand="block" [disabled]="!selectedZones.length" (click)="saveIntervention()">Crear Work Order</ion-button>
+        <ion-button expand="block" fill="outline" color="medium" [disabled]="!selectedZones.length" (click)="clearSelection()">Limpiar selección</ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
