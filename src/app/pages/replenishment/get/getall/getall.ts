@@ -3,21 +3,10 @@ import { Location } from '@angular/common';
 import { MenuController } from '@ionic/angular';
 import { ConferenceData } from '../../../../providers/conference-data';
 import { UserData } from '../../../../providers/user-data';
-import { OpportunityService } from '../../../../services/opportunity.service';
-import { PosOrderService } from '../../../../services/pos-order.service';
-import { TableService } from '../../../../services/table.service';
 import { Ship,ShipMap } from '../../../../interfaces/ship';
-import { SessionService } from '../../../../services/session.service';
 import { UtilService } from '../../../../services/util.service';
-import { ProductService } from '../../../../services/product.service';
 import { BarcodeService } from '../../../../services/barcode.service';
-import { CategoryService } from '../../../../services/category.service';
-import { Product } from '../../../../interfaces/product';
 import { Subject } from 'rxjs';
-import { DateService } from '../../../../services/local/date.service';
-import { RexService } from '../../../../services/rex.service';
-import { ProdrexService } from '../../../../services/prodrex.service';
-import { UserService } from '../../../../services/user.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { Cco,CcoMap } from '../../../../interfaces/cco';
 import { CcoService } from '../../../../services/cc/cco.service';
@@ -78,18 +67,7 @@ export class GetallPage implements OnInit {
     public toastCtrl:ToastController,
     public user:UserData,
     public config:Config,
-    //private opportunityService:OpportunityService,
-    //private posOrderService:PosOrderService,
-    //private tableService:TableService,
-    //private route:ActivatedRoute,
-    //private sessionService:SessionService,
     private utilService:UtilService,
-    //private productService:ProductService,
-    //private categoryService:CategoryService,
-    //private dateService:DateService,
-    //private rexService:RexService,
-    //private prodrexService:ProdrexService,
-    //private userService:UserService,
     private withdrawnService:WithdrawnService,
     private ccoService:CcoService,
     private shipService:ShipService,
@@ -98,9 +76,9 @@ export class GetallPage implements OnInit {
   ) {}
 
 
-ionViewWillLeave() {
-    this.menu.enable(true);
-}
+  ionViewWillLeave() {
+      this.menu.enable(true);
+  }
 
   ngOnInit() {
     this.initCurrentMonthRange();
@@ -128,385 +106,133 @@ ionViewWillLeave() {
         this.shipList=ships;
         console.log('shipList',ships);
         this.shipMap=this.buildShipMap(ships);
-        //this.fullWithdrawnList=this.sortWithdrawnByDateAndSum(this.withdrawnList).reverse();
       },
       error:(err)=>console.error(err)
     });
   }
 
-getAll() {
-
-  const since = this.dayOfYearToISO(this.startDay);
-  const until = this.dayOfYearToISO(this.endDay, true);
-
-  this.withdrawnService
-    .getIntervalByAdate(since, until)
-    .subscribe({
-
-      next: response => {
-
-        this.withdrawnList = response;
-
-        // Enriquecer datos (diff, nombres, totales...)
-        this.prepareWithdrawnList(this.withdrawnList);
-
-        // Construir lista visual por movimientos
-        this.fullWithdrawnList =
+  getAll() {
+    const since = this.dayOfYearToISO(this.startDay);
+    const until = this.dayOfYearToISO(this.endDay, true);
+    this.withdrawnService
+      .getIntervalByAdate(since, until)
+      .subscribe({
+        next: response => {
+          this.withdrawnList = response;
+          this.prepareWithdrawnList(this.withdrawnList);
+          this.fullWithdrawnList =
           this.buildMovementList(this.withdrawnList);
-
-        console.log(this.fullWithdrawnList);
-
-      }
-
-    });
-
-}
-
-private prepareWithdrawnList(withdrawnList: any[]): void {
-
-  let total = 0;
-  let totalOpc = 0;
-  let totalImportado = 0;
-
-  const map = new Map<string, any>();
-
-  for (const item of withdrawnList) {
-
-    if (!item.data)
-      item.data = {};
-
-    const data = item.data;
-
-    data.diff = 0;
-
-    const kg = Number(data.kg) || 0;
-
-    total += kg;
-
-    if (data.id_replenishment_product === 1)
-      totalOpc += kg;
-    else if (data.id_replenishment_product === 2)
-      totalImportado += kg;
-
-    const wticket = data.wticket;
-
-    if (
-      wticket !== undefined &&
-      Number(data.wnet) > 0 &&
-      Number(data.wgross) > 0 &&
-      Number(data.wtare) > 0
-    ) {
-
-      const key = String(wticket);
-
-      if (map.has(key)) {
-
-        const other = map.get(key);
-
-        const match =
-          Number(other.data.wnet) === Number(data.wnet) &&
-          Number(other.data.wgross) === Number(data.wgross) &&
-          Number(other.data.wtare) === Number(data.wtare);
-
-        if (match) {
-
-          const diff =
-            (Number(other.data.kg) || 0) +
-            (Number(data.kg) || 0) -
-            Number(data.wnet);
-
-          other.data.diff = diff;
-          data.diff = diff;
-
+          console.log('fullWithdrawnList',this.fullWithdrawnList);
+          this.fullWithdrawnList = this.mapFullWithdrawnList(this.fullWithdrawnList);
         }
+      });
+  }
 
-      } else {
+  private prepareWithdrawnList(withdrawnList: any[]): void {
+    let total = 0;
+    let totalOpc = 0;
+    let totalImportado = 0;
+    const map = new Map<string, any>();
+    for (const item of withdrawnList) {
+      if (!item.data)
+        item.data = {};
+      const data = item.data;
+      data.diff = 0;
+      const kg = Number(data.kg) || 0;
+      total += kg;
+      if (data.id_replenishment_product === 1)
+        totalOpc += kg;
+      else if (data.id_replenishment_product === 2)
+        totalImportado += kg;
+      const wticket = data.wticket;
+      if (
+        wticket !== undefined &&
+        Number(data.wnet) > 0 &&
+        Number(data.wgross) > 0 &&
+        Number(data.wtare) > 0
+      ) {
 
-        map.set(key, item);
+        const key = String(wticket);
 
+        if (map.has(key)) {
+
+          const other = map.get(key);
+
+          const match =
+            Number(other.data.wnet) === Number(data.wnet) &&
+            Number(other.data.wgross) === Number(data.wgross) &&
+            Number(other.data.wtare) === Number(data.wtare);
+          if (match) {
+            const diff =
+              (Number(other.data.kg) || 0) +
+              (Number(data.kg) || 0) -
+              Number(data.wnet);
+            other.data.diff = diff;
+            data.diff = diff;
+          }
+        } else {
+          map.set(key, item);
+        }
       }
-
+      data.shipoutName =
+        this.shipMap[data.shipout]?.name ?? 'N/A';
+      data.shipinName =
+        this.shipMap[data.shipin]?.name ?? 'N/A';
     }
-
-    data.shipoutName =
-      this.shipMap[data.shipout]?.name ?? 'N/A';
-
-    data.shipinName =
-      this.shipMap[data.shipin]?.name ?? 'N/A';
-
+    this.totalKg = total;
+    this.totalGlpOpc = totalOpc;
+    this.totalGlpImportado = totalImportado;
   }
 
-  this.totalKg = total;
-  this.totalGlpOpc = totalOpc;
-  this.totalGlpImportado = totalImportado;
 
-}
+  private buildMovementList(withdrawnList: any[]): any[] {
+    const byId = new Map<number, any>();
+    withdrawnList.forEach(item => {
+      byId.set(item.id, item);
+    });
+    const visited = new Set<number>();
+    const movements: {
+      date: number;
+      rows: any[];
+    }[] = [];
+    for (const item of withdrawnList) {
+      if (visited.has(item.id))
+        continue;
 
+      visited.add(item.id);
+      const rows = [item];
+      const twinId = Number(item.data?.twin);
+      if (twinId > 0) {
+        const twin = byId.get(twinId);
+        if (twin && !visited.has(twin.id)) {
 
-
-private buildMovementList(withdrawnList: any[]): any[] {
-
-  const byId = new Map<number, any>();
-
-  withdrawnList.forEach(item => {
-    byId.set(item.id, item);
-  });
-
-  const visited = new Set<number>();
-
-  const movements: {
-
-    date: number;
-
-    rows: any[];
-
-  }[] = [];
-
-  for (const item of withdrawnList) {
-
-    if (visited.has(item.id))
-      continue;
-
-    visited.add(item.id);
-
-    const rows = [item];
-
-    const twinId = Number(item.data?.twin);
-
-    if (twinId > 0) {
-
-      const twin = byId.get(twinId);
-
-      if (twin && !visited.has(twin.id)) {
-
-        rows.push(twin);
-
-        visited.add(twin.id);
-
+          rows.push(twin);
+          visited.add(twin.id);
+        }
       }
-
+      rows.sort((a, b) => {
+        return new Date(a.data.date).getTime()
+          - new Date(b.data.date).getTime();
+      });
+      movements.push({
+        date: new Date(rows[0].data.date).getTime(),
+        rows
+      });
     }
-
-    //
-    // Orden interno de la pareja
-    //
-
-    rows.sort((a, b) => {
-
-      return new Date(a.data.date).getTime()
-        - new Date(b.data.date).getTime();
-
-    });
-
-    //
-    // Fecha del movimiento
-    //
-
-    movements.push({
-
-      date: new Date(rows[0].data.date).getTime(),
-
-      rows
-
-    });
-
+    // Movimientos más recientes primero
+    movements.sort((a, b) => b.date - a.date);
+    // Construir fullWithdrawnList
+    const result: any[] = [];
+    for (const movement of movements) {
+      movement.rows.forEach((row, index) => {
+        row.showSeparator =
+          index === movement.rows.length - 1;
+        result.push(row);
+      });
+    }
+    return result;
   }
 
-  //
-  // Movimientos más recientes primero
-  //
-
-  movements.sort((a, b) => b.date - a.date);
-
-  //
-  // Construir fullWithdrawnList
-  //
-
-  const result: any[] = [];
-
-  for (const movement of movements) {
-
-    movement.rows.forEach((row, index) => {
-
-      row.showSeparator =
-        index === movement.rows.length - 1;
-
-      result.push(row);
-
-    });
-
-  }
-
-  return result;
-
-}
-
-
-
-
-
-
-  /*getAll() {*/
-    /*const since=this.dayOfYearToISO(this.startDay);*/
-    /*const until=this.dayOfYearToISO(this.endDay,true);*/
-    /*this.withdrawnService*/
-      /*.getIntervalByAdate(since,until)*/
-      /*.subscribe({*/
-        /*next:response=>{*/
-          /*this.withdrawnList=response;*/
-          /*console.log('withdrawnList response2',this.withdrawnList);*/
-          /*this.fullWithdrawnList=this.sortWithdrawnByDateAndSum(this.withdrawnList).reverse();*/
-          /*console.log('full',this,this.fullWithdrawnList);*/
-        /*}*/
-      /*});*/
-  /*}*/
-
-
-/*sortWithdrawnByDateAndSum(withdrawnList: any[]): any[] {*/
-
-  /*let total = 0;*/
-  /*let totalOpc = 0;*/
-  /*let totalImportado = 0;*/
-
-  /*const map = new Map<string, any>();*/
-
-  /*for (let i = 0; i < withdrawnList.length; i++) {*/
-
-    /*const item = withdrawnList[i];*/
-    /*const data = item.data;*/
-
-    /*if (!item.data)*/
-      /*item.data = {};*/
-
-    /*item.data.diff = 0;*/
-
-    /*const kg = Number(data?.kg) || 0;*/
-
-    /*total += kg;*/
-
-    /*if (data?.id_replenishment_product === 1)*/
-      /*totalOpc += kg;*/
-    /*else if (data?.id_replenishment_product === 2)*/
-      /*totalImportado += kg;*/
-
-    /*const wticket = data?.wticket;*/
-
-    /*if (*/
-      /*wticket !== undefined &&*/
-      /*Number(data?.wnet) > 0 &&*/
-      /*Number(data?.wgross) > 0 &&*/
-      /*Number(data?.wtare) > 0*/
-    /*) {*/
-
-      /*const key = String(wticket);*/
-
-      /*if (map.has(key)) {*/
-
-        /*const other = map.get(key);*/
-
-        /*const match =*/
-          /*Number(other.data?.wnet) === Number(data?.wnet) &&*/
-          /*Number(other.data?.wgross) === Number(data?.wgross) &&*/
-          /*Number(other.data?.wtare) === Number(data?.wtare);*/
-
-        /*if (match) {*/
-
-          /*const diff =*/
-            /*(Number(other.data?.kg) || 0) +*/
-            /*(Number(data?.kg) || 0) -*/
-            /*Number(data?.wnet);*/
-
-          /*item.data = { ...item.data, diff };*/
-          /*other.data = { ...other.data, diff };*/
-
-        /*}*/
-
-      /*} else {*/
-
-        /*map.set(key, item);*/
-
-      /*}*/
-
-    /*}*/
-
-    /*data.shipoutName = this.shipMap[data.shipout]?.name ?? 'N/A';*/
-    /*data.shipinName  = this.shipMap[data.shipin]?.name  ?? 'N/A';*/
-
-  /*}*/
-
-  /*withdrawnList.sort((a, b) => a._ts - b._ts);*/
-
-  /*// -------------------------------*/
-  /*// Marcar separadores de movimiento*/
-  /*// -------------------------------*/
-
-  /*for (let i = 0; i < withdrawnList.length; i++) {*/
-
-    /*const current = withdrawnList[i];*/
-    /*const next = withdrawnList[i + 1];*/
-
-    /*current.showSeparator =*/
-      /*!next ||*/
-      /*current.data.twin !== next.id;*/
-
-  /*}*/
-
-  /*this.totalKg = total;*/
-  /*this.totalGlpOpc = totalOpc;*/
-  /*this.totalGlpImportado = totalImportado;*/
-
-  /*return withdrawnList;*/
-
-/*}*/
-
-  /*sortWithdrawnByDateAndSum(withdrawnList:any[]):any[] {*/
-    /*let total=0;*/
-    /*let totalOpc=0;*/
-    /*let totalImportado=0;*/
-    /*const map=new Map<string,any>();*/
-    /*for(let i=0;i<withdrawnList.length;i++) {*/
-      /*const item=withdrawnList[i];*/
-      /*const data=item.data;*/
-      /*if(!item.data)*/
-        /*item.data={};*/
-      /*item.data.diff=0;*/
-      /*const kg=Number(data?.kg)||0;*/
-      /*total+=kg;*/
-      /*if(data?.id_replenishment_product===1)*/
-        /*totalOpc+=kg;*/
-      /*else if(data?.id_replenishment_product===2)*/
-        /*totalImportado+=kg;*/
-      /*const wticket=data?.wticket;*/
-      /*if(wticket!==undefined&&Number(data?.wnet)>0&&Number(data?.wgross)>0&&Number(data?.wtare)>0){*/
-        /*const key=String(wticket);*/
-        /*if(map.has(key)) {*/
-          /*const other=map.get(key);*/
-          /*const match=*/
-            /*Number(other.data?.wnet)===Number(data?.wnet) &&*/
-            /*Number(other.data?.wgross)===Number(data?.wgross) &&*/
-            /*Number(other.data?.wtare)===Number(data?.wtare);*/
-          /*if(match) {*/
-            /*const diff=*/
-              /*(Number(other.data?.kg)||0)+*/
-              /*(Number(data?.kg)||0)-*/
-              /*Number(data?.wnet);*/
-            /*item.data={ ...item.data,diff };*/
-            /*other.data={ ...other.data,diff };*/
-          /*}*/
-        /*} else {*/
-          /*map.set(key,item);*/
-        /*}*/
-      /*}*/
-      /*console.log('shipMap',this.shipMap)*/
-      /*data.shipoutName=this.shipMap[data.shipout]?.name ?? 'N/A';*/
-      /*data.shipinName=this.shipMap[data.shipin]?.name ?? 'N/A';*/
-    /*}*/
-    /*withdrawnList.sort((a,b)=>a._ts-b._ts);*/
-    /*this.totalKg=total;*/
-    /*this.totalGlpOpc=totalOpc;*/
-    /*this.totalGlpImportado=totalImportado;*/
-    /*return withdrawnList;*/
-  /*}*/
   trackByGroup(index:number,group:any):string {
     return group.refdate+'-'+index;
   }
@@ -793,20 +519,6 @@ private buildMovementList(withdrawnList: any[]): any[] {
         console.error('Error al copiar:',err);
       });
   }
-/*  patch(withdrawn:any,page:any) {*/
-    /*console.log('item to patch',withdrawn);*/
-    /*console.log('ruta',page);*/
-    /*const pageRoute='/app/tabs/replenishment-'+page+'-patch';*/
-    /*console.log('pageRoute',pageRoute);*/
-    /*this.router.navigate(*/
-      /*[pageRoute],*/
-      /*{*/
-        /*state:{*/
-          /*item:withdrawn*/
-        /*}*/
-      /*}*/
-    /*);*/
-  /*}*/
 
   shipInName(p){}
   shipOutName(p){}
@@ -823,22 +535,19 @@ private buildMovementList(withdrawnList: any[]): any[] {
     this.location.back();
   }
 
+  onColorPickerOpen(item: any, color: string): void {
+    console.log('onColorPickerOpen');
+    console.log('item:', item);
+    console.log('color:', color);
+  }
 
-onColorPickerOpen(item: any, color: string): void {
-  console.log('onColorPickerOpen');
-  console.log('item:', item);
-  console.log('color:', color);
-}
-
-onColorChange(item: any, color: string): void {
-  console.log('onColorChange');
-  console.log('item:', item);
-  console.log('color:', color);
-  item.data.color=color;
-  this.patchItem(item)
-}
-
-
+  onColorChange(item: any, color: string): void {
+    console.log('onColorChange');
+    console.log('item:', item);
+    console.log('color:', color);
+    item.data.color=color;
+    this.patchItem(item)
+  }
  
   patchItem(item:any) {
     console.log("item to patch",item)
@@ -860,13 +569,6 @@ onColorChange(item: any, color: string): void {
     textarea.style.height = textarea.scrollHeight + 'px';
   }
 
-  /**
-   * Se ejecuta cuando el usuario termina de editar.
-   * Contrae nuevamente el textarea.
-   * Normaliza el texto.
-   * Actualiza el modelo.
-   * Guarda en PostgreSQL.
-   */
   onTextBlur(item: any, event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     // Volver a una sola línea visual
@@ -888,6 +590,56 @@ onColorChange(item: any, color: string): void {
       .replace(/\s+/g, " ")
       .replace(/[^\w\s\-./]/g, "");
   }
+
+/*  mapFullWithdrawnList(list: any[]): any[] {*/
+    /*return list.map(item => {*/
+      /*const d = item.data;*/
+      /*let level = '';*/
+      /*if (d?.shipout > 0 && d?.shipout != 3) level = 'nivel5';*/
+      /*else if (d?.deliveryout?.length > 2) level = 'nivel4';*/
+      /*else if (d?.wtare > 1000 && d?.wnet > 1000) level = 'nivel3';*/
+      /*else if (d?.kg > 10) level = 'nivel2';*/
+      /*else if (d?.deliveryin?.length > 2 && d?.datein?.length > 2) level = 'nivel1';*/
+      /*return { ...item, level };*/
+    /*});*/
+  /*}*/
+
+/*getLevel(item: any): string {*/
+  /*console.log('updated_at',item.updated_at);*/
+  /*const data=item.data*/
+  /*if (data?.shipout > 0 && data?.shipout != 3) return '->sai';*/
+  /*if (data?.deliveryout?.length > 2) return 'puerto';*/
+  /*if (data?.wtare > 1000 && data?.wnet > 1000) return '->puerto';*/
+  /*if (data?.kg > 10) return 'ctg';*/
+  /*if (data?.deliveryin?.length > 2 && data?.datein?.length > 2) return 'ctg';*/
+  /*return '';*/
+/*}*/
+
+  getLevel(item: any): string {
+    const updatedAt = new Date(item.updated_at);
+    const now = new Date();
+    const diffDays = (now.getTime() - updatedAt.getTime()) / (1000 * 60 * 60 * 24);
+    const olderThan8Days = diffDays > 8;
+    //console.log('updated_at', item.updated_at);
+    //console.log('diffDays', diffDays);
+    console.log('olderThan8Days', olderThan8Days);
+    const data = item.data;
+    if (data?.shipout > 0 && data?.shipout != 3 && olderThan8Days) return 'sai';
+    if (data?.shipout > 0 && data?.shipout != 3) return '->sai';
+    if (data?.deliveryout?.length > 2) return 'puerto';
+    if (data?.wtare > 1000 && data?.wnet > 1000) return '->puerto';
+    if (data?.kg > 10) return 'ctg';
+    if (data?.deliveryin?.length > 2 && data?.datein?.length > 2) return 'ctg';
+    return '';
+  }
+
+  mapFullWithdrawnList(list: any[]): any[] {
+    return list.map(item => ({ ...item, level: this.getLevel(item) }));
+  }
+
+  /*mapFullWithdrawnList(fullWithdrawnList:any[]):any[]{*/
+    /*fullWithdrawnList.map((it)=>{it.})*/
+  /*}*/
 
 
 }
