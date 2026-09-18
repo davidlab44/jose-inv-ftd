@@ -212,6 +212,11 @@ export class AppComponent implements OnInit {
      icon: 'add'
    },
    {
+     title: 'ingresoa patio',
+     url: '/app/tabs/sgc-in-post',
+     icon: 'barcode'
+   },
+   {
      title: 'Almacen',
      url: '/app/tabs/schedule',
      icon: 'calendar'

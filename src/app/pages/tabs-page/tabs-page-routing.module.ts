@@ -184,11 +184,11 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'ats-bom-post',
+        path: 'sgc-in-post',
         children: [
           {
             path: '',
-            loadChildren: () => import('../ats/bom/post/post.module').then(m =>m.AssetSupplyPostModule )
+            loadChildren: () => import('../sgc/in/post/post.module').then(m =>m.AssetSupplyPostModule )
           }
         ]
       },

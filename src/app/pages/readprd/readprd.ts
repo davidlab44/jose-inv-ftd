@@ -80,13 +80,13 @@ export class ReadprdPage {
     this.refreshView();
   }
   ionViewWillEnter() {
-    this.refreshView();
+    //this.refreshView();
   }
   refreshView() {
     this.loadCategories();
     this.loadUms();
     this.getAllProducts();
-    this.getAllProductsFull();
+    //this.getAllProductsFull();
     this.searchSubject.pipe(
       debounceTime(500),
       distinctUntilChanged(),
@@ -104,6 +104,7 @@ export class ReadprdPage {
     ).subscribe({
       next: results => {
         this.productList = shared.mergeProducts(results, this.filteredProductsByCategory);
+        this.mapProductList();
       },
       error: err => console.error('Error en búsqueda:', err)
     });
@@ -114,18 +115,19 @@ export class ReadprdPage {
     this.productService.getAllProducts().subscribe({
       next: r => {
         this.productList = r;
+        this.mapProductList();
       },
       error: e => console.error('Error:', e)
     });
   }
-  getAllProductsFull() {
-    this.productService.getAll().subscribe({
-      next: r => {
-        this.productListFull = r;
-      },
-      error: e => console.error('Error:', e)
-    });
-  }
+/*  getAllProductsFull() {*/
+    /*this.productService.getAll().subscribe({*/
+      /*next: r => {*/
+        /*this.productListFull = r;*/
+      /*},*/
+      /*error: e => console.error('Error:', e)*/
+    /*});*/
+  /*}*/
   searchProducts(hash: string, list: any[]): any[] {
     return shared.searchProducts(hash, list);
   }
@@ -134,6 +136,8 @@ export class ReadprdPage {
       next: r => {
         this.categories = r;
         this.categoryService.saveCategoriesToLocal(r);
+        setTimeout(()=>{this.mapProductList()},3000)
+        console.log("ctg list1",this.categories)
       },
       error: e => {
         console.error('Error categorías:', e);
@@ -153,6 +157,16 @@ export class ReadprdPage {
       }
     });
   }
+
+  mapProductList(): void {
+    this.productList = this.productList.map(item => ({
+      ...item,
+      ctgname: this.getCategoryNameById(item.data.categ[0])
+    }));
+    console.log("productlist con ctgname",this.productList)
+    console.log("ctg list",this.categories)
+  }
+
   getCategoryNameById(id: number | null | undefined): string {
     return shared.getCategoryNameById(this.categories, id);
   }
@@ -217,4 +231,6 @@ export class ReadprdPage {
   downloadExcel() {
     this.excelService.exportInventory(this.productList, this.ums, this.categories, 'products');
   }
+
+
 }

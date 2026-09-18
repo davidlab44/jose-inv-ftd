@@ -3,23 +3,10 @@ import { Router } from '@angular/router';
 import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
 import { ConferenceData } from '../../providers/conference-data';
 import { UserData } from '../../providers/user-data';
-import { OpportunityService } from '../../services/opportunity.service';
-import { PosOrderService } from '../../services/pos-order.service';
-import { TableService } from '../../services/table.service';
-import { environment } from '../../../environments/environment';
-import { ActivatedRoute } from '@angular/router'
 import { Session } from '../../interfaces/session';
-import { SessionService } from '../../services/session.service';
 import { UtilService } from '../../services/util.service';
 import { ProductService } from '../../services/product.service';
-import { BarcodeService } from '../../services/barcode.service';
-import { CategoryService } from '../../services/category.service';
-import { UmService } from '../../services/um.service';
-import { Product } from '../../interfaces/product';
-import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { DateService } from '../../services/local/date.service';
 import { RexService } from '../../services/rex.service';
 import { ProdrexService } from '../../services/prodrex.service';
 import { UserService } from '../../services/user.service';
@@ -49,9 +36,9 @@ export class ProdrexPage {
   sessionId: number | null = null;
   searchSubject = new Subject<string>();
   todayDate:any
-
+  productListCaos:any[]=[];
+  
   constructor(
-    private barcodeService: BarcodeService,
     public alertCtrl: AlertController,
     public confData: ConferenceData,
     public loadingCtrl: LoadingController,
@@ -60,26 +47,14 @@ export class ProdrexPage {
     public toastCtrl: ToastController,
     public user: UserData,
     public config: Config,
-    private opportunityService: OpportunityService,
-    private posOrderService: PosOrderService,
-    private tableService: TableService,
-    private route: ActivatedRoute,
-    private sessionService:SessionService,
     private utilService:UtilService,
     private productService:ProductService,
-    private categoryService:CategoryService,
-    private umService:UmService,
-    private dateService: DateService,
     private rexService: RexService,
     private prodrexService: ProdrexService,
     private userService: UserService
-  ) {}
-
-  /* printSelectedBarcodes(p: Product) {*/
-    /*const paddedId = p.id.toString().padStart(6, '0');*/
-    /*const selectedBarcodes = [paddedId];*/
-    /*this.barcodeService.downloadPDF(selectedBarcodes);*/
-  /*}*/
+  ) {
+    this.loadUsers();
+  }
 
   hash:string='';
   table:any
@@ -88,13 +63,9 @@ export class ProdrexPage {
   }
 
   async refreshView() {
-    await this.loadCategories();
-    await this.loadUms();
-    const ahora = new Date();
-    this.todayDate=this.formatFechaLatam(ahora);
-    this.loadUsers();
     this.rexService.getLast().subscribe({
       next: (response) => {
+        this.getProdrexList();
         if(response && response.length && response.length>0){
           console.log('getLast RSPNS',response)
           if(response[0].state=='draft'){
@@ -114,12 +85,12 @@ export class ProdrexPage {
             })
           }
         }
-        //console.log("response rex table",response)
       }
     })
 
     this.productService.getCachedOrServer().subscribe(data => {
       this.productListCaos = data;
+      console.log('this.productListCaos',this.productListCaos)
     });
   }
   
@@ -133,27 +104,19 @@ export class ProdrexPage {
     })
   }
 
+  ionViewWillEnter() {}
 
-  updateSchedule(){
-     
-  }
-
-  productListCaos:any[]=[];
-
-  ionViewWillEnter() {
+  ionViewDidEnter(){
     this.refreshView();
   }
 
-
-  ionViewDidEnter(){
-    this.refreshProdrexList();
-  }
-
   prodrexList:any[]=[];
-  refreshProdrexList() {
+  getProdrexList() {
     this.prodrexList=[];
-    this.prodrexService.getAll().subscribe({
+    console.log('va a consultar prodrexservice')
+    this.prodrexService.getRecents().subscribe({
       next: response=>{
+        console.log('prodRexService',response);
         if(this.rexDocument.length && this.rexDocument.length>0){
           response.forEach(prodrex => {
             if(prodrex.data.id_rex==this.rexDocument[0].id){
@@ -163,134 +126,39 @@ export class ProdrexPage {
         }else{
           this.utilService.presentToast('rexDocument is empty')
         }
+        this.mapProdrexList()
       }
     })
   }
-  
-  posCategId:number=0
-  productList:Product[]=[];
-  getAllProducts() {
-    this.productService.getAllProducts().subscribe({
-      next: response => {
-        this.productList=response;
-        //console.log('products By Cat',this.productList)
-      },
-      error: error => console.error('Error:', error),
-      complete: () => {}
-    });
+
+  mapProdrexList(): void {
+    console.log('prodrexLissss',this.prodrexList);
+    this.prodrexList = this.prodrexList.map(item => ({
+      ...item,
+      prdtname: this.getProductNameById(item.data?.id_product)
+    }));
+    console.log('prodrexListtt',this.prodrexList);
   }
-
-  searchProducts(hash: string, productList: any[]): any[] {
-    if (!hash || hash.trim() === '') return productList;
-    return productList.filter(product =>
-      product.name.toLowerCase().includes(hash.toLowerCase())
-    );
-  }
-
-  categories: any[] = [];    
-  loadCategories() { 
-    this.categoryService.getAllCategories().subscribe({ 
-      next: (res) => {       
-        this.categories = res;          
-        this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
-      }, 
-      error: (err) => {      
-        console.error('❌ Error al cargar categorías:', err); 
-        this.categories = this.categoryService.getCategoriesFromLocal(); 
-      } 
-    }); 
-  }   
-  ums: any[] = []; 
-  loadUms() {                
-    this.umService.getAllUms().subscribe({ 
-      next: (res) => {       
-        console.log('✅ Ums:', res);    
-        this.ums = res; 
-        this.umService.saveUmsToLocal(res); 
-      }, 
-      error: (err) => {      
-        console.error('❌ Error al cargar categorías:', err); 
-        this.ums = this.umService.getUmsFromLocal(); 
-      } 
-    }); 
-  }     
-    
-  getCategoryNameById(id: number | null | undefined): string {
-    if (id === null || id === undefined) {
-      return 'Sin categoría';
-    }
-    if (!Array.isArray(this.categories) || this.categories.length === 0) {
-      return 'Sin categoría';
-    }
-    const cat = this.categories.find(c => Number(c.ext_id) === Number(id));
-    const nombre = cat?.datos?.nombre;
-    return typeof nombre === 'string' && nombre.trim() !== ''
-      ? nombre
-      : 'Sin categoría';
-  }
-
-
-  getUmNameById(id: number | string | null | undefined): string {
-    if (id === null || id === undefined) {
-      return 'Sin UM';
-    }
-    const idNum = Number(id);
-    if (isNaN(idNum)) {
-      return 'Sin UM';
-    }
-    if (!Array.isArray(this.ums) || this.ums.length === 0) {
-      return 'Sin UM';
-    }
-    const um = this.ums.find(u => Number(u.id) === idNum);
-    if (!um) {
-      return 'Sin UM';
-    }
-    const nombre = um?.datos?.name;
-    if (typeof nombre === 'string' && nombre.trim() !== '') {
-      return nombre;
-    }
-    return 'Sin UM';
-  }
-
 
   getProductNameById(id: number | string | null | undefined): string {
-    //console.log("id product pasado", id);
-    if (id === null || id === undefined) return 'Sin Nombre';
+    console.log("id product pasado",id);
+    if (id === null || id === undefined) return 'Sin Nombre 1';
     const idNum = Number(id);
-    if (isNaN(idNum)) return 'Sin Nombre';
+    if (isNaN(idNum)) return 'Sin Nombre 2';
     if (!Array.isArray(this.productListCaos) || this.productListCaos.length === 0) {
-      return 'Sin Nombre';
+      return 'Sin Nombre 3';
     }
     const product = this.productListCaos.find(p => Number(p.id) === idNum);
-    if (!product) return 'Sin Nombre';
+    if (!product) return 'Sin Nombre 4';
     const name = product?.data?.name;
     if (typeof name === 'string' && name.trim() !== '') {
       return name;
     }
-    return 'Sin Nombre';
+    return 'Sin Nombre 5';
   }
   
   onSearch(text: string) {
     this.searchSubject.next(text);
-  }
-
-  formatFechaLatam(dateInput: string | Date | number): string {
-    if (!dateInput) return '';
-    const date = new Date(dateInput);
-    const opciones: Intl.DateTimeFormatOptions = {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    };
-    const fechaTexto = new Intl.DateTimeFormat('es-ES', opciones).format(date);
-    let horas = date.getHours();
-    const minutos = String(date.getMinutes()).padStart(2, '0');
-    const segundos = String(date.getSeconds()).padStart(2, '0');
-    const ampm = horas >= 12 ? 'PM' : 'AM';
-    horas = horas % 12;
-    if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
-    const horasTexto = String(horas).padStart(2, '0');
-    return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
   selectUsers(){
@@ -371,7 +239,6 @@ export class ProdrexPage {
       }
     });
   }
-
 
 }
 

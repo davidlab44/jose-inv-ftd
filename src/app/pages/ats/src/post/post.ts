@@ -185,11 +185,8 @@ export class AssetSupplyPostPage {
       }
       return match;
     });
-
     console.log('[SEARCH][8] coincidencias totales antes de limitar:', matches.length);
-
     const visibleResults = matches.slice(0, 20);
-
     return visibleResults;
   }
 
@@ -226,7 +223,7 @@ export class AssetSupplyPostPage {
     const segundos = String(date.getSeconds()).padStart(2, '0');
     const ampm = horas >= 12 ? 'PM' : 'AM';
     horas = horas % 12;
-    if (horas === 0) horas = 12; // 12 AM o 12 PM en lugar de 0
+    if (horas === 0) horas = 12;
     const horasTexto = String(horas).padStart(2, '0');
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
@@ -285,8 +282,8 @@ export class AssetSupplyPostPage {
   }
 
   restartQty(p:any){
-   p.data.qty=1;
-   console.log('TEST ESBUILD 001');
+   p.data.qty=0;
+   //console.log('TEST ESBUILD 001');
   }
 
 
