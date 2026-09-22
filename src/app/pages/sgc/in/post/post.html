@@ -31,98 +31,33 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-<!--  <ion-grid class="bom-grid">-->
-    <!--<ion-row *ngFor="let p of bomList">-->
-      <!--<ion-col size="2" class="product-category">-->
-        <!--{{p.data.categName}}-->
-      <!--</ion-col>-->
-      <!--<ion-col size="4" class="product-name">-->
-        <!--{{ p.data.name }}-->
-      <!--</ion-col>-->
-      <!--<ion-col size="1" class="qty-container" >-->
-        <!--<span (click)="restartQty(p)" class="qty-control" >-->
-          <!--{{ p.data.qty || 0 }}-->
-        <!--</span>-->
-      <!--</ion-col>-->
-      <!--<ion-col size="1" class="product-category">-->
-        <!--{{p.data.umName}}-->
-      <!--</ion-col>-->
-      <!--<ion-col size="1" class="control-col">-->
-        <!--<ion-button type="button" color="primary" (click)="incrementQty(p,1,$event)">-->
-          <!--+1-->
-        <!--</ion-button>-->
-      <!--</ion-col>-->
-      <!--<ion-col size="1" class="control-col">-->
-        <!--<ion-button type="button" color="primary" (click)="incrementQty(p,10,$event)">-->
-          <!--+10-->
-        <!--</ion-button>-->
-      <!--</ion-col>-->
-      <!--<ion-col size="1" class="control-col">-->
-        <!--<ion-button type="button" color="primary" (click)="incrementQty(p,100,$event)">-->
-          <!--+100-->
-        <!--</ion-button>-->
-      <!--</ion-col>-->
-      <!--<br>-->
-      <!--<ion-col size="1" class="control-col">-->
-        <!--<ion-button-->
-          <!--type="button"-->
-          <!--color="danger"-->
-          <!--(click)="removeById(p, $event)">-->
-          <!--<ion-icon name="trash-outline"></ion-icon>-->
-        <!--</ion-button>-->
-      <!--</ion-col>-->
-      <!--<br>-->
-    <!--</ion-row>-->
-  <!--</ion-grid>-->
-  <!--<br>-->
-  <!--<form [formGroup]="form">-->
-    <!--<ion-list>-->
-      <!--<ion-item>-->
-        <!--<ion-label position="floating">Sub tarea</ion-label>-->
-        <!--<ion-input formControlName="name"></ion-input>-->
-      <!--</ion-item>-->
-      <!--<ion-item>-->
-        <!--<ion-label position="floating">Unidad de medida</ion-label>-->
-        <!--<ion-select formControlName="um" placeholder="Seleccione una unidad">-->
-          <!--<ion-select-option *ngFor="let item of ums" [value]="item.id">-->
-            <!--{{ item.data.name }}-->
-          <!--</ion-select-option>-->
-        <!--</ion-select>-->
-      <!--</ion-item>-->
-    <!--</ion-list>-->
-    <!--<br>-->
-    <!--<ion-button expand="block" (click)="guardar()">-->
-      <!--Guardar-->
-    <!--</ion-button>-->
-  <!--</form>-->
-  <!--<br>-->
   <ion-grid class="bom-grid">
-    <ion-row style="margin-top:-12px;">
-      <ion-col size="1"></ion-col>
-      <ion-col size="10">
+    <ion-row style="margin-top:-2px;">
+      <ion-col size="2"></ion-col>
+      <ion-col size="8">
         <div class="iso-container">
           <div class="iso-tank" [style.background-color]="isoColor">
             <div class="iso-cap iso-cap-left" [style.background-color]="isoColor"></div>
-            <div class="iso-name">{{ isoName }}</div>
+            <div class="iso-name">{{ isotanq1?.data?.name }}</div>
             <div class="iso-cap iso-cap-right" [style.background-color]="isoColor"></div>
           </div>
         </div>
      </ion-col> 
     </ion-row>
-    <ion-row style="margin-top:-12px;">
-      <ion-col size="1"></ion-col>
-      <ion-col size="10"> 
+    <ion-row style="margin-top:-64px;">
+      <ion-col size="2"></ion-col>
+      <ion-col size="8"> 
        <div class="iso-container">
          <div class="iso-tank" [style.background-color]="isoColor">
            <div class="iso-cap iso-cap-left" [style.background-color]="isoColor"></div>
-           <div class="iso-name">{{ iso2Name }}</div>
+           <div class="iso-name">{{ isotanq2?.data?.name }}</div>
            <div class="iso-cap iso-cap-right" [style.background-color]="isoColor"></div>
          </div>
        </div>
      </ion-col> 
     </ion-row>
   </ion-grid>
-  <ion-button expand="block" (click)="guardar()">
+  <ion-button expand="block" (click)="post()"   style="margin-top:-38 px;">
     Guardar
   </ion-button>
   <br>
