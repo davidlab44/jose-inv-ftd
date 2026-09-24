@@ -10,7 +10,7 @@ import { BehaviorSubject, of } from 'rxjs';
 })
 export class IoService {
 
-  private apiUrl = environment.apiHost;
+  private apiUrl = environment.pimApiHost;
   private cache: any[] | null = null;
   private storageKey = 'productos_cache';
   private productos$ = new BehaviorSubject<any[] | null>(null);
@@ -38,9 +38,23 @@ export class IoService {
     return this.http.get<any[]>(this.urlLastProducts(limit));
   }
   
-  post(data): Observable<any> {
+  /*post(data): Observable<any> {*/
+    /*const url = `${this.apiUrl}/${this.model}?select=*`;*/
+    /*console.log('antes de la peticion',url)*/
+    /*return this.http.post(url, data, {*/
+      /*headers: {*/
+        /*'Content-Type': 'application/json',*/
+        /*'Prefer': 'return=representation'*/
+      /*}*/
+    /*});*/
+  /*}*/
+
+  post(data:any): Observable<any> {
     const url = `${this.apiUrl}/${this.model}?select=*`;
-    return this.http.post(url, data, {
+    const item = {
+      data: data
+    };
+    return this.http.post(url, item, {
       headers: {
         'Content-Type': 'application/json',
         'Prefer': 'return=representation'

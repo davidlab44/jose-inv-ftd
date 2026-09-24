@@ -32,32 +32,33 @@
 
 <ion-content class="ion-padding">
   <ion-grid class="bom-grid">
-    <ion-row style="margin-top:-2px;">
+    <ion-row>
       <ion-col size="2"></ion-col>
       <ion-col size="8">
-        <div class="iso-container">
+        <div class="iso-container" *ngIf="this.isotanq1?.id_cco>0">
           <div class="iso-tank" [style.background-color]="isoColor">
             <div class="iso-cap iso-cap-left" [style.background-color]="isoColor"></div>
-            <div class="iso-name">{{ isotanq1?.data?.name }}</div>
+            <div class="iso-name">{{ iso1?.data?.name }}</div>
             <div class="iso-cap iso-cap-right" [style.background-color]="isoColor"></div>
           </div>
         </div>
      </ion-col> 
     </ion-row>
-    <ion-row style="margin-top:-64px;">
+    <ion-row>
       <ion-col size="2"></ion-col>
       <ion-col size="8"> 
-       <div class="iso-container">
+       <div class="iso-container" *ngIf="this.isotanq2?.id_cco" >
          <div class="iso-tank" [style.background-color]="isoColor">
            <div class="iso-cap iso-cap-left" [style.background-color]="isoColor"></div>
-           <div class="iso-name">{{ isotanq2?.data?.name }}</div>
+           <div class="iso-name">{{ iso2?.data?.name }}</div>
            <div class="iso-cap iso-cap-right" [style.background-color]="isoColor"></div>
          </div>
        </div>
      </ion-col> 
     </ion-row>
   </ion-grid>
-  <ion-button expand="block" (click)="post()"   style="margin-top:-38 px;">
+
+  <ion-button expand="block" (click)="post()" *ngIf="this.isotanq1?.id_cco>0">
     Guardar
   </ion-button>
   <br>

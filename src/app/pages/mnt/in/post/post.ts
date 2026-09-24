@@ -9,11 +9,11 @@ import { UtilService } from '../../../../services/util.service';
 import { ProductService } from '../../../../services/product.service';
 import { Subject } from 'rxjs';
 import { DateService } from '../../../../services/local/date.service';
-//import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { IoService } from '../../../../services/mnt/io.service';
+//import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'page-post',
@@ -117,29 +117,58 @@ export class AssetSupplyPostPage {
       }
     });
   }
+  isotanq1:any={"id_cco":0,"in":'',"out":""};
+  isotanq2:any={"id_cco":0,"in":'',"out":""};
+  iso1:any;
+  iso2:any;
+
+  /*aqui HACER EL MAP YO MISMO PARA MAPEAR EL RESULTADO CON LOS NOMBRES*/
+/*parece que no hay loadCCO   no puede ser y como mostraba los nombres de los isotanques hace poco */
+
+/*bueno bueno sui no hay hay que cargarlos ya */
+
+  selectProduct(p){
+    console.log('this.isotanq1?.data?.name.length',this.isotanq1?.data?.name.length)
+    if(this.isotanq1?.id_cco>0){
+      this.iso2=p;
+      this.isotanq2.id_cco =p.id;
+    }else{
+      this.isotanq1.id_cco=p.id;
+      this.iso1=p;
+    }
+    console.log("isotanq1",this.isotanq1);
+    console.log("isotanq2",this.isotanq2);
+    this.filteredProductList=[] 
+  }
 
   post() {
-    if(this.iso2Name.length<2){
+    if(this.isotanq1.id_cco>0&&this.isotanq2.id_cco==0){
+      console.log('esta seguro que desea enviar un solo tanque?')     
+      this.postRequest(this.isotanq1);
       return;
     }
-    const data={"id_isotq":this.isotanq1.id}
+    if(this.isotanq1.id_cco&&this.isotanq1.id_cco>0&&this.isotanq2.id_cco&&this.isotanq2.id_cco>0){
+      console.log("todo en orden, enviando los dos tanques")
+      this.postRequest(this.isotanq1);
+      this.postRequest(this.isotanq2);
+      return;
+    }
+    return;
+    //const data={"id_isotq":this.isotanq1}
   }
 
 
-  isotanq1:any;
-  isotanq2:any;
-  selectProduct(p){
-  console.log('this.isotanq1?.data?.name.length',this.isotanq1?.data?.name.length)
-   if(this.isotanq1?.data?.name){
-     this.isotanq2 =p;
-   }else{
-     this.isotanq1=p;
-   }
-   console.log("isotanq1",this.isotanq1);
-   console.log("isotanq2",this.isotanq2);
-  this.filteredProductList=[] 
 
-
+  postRequest(data:any){
+    this.ioService.post(data).subscribe({
+      next:(res)=>{
+        console.log('postRequest',res)
+      },
+      error:(err)=>{
+        console.error('error',err)
+      }
+    })   
   }
+
 
 }

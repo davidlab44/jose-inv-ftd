@@ -135,11 +135,11 @@ export class AssetSupplyPostPage implements OnInit {
 
   guardar(prdtAtt:any) {
     const data: any = prdtAtt;
-    if(!Number(this.categFull.id)||Number(this.categFull.id)<1 ){
+    if(!Number(this.categFull.ext_id)||Number(this.categFull.ext_id)<1 ){
       console.log ("Categoria No Valida")
       return;
     }
-    data.categ = [this.categFull.id];
+    data.categ = [this.categFull.ext_id];
     delete data.category;
     console.log('Product to post =>', data);
     this.productService.post(data).subscribe({

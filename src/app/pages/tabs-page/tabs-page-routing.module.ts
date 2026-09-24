@@ -188,7 +188,16 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../sgc/in/post/post.module').then(m =>m.AssetSupplyPostModule )
+            loadChildren: () => import('../mnt/in/post/post.module').then(m =>m.AssetSupplyPostModule)
+          }
+        ]
+      },
+      {
+        path: 'sgc-in-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../mnt/in/getall/getall.module').then(m =>m.GetallModule)
           }
         ]
       },
