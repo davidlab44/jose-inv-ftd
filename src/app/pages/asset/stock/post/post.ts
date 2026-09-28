@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';   
 import { ProductService } from '../../../../services/product.service';   
+import { UtilService } from '../../../../services/util.service';   
 import { FormBuilder,FormControl,FormGroup,ReactiveFormsModule,Validators} from '@angular/forms';
+
 
 type AttributeType =
   | 'string'
@@ -43,10 +45,9 @@ export class AssetSupplyPostPage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private productService: ProductService
-  ) {
-  }
-
+    private productService: ProductService,
+    private utilService: UtilService,
+  ){}
 
   receiveDataFromRouter(){
     const navigation = this.router.getCurrentNavigation();
@@ -69,15 +70,10 @@ export class AssetSupplyPostPage implements OnInit {
     this.buildForm();
   }
 
-  ionViewWillEnter(){
-    //this.receiveDataFromRouter();
-  }
-
   get requiredAttributes(): Array<{
     key: string;
     config: ProductAttribute;
   }> {
-
     return Object.entries(
       this.category.product_template
     )
@@ -89,6 +85,16 @@ export class AssetSupplyPostPage implements OnInit {
   }
 
   private buildForm(): void {
+
+
+  if(!Number(this.categFull.ext_id)||Number(this.categFull.ext_id)<1 ){
+      console.log ("Categoria No Valida")
+      return;
+    }
+    //this.requiredAttributes.data.categ = [this.categFull.ext_id];
+    //delete data.category;
+
+
     const controls: Record<string, FormControl> = {};
     for (const { key, config } of this.requiredAttributes) {
       let defaultValue: unknown;
@@ -116,6 +122,9 @@ export class AssetSupplyPostPage implements OnInit {
       );
     }
     this.form = this.fb.group(controls);
+    this.form.patchValue({
+      category:this.categFull.ext_id ?? null
+    })
   }
   label(value: string): string {
     return value
@@ -146,13 +155,12 @@ export class AssetSupplyPostPage implements OnInit {
       next: (response) => {
         console.log("product post response", response);
         if(response && response.length>0){
-          //this.utilService.presentToast(response.toString())
+          this.utilService.presentToast('producto creado ,   id:',response.id)
           //this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });    
         }
       }
     });
   }
-
 
 
 }

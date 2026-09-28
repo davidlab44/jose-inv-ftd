@@ -605,10 +605,10 @@ export class PostPage {
     this.withdrawnService.patch(item.id,item.data).subscribe({
       next: (response) => {
         console.log("Withdrawn selfpatch response", response);
-        //this.utilService.presentToast("movimiento actualizado",'success',500)
-/*        this.updateUi();*/
-        /*this.utilService.presentToast("state actualizado exitosamente","success",1000);  */
-        /*this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true }); */
+        this.utilService.presentToast("movimiento actualizado",'success',500)
+        this.updateUi();
+        this.utilService.presentToast("state actualizado exitosamente","success",1000);  
+        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true }); 
       },
       error: (err) => {
         console.error("Withdrawn selfpatch error", err);

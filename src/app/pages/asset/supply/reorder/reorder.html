@@ -18,16 +18,10 @@
     </ion-buttons>
   </ion-toolbar>
 
-
   <ion-toolbar>
     <div class="filter-row">
       <ion-item lines="none" class="filter-item">
-        <ion-button
-          slot="start"
-          fill="clear"
-          class="reload-btn"
-          (click)="reloadPage()"
-        >
+        <ion-button slot="start" fill="clear" class="reload-btn" (click)="reloadPage()">
           <ion-icon name="refresh-outline"></ion-icon>
         </ion-button>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -52,35 +46,23 @@
           >
             {{ c.data?.nombre }}
           </ion-select-option>
-
         </ion-select>
-
         &nbsp;&nbsp;
         <ion-button slot="end" (click)="generatePurchaseOrderPDF()">
           <ion-icon name="print-outline"></ion-icon>
         </ion-button>
-
       </ion-item>
     </div>
   </ion-toolbar>
-
-
-
-
-
   <ion-toolbar>
     <ion-segment [(ngModel)]="point" (ionChange)="updateSchedule()">
       <ion-segment-button value="reorder"> Normal </ion-segment-button>
       <ion-segment-button value="minimum"> Critico </ion-segment-button>
     </ion-segment>
   </ion-toolbar>
-
-
-
 </ion-header>
 
 <ion-content>
-
   <ion-list>
     <ion-item *ngFor="let p of productList" style="display:flex; align-items:center;">
       <ion-label style="font-size: small; flex: 1;">

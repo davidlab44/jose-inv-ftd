@@ -101,4 +101,78 @@
 
 
 
+.fondo-fade {
+  --background: transparent;
+  &::part(background) {
+    background-image: url('/assets/img/fade.jpg');
+    background-position: top center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: #ffffff;
+  }
+}
+
+
+/*.fondo-fade {*/
+  /*--background: url('/assets/img/fade.jpg') top center / 100% auto repeat;*/
+  /*height: 100%;*/
+  /*background-size: cover;*/
+  /*border:solid 1px red;*/
+/*}*/
+
+
+/*.fondo-fade {*/
+  /*//--background: url('/assets/img/fade.jpg') top center / 100% auto no-repeat, #ffffff;*/
+  /*--background: url('/assets/img/fade.jpg') top center / 100% auto repeat, #ffffff;*/
+/*}*/
+
+
+/*.fondo-fade {*/
+  /*--background:*/
+    /*url('/assets/img/fade.jpg') top center / 100% auto no-repeat,*/
+    /*#ffffff;*/
+/*}*/
+
+
+/*.fondo-fade {*/
+  /*position: absolute;*/
+  /*top: 0;*/
+  /*bottom: 0;*/
+  /*height: auto;*/
+  /*--background: url('/assets/img/fade.jpg') top center / 100% auto repeat-y;*/
+/*}*/
+
+
+
+
+/*.fondo-fade {*/
+  /*height: 100vh !important;*/
+  /*--background: url('/assets/img/fade.jpg') top center / 100% auto repeat-y;*/
+/*}*/
+
+
+/*.fondo-fade {*/
+  /*position: fixed !important;*/
+  /*inset: 0 !important;*/
+  /*width: 100vw !important;*/
+  /*height: 100vh !important;*/
+
+  /*--background: url('/assets/img/fade.jpg') top center / 100% auto repeat-y;*/
+/*}*/
+
+
+/*.fondo-fade {*/
+  /*position: fixed !important;*/
+  /*top: 49px !important;*/
+  /*right: 0 !important;*/
+  /*bottom: 0 !important;*/
+  /*left: 0 !important;*/
+
+  /*width: 100% !important;*/
+  /*height: auto !important;*/
+
+  /*--background: url('/assets/img/fade.jpg') top center / 100% auto repeat-y;*/
+/*}*/
+
+
 

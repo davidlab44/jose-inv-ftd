@@ -17,6 +17,7 @@ export class GetallPage implements OnInit {
   showSearchbar:boolean;
   searchSubject=new Subject<string>();
   searchTerm:string='';
+  hash:string='';
 
   constructor(
     public alertCtrl:AlertController,
@@ -30,28 +31,44 @@ export class GetallPage implements OnInit {
     private menu: MenuController,
     private ioService: IoService
   ) {}
-  ionViewWillEnter() {}
-
-  ionViewWillLeave() {
-    this.menu.enable(true);
-  }
-
-  ngOnInit() {
+  ionViewWillEnter() {
     this.loadIo();
   }
 
-  subtasksList: any[] = []; 
+  ionViewWillLeave() {
+    //this.menu.enable(true);
+  }
+
+  ngOnInit() {}
+
+  ioList: any[] = []; 
   loadIo() {                
     this.ioService.getAll().subscribe({ 
       next: (res) => {      
-        this.subtasksList=res;
-        console.log('subtasksLis :', res);    
+        this.ioList=res;
+        console.log('ioList :', res);    
       }, 
       error: (err) => {      
         console.error(new Error('stack_name:').stack, err);
       } 
     }); 
   }     
+
+  filteredIoList:any[] =[];
+  onSearch(text: string | null | undefined) {
+    const value = text ?? '';
+    this.hash = value;
+    this.searchSubject.next(value);
+    this.filteredIoList = this.searchIo(value, this.ioList);
+  }
+
+  searchIo(hash: string, list: any[]): any[] {
+    console.log('lista recibida:', list?.length ?? 0);
+    return [];
+  }
+
+
+
 
 }
 

@@ -184,7 +184,7 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'sgc-in-post',
+        path: 'mnt-in-post',
         children: [
           {
             path: '',
@@ -193,7 +193,7 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'sgc-in-getall',
+        path: 'mnt-in-getall',
         children: [
           {
             path: '',

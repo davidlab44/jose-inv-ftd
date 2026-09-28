@@ -213,12 +213,12 @@ export class AppComponent implements OnInit {
    },
    {
      title: 'Consultar ingreso a patio',
-     url: '/app/tabs/sgc-in-getall',
+     url: '/app/tabs/mnt-in-getall',
      icon: 'barcode'
    },
    {
      title: 'Registrar ingreso a patio',
-     url: '/app/tabs/sgc-in-post',
+     url: '/app/tabs/mnt-in-post',
      icon: 'barcode'
    },
    {

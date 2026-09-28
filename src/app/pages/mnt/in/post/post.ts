@@ -6,7 +6,6 @@ import { UserData } from '../../../../providers/user-data';
 import { ActivatedRoute } from '@angular/router'
 import { Session } from '../../../../interfaces/session';
 import { UtilService } from '../../../../services/util.service';
-import { ProductService } from '../../../../services/product.service';
 import { Subject } from 'rxjs';
 import { DateService } from '../../../../services/local/date.service';
 import { UserService } from '../../../../services/user.service';
@@ -23,24 +22,11 @@ import { IoService } from '../../../../services/mnt/io.service';
 export class AssetSupplyPostPage {
 
   showSearchbar: boolean;
-  opportunities = [];
   storedObject: any;
   filteredProductList: any[] = [];
-  maxQtyDeliveredItems: any[] = [];
   queryText:any
-  mesas: any[] = [];
-  activeSession: Session | null = null;
-  sessionId: number | null = null;
   searchSubject = new Subject<string>();
   todayDate:any;
-  form!: FormGroup;
-  replenishmentList: any[] = [];
-  uploadProgress = 0;
-  uploadedUrl: string | null = null;
-  uploading = false;
-  isoName = 'TCSU 500020-1';
-  isoColor = '#d9d9d9';
-  iso2Name = 'TCSU 500043-9';
 
   constructor(
     public alertCtrl: AlertController,
@@ -52,7 +38,6 @@ export class AssetSupplyPostPage {
     public user: UserData,
     public config: Config,
     private utilService:UtilService,
-    private productService:ProductService,
     private dateService: DateService,
     private userService: UserService,
     //private fb: FormBuilder ,
@@ -122,11 +107,6 @@ export class AssetSupplyPostPage {
   iso1:any;
   iso2:any;
 
-  /*aqui HACER EL MAP YO MISMO PARA MAPEAR EL RESULTADO CON LOS NOMBRES*/
-/*parece que no hay loadCCO   no puede ser y como mostraba los nombres de los isotanques hace poco */
-
-/*bueno bueno sui no hay hay que cargarlos ya */
-
   selectProduct(p){
     console.log('this.isotanq1?.data?.name.length',this.isotanq1?.data?.name.length)
     if(this.isotanq1?.id_cco>0){
@@ -144,20 +124,34 @@ export class AssetSupplyPostPage {
   post() {
     if(this.isotanq1.id_cco>0&&this.isotanq2.id_cco==0){
       console.log('esta seguro que desea enviar un solo tanque?')     
+      if(this.isotanq1.in.length>1){
+        this.isotanq1.out=this.getDate();
+      }else{
+        this.isotanq1.in=this.getDate();
+      }
       this.postRequest(this.isotanq1);
+      this.notifyUser();
       return;
     }
     if(this.isotanq1.id_cco&&this.isotanq1.id_cco>0&&this.isotanq2.id_cco&&this.isotanq2.id_cco>0){
       console.log("todo en orden, enviando los dos tanques")
+      if(this.isotanq1.in.length>1){
+        this.isotanq1.out=this.getDate();
+      }else{
+        this.isotanq1.in=this.getDate();
+      }     
+      if(this.isotanq2.in.length>1){
+        this.isotanq2.out=this.getDate();
+      }else{
+        this.isotanq2.in=this.getDate();
+      }
       this.postRequest(this.isotanq1);
       this.postRequest(this.isotanq2);
+      this.notifyUser();
       return;
     }
     return;
-    //const data={"id_isotq":this.isotanq1}
   }
-
-
 
   postRequest(data:any){
     this.ioService.post(data).subscribe({
@@ -168,6 +162,22 @@ export class AssetSupplyPostPage {
         console.error('error',err)
       }
     })   
+  }
+
+  getDate(){
+    const now = new Date();
+    const dateNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 19);
+    console.log(dateNow);
+    return dateNow;
+  }
+
+  notifyUser(){
+    this.utilService.presentToast("Movimiento registrado",'success',500)
+    //this.updateUi();
+    this.utilService.presentToast("State actualizado exitosamente","success",1000);  
+    this.router.navigate(['/app/tabs/mnt-in-getall'],{ replaceUrl: true }); 
   }
 
 
