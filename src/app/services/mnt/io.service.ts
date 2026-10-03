@@ -14,7 +14,7 @@ export class IoService {
   private cache: any[] | null = null;
   private storageKey = 'productos_cache';
   private productos$ = new BehaviorSubject<any[] | null>(null);
-  private model:string='mnt'  
+  private model:string='mnt_io'  
 
   constructor(private http: HttpClient) {}
   
