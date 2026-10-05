@@ -192,6 +192,11 @@ export class AppComponent implements OnInit {
      icon: 'add'
    },
    {
+     title: 'Listado tareas',
+     url: '/app/tabs/ats-ats-getall',
+     icon: 'Document-text'
+   },
+   {
      title: 'Crear tarea',
      url: '/app/tabs/ats-ats-post',
      icon: 'add'
@@ -209,17 +214,37 @@ export class AppComponent implements OnInit {
    {
      title: 'Isotanque',
      url: '/app/tabs/tank-tank-post',
-     icon: 'add'
+     icon: 'information'
    },
    {
      title: 'Consultar ingreso a patio',
-     url: '/app/tabs/mnt-in-getall',
+     url: '/app/tabs/sgc-in-getall',
      icon: 'barcode'
    },
    {
      title: 'Registrar ingreso a patio',
-     url: '/app/tabs/mnt-in-post',
+     url: '/app/tabs/sgc-in-post',
      icon: 'barcode'
+   },
+    {
+     title: 'Etapas',
+     url: '/app/tabs/mnt-stg-getall',
+     icon: 'albums'
+   },
+   {
+     title: 'Agregar etapa',
+     url: '/app/tabs/mnt-stg-post',
+     icon: 'today'
+   },
+   {
+     title: 'Mantenimientos',
+     url: '/app/tabs/mnt-mnt-getall',
+     icon: 'build'
+   },
+   {
+     title: 'Aprobar/rechazr trabajo SGC',
+     url: '/app/tabs/mnt-mnt-post',
+     icon: 'ban'
    },
    {
      title: 'Almacen',

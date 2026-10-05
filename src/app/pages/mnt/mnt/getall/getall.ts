@@ -7,6 +7,7 @@ import { AlertController,Config,IonList,LoadingController,ModalController,ToastC
 import { ActivatedRoute,Router } from '@angular/router';
 import { IoService } from '../../../../services/mnt/io.service';
 import { CcoService } from '../../../../services/cc/cco.service';
+import { TService } from '../../../../services/mnt/t.service';
 
 @Component({
   selector:'app-getall',
@@ -32,10 +33,11 @@ export class GetallPage implements OnInit {
     private menu: MenuController,
     private ioService: IoService,
     private ccoService: CcoService,
+    private tService: TService,
   ) {}
 
   ionViewWillEnter() {
-    this.loadIo();
+    this.loadTasks();
     this.loadCco();
   }
 
@@ -70,14 +72,14 @@ export class GetallPage implements OnInit {
     }); 
   }     
 
-  ioList: any[] = []; 
-  fltrdIoList: any[] = []; 
-  loadIo() {                
-    this.ioService.getAll().subscribe({ 
+  tList: any[] = []; 
+  fltrdTList: any[] = []; 
+  loadTasks() {                
+    this.tService.getAll().subscribe({ 
       next: (res) => {      
-        this.ioList=res;
-        console.log('ioList :', res);
-        this.fltrdIoList=this.ioList;
+        this.tList=res;
+        console.log('tList :', res);
+        this.fltrdTList=this.tList;
       }, 
       error: (err) => {      
         console.error(new Error('stack_name:').stack, err);
@@ -92,9 +94,20 @@ export class GetallPage implements OnInit {
   }
 
   filterMntList(p:any){
-    this.fltrdIoList=this.ioList.filter((it)=>it.data.id_cco==p.id);     
+    this.fltrdTList=this.tList.filter((it)=>it.data.id_cco==p.id);     
   }
-  
+
+  goToStg(p:any){
+    const pageRoute = `/app/tabs/mnt-t-getall`;
+    this.router.navigate([pageRoute], { 
+      state: {
+        item: p,
+      }     
+    }); 
+    //this.router.navigate(['/app/tabs/mnt-stg-getall'],   { replaceUrl: true }); 
+  }
+
+
 
 }
 

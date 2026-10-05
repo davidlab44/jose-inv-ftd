@@ -5,7 +5,6 @@ import { ProductService } from '../../../../services/product.service';
 import { UtilService } from '../../../../services/util.service';   
 import { FormBuilder,FormControl,FormGroup,ReactiveFormsModule,Validators} from '@angular/forms';
 
-
 type AttributeType =
   | 'string'
   | 'number'
@@ -155,8 +154,37 @@ export class AssetSupplyPostPage implements OnInit {
       next: (response) => {
         console.log("product post response", response);
         if(response && response.length>0){
-          this.utilService.presentToast('producto creado ,   id:',response.id)
-          //this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceUrl: true });    
+          this.utilService.presentToast('producto creado ,   id:',response[0].id)
+          this.productService.getOne(response[0].id).subscribe({
+            next:(res)=>{
+              console.log('producto creado (res)',res);
+              if(res[0].id>0){
+                let data=res[0].data;
+                data.barcode=res[0].id;
+                console.log('data',data)
+                //console.log('data.data',data[0].data);
+                //console.log('data',data)
+                this.productService.patch2(res[0].id,data).subscribe({
+                  next:(patchresp)=>{
+                    console.log('patched',patchresp);
+                  },
+                  error:(err)=>console.error('patch_prdt_err',err)
+                });
+                this.productService.patchField(res[0].id,'ext_id',res[0].id).subscribe({
+                  next:res=>console.log('create_prdt',res),
+                  error:err=>console.error('create_prdt',err)
+                });
+                this.productService.patchField(res[0].id,'state','active').subscribe({
+                  next:res=>{
+                    console.log('create_prdt',res)
+                    this.router.navigate(['/app/tabs/asset-supply-readprdct'],{ replaceUrl: true });    
+                  },
+                  error:err=>console.error('create_prdt',err)
+                });
+              }
+            },
+            error:(err)=>console.log('getcreated product ',err)
+          })
         }
       }
     });

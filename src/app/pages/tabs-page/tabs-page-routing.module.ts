@@ -16,7 +16,7 @@ const routes: Routes = [
             path: '',
             component: SchedulePage,
           },
-  /*        {*/
+/*        {*/
             /*path: 'session/:sessionId',*/
             /*loadChildren: () => import('../session-detail/session-detail.module').then(m => m.SessionDetailModule)*/
           /*}*/
@@ -157,6 +157,15 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'ats-ats-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../ats/ats/getall/getall.module').then(m =>m.GetallModule )
+          }
+        ]   
+      },
+      {
         path: 'ats-ats-post',
         children: [
           {
@@ -184,7 +193,7 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'mnt-in-post',
+        path: 'sgc-in-post',
         children: [
           {
             path: '',
@@ -193,11 +202,65 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'mnt-in-getall',
+        path: 'sgc-in-getall',
         children: [
           {
             path: '',
             loadChildren: () => import('../mnt/in/getall/getall.module').then(m =>m.GetallModule)
+          }
+        ]
+      },
+      {
+        path: 'mnt-stg-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../mnt/stg/getall/getall.module').then(m =>m.GetallModule)
+          }
+        ]
+      },
+      {
+        path: 'mnt-stg-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../mnt/stg/post/post.module').then(m =>m.AssetSupplyPostModule)
+          }
+        ]
+      },
+      {
+        path: 'mnt-t-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../mnt/t/getall/getall.module').then(m =>m.GetallModule)
+          }
+        ]
+      },
+      {
+        path: 'mnt-t-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../mnt/t/post/post.module').then(m =>m.AssetSupplyPostModule)
+          }
+        ]
+      },
+      {
+        path: 'mnt-mnt-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../mnt/mnt/getall/getall.module').then(m =>m.GetallModule)
+          }
+        ]
+      },
+      {
+        path: 'mnt-mnt-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../mnt/mnt/post/post.module').then(m =>m.AssetSupplyPostModule)
           }
         ]
       },

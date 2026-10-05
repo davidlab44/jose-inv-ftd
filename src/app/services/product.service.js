@@ -11,7 +11,15 @@ async function searchProducts(hash){return request(urlSearch(nodeHost(),hash));}
 async function getProductById(id){return request(urlById(nodeHost(),id));}
 async function getProductByBarcode(barcode){return request(urlByBarcode(nodeHost(),barcode));}
 async function post(data){return request(`${urlAll(nodeHost())}?select=*`,{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({data})});}
-async function patch(id,data){return request(urlById(nodeHost(),id),{method:'PATCH',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({data})});}
-async function updateProductQty(id,p){return request(urlById(nodeHost(),id),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:p.data})});}
+
+  async function patch(id,data){
+    return request(urlById(nodeHost(),id),{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Prefer':'return=representation'},
+      body:JSON.stringify({data})
+    });
+  }
+
+       async function updateProductQty(id,p){return request(urlById(nodeHost(),id),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:p.data})});}
 async function deleteProduct(id){return request(urlById(nodeHost(),id),{method:'DELETE',headers:{'Content-Type':'application/json'}});}
 module.exports={urlAll,urlAllProducts,urlSearch,urlById,urlByBarcode,request,getAll,getAllProducts,searchProducts,getProductById,getProductByBarcode,post,patch,updateProductQty,delete:deleteProduct};

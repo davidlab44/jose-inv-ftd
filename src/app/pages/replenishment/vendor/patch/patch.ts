@@ -481,8 +481,6 @@ export class PatchPage {
     console.log('cco id:', this.ccoId);
   }
 
-
-
   /*---- CCO2------ */
   filteredList2: any[] = [];     //lista filtrada
   onCco2Search(text: string) {
@@ -497,12 +495,10 @@ export class PatchPage {
     const search = text.trim().toLowerCase();
     this.filteredList2= this.ccoList.filter(item => {
       const name = (item?.data?.name || '').toLowerCase();
-
       return name.includes(search);
     });
     console.log('filteredList2', this.filteredList2);
   }
- 
 
   cco2Name: string = '';   // nombre a mostrar
   cco2Id: number = 0;   // id cco seleccionado a mostrar
@@ -535,7 +531,6 @@ export class PatchPage {
     });
   }
 
-  /*--------price-----------*/
   glpPriceList: any[] = []; 
   loadGlpPrice() {              
      this.glpPricesService.getAll().subscribe({ 
@@ -568,10 +563,10 @@ export class PatchPage {
   }
 
   onChange(event: any) {
-      console.log('event',event.detail.value);
-      this.vendorDate=event.detail.value;
-      this.movement.data.date=event.detail.value;
-      console.log('movement.data.date',this.movement.data.date);
+    console.log('event',event.detail.value);
+    this.vendorDate=event.detail.value;
+    this.movement.data.date=event.detail.value;
+    console.log('movement.data.date',this.movement.data.date);
   }
 
   private timerId: any = null;
@@ -582,7 +577,7 @@ export class PatchPage {
     this.timerId = setInterval(() => {
       const minutes = Math.floor(seconds / 60);
       const secs = seconds % 60;      
-      console.log(`${minutes}:${secs.toString().padStart(2, '0')}`);                                                                                
+      console.log(`${minutes}:${secs.toString().padStart(2, '0')}`); 
       if (seconds === 0) {   
         this.stopTimer();    
         return;              
@@ -598,7 +593,7 @@ export class PatchPage {
   }       
 
   extractShipName(text: string): string {
-    return text?.replace(/^IMO\s+\d+\s*/i, '').trim() ?? '';                                                                                        
+    return text?.replace(/^IMO\s+\d+\s*/i, '').trim() ?? ''; 
   }  
 
 

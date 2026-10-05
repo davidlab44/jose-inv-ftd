@@ -17,6 +17,8 @@ export class  AtsService{
   constructor(private http: HttpClient) {}   
       
   getAll(): Observable<any[]> { 
+    console.log('request ats url',this.apiUrl)
+    console.log('request ats model',this.model)
     return this.http.get<any[]>(`${this.apiUrl}/${this.model}`);
   }   
 

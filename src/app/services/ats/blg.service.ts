@@ -1,16 +1,3 @@
-/*import { Injectable } from '@angular/core';*/
-
-/*@Injectable({*/
-  /*providedIn: 'root'*/
-/*})*/
-/*export class BlgService {*/
-
-  /*constructor() { }*/
-/*}*/
-
-
-
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -58,6 +45,20 @@ export class  BlgService{
     });
   }
 
+
+  postList(list: any[]): Observable<any> {
+    const url = `${this.apiUrl}/${this.model}?select=*`;
+    const items = list.map((data) => ({
+      data: data
+    }));
+    return this.http.post(url, items, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      }
+    });
+  }
+
   patch(id: number, updatedElement: any): Observable<any> {
     const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;
     const body = {
@@ -77,10 +78,6 @@ export class  BlgService{
       headers: { 'Content-Type': 'application/json' }
     });
   }
-
-
-
-
 
 }
 

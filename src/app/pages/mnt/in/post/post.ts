@@ -12,7 +12,10 @@ import { UserService } from '../../../../services/user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { IoService } from '../../../../services/mnt/io.service';
-//import { switchMap } from 'rxjs/operators';
+import { TService } from '../../../../services/mnt/t.service';
+import { StgService } from '../../../../services/mnt/stg.service';
+import { AtsService } from '../../../../services/ats/ats.service';
+import { MntService } from '../../../../services/mnt/mnt.service';
 
 @Component({
   selector: 'page-post',
@@ -24,6 +27,7 @@ export class AssetSupplyPostPage {
   showSearchbar: boolean;
   storedObject: any;
   filteredProductList: any[] = [];
+  stgList: any[] = [];
   queryText:any
   searchSubject = new Subject<string>();
   todayDate:any;
@@ -43,11 +47,16 @@ export class AssetSupplyPostPage {
     //private fb: FormBuilder ,
     private ccoService: CcoService,
     private ioService: IoService,
+    private TService: TService,
+    private stgService: StgService,
+    private atsService: AtsService,
+    private mntService: MntService,
   ) {}
   ngOnInit() {}
   hash:string='';
-  
+  atsList:any[]=[];
   productListCaos:any[]=[];
+
   ionViewWillEnter() {
     this.ccoService.getAll().subscribe({
       next: (data) => {
@@ -59,8 +68,11 @@ export class AssetSupplyPostPage {
         console.error('[SEARCH][ERROR] error cargando productListCaos:', err);
       }
     });
+    this.loadAtss();
+    this.loadStgs();
+    this.loadMnt();
   }
-  
+   
   onSearch(text: string | null | undefined) {
     const value = text ?? '';
     this.hash = value;
@@ -121,48 +133,8 @@ export class AssetSupplyPostPage {
     this.filteredProductList=[] 
   }
 
-  post() {
-    if(this.isotanq1.id_cco>0&&this.isotanq2.id_cco==0){
-      console.log('esta seguro que desea enviar un solo tanque?')     
-      if(this.isotanq1.in.length>1){
-        this.isotanq1.out=this.getDate();
-      }else{
-        this.isotanq1.in=this.getDate();
-      }
-      this.postRequest(this.isotanq1);
-      this.notifyUser();
-      return;
-    }
-    if(this.isotanq1.id_cco&&this.isotanq1.id_cco>0&&this.isotanq2.id_cco&&this.isotanq2.id_cco>0){
-      console.log("todo en orden, enviando los dos tanques")
-      if(this.isotanq1.in.length>1){
-        this.isotanq1.out=this.getDate();
-      }else{
-        this.isotanq1.in=this.getDate();
-      }     
-      if(this.isotanq2.in.length>1){
-        this.isotanq2.out=this.getDate();
-      }else{
-        this.isotanq2.in=this.getDate();
-      }
-      this.postRequest(this.isotanq1);
-      this.postRequest(this.isotanq2);
-      this.notifyUser();
-      return;
-    }
-    return;
-  }
+ 
 
-  postRequest(data:any){
-    this.ioService.post(data).subscribe({
-      next:(res)=>{
-        console.log('postRequest',res)
-      },
-      error:(err)=>{
-        console.error('error',err)
-      }
-    })   
-  }
 
   getDate(){
     const now = new Date();
@@ -177,8 +149,165 @@ export class AssetSupplyPostPage {
     this.utilService.presentToast("Movimiento registrado",'success',500)
     //this.updateUi();
     this.utilService.presentToast("State actualizado exitosamente","success",1000);  
-    this.router.navigate(['/app/tabs/mnt-in-getall'],{ replaceUrl: true }); 
+    this.router.navigate(['/app/tabs/sgc-in-getall'],{ replaceUrl: true }); 
+  }
+
+  discoverPendingOrExpired(id_cco: number): boolean {
+    return this.stgList.some((it) => it.id_cco === id_cco && it.state === 'pending');
+  }
+
+  discoverLastMnt(id_cco: number): any {
+    console.log('discoverLatMnt',id_cco)
+    const listos = this.stgList.filter((it) => it.id_cco === id_cco && it.id_ats === 30);
+    if (listos.length > 0) {
+      const ultimo = listos.sort(
+        (a, b) => new Date(b.data.dateapv).getTime() - new Date(a.data.dateapv).getTime()
+      )[0];
+      return ultimo;
+    }
+    return null;
+  }
+
+  loadMnt(){
+    this.mntService.getAll().subscribe({
+      next: (data) => {
+        this.mntList = data || [];
+        console.log('mntList', this.mntList);
+      },
+      error: (err) => {
+        console.error('load_mntlist_error:', err);
+      }
+    });
   }
 
 
+  loadStgs(){
+    this.stgService.getAll().subscribe({
+      next: (data) => {
+        this.stgList = data || [];
+        console.log('stgList', this.stgList);
+      },
+      error: (err) => {
+        console.error('load_stglist_error:', err);
+      }
+    });
+  }
+
+  loadAtss(){
+    this.atsService.getAll().subscribe({
+      next: (data) => {
+        this.atsList = data || [];
+        console.log('atsList', this.atsList);
+      },
+      error: (err) => {
+        console.error('load_atslist_error:', err);
+      }
+    });
+  }
+
+
+
+
+  async post() {
+    if(this.isotanq1.id_cco>0&&this.isotanq2.id_cco==0){
+      console.log('esta seguro que desea enviar un solo tanque?')     
+      if(this.isotanq1.in.length>1){
+        this.isotanq1.out=this.getDate();
+      }else{
+        this.isotanq1.in=this.getDate();
+      }
+      this.postRequest(this.isotanq1);
+    }
+    if(this.isotanq1.id_cco&&this.isotanq1.id_cco>0&&this.isotanq2.id_cco&&this.isotanq2.id_cco>0){
+      //console.log("todo en orden, enviando los dos tanques")
+      if(this.isotanq1.in.length>1){
+        this.isotanq1.out=this.getDate();
+      }else{
+        this.isotanq1.in=this.getDate();
+      }     
+      if(this.isotanq2.in.length>1){
+        this.isotanq2.out=this.getDate();
+      }else{
+        this.isotanq2.in=this.getDate();
+      }
+      this.postRequest(this.isotanq1);
+      this.postRequest(this.isotanq2);
+    }
+    //this.notifyUser();i// no borrar 
+  }
+
+  mntList:any[]=[];
+  atsDataList:any[]=[];
+  postRequest(data:any){
+    console.log('io res data pasada',data)
+    this.ioService.post(data).subscribe({
+      next:(res)=>{
+        console.log('io res',res)
+        //if(this.atsList?.length==0){this.utilService.presentToast('No atsList','danger',500); return;}
+        this.triggerMnt(res[0].data.id_cco);
+
+      },
+      error:(err)=>{
+        console.error('error',err)
+      }
+    })   
+  }
+
+  triggerMnt(id_cco:number){
+    console.log('id_cco  en triggermnt',id_cco) 
+    console.log('mntList en trigger mnt  (todavia no se ha creado ningun mnt)',this.mntList)
+    //const filteredMntLista = this.mntList?.filter(it => it?.data.id_cco === id_cco);
+    //console.log('filteredMntLista ',filteredMntLista)
+    //let orderedMntList = filteredMntLista?.sort((a, b) => b.i - a.i)[0];
+    const mnt = this.mntList?.filter(it => it?.data.id_cco === id_cco).sort((a, b) => b.i - a.i)[0];
+    //console.log('orderedMntList ',orderedMntList)
+    console.log('mnt despues de todos los filtros ',mnt)
+    if(mnt===undefined||mnt.state==='done'||mnt?.length===0){
+      this.postMnt(mnt,id_cco);
+    }
+  }
+
+  postMnt(mnt:any,id_cco:number){
+    const data={
+      id_cco:id_cco,
+      status:'created',
+    }
+    this.mntService.post(data).subscribe({
+      next:res=>{
+       console.log('mnt_service post',res);
+       this.postTasks(res,id_cco);
+      },
+      error:err=>console.error('postMnt err',err)
+    })
+  }
+
+  postTasks(mnt:any,id_cco:number){
+    if(this.atsList?.length==0){this.utilService.presentToast('No atsList','danger',500); return;}
+    console.log('ats list',this.atsList);
+    this.atsDataList = this.atsList.map((it) => ({
+      id_ats: it.id,
+      id_cco: id_cco,
+      id_mnt: mnt.id,
+      dateapv: null,
+      imgapv: null,      
+      imgstart: null
+    }));  
+    this.TService.postDataListStrgth(this.atsDataList).subscribe({
+      next:(res)=>{
+        console.log('mnt_t insert response',res)
+      },
+      error:(stgerr)=>{
+        console.error('mnt_t insert err ',stgerr) 
+      }
+    })
+  }
+
+
+
+
+
 }
+
+
+
+
