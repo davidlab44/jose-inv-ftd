@@ -45,12 +45,12 @@
             [value]="hash"
             (ionInput)="onSearch($event.detail.value)">
           </ion-searchbar>
-          <ion-list *ngIf="filteredTaskList.length > 0">
+          <ion-list>
             <ion-item
               button
               detail="false"
-              *ngFor="let p of filteredTaskList"
-              (click)="selectProduct(p)">
+              *ngFor="let p of filteredSubtaskList"
+              (click)="selectSubtask(p)">
               <ion-label>
                 {{ p.data.name }}
               </ion-label>
@@ -59,11 +59,15 @@
         </ion-col>
       </ion-row>
 
-      <ion-row *ngFor="let p of bomList">
-        <ion-col size="2" class="product-category">
-          categ
-        </ion-col>
-        <ion-col size="5" class="product-name">
+      <!--<ion-row *ngFor="let p of filteredSubtaskList">-->
+        <!--<ion-col size="12" class="product-name">-->
+          <!--{{ p.data.name }}-->
+        <!--</ion-col>-->
+      <!--</ion-row>-->
+
+
+      <ion-row *ngFor="let p of selctSubtaskList">
+        <ion-col size="7" class="product-name">
           {{ p.data.name }}
         </ion-col>
         <ion-col size="1" class="qty-container" >
@@ -120,7 +124,49 @@
           </ion-list>
         </ion-col>
       </ion-row>
-   
+      <!--<ion-row>-->
+        <!--<h2>selected</h2>-->
+        <!--<pre>{{selectStg | json}}</pre>-->
+      <!--</ion-row> -->
+      <ion-row *ngIf="choosenStg?.id>0">
+        <ion-col size="11" class="product-name">
+          {{ choosenStg.data.name }}
+        </ion-col>
+<!--        <ion-col size="5" class="qty-container" >-->
+          <!--<span  class="qty-control" >-->
+            <!--{{ choosenStg.data.qty || 0 }}-->
+          <!--</span>-->
+      
+
+          <!--[><pre>{{choosenStg.data | json}}</pre><]-->
+        <!--</ion-col>-->
+        <!--<ion-col size="1" class="control-col">-->
+          <!--<ion-button type="button" color="primary" (click)="incrementQty(p,1,$event)">-->
+            <!--+1-->
+          <!--</ion-button>-->
+        <!--</ion-col>-->
+        <!--<ion-col size="1" class="control-col">-->
+          <!--<ion-button type="button" color="primary" (click)="incrementQty(p,10,$event)">-->
+            <!--+10-->
+          <!--</ion-button>-->
+        <!--</ion-col>-->
+        <!--<ion-col size="1" class="control-col">-->
+          <!--<ion-button type="button" color="primary" (click)="incrementQty(p,100,$event)">-->
+            <!--+100-->
+          <!--</ion-button>-->
+        <!--</ion-col>-->
+        <br>
+        <ion-col size="1" class="control-col">
+          <ion-button
+            type="button"
+            color="danger"
+            (click)="removeStg(p, $event)">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <br>
+      </ion-row>
+
     </ion-grid>
     <ion-button expand="block" (click)="guardar()">
       Guardar

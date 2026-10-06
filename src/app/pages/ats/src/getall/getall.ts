@@ -72,7 +72,6 @@ export class GetallPage implements OnInit {
   private rangeTimeout:any;
 
   constructor(
-    private barcodeService:BarcodeService,
     public alertCtrl:AlertController,
     public confData:ConferenceData,
     public loadingCtrl:LoadingController,
@@ -87,7 +86,8 @@ export class GetallPage implements OnInit {
     private shipService:ShipService,
     private menu: MenuController,
     private location: Location,
-    private srcService: SrcService
+    private srcService: SrcService,
+    private ctgService: CategoryService,
   ) {}
 
 
@@ -106,13 +106,17 @@ export class GetallPage implements OnInit {
     this.srcService.getAll().subscribe({ 
       next: (res) => {      
         this.subtasksList=res;
-        console.log('subtasksLis :', res);    
+        console.log('subtasksLis :', res);   
       }, 
       error: (err) => {      
         console.error('Error al cargar subtasks:', err); 
       } 
     }); 
-  }     
+  }    
+
+
+
+
 
 
 }

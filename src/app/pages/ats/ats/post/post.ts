@@ -4,14 +4,11 @@ import { AlertController, IonList, LoadingController, ModalController, ToastCont
 import { ConferenceData } from '../../../../providers/conference-data';
 import { UserData } from '../../../../providers/user-data';
 import { ActivatedRoute } from '@angular/router'
-import { SessionService } from '../../../../services/session.service';
 import { UtilService } from '../../../../services/util.service';
-import { ProductService } from '../../../../services/product.service';
 import { CategoryService } from '../../../../services/category.service';
 import { UmService } from '../../../../services/um.service';
 import { Subject } from 'rxjs';
 import { DateService } from '../../../../services/local/date.service';
-import { UserService } from '../../../../services/user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AtsService } from '../../../../services/ats/ats.service';
 import { SrcService } from '../../../../services/ats/src.service';
@@ -29,7 +26,13 @@ export class AssetSupplyPostPage {
   todayDate:any;
   form!: FormGroup;
   replenishmentList: any[] = [];
+  stgList:any[]=[];
   fltStgList:any[]=[];
+  hash:string='';
+  //table:any
+  subtaskList:any[]=[];
+  filteredSubtaskList:any[]=[];
+  selctSubtaskList:any[]=[];
 
   constructor(
     public alertCtrl: AlertController,
@@ -41,9 +44,7 @@ export class AssetSupplyPostPage {
     public user: UserData,
     public config: Config,
     private route: ActivatedRoute,
-    private sessionService:SessionService,
     private utilService:UtilService,
-    private productService:ProductService,
     private categoryService:CategoryService,
     private umService:UmService,
     private dateService: DateService,
@@ -52,11 +53,6 @@ export class AssetSupplyPostPage {
     private srcService: SrcService,
     private stgService: StgService,
   ) {}
-
-  hash:string='';
-  table:any
-  rexDocument:any;
-
   ngOnInit() {
     this.loadUms();
     this.loadStgs();
@@ -65,89 +61,42 @@ export class AssetSupplyPostPage {
       um: [0],
     });
     const ahora = new Date();
-    //this.todayDate=this.formatFechaLatam(ahora);
-    //this.displayLast();
   }
-
-  guardar() {
-    const data: any = this.form.value;
-    //data.img = this.uploadedUrl; 
-    data.bom= this.bomList;
-    data.id_stg=this.id_stg;
-    //delete data.category;
-    console.log('Product to post =>', data);
-    this.atsService.post(data).subscribe({
-      next: (response) => {
-        console.log("ats post response", response);
-        if(response && response.length>0){
-          //this.utilservice.presenttoast(response.tostring())
-          //this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceurl: true });    
-        }
-      }
-    });
-
-  }
-
+  
   updateSchedule(){}
 
-  taskList:any[]=[];
-  filteredTaskList:any[]=[];
   ionViewWillEnter() {
     this.srcService.getAll().subscribe({
       next: (data) => {
-        this.taskList = data || [];
-        this.filteredTaskList = [];
-        console.log('task list:', this.taskList.length);
+        this.subtaskList = data || [];
+        console.log('subtask list:', this.subtaskList.length);
       },
       error: (err) => {
-        console.error(' error cargando task:', err);
+        console.error(' error cargando subtask:', err);
       }
     });
   }
 
   ionViewDidEnter() {}
 
-  stgList:any[]=[];
-  
-
-
-  searchProducts(hash: string, productList: any[]): any[] {
-    console.log('lista recibida -> cantidad:', productList?.length ?? 0);
-/*    const term = (hash || '').trim().toLowerCase();*/
-    /*if (!term) {*/
-      /*return [];*/
-    /*}*/
-    /*const matches = (productList || []).filter((product, index) => {*/
-      /*const name = product?.data.name;*/
-      /*console.log('elemento lista',productList)*/
-      /*console.log('elemento product',product)*/
-      /*console.log('elemento name',name)*/
-      /*const validName = typeof name === 'string';*/
-      /*const match = validName && name.toLowerCase().includes(term);*/
-      /*return match;*/
-    /*});*/
-    /*console.log('coincidencias totales antes de limitar:', matches.length);*/
-    /*const visibleResults =f matches.slice(0, 20);*/
-    /*return visibleResults;*/
-    return [];
-  }
-
   onSearch(text: string | null | undefined) {
     const value = text ?? '';
-    this.hash = value;
+    this.hash = value;//para clear el cajon de texto
     this.searchSubject.next(value);
-    this.filteredTaskList = this.searchProducts(value, this.taskList);
+    this.filteredSubtaskList = this.subtaskList.filter(it=>it.data.name.toLowerCase().includes(text.toLowerCase()))
+    //console.log('',this.filteredSubtaskList?.length ?? 0); NO BORRAR nuevo estandar
   }
 
-  bomList:any[]=[];
-  selectProduct(p: any) {
-    p.data.qty=1;
-    this.bomList.push(p)
-    console.log('bomlist',this.bomList)
-    this.hash = p?.name ?? '';
-    this.filteredTaskList = [];
+  selectSubtask(p: any) {
+    p.data.qty = 1;
+    console.log('qty:', p.data.qty);
+    console.log('p:', p);
+    this.selctSubtaskList.push(p);
+    console.log('selectedSubtaskList:', this.selctSubtaskList);
+    this.filteredSubtaskList = [];
+    this.hash='';
   }
-      
+
   ums: any[] = []; 
   loadUms() {                
     this.umService.getAllUms().subscribe({ 
@@ -175,7 +124,11 @@ export class AssetSupplyPostPage {
   }
 
   removeById(p:any) {
-    this.bomList = this.bomList.filter(item=>item.id !== p.id)
+    this.selctSubtaskList = this.selctSubtaskList.filter(item=>item.id !== p.id)
+  }
+
+  removeStg(p:any) {
+    this.selectStg =null;
   }
 
   restartQty(p:any){
@@ -201,11 +154,29 @@ export class AssetSupplyPostPage {
     console.log('fltStgList',this.fltStgList)
   }
  
-  id_stg:number|null=null;
+  choosenStg:any;
   selectStg(p:any){
-    console.log('selected',p);
+    p.data.qty=1;
+    console.log('selectedStg',p);
     this.fltStgList=[];
-    this.id_stg=p.id;
+    this.choosenStg=p;
+  }
+
+  guardar() {
+    const data: any = this.form.value;
+    data.src = this.selctSubtaskList.map(it => it.i);
+    data.id_stg=this.choosenStg?.i;
+    //delete data.category;  nuevo estandar NO_BORRAR
+    console.log('task to post =>', data);
+    this.atsService.post(data).subscribe({
+      next: (response) => {
+        console.log("ats post response", response);
+        if(response && response.length>0){
+          //this.utilservice.presenttoast(response.tostring())
+          //this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceurl: true });    
+        }
+      }
+    });
   }
 
 

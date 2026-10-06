@@ -49,7 +49,6 @@ export class AssetSupplyPostPage {
   filteredProductList: any[] = [];
   maxQtyDeliveredItems: any[] = [];
   queryText:any
-  mesas: any[] = [];
   activeSession: Session | null = null;
   sessionId: number | null = null;
   searchSubject = new Subject<string>();
@@ -61,7 +60,6 @@ export class AssetSupplyPostPage {
   uploading = false;
 
   constructor(
-    private barcodeService: BarcodeService,
     public alertCtrl: AlertController,
     public confData: ConferenceData,
     public loadingCtrl: LoadingController,
@@ -88,6 +86,7 @@ export class AssetSupplyPostPage {
     private photoService: PhotoService,
     private atsService: AtsService,
     private srcService: SrcService,
+    private ctgService: CategoryService,
   ) {}
 
   hash:string='';
@@ -134,11 +133,11 @@ export class AssetSupplyPostPage {
     });
   }
 
-  slideOpts = {
-    initialSlide: 0,
-    slidesPerView: 1,
-    speed: 300
-  };
+  /*slideOpts = {*/
+    /*initialSlide: 0,*/
+    /*slidesPerView: 1,*/
+    /*speed: 300*/
+  /*};*/
 
   updateSchedule(){}
 
@@ -168,7 +167,6 @@ export class AssetSupplyPostPage {
   }
 
   searchProducts(hash: string, productList: any[]): any[] {
-    console.log('[SEARCH][6.2] lista recibida -> cantidad:', productList?.length ?? 0);
     const term = (hash || '').trim().toLowerCase();
     if (!term) {
       return [];
@@ -185,7 +183,6 @@ export class AssetSupplyPostPage {
       }
       return match;
     });
-    console.log('[SEARCH][8] coincidencias totales antes de limitar:', matches.length);
     const visibleResults = matches.slice(0, 20);
     return visibleResults;
   }
@@ -259,22 +256,13 @@ export class AssetSupplyPostPage {
 
   incrementQty(p: any, amount: number, event: Event) {
     event.stopPropagation();
-    console.log('--------------------------------');
-    console.log('[QTY] Producto:', p);
-    console.log('[QTY] Incremento:', amount);
-    console.log('[QTY] Qty anterior:', p.data.qty);
     const currentQty = Number(p?.data?.qty) || 0;
     p.data.qty = currentQty + amount;
-    console.log('[QTY] Qty nueva:', p.data.qty);
   }
 
   clearQty(p: any, event: Event) {
     event.stopPropagation();
-    console.log('--------------------------------');
-    console.log('[QTY][CLEAR] Producto:', p);
-    console.log('[QTY][CLEAR] Qty anterior:', p.data.qty);
     p.data.qty = 1;
-    console.log('[QTY][CLEAR] Qty nueva:', p.data.qty);
   }
 
   removeById(p:any) {
@@ -285,6 +273,7 @@ export class AssetSupplyPostPage {
    p.data.qty=0;
    //console.log('TEST ESBUILD 001');
   }
+
 
 
 }

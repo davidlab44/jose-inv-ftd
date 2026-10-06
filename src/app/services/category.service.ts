@@ -30,11 +30,11 @@ export class CategoryService {
     if (!Array.isArray(umList) || umList.length === 0) {
       return 'Sin categ3';
     }
-    const um = umList.find(u => Number(u.id) === idNum);
+    const um = umList.find(u => Number(u.ext_id) === idNum);
     if (!um) {
       return 'Sin categ4';
     }
-    const nombre = um?.data?.name;
+    const nombre = um?.data?.name_es_CO;
     if (typeof nombre === 'string' && nombre.trim() !== '') {
       return nombre;
     }
