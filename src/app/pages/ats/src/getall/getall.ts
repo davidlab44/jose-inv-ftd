@@ -3,9 +3,6 @@ import { Location } from '@angular/common';
 import { MenuController } from '@ionic/angular';
 import { ConferenceData } from '../../../../providers/conference-data';
 import { UserData } from '../../../../providers/user-data';
-import { OpportunityService } from '../../../../services/opportunity.service';
-import { PosOrderService } from '../../../../services/pos-order.service';
-import { TableService } from '../../../../services/table.service';
 import { Ship,ShipMap } from '../../../../interfaces/ship';
 import { SessionService } from '../../../../services/session.service';
 import { UtilService } from '../../../../services/util.service';
@@ -18,7 +15,6 @@ import { DateService } from '../../../../services/local/date.service';
 import { RexService } from '../../../../services/rex.service';
 import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
-import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { Cco,CcoMap } from '../../../../interfaces/cco';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { ShipService } from '../../../../services/logistic/ship.service';
@@ -81,7 +77,7 @@ export class GetallPage implements OnInit {
     public user:UserData,
     public config:Config,
     private utilService:UtilService,
-    private withdrawnService:WithdrawnService,
+    private prdtService :ProductService,
     private ccoService:CcoService,
     private shipService:ShipService,
     private menu: MenuController,
@@ -101,12 +97,13 @@ export class GetallPage implements OnInit {
   ionViewWillEnter() {
   }
 
-  subtasksList: any[] = []; 
+  subtaskList: any[] = []; 
   loadSubtasks() {                
     this.srcService.getAll().subscribe({ 
       next: (res) => {      
-        this.subtasksList=res;
-        console.log('subtasksLis :', res);   
+        this.subtaskList=res;
+        console.log('subtasksLis :', res);  
+        this.loadPrdt();
       }, 
       error: (err) => {      
         console.error('Error al cargar subtasks:', err); 
@@ -114,8 +111,50 @@ export class GetallPage implements OnInit {
     }); 
   }    
 
+  prdtList: any[] = [];
+  loadPrdt() {
+    this.prdtService.getAll().subscribe({
+      next: (res) => {
+        this.prdtList = res;
+        this.subtaskList.forEach(subtask => {
+          subtask.data.bomnames = subtask.data.bom.map((id: number) => {
+            const p = this.prdtList.find(p => p.i === id);
+            return {
+              i: id,
+              name: p?.data?.name ?? ''
+            };
+          });
+        });
+        console.log('Nueva subtaskList:', this.subtaskList);
+      },
+      error: (err) => {
+        console.error('Error al cargar productos:', err);
+      }
+    });
+  }
 
 
+  /*prdtList: any[] = [];*/
+  /*loadPrdt() {*/
+
+    /*this.prdtService.getAll().subscribe({*/
+      /*next: (res) => {*/
+        /*this.prdtList = res;*/
+        /*this.subtaskList.forEach(subtask => {*/
+          /*subtask.data.bom.forEach(prdt => {*/
+            /*const p = this.prdtList.find(p => p.i === prdt.i);*/
+            /*if (p) {*/
+              /*prdt.bomName[] = p.data.name;*/
+            /*}*/
+          /*});*/
+        /*});*/
+        /*console.log('nueva subtaskList con nombre',this.subtaskList)*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error('Error al cargar productos:', err);*/
+      /*}*/
+    /*});*/
+  /*}*/
 
 
 

@@ -25,7 +25,7 @@
   <ion-list>
 
     <ion-grid
-      *ngFor="let p of subtasksList"
+      *ngFor="let p of subtaskList"
       class="subtask">
 
       <!-- Nombre de la subtarea -->
@@ -37,13 +37,13 @@
 
       <!-- BOM -->
       <ion-row
-        *ngFor="let item of p?.data?.bom"
+        *ngFor="let item of p?.data?.bomnames"
         class="bom-row">
 
         <ion-col size="2"></ion-col>
 
         <ion-col size="7" class="bom-name">
-          {{ item?.data?.name }}
+          {{ item?.name }}
         </ion-col>
 
         <ion-col size="1" class="bom-qty">

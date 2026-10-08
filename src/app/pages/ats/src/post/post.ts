@@ -116,29 +116,6 @@ export class AssetSupplyPostPage {
     });
   }
 
-  guardar() {
-    const data: any = this.form.value;
-    data.img = this.uploadedUrl; 
-    data.bom= this.bomList;
-    //delete data.category;
-    console.log('Product to post =>', data);
-    this.srcService.post(data).subscribe({
-      next: (response) => {
-        console.log("ats post response", response);
-        if(response && response.length>0){
-          //this.utilservice.presenttoast(response.tostring())
-          //this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceurl: true });    
-        }
-      }
-    });
-  }
-
-  /*slideOpts = {*/
-    /*initialSlide: 0,*/
-    /*slidesPerView: 1,*/
-    /*speed: 300*/
-  /*};*/
-
   updateSchedule(){}
 
   productListCaos:any[]=[];
@@ -272,6 +249,25 @@ export class AssetSupplyPostPage {
   restartQty(p:any){
    p.data.qty=0;
    //console.log('TEST ESBUILD 001');
+  }
+
+  guardar() {
+    const data: any = this.form.value;
+    data.img = this.uploadedUrl; 
+    data.bom= this.bomList.map(it=>it.i);
+    //delete data.category;
+    console.log('Subtask to post =>', data);
+    this.srcService.post(data).subscribe({
+      next: (response) => {
+        console.log("ats post response", response);
+        if(response && response.length>0){
+          this.bomList=[];
+          this.form.reset();
+          this.utilService.presentToast('registro creado','success')
+          //this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceurl: true });    
+        }
+      }
+    });
   }
 
 
