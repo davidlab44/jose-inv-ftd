@@ -43,7 +43,7 @@ export class GetallPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    this.loadIo();
+    this.loadStg();
   }
 
   ionViewWillLeave() {
@@ -53,11 +53,14 @@ export class GetallPage implements OnInit {
   ngOnInit() {}
 
   stgList: any[] = []; 
-  loadIo() {                
+  loadStg() {                
     this.stgService.getAll().subscribe({ 
       next: (res) => {      
         this.stgList=res;
-        console.log('ioList :', res);    
+        console.log('stgList:', res);   
+        this.stgList.sort((a,b)=>a.data.order-b.data.order)
+
+
       }, 
       error: (err) => {      
         console.error(new Error('stack_name:').stack, err);
@@ -70,10 +73,11 @@ export class GetallPage implements OnInit {
     const value = text ?? '';
     this.hash = value;
     this.searchSubject.next(value);
-    this.filteredStgList = this.searchIo(value, this.stgList);
+    this.filteredStgList = this.searchStg(value, this.stgList);
+    console.log('filteredStgList',this.filteredStgList)
   }
 
-  searchIo(hash: string, list: any[]): any[] {
+  searchStg(hash: string, list: any[]): any[] {
     console.log('lista recibida:', list?.length ?? 0);
     return [];
   }
