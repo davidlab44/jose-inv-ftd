@@ -8,6 +8,7 @@ import { ActivatedRoute,Router } from '@angular/router';
 import { IoService } from '../../../../services/mnt/io.service';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { TService } from '../../../../services/mnt/t.service';
+import { MntService } from '../../../../services/mnt/mnt.service';
 
 @Component({
   selector:'app-getall',
@@ -34,9 +35,11 @@ export class GetallPage implements OnInit {
     private ioService: IoService,
     private ccoService: CcoService,
     private tService: TService,
+    private mntService: MntService,
   ) {}
 
   ionViewWillEnter() {
+    this.loadMnt();
     this.loadTasks();
     this.loadCco();
   }
@@ -80,12 +83,39 @@ export class GetallPage implements OnInit {
         this.tList=res;
         console.log('tList :', res);
         this.fltrdTList=this.tList;
+
+        this.loadMnt(); 
       }, 
       error: (err) => {      
         console.error(new Error('stack_name:').stack, err);
       } 
     }); 
   }     
+
+  mntList: any[] = []; 
+  loadMnt(){                
+    this.mntService.getAll().subscribe({ 
+      next: (res) => {      
+        this.mntList=res;
+        console.log('mntList :', res);   
+        this.builTaskFullList();
+      }, 
+      error: (err) => {      
+        console.error(new Error('stack_name:').stack, err);
+      } 
+    }); 
+  }     
+
+  builTaskFullList(){
+    this.fltrdTList.map((task)=>{
+      this.mntList.forEach((mnt)=>{
+        if(task.data.id_mnt===mnt.i){
+          task.data.mnt=mnt;     
+        }
+      })
+    });
+    console.log('load/build full fltrdTList',this.fltrdTList)
+  }
 
   selectedItem(p:any){
     console.log('selectedItem', p)
@@ -94,8 +124,24 @@ export class GetallPage implements OnInit {
   }
 
   filterMntList(p:any){
-    this.fltrdTList=this.tList.filter((it)=>it.data.id_cco==p.id);     
+    console.log('p pasada',p)
+    const mylist:any[]=this.fltrdTList
+    .filter((it)=>{
+      //it.data.mnt.data.id_cco==1
+      //it.data.mnt.data.id_cco==p.idd&&it.state==='c'&&it.data.dateapv===null
+      //console.log('it',it)
+      //console.log('it id_cco',it.data.mnt.data.id_cco)
+      const match = it.data.mnt.data.id_cco==p.id;
+      console.log('it id_cco==p.id',match)
+      return match;
+    })
+    console.log('fltrdTListi el del filter',mylist);
+    this.fltrdTList=mylist;
   }
+
+  /*filterMntList(p:any){*/
+    /*this.fltrdTList=this.tList.filter((it)=>it.data.id_cco==p.id);     */
+  /*}*/
 
   goToStg(p:any){
     const pageRoute = `/app/tabs/mnt-t-getall`;
@@ -106,7 +152,6 @@ export class GetallPage implements OnInit {
     }); 
     //this.router.navigate(['/app/tabs/mnt-stg-getall'],   { replaceUrl: true }); 
   }
-
 
 
 }

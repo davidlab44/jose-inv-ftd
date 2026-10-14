@@ -479,6 +479,7 @@ export class PatchPage {
     console.log('item pasado:', item);
     console.log('cco name:', this.ccoName);
     console.log('cco id:', this.ccoId);
+    this.filteredList=[];
   }
 
   /*---- CCO2------ */
@@ -510,6 +511,7 @@ export class PatchPage {
     console.log('item pasado cco2:', item);
     console.log('cco2 name:', this.cco2Name);
     console.log('cco2 id :', this.cco2Id);
+    this.filteredList2=[];
   }
   cco2:any;  
   isotanq2:any;

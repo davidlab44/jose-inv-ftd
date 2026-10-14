@@ -211,6 +211,15 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'mnt-drag-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../mnt/drag/getall/getall.module').then(m =>m.GetallModule)
+          }
+        ]
+      },
+      {
         path: 'mnt-stg-getall',
         children: [
           {

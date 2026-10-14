@@ -569,6 +569,7 @@ export class PostPage {
       return name.includes(search);
     });
     console.log('filteredList2', this.filteredList2);
+    this.filteredList2=[];
   }
  
   cco2Name: string = '';   // nombre a mostrar

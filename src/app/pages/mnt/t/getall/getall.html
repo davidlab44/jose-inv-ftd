@@ -17,60 +17,66 @@
       </ion-button>            
     </ion-buttons>
   </ion-toolbar>
-<!--  <ion-list *ngIf="filteredProductList.length > 0">-->
-    <!--<ion-item-->
-      <!--button-->
-      <!--detail="false"           -->
-      <!--*ngFor="let p of filteredProductList"-->
-      <!--(click)="selectProduct(p)">-->
-      <!--<ion-label>              -->
-        <!--{{ p.data.name }}-->
-      <!--</ion-label>-->
-    <!--</ion-item>-->
-  <!--</ion-list>-->
+  <ion-list *ngIf="filteredCcoList.length > 0">
+    <ion-item
+      button
+      detail="false"           
+      *ngFor="let p of filteredCcoList"
+      (click)="selectedItem(p)">
+      <ion-label>              
+        {{ p.data.name }}
+      </ion-label>
+    </ion-item>
+  </ion-list>
 </ion-header>  
 
-<!--<ion-header translucent="true">-->
-  <!--<ion-toolbar>-->
-    <!--<ion-buttons slot="start">-->
-      <!--<ion-button fill="clear">-->
-        <!--<ion-icon slot="icon-only" name="menu"></ion-icon>-->
-      <!--</ion-button>-->
-    <!--</ion-buttons>-->
-    <!--[><ion-searchbar<]-->
-      <!--[>placeholder="Buscar"<]-->
-      <!--[>(ionInput)="onSearch($event.target.value)"><]-->
-    <!--[></ion-searchbar><]-->
-    <!--<ion-buttons slot="end">-->
-      <!--<ion-button *ngIf="!showSearchbar" (click)="presentFilter()">-->
-        <!--<span *ngIf="ios">Filter</span>-->
-        <!--<span *ngIf="!ios">-->
-          <!--<ion-icon slot="icon-only" name="options"></ion-icon>-->
-        <!--</span>-->
-      <!--</ion-button>-->
-    <!--</ion-buttons>-->
-  <!--</ion-toolbar>-->
-<!--</ion-header>-->
 
 <ion-content>
   <ion-list>
     <ion-grid
-      *ngFor="let p of tasksList"
+      *ngFor="let p of fltrdTList"
       class="subtask">
-      <ion-row>
+      <ion-row
+        [class.approved]="p?.data?.mnt?.data?.dateapv == null"
+        [class.pending]="p?.data?.mnt?.data?.dateapv != null">
         <ion-col size="1" class="subtask-title">
-          {{ p?.i }}
+          {{ p?.id }}
         </ion-col>
-        <ion-col size="5" class="subtask-title">
-          {{ p?.created_at }} 
+        <ion-col size="4" class="subtask-title">
+          {{ p?.created_at }}
         </ion-col>
-        <ion-col size="3" class="subtask-title">
-          {{ p?.data?.id_ats }}  
+        <ion-col size="2" class="subtask-title" *ngIf="p.data.in" >
+          {{ p?.data?.in }}
         </ion-col>
-       <ion-col size="3" class="subtask-title">
-          {{ p?.data?.id_cco }}  
+        <ion-col *ngIf="p?.data?.mnt?.data?.id_cco"
+          size="1"
+          class="subtask-title"
+          (click)="goToStg(p)">
+          {{ p?.data?.mnt?.data?.id_cco }}
+        </ion-col>
+        <ion-col *ngIf="p?.data?.id_ats"
+          size="1"
+          class="subtask-title"
+          (click)="goToStg(p)">
+          {{ p?.data?.id_ats }}
+        </ion-col>
+        <ion-col *ngIf="p?.state" 
+          size="2"
+          class="subtask-title"
+          (click)="goToStg(p)">
+          {{ p?.state }}
+        </ion-col>
+        <ion-col   *ngIf="p?.data?.ats?.data?.stg?.data?.order"
+          size="1"
+          class="subtask-title"
+          (click)="goToStg(p)">
+          {{ p?.data?.ats?.data?.stg?.data?.order}}
         </ion-col>
       </ion-row>
     </ion-grid>
   </ion-list>
 </ion-content>
+
+
+
+

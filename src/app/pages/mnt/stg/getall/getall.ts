@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { AlertController,Config,IonList,LoadingController,ModalController,ToastController } from '@ionic/angular';
 import { ActivatedRoute,Router } from '@angular/router';
 import { StgService } from '../../../../services/mnt/stg.service';
+import { TService } from '../../../../services/mnt/t.service';
 
 @Component({
   selector:'app-getall',
@@ -18,7 +19,6 @@ export class GetallPage implements OnInit {
   searchSubject=new Subject<string>();
   searchTerm:string='';
   hash:string='';
-  //mnt:any;
 
   constructor(
     public alertCtrl:AlertController,
@@ -30,17 +30,9 @@ export class GetallPage implements OnInit {
     public user:UserData,
     public config:Config,
     private menu: MenuController,
-    private stgService: StgService
-  ) {
-/*    const navigation = this.router.getCurrentNavigation();*/
-    /*if (navigation?.extras?.state?.item) {*/
-      /*this.mnt = navigation.extras.state.item;*/
-    /*} else {*/
-      /*// Si recargaron la página, puedes cargar el item desde un servicio o API*/
-      /*console.warn('No se recibió item por NavigationExtras.state');*/
-    /*}*/
-    /*console.log("Item recibidox:", this.mnt);*/
-  }
+    private stgService: StgService,
+    private tService: TService,
+  ) {}
 
   ionViewWillEnter() {
     this.loadStg();
@@ -59,8 +51,6 @@ export class GetallPage implements OnInit {
         this.stgList=res;
         console.log('stgList:', res);   
         this.stgList.sort((a,b)=>a.data.order-b.data.order)
-
-
       }, 
       error: (err) => {      
         console.error(new Error('stack_name:').stack, err);
@@ -82,6 +72,36 @@ export class GetallPage implements OnInit {
     return [];
   }
 
+
+
+
+  /*ccoList: any[] = []; */
+  /*loadCco() {                */
+    /*this.ccoService.getAll().subscribe({ */
+      /*next: (res) => {      */
+        /*this.ccoList=res;*/
+        /*console.log('ccoList:', res);   */
+      /*}, */
+      /*error: (err) => {      */
+        /*console.error(new Error('stack_name:').stack, err);*/
+      /*} */
+    /*}); */
+  /*}     */
+
+
+  /*tList: any[] = []; */
+  /*loadT(id_cco) {                */
+    /*this.tService.getAll().subscribe({ */
+      /*next: (res) => {      */
+        /*this.tList=res;*/
+        /*console.log('tList:', res);   */
+        /*this.tList.filter(it=>it.data.id_cco===id_cco).filter(item=>item.state==='doing')*/
+      /*}, */
+      /*error: (err) => {      */
+        /*console.error(new Error('stack_name:').stack, err);*/
+      /*} */
+    /*}); */
+  /*}     */
 
 
 

@@ -172,6 +172,12 @@ export class AssetSupplyPostPage {
       next: (response) => {
         console.log("ats post response", response);
         if(response && response.length>0){
+          this.form.reset();
+          this.hash='';
+          this.hazh='';
+          this.filteredSubtaskList=[];
+          this.fltStgList=[];
+          window.location.reload();
           //this.utilservice.presenttoast(response.tostring())
           //this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceurl: true });    
         }

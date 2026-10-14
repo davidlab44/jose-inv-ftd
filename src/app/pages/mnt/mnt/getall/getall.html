@@ -34,25 +34,34 @@
   <ion-list>
     <ion-grid
       *ngFor="let p of fltrdTList"
-      class="subtask">
+      class="subtask"
+      [ngClass]="{
+        'approved': p?.data?.mnt?.data?.dateapv != null,
+        'pending': p?.data?.mnt?.data?.dateapv == null
+      }">
       <ion-row>
         <ion-col size="1" class="subtask-title">
           {{ p?.id }}
         </ion-col>
         <ion-col size="4" class="subtask-title">
-          {{ p?.created_at }} 
+          {{ p?.created_at }}
         </ion-col>
         <ion-col size="2" class="subtask-title">
-          {{ p?.data?.in }}  
+          {{ p?.data?.in }}
         </ion-col>
-        <ion-col size="2" class="subtask-title"  (click)="goToStg(p)" >
-          {{ p?.data?.id_cco }}  
+        <ion-col size="1" class="subtask-title" (click)="goToStg(p)">
+          {{ p?.data?.mnt?.data?.id_cco }}
+        </ion-col>
+        <ion-col size="1" class="subtask-title" (click)="goToStg(p)">
+          {{ p?.data?.id_ats }}
+        </ion-col>
+        <ion-col size="2" class="subtask-title" (click)="goToStg(p)">
+          {{ p?.state }}
         </ion-col>
       </ion-row>
     </ion-grid>
   </ion-list>
 </ion-content>
-
 
 
 

@@ -474,6 +474,7 @@ export class PatchPage {
     //actualizar movement (muy importante en tu flujo)
     console.log('item pasado:', item);
     this.ccoName=this.getCcoNameById(item.id);
+    this.filteredList=[];
   }
   cco:any;  
   isotanq:any;

@@ -285,25 +285,29 @@ export class AssetSupplyPostPage {
     if(this.atsList?.length==0){this.utilService.presentToast('No atsList','danger',500); return;}
     console.log('ats list',this.atsList);
     this.atsDataList = this.atsList.map((it) => ({
-      id_ats: it.id,
-      id_cco: id_cco,
-      id_mnt: mnt.id,
+      id_ats: it.i,
+      //id_cco: id_cco,
+      id_mnt: mnt[0].i,
       dateapv: null,
       imgapv: null,      
       imgstart: null
-    }));  
-    this.TService.postDataListStrgth(this.atsDataList).subscribe({
-      next:(res)=>{
-        console.log('mnt_t insert response',res)
-      },
-      error:(stgerr)=>{
-        console.error('mnt_t insert err ',stgerr) 
-      }
-    })
+    })); 
+
+
+
+
+
+
+    console.log('lo que se enviara en el      atsDataList',this.atsDataList)
+/*    this.TService.postDataListStrgth(this.atsDataList).subscribe({*/
+      /*next:(res)=>{*/
+        /*console.log('mnt_t insert response',res)*/
+      /*},*/
+      /*error:(stgerr)=>{*/
+        /*console.error('mnt_t insert err ',stgerr) */
+      /*}*/
+    /*})*/
   }
-
-
-
 
 
 }
