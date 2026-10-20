@@ -238,6 +238,51 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'mnt-t-patch',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../mnt/t/patch/patch.module').then(m =>m.PatchModule)
+          }
+        ]
+      },
+      {
+        path: 'mnt-t-stend',
+        children: [
+          {
+            path: '',
+            loadChildren:()=>import('../mnt/t/stend/patch.module').then(m =>m.PatchModule)
+          }
+        ]
+      },
+      {
+        path: 'mnt-t-apv',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../mnt/t/apv/patch.module').then(m =>m.PatchModule)
+          }
+        ]
+      },
+      {
+        path: 'mnt-t-exec',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../mnt/t/exec/patch.module').then(m =>m.PatchModule)
+          }
+        ]
+      },
+     {
+        path: 'mnt-t-jse',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../mnt/t/jse/patch.module').then(m =>m.PatchModule)
+          }
+        ]
+      },
+      {
         path: 'mnt-t-getall',
         children: [
           {

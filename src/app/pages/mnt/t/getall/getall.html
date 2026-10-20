@@ -37,8 +37,8 @@
       *ngFor="let p of fltrdTList"
       class="subtask">
       <ion-row
-        [class.approved]="p?.data?.mnt?.data?.dateapv == null"
-        [class.pending]="p?.data?.mnt?.data?.dateapv != null">
+        [class.approved]="p?.data?.mnt?.data?.dateapv != null"
+        [class.pending]="p?.data?.mnt?.data?.dateapv == null">
         <ion-col size="1" class="subtask-title">
           {{ p?.id }}
         </ion-col>
@@ -51,13 +51,13 @@
         <ion-col *ngIf="p?.data?.mnt?.data?.id_cco"
           size="1"
           class="subtask-title"
-          (click)="goToStg(p)">
+          (click)="goToPatch(p)">
           {{ p?.data?.mnt?.data?.id_cco }}
         </ion-col>
         <ion-col *ngIf="p?.data?.id_ats"
           size="1"
           class="subtask-title"
-          (click)="goToStg(p)">
+          (click)="goToPatch(p)">
           {{ p?.data?.id_ats }}
         </ion-col>
         <ion-col *ngIf="p?.state" 

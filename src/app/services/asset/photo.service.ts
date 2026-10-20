@@ -1,7 +1,6 @@
-
 import { Injectable } from '@angular/core';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'; // Importa la librería de Camera de Capacitor
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'; //lib Camera Capacitor
+import { S3Client } from '@aws-sdk/client-s3';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Upload } from "@aws-sdk/lib-storage";
 import { environment } from '../../../environments/environment';
@@ -11,18 +10,54 @@ import { environment } from '../../../environments/environment';
 })
 export class PhotoService {
 
-private s3: S3Client;
+  private s3Clients: Record<'s3aws' | 's3mnt', S3Client>;
 
   constructor() {
-    this.s3 = new S3Client({
-      region: "us-east-1", // MinIO lo ignora pero es requerido // endpoint: "http://192.168.40.47:9000", // ⚠️ Ojo, quité el espacio final
-      endpoint: environment.s3aws, // ⚠️ Ojo, quité el espacio final
-      credentials: {
-        accessKeyId: "miusuarioseguro",
-        secretAccessKey: "mipasswordsuperseguro",
-      },
-      forcePathStyle: true, // 🔴 NECESARIO para MinIO
-    });
+    this.s3Clients = {
+      s3aws: new S3Client({
+        region: 'us-east-1',
+        endpoint: environment.s3aws,
+        credentials: {
+          accessKeyId: 'miusuarioseguro',
+          secretAccessKey: 'mipasswordsuperseguro',
+        },
+        forcePathStyle: true,
+      }),
+      s3mnt: new S3Client({
+        region: 'us-east-1',
+        endpoint: environment.s3mnt,
+        credentials: {
+          accessKeyId: 'jseocampo',
+          secretAccessKey: 'INBEMETAL2025*&',
+        },
+        forcePathStyle: true,
+      }),
+    };
+  }
+
+  /*constructor() {*/
+    /*const config = {*/
+      /*region: 'us-east-1',*/
+      /*credentials: {*/
+        /*accessKeyId: 'miusuarioseguro',*/
+        /*secretAccessKey: 'mipasswordsuperseguro',*/
+      /*},*/
+      /*forcePathStyle: true,*/
+    /*};*/
+
+    /*this.s3Clients = {*/
+      /*s3aws: new S3Client({ ...config, endpoint: environment.s3aws }),*/
+      /*s3mnt: new S3Client({ ...config, endpoint: environment.s3mnt }),*/
+    /*};*/
+  /*}*/
+
+  private getS3Client(endpoint: 's3aws' | 's3mnt'): S3Client {
+    return this.s3Clients[endpoint];
+  }
+
+  private getObjectUrl(endpoint: 's3aws' | 's3mnt', bucket: string, key: string): string {
+    const baseUrl = environment[endpoint].replace(/\/+$/, '');
+    return `${baseUrl}/${bucket}/${key.split('/').map(encodeURIComponent).join('/')}`;
   }
 
   private base64ToUint8Array(base64: string): { bytes: Uint8Array, mimeType: string } {
@@ -39,84 +74,24 @@ private s3: S3Client;
     return { bytes, mimeType };
   }
 
-  /*uploadBase64Image(base64: string, bucket: string): { progress$: Observable<number>, url$: Observable<string> } {*/
-    /*const progressSubject = new BehaviorSubject<number>(0);*/
-    /*const urlSubject = new BehaviorSubject<string>('');*/
-    /*(async () => {*/
-      /*try {*/
-        /*console.log('[IMG] Iniciando resize...');*/
-        /*base64 = await this.resizeImg(base64);*/
-        /*console.log('[IMG] Resize terminado');*/
-        /*const { bytes, mimeType } = this.base64ToUint8Array(base64);*/
-        /*const key = `img_${Date.now()}.${mimeType.split('/')[1] || 'jpg'}`;*/
-        /*console.log('[IMG] Subiendo:', key);*/
-        /*const parallelUploads3 = new Upload({*/
-          /*client: this.s3,*/
-          /*params: {*/
-            /*Bucket: bucket,*/
-            /*Key: key,*/
-            /*Body: bytes,*/
-            /*ContentType: mimeType*/
-          /*},*/
-          /*queueSize: 4,*/
-          /*partSize: 1024 * 1024 * 5*/
-        /*});*/
-        /*parallelUploads3.on('httpUploadProgress', (progress) => {*/
-          /*if (progress.loaded && progress.total) {*/
-            /*const percent = Math.round((progress.loaded / progress.total) * 100);*/
-            /*progressSubject.next(percent);*/
-          /*}*/
-        /*});*/
-        /*await parallelUploads3.done();*/
-        /*progressSubject.next(100);*/
-        /*urlSubject.next(`${environment.s3aws}${bucket}/${key}`);*/
-        /*progressSubject.complete();*/
-        /*urlSubject.complete();*/
-      /*} catch (err) {*/
-        /*console.error('[IMG] Error:', err);*/
-        /*progressSubject.error(err);*/
-        /*urlSubject.error(err);*/
-      /*}*/
-    /*})();*/
-    /*return {*/
-      /*progress$: progressSubject.asObservable(),*/
-      /*url$: urlSubject.asObservable()*/
-    /*};*/
-  /*}*/
+  /*Subir al servidor anterior:*/
+  /*this.photoService.uploadBase64Image(*/
+    /*base64,*/
+    /*'imagenes',*/
+    /*'s3aws'*/
+  /*);*/
 
-  /*resizeImg(base64: string, maxWidth: number = 1000, quality: number = 0.85): Promise<string> {*/
-    /*return new Promise((resolve, reject) => {*/
-      /*const img = new Image();*/
-      /*img.onload = () => {*/
-        /*if (img.width <= maxWidth) {*/
-          /*resolve(base64);*/
-          /*return;*/
-        /*}*/
-        /*const ratio = maxWidth / img.width;*/
-        /*const newWidth = maxWidth;*/
-        /*const newHeight = Math.round(img.height * ratio);*/
-        /*console.log('[RESIZE] Original:', img.width, 'x', img.height);*/
-        /*console.log('[RESIZE] Nueva:', newWidth, 'x', newHeight);*/
-        /*const canvas = document.createElement('canvas');*/
-        /*canvas.width = newWidth;*/
-        /*canvas.height = newHeight;*/
-        /*const ctx = canvas.getContext('2d');*/
-        /*if (!ctx) {*/
-          /*reject(new Error('No se pudo crear el contexto canvas'));*/
-          /*return;*/
-        /*}*/
-        /*ctx.drawImage(img, 0, 0, newWidth, newHeight);*/
-        /*const resizedBase64 = canvas.toDataURL('image/jpeg', quality);*/
-        /*resolve(resizedBase64);*/
-      /*};*/
-      /*img.onerror = () => reject(new Error('No se pudo cargar la imagen'));*/
-      /*img.src = base64;*/
-    /*});*/
-  /*}*/
+  /*Subir al nuevo MinIO mnio_mnt:*/
+  /*this.photoService.uploadBase64Image(*/
+    /*base64,*/
+    /*'mntdev',*/
+    /*'s3mnt'*/
+  /*);*/
 
-
-
-  uploadBase64Image(base64: string,bucket:string): { progress$: Observable<number>, url$: Observable<string> } {
+  uploadBase64Image(base64: string, bucket: string, endpoint: 's3aws' | 's3mnt' = 's3aws'): { progress$: Observable<number>, url$: Observable<string> } {
+    console.log('bucket',bucket)
+    console.log('endpoint',endpoint)
+    console.log('base64',base64)
     const progressSubject = new BehaviorSubject<number>(0);
     const urlSubject = new BehaviorSubject<string>('');
     (async () => {
@@ -124,7 +99,7 @@ private s3: S3Client;
         const { bytes, mimeType } = this.base64ToUint8Array(base64);
         const key = `img_${Date.now()}.${mimeType.split('/')[1] || 'jpg'}`;
         const parallelUploads3 = new Upload({
-          client: this.s3,
+          client: this.getS3Client(endpoint),
           params: {
             Bucket: bucket,
             Key: key,
@@ -142,7 +117,7 @@ private s3: S3Client;
         });
         await parallelUploads3.done();
         progressSubject.next(100);
-        urlSubject.next(`${environment.s3aws}${bucket}/${key}`);
+        urlSubject.next(this.getObjectUrl(endpoint, bucket, key));
         progressSubject.complete();
         urlSubject.complete();
       } catch (err) {
@@ -159,7 +134,8 @@ private s3: S3Client;
     base64:string,
     cco:string,
     year:number,
-    type:'parcial'|'total'
+    type:'parcial'|'total',
+    endpoint: 's3aws' | 's3mnt' = 's3aws'
   ):{progress$:Observable<number>,url$:Observable<string>}{
 
     const progressSubject=new BehaviorSubject<number>(0);
@@ -174,7 +150,7 @@ private s3: S3Client;
         const key=`${cco}/${type}/${year}.pdf`;
 
         const upload=new Upload({
-          client:this.s3,
+          client:this.getS3Client(endpoint),
           params:{
             Bucket:'cert',
             Key:key,
@@ -193,7 +169,7 @@ private s3: S3Client;
         await upload.done();
 
         progressSubject.next(100);
-        urlSubject.next(`${environment.s3aws}cert/${key}`);
+        urlSubject.next(this.getObjectUrl(endpoint, 'cert', key));
 
         progressSubject.complete();
         urlSubject.complete();
@@ -346,16 +322,3 @@ private s3: S3Client;
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

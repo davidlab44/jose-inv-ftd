@@ -11,6 +11,7 @@ import { TService } from '../../../../services/mnt/t.service';
 import { MntService } from '../../../../services/mnt/mnt.service';
 import { StgService } from '../../../../services/mnt/stg.service';
 import { AtsService } from '../../../../services/ats/ats.service';
+import { DateService } from '../../../../services/local/date.service';
 
 @Component({
   selector:'app-getall',
@@ -41,6 +42,7 @@ export class GetallPage implements OnInit {
     private mntService: MntService,
     private stgService: StgService,
     private atsService: AtsService,
+    private dateService: DateService,
   ) {}
 
   ionViewWillEnter() {
@@ -208,6 +210,20 @@ export class GetallPage implements OnInit {
     }); 
     //this.router.navigate(['/app/tabs/mnt-stg-getall'],   { replaceUrl: true }); 
   }
+
+  goToPatch(p:any){
+    const pageRoute = `/app/tabs/mnt-t-stend`;
+    this.router.navigate([pageRoute], { 
+      state: {
+        item: p,
+        custom:'prueba',
+        oid: this.dateService.getDate()
+      }     
+    }); 
+    //this.router.navigate(['/app/tabs/mnt-stg-getall'],   { replaceUrl: true }); 
+  }
+
+
 
 
 }

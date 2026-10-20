@@ -20,6 +20,11 @@ export class  TService{
     return this.http.get<any[]>(`${this.apiUrl}/${this.model}`);
   }
 
+  getOne(id: number): Observable<any> {
+    const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;
+    return this.http.get<any[]>(url);
+  }
+
   getInterval(since: string, until: string): Observable<any[]> {
     const params = [
       `created_at=gte.${since}`,
@@ -46,6 +51,8 @@ export class  TService{
       }
     });
   }
+
+
 
   postDataList(list: any[]): Observable<any> {
     const url = `${this.apiUrl}/${this.model}?select=*`;

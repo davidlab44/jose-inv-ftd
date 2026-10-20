@@ -262,12 +262,16 @@ export class AssetSupplyPostPage {
     const mnt = this.mntList?.filter(it => it?.data.id_cco === id_cco).sort((a, b) => b.i - a.i)[0];
     //console.log('orderedMntList ',orderedMntList)
     console.log('mnt despues de todos los filtros ',mnt)
+    //el metodo mas importante (dispara la creacion de mantenimiento )
     if(mnt===undefined||mnt.state==='done'||mnt?.length===0){
       this.postMnt(mnt,id_cco);
+    }else{
+      console.log('mnt no se puede crear ')
     }
   }
 
   postMnt(mnt:any,id_cco:number){
+    console.log('post Mnt!!')
     const data={
       id_cco:id_cco,
       status:'created',
@@ -286,27 +290,20 @@ export class AssetSupplyPostPage {
     console.log('ats list',this.atsList);
     this.atsDataList = this.atsList.map((it) => ({
       id_ats: it.i,
-      //id_cco: id_cco,
       id_mnt: mnt[0].i,
-      dateapv: null,
-      imgapv: null,      
-      imgstart: null
+      ini: [],
+      end: [],
+      apv: [],
     })); 
-
-
-
-
-
-
-    console.log('lo que se enviara en el      atsDataList',this.atsDataList)
-/*    this.TService.postDataListStrgth(this.atsDataList).subscribe({*/
-      /*next:(res)=>{*/
-        /*console.log('mnt_t insert response',res)*/
-      /*},*/
-      /*error:(stgerr)=>{*/
-        /*console.error('mnt_t insert err ',stgerr) */
-      /*}*/
-    /*})*/
+    console.log('Lo que se enviara en el atsDataList',this.atsDataList)
+    this.TService.postDataListStrgth(this.atsDataList).subscribe({
+      next:(res)=>{
+        console.log('mnt_t insert response',res)
+      },
+      error:(stgerr)=>{
+        console.error('mnt_t insert err ',stgerr) 
+      }
+    })
   }
 
 
