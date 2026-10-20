@@ -21,7 +21,6 @@ export class PatchPage {
   modalPreviewSrc: string | null = null;
   viewerOpen = false;
   savingEdited = false;
-  // Vista previa local para URLs S3 no públicas (403/CORS).
   previewsByUrl: Record<string, string> = {};
   brokenImages: Record<string, boolean> = {};
   activeTool: 'point' | 'circle' | 'arrow' = 'point';
@@ -29,7 +28,6 @@ export class PatchPage {
   private annotationsByUrl: Record<string, Annotation[]> = {};
   private dragStart: { x: number; y: number } | null = null;
   draftEnd: { x: number; y: number } | null = null;
-  //task:any;
 
   constructor(private router: Router, 
               private photoService: PhotoService,
@@ -54,15 +52,15 @@ export class PatchPage {
     this.loadTaskById();
   }
 
-  imgs:string[]=[];
+  imagenes:any[]=[];
   loadTaskById(){
     console.log('entro a loadTaskById')
     this.tService.getOne(this.task.id).subscribe({ 
       next: (res) => {      
         this.task=res[0];
         console.log('single task :', this.task);  
-        this.imgs=this.task?.data?.ini;
-        console.log('imgs IMGS',this.imgs)
+        this.images=this.task?.data?.ini;
+        console.log('imgs IMGS',this.imagenes)
       }, 
       error: (err) => {      
         console.error(new Error('stack_name:').stack, err);
@@ -85,6 +83,7 @@ export class PatchPage {
 
   async addImage(): Promise<void> {
     if (!this.canAdd) return;
+    console.log('imgs3',this.imagenes);
     const sheet = await this.actionSheetController.create({
       header: 'Agregar fotografía',
       buttons: [
@@ -137,7 +136,17 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
               received = true;
               resolve(value);
             }
-            this.imgs.push(value);
+            //Fotografia puede emitir value vacio, esto puede generar bugs si no se controla 
+            /*[Fotografía] url$ emitió: <empty string> patch.ts:136:21*/
+            /*value1 <empty string>*/
+            //esta pendiente por comprobar si puede generar varios values , o sea otros values con strings eso se sabra con el uso continuo
+            // TADA  tambien se puede solucionar con una refactorizacion clara y bien documentada con AI una vez termine de construir esta page 
+            if(value&&value.length&&value.length>2){
+              console.log('value1',value)
+              console.log('imgs1',this.imagenes)
+              this.imagenes.push(value);
+              console.log('imgs2',this.imagenes)
+            }
           },
           error: err => {
             console.error('[Fotografía] Error en url$:', err);
@@ -153,15 +162,15 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
         });
       });
       // URL definitiva generada por el servicio
-      console.log('======================================');
-      console.log('[Fotografía] URL FINAL MINIO:', url);
-      console.log('======================================');
+      //console.log('======================================');
+      //console.log('[Fotografía] URL FINAL MINIO:', url);
+      //console.log('======================================');
       // La URL remota se conserva en images.
       // La imagen local se utiliza únicamente para visualizar.
       this.previewsByUrl[url] = this.asImageSrc(base64);
       this.setImages([...this.images, url]);
       console.log('[Fotografía] URLs almacenadas:', this.images);
-      console.log('[Fotografía] Subida completada correctamente.');
+      //console.log('[Fotografía] Subida completada correctamente.');
     } finally {
       progressSub.unsubscribe();
     }
@@ -175,23 +184,20 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
   }
 }
 
+  /*sendObservations(): void {*/
+    /*const text = this.observations.trim();*/
+    /*console.log('[Observaciones] Enviar:', { text, images: [...this.images], taskId: this.task?.id ?? null });*/
+    /*this.observations = '';*/
+    /*this.showObservations = false;*/
+  /*}*/
 
-
-
-  sendObservations(): void {
-    const text = this.observations.trim();
-    console.log('[Observaciones] Enviar:', { text, images: [...this.images], taskId: this.task?.id ?? null });
-    this.observations = '';
-    this.showObservations = false;
-  }
-
-  removeImage(index: number): void {
-    if (this.uploading) return;
-    const url = this.images[index];
-    if (url) { delete this.annotationsByUrl[url]; delete this.previewsByUrl[url]; delete this.brokenImages[url]; }
-    this.setImages(this.images.filter((_, i) => i !== index));
-    console.log('[Fotografía] Eliminada de la lista local:', url);
-  }
+/*  removeImage(index: number): void {*/
+    /*if (this.uploading) return;*/
+    /*const url = this.images[index];*/
+    /*if (url) { delete this.annotationsByUrl[url]; delete this.previewsByUrl[url]; delete this.brokenImages[url]; }*/
+    /*this.setImages(this.images.filter((_, i) => i !== index));*/
+    /*console.log('[Fotografía] Eliminada de la lista local:', url);*/
+  /*}*/
 
   private setImages(images: string[]): void {
     this.images = images;
@@ -417,20 +423,73 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
   }
 
   onSearch(_value: any): void {}
-  
-  patch():void{
-    console.log('anotations to patch',this.annotations)
-    console.log('selectedUrl patch',this.selectedUrl)
-    //let note.push=this.note;
-    const itr={
-      date:this.task.oid,
-      img:this.imgs,
-      status: 'c',
-      apv:[],
-      //note=
-    }
-    console.log('itr',itr);
+ 
+
+
+patch(): void {
+
+  const itr = {
+    date: this.task.oid,
+    img: this.imagenes,
+    status: 'c',
+    apv: [],
+    note: this.observations
+  };
+
+  const ini = [...(this.task.data.ini ?? []), itr];
+
+  // Verificar serialización antes de enviar
+  try {
+    const json = JSON.stringify(ini);
+    console.log('JSON válido para PATCH:', json);
+  } catch (err) {
+    console.error('Objeto circular detectado:', err);
+    return;
   }
+
+  this.tService.patchDataAttribute(
+    'mnt_t',
+    this.task.id,
+    'ini',
+    ini
+  ).subscribe({
+
+    next: (r) => {
+      this.task.data.ini = ini;
+      console.log('PATCH exitoso:', r);
+    },
+
+    error: (err) => {
+      console.error('Error PATCH:', err.message);
+      console.error('HTTP status:', err.status);
+      console.log('Detalles:', err);
+    }
+
+  });
+}
+
+
+
+  /*patch():void{*/
+    /*console.log('anotations to patch',this.annotations)*/
+    /*console.log('selectedUrl patch',this.selectedUrl)*/
+    /*//let note.push=this.note;*/
+    /*const itr={*/
+      /*date:this.task.oid,*/
+      /*img:this.imgs,*/
+      /*status: 'c',*/
+      /*apv:[],*/
+      /*note:this.observations*/
+    /*}*/
+    /*this.task.data.ini.push(itr);*/
+    /*console.log('itr',itr);*/
+    /*this.tService.patchDataAttribute('mnt_t',this.task.id,'ini',this.task.data.ini).subscribe({*/
+      /*next:(r)=>{*/
+        /*console.log('patchDataAttribute data.ini response')*/
+      /*},*/
+      /*error:err=>console.error('error on patch data atrib response',err)*/
+    /*})*/
+  /*}*/
 
   patchModified(){  }
 
