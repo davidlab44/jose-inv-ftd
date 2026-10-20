@@ -7,6 +7,7 @@ interface Annotation { type: 'point' | 'circle' | 'arrow'; x1: number; y1: numbe
 
 @Component({ selector: 'page-patch', templateUrl: 'patch.html', styleUrls: ['./patch.scss'] })
 export class PatchPage {
+
   @Input() images: string[] = [];
   @Output() imagesChange = new EventEmitter<string[]>();
   @Input() maxImages = 10;
@@ -59,27 +60,20 @@ export class PatchPage {
       next: (res) => {      
         this.task=res[0];
         console.log('single task :', this.task);  
-        this.images=this.task?.data?.ini;
-        console.log('imgs IMGS',this.imagenes)
+        // data.ini puede contener registros {img: string[]} creados por patch().
+        // Conservar exclusivamente URLs efectivas, nunca URLs de thumbnails.
+        const ini = this.task?.data?.ini;
+        const latest = Array.isArray(ini) ? [...ini].reverse().find((entry: any) =>
+          entry && !Array.isArray(entry) && Array.isArray(entry.img)) : null;
+        const stored = latest?.img ?? (Array.isArray(ini) && ini.every((v: any) => typeof v === 'string') ? ini : []);
+        this.setImages(Array.isArray(stored) ? [...stored] : []);
+        console.log('imgs IMGS', this.imagenes)
       }, 
       error: (err) => {      
         console.error(new Error('stack_name:').stack, err);
       } 
     }); 
   }
-
-  /*taskList: any[] = []; */
-  /*loadTask(){                */
-    /*this.tService.getAll().subscribe({ */
-      /*next: (res) => {      */
-        /*this.taskList=res;*/
-        /*console.log('taskList :', res);   */
-      /*}, */
-      /*error: (err) => {      */
-        /*console.error(new Error('stack_name:').stack, err);*/
-      /*} */
-    /*}); */
-  /*}     */
 
   async addImage(): Promise<void> {
     if (!this.canAdd) return;
@@ -126,42 +120,21 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
       }
     });
     try {
-      const url = await new Promise<string>((resolve, reject) => {
-        let received = false;
-        console.log('[Fotografía] Esperando URL de MinIO...');
-        url$.subscribe({
-          next: value => {
-            console.log('[Fotografía] url$ emitió:', value);
-            if (!received) {
-              received = true;
-              resolve(value);
-            }
-            //Fotografia puede emitir value vacio, esto puede generar bugs si no se controla 
-            /*[Fotografía] url$ emitió: <empty string> patch.ts:136:21*/
-            /*value1 <empty string>*/
-            //esta pendiente por comprobar si puede generar varios values , o sea otros values con strings eso se sabra con el uso continuo
-            // TADA  tambien se puede solucionar con una refactorizacion clara y bien documentada con AI una vez termine de construir esta page 
-            if(value&&value.length&&value.length>2){
-              console.log('value1',value)
-              console.log('imgs1',this.imagenes)
-              this.imagenes.push(value);
-              console.log('imgs2',this.imagenes)
-            }
-          },
-          error: err => {
-            console.error('[Fotografía] Error en url$:', err);
-            reject(err);
-          },
-          complete: () => {
-            console.log('[Fotografía] url$ completado.');
-
-            if (!received) {
-              reject(new Error('La subida terminó sin URL'));
-            }
-          }
-        });
-      });
-      // URL definitiva generada por el servicio
+             const url = await new Promise<string>((resolve, reject) => {
+         let received = false;
+         url$.subscribe({
+           next: value => {
+             // El servicio puede emitir inicialmente una cadena vacía.
+             if (!received && typeof value === 'string' && value.trim().length > 2) {
+               received = true;
+               resolve(value);
+             }
+           },
+           error: reject,
+           complete: () => { if (!received) reject(new Error('La subida terminó sin URL')); }
+         });
+       });
+// URL definitiva generada por el servicio
       //console.log('======================================');
       //console.log('[Fotografía] URL FINAL MINIO:', url);
       //console.log('======================================');
@@ -184,12 +157,6 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
   }
 }
 
-  /*sendObservations(): void {*/
-    /*const text = this.observations.trim();*/
-    /*console.log('[Observaciones] Enviar:', { text, images: [...this.images], taskId: this.task?.id ?? null });*/
-    /*this.observations = '';*/
-    /*this.showObservations = false;*/
-  /*}*/
 
 /*  removeImage(index: number): void {*/
     /*if (this.uploading) return;*/
@@ -200,11 +167,33 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
   /*}*/
 
   private setImages(images: string[]): void {
-    this.images = images;
-    this.imagesChange.emit(images);
+    this.images = [...images];
+    this.imagenes = [...images];
+    this.imagesChange.emit([...images]);
   }
 
+  // Solo para la cuadrícula: la URL original sigue siendo la fuente de datos.
+  thumbnailUrl(url: string): string {
+    if (!url || /^(data:|blob:)/i.test(url)) return url;
+    const match = url.match(/^([^?#]+)([?#].*)?$/);
+    if (!match) return url;
+    const path = match[1];
+    if (/_thumbnail\.jpg$/i.test(path)) return url;
+    return path.replace(/\.[^/.]+$/, '_thumbnail.jpg') + (match[2] || '');
+  }
+
+  // El editor mantiene la imagen original en resolución completa.
   imageSrc(url: string): string { return this.previewsByUrl[url] || url; }
+
+  removeImage(index: number): void {
+    if (this.uploading || this.savingEdited) return;
+    const url = this.images[index];
+    if (!url) return;
+    delete this.annotationsByUrl[url];
+    delete this.previewsByUrl[url];
+    delete this.brokenImages[url];
+    this.setImages(this.images.filter((_, i) => i !== index));
+  }
 
   imageFailed(url: string): void {
     this.brokenImages[url] = true;
@@ -319,11 +308,6 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
 
   async saveEditedImage(): Promise<void> {
     if (this.selectedUrl === null || !this.annotations.length || this.savingEdited || this.uploading) return;
-    if (this.images.length >= this.maxImages) {
-      this.errorMessage = 'Se alcanzó el máximo de fotografías.';
-      console.warn('[Editor]', this.errorMessage);
-      return;
-    }
     const originalUrl = this.selectedUrl;
     this.savingEdited = true;
     this.errorMessage = '';
@@ -379,22 +363,32 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
         console.log(`[Editor] Subida de imagen editada: ${p}%`);
       });
       try {
-        const newUrl = await new Promise<string>((resolve, reject) => {
-          let gotUrl = false;
-          url$.subscribe({
-            next: url => { 
-              if (!gotUrl) { gotUrl = true; resolve(url); } 
-              console.log('urlpara guardar',url)
-            },
-            error: reject,
-            complete: () => { if (!gotUrl) reject(new Error('Subida finalizada sin URL')); }
-          });
-        });
-        this.previewsByUrl[newUrl] = editedDataUrl;
-        this.setImages([...this.images, newUrl]);
-        console.log('[Editor] ÉXITO: imagen modificada almacenada en MinIO:', { bucket: this.bucket, endpoint: 's3mnt', url: newUrl, originalUrl, taskId: this.task?.id ?? null, annotations: this.annotations.map(a => ({...a})), totalAnotaciones: this.annotations.length });
+                 const newUrl = await new Promise<string>((resolve, reject) => {
+           let gotUrl = false;
+           url$.subscribe({
+             next: url => {
+               if (!gotUrl && typeof url === 'string' && url.trim().length > 2) {
+                 gotUrl = true;
+                 resolve(url);
+               }
+             },
+             error: reject,
+             complete: () => { if (!gotUrl) reject(new Error('Subida finalizada sin URL')); }
+           });
+         });
+         // Sustituye la URL anterior, NO añade otra imagen ni ocupa otro cupo.
+         const index = this.images.indexOf(originalUrl);
+         if (index < 0) throw new Error('La imagen original ya no está en la lista.');
+         const updated = [...this.images];
+         updated[index] = newUrl;
+         this.previewsByUrl[newUrl] = editedDataUrl;
+         delete this.previewsByUrl[originalUrl];
+         delete this.annotationsByUrl[originalUrl];
+         this.annotationsByUrl[newUrl] = [];
+         this.setImages(updated);
+console.log('[Editor] ÉXITO: imagen modificada almacenada en MinIO:', { bucket: this.bucket, endpoint: 's3mnt', url: newUrl, originalUrl, taskId: this.task?.id ?? null, annotations: this.annotations.map(a => ({...a})), totalAnotaciones: this.annotations.length });
         console.log('[Editor] URL de imagen EDITADA subida:', newUrl);
-        console.log('[Editor] URL de imagen ORIGINAL (conservada):', originalUrl);
+        console.log('[Editor] URL original reemplazada en la lista:', originalUrl);
         this.closeViewer();
       } finally { sub.unsubscribe(); }
     } catch (error) {
@@ -423,7 +417,6 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
   }
 
   onSearch(_value: any): void {}
- 
 
 
 patch(): void {
@@ -432,7 +425,6 @@ patch(): void {
     date: this.task.oid,
     img: this.imagenes,
     status: 'c',
-    apv: [],
     note: this.observations
   };
 
@@ -468,29 +460,7 @@ patch(): void {
   });
 }
 
+  patchModified(): void { void this.saveEditedImage(); }
 
-
-  /*patch():void{*/
-    /*console.log('anotations to patch',this.annotations)*/
-    /*console.log('selectedUrl patch',this.selectedUrl)*/
-    /*//let note.push=this.note;*/
-    /*const itr={*/
-      /*date:this.task.oid,*/
-      /*img:this.imgs,*/
-      /*status: 'c',*/
-      /*apv:[],*/
-      /*note:this.observations*/
-    /*}*/
-    /*this.task.data.ini.push(itr);*/
-    /*console.log('itr',itr);*/
-    /*this.tService.patchDataAttribute('mnt_t',this.task.id,'ini',this.task.data.ini).subscribe({*/
-      /*next:(r)=>{*/
-        /*console.log('patchDataAttribute data.ini response')*/
-      /*},*/
-      /*error:err=>console.error('error on patch data atrib response',err)*/
-    /*})*/
-  /*}*/
-
-  patchModified(){  }
 
 }

@@ -211,17 +211,31 @@ export class GetallPage implements OnInit {
     //this.router.navigate(['/app/tabs/mnt-stg-getall'],   { replaceUrl: true }); 
   }
 
-  goToPatch(p:any){
+
+  goToPatch(p: any) {
+    p.oid = this.dateService.getDate();
     const pageRoute = `/app/tabs/mnt-t-stend`;
-    this.router.navigate([pageRoute], { 
+    this.router.navigate([pageRoute], {
       state: {
         item: p,
-        custom:'prueba',
-        oid: this.dateService.getDate()
-      }     
-    }); 
-    //this.router.navigate(['/app/tabs/mnt-stg-getall'],   { replaceUrl: true }); 
+        custom: 'prueba'
+      }
+    });
   }
+
+
+
+  /*goToPatch(p:any){*/
+    /*const pageRoute = `/app/tabs/mnt-t-stend`;*/
+    /*this.router.navigate([pageRoute], { */
+      /*state: {*/
+        /*item: p,*/
+        /*custom:'prueba',*/
+        /*oid: this.dateService.getDate()*/
+      /*}     */
+    /*}); */
+    /*//this.router.navigate(['/app/tabs/mnt-stg-getall'],   { replaceUrl: true }); */
+  /*}*/
 
 
 

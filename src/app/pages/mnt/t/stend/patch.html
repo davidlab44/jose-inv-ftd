@@ -11,7 +11,7 @@
     <ion-grid><ion-row>
       <ion-col size="4" size-sm="3" size-md="2" *ngFor="let image of images; let i = index">
         <div class="photo-tile">
-          <img [src]="imageSrc(image)" (error)="imageFailed(image)" [alt]="'Fotografía ' + (i + 1)" (click)="openViewer(image)" />
+          <img [src]="thumbnailUrl(image)" (error)="imageFailed(image)" [alt]="'Fotografía ' + (i + 1)" (click)="openViewer(image)" />
           <ion-button class="remove" color="danger" size="small" [disabled]="uploading"
                       (click)="removeImage(i)" aria-label="Quitar fotografía de la lista">
             <ion-icon slot="icon-only" name="close-outline"></ion-icon>
@@ -81,10 +81,11 @@
         <ion-progress-bar *ngIf="savingEdited" [value]="uploadProgress / 100"></ion-progress-bar>
         <ion-note *ngIf="savingEdited" color="light">Subiendo imagen editada: {{ uploadProgress }}%</ion-note>
         <ion-note *ngIf="errorMessage" color="danger">{{ errorMessage }}</ion-note>
-        <!--<ion-button expand="block" [disabled]="savingEdited || !annotations.length || images.length >= maxImages" (click)="saveEditedImage()">Guardar edición como nueva imagen en S3</ion-button>-->
-        <ion-button expand="block" (click)="patchModified()">Guardar edición como nueva imagen en S3</ion-button>
+        <!--<ion-button expand="block" [disabled]="savingEdited || !annotations.length || images.length >= maxImages" (click)="saveEditedImage()">Guardar edición (reemplazar imagen)</ion-button>-->
+        <ion-button expand="block" (click)="patchModified()">Guardar edición (reemplazar imagen)</ion-button>
         <!--<ion-button expand="block" fill="outline" [disabled]="savingEdited" (click)="sendAnnotations()">Solo enviar anotaciones (console.log)</ion-button>-->
       </div>
     </ion-content>
   </ng-template>
 </ion-modal>
+
