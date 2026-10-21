@@ -32,3 +32,12 @@
   user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
 }
 
+
+.photo-record { border: 1px solid var(--ion-color-light-shade); border-radius: 10px; overflow: hidden; height: 100%; }
+.photo-details { padding: 8px; }
+.photo-details ion-textarea { margin-top: 6px; }
+
+.photo-actions { display: flex; justify-content: space-between; gap: 2px; }
+.photo-actions ion-button { flex: 1; min-width: 0; margin-inline: 0; }
+.viewer-note { color: #fff; padding: 10px 12px; background: #303030; border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+:host ::ng-deep ion-modal.photo-note-modal { --width: min(92vw, 420px); --height: 260px; --border-radius: 12px; }

@@ -2,11 +2,13 @@ import { Component, EventEmitter, HostListener, Input, Output } from '@angular/c
 import { ActionSheetController } from '@ionic/angular';
 import { PhotoService } from '../../../../services/asset/photo.service';
 import { TService } from '../../../../services/mnt/t.service';
+import { DateService } from '../../../../services/local/date.service';
 import { Router } from '@angular/router';
 interface Annotation { type: 'point' | 'circle' | 'arrow'; x1: number; y1: number; x2?: number; y2?: number; }
 
 @Component({ selector: 'page-patch', templateUrl: 'patch.html', styleUrls: ['./patch.scss'] })
 export class PatchPage {
+
   @Input() images: string[] = [];
   @Output() imagesChange = new EventEmitter<string[]>();
   @Input() maxImages = 10;
@@ -33,6 +35,7 @@ export class PatchPage {
               private photoService: PhotoService,
               private actionSheetController: ActionSheetController,
               private tService: TService, 
+              private dateService: DateService, 
              ) {
     const navigation = this.router.getCurrentNavigation();
     console.log("Item recibido en patch:", navigation);
@@ -64,7 +67,7 @@ export class PatchPage {
         const ini = this.task?.data?.ini;
         const latest = Array.isArray(ini) ? [...ini].reverse().find((entry: any) =>
           entry && !Array.isArray(entry) && Array.isArray(entry.img)) : null;
-        const stored = latest?.img ?? (Array.isArray(ini) && ini.every((v: any) => typeof v === 'string') ? ini : []);
+        const stored = latest?.img ?? (Array.isArray(ini)&&ini.every((v: any)=>typeof v === 'string') ? ini : []);
         this.setImages(Array.isArray(stored) ? [...stored] : []);
         console.log('imgs IMGS', this.imagenes)
       }, 
@@ -133,7 +136,7 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
            complete: () => { if (!received) reject(new Error('La subida terminó sin URL')); }
          });
        });
-// URL definitiva generada por el servicio
+      // URL definitiva generada por el servicio
       //console.log('======================================');
       //console.log('[Fotografía] URL FINAL MINIO:', url);
       //console.log('======================================');
@@ -157,7 +160,7 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
 }
 
 
-/*  removeImage(index: number): void {*/
+   /*removeImage(index: number): void {*/
     /*if (this.uploading) return;*/
     /*const url = this.images[index];*/
     /*if (url) { delete this.annotationsByUrl[url]; delete this.previewsByUrl[url]; delete this.brokenImages[url]; }*/
@@ -421,10 +424,9 @@ console.log('[Editor] ÉXITO: imagen modificada almacenada en MinIO:', { bucket:
 patch(): void {
 
   const itr = {
-    date: this.task.oid,
     img: this.imagenes,
+    date: this.dateService.getDate(),
     status: 'c',
-    apv: [],
     note: this.observations
   };
 
@@ -439,13 +441,7 @@ patch(): void {
     return;
   }
 
-  this.tService.patchDataAttribute(
-    'mnt_t',
-    this.task.id,
-    'ini',
-    ini
-  ).subscribe({
-
+  this.tService.patchDataAttribute('mnt_t',this.task.id,'ini',ini).subscribe({
     next: (r) => {
       this.task.data.ini = ini;
       console.log('PATCH exitoso:', r);
@@ -462,5 +458,5 @@ patch(): void {
 
   patchModified(): void { void this.saveEditedImage(); }
 
+
 }
- 
