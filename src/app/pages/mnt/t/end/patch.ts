@@ -3,6 +3,7 @@ import { ActionSheetController, AlertController } from '@ionic/angular';
 import { PhotoService } from '../../../../services/asset/photo.service';
 import { TService } from '../../../../services/mnt/t.service';
 import { Router } from '@angular/router';
+import { DateService } from '../../../../services/local/date.service';
 interface PhotoEntry { img: string; date: string; status: string; note: string; pending?: boolean; replacesUrl?: string; saving?: boolean; dirty?: boolean; }
 interface Annotation { type: 'point' | 'circle' | 'arrow'; x1: number; y1: number; x2?: number; y2?: number; }
 
@@ -14,14 +15,14 @@ export class PatchPage {
   @Input() maxImages = 10;
   @Input() bucket = 'mntdev';
   task: any;
-  observations:string='';
-  passedTask: any;
   uploading = false;
   uploadProgress = 0;
   errorMessage = '';
   photoEntries: PhotoEntry[] = [];
   saving = false;
   showObservations = false;
+  observations = '';
+  // Las fotografías nuevas se agrupan en una única entrada de data.end.
   selectedUrl: string | null = null;
   modalPreviewSrc: string | null = null;
   viewerOpen = false;
@@ -42,7 +43,8 @@ export class PatchPage {
               private photoService: PhotoService,
               private actionSheetController: ActionSheetController,
               private alertController: AlertController,
-              private tService: TService, 
+              private tService: TService,
+              private dateService: DateService, 
              ) {
     const navigation = this.router.getCurrentNavigation();
     console.log("Item recibido en patch:", navigation);
@@ -54,13 +56,12 @@ export class PatchPage {
     }
     console.log('item recibido router',item)
     this.task=item;
-    this.passedTask=item;
   }
 
   get canAdd(): boolean { return !this.uploading && !this.saving && !this.savingEdited && this.photoEntries.filter(e => e.pending && e.status === 'c').length < this.maxImages; }
   get pendingCount(): number { return this.photoEntries.filter(e => e.pending).length; }
   get orderedPhotos(): PhotoEntry[] { return this.photoEntries.filter(e => e.status === 'c').sort((a, b) => (Date.parse(b.date) || 0) - (Date.parse(a.date) || 0)); }
-  private now(): string { return new Date().toISOString(); }
+  private now(): string { return this.dateService.getDate(); }
   private refreshImages(): void { this.setImages(this.photoEntries.filter(e => e.status === 'c').map(e => e.img)); }
 
 
@@ -75,23 +76,18 @@ export class PatchPage {
       next: (res) => {      
         this.task=res[0];
         console.log('single task :', this.task);  
-        // Formato nuevo: un objeto por imagen. Leer también el formato anterior
-        // sin modificarlo ni perder fotografías históricas.
-        const ini = this.task?.data?.ini;
+        // data.end contiene grupos {date, imgs: string[], status, note}.
+        const end = this.task?.data?.end;
         const entries: PhotoEntry[] = [];
-        if (Array.isArray(ini)) {
-          ini.forEach((item: any) => {
-            if (typeof item === 'string') {
-              entries.push({ img: item, date: '', status: 'c', note: '' });
-            } else if (item && typeof item === 'object') {
-              const urls = Array.isArray(item.img) ? item.img : (typeof item.img === 'string' ? [item.img] : []);
-              urls.forEach((url: any) => {
-                if (typeof url === 'string' && url) entries.push({
-                  img: url, date: typeof item.date === 'string' ? item.date : '',
-                  status: item.status || 'c', note: item.note || ''
-                });
+        if (Array.isArray(end)) {
+          end.forEach((item: any) => {
+            if (!item || typeof item !== 'object' || item.status !== 'c') return;
+            const urls = Array.isArray(item.imgs) ? item.imgs : [];
+            urls.forEach((url: any) => {
+              if (typeof url === 'string' && url) entries.push({
+                img: url, date: item.date || '', status: 'c', note: item.note || ''
               });
-            }
+            });
           });
         }
         this.photoEntries = entries;
@@ -187,6 +183,15 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
   }
 }
 
+
+   /*removeImage(index: number): void {*/
+    /*if (this.uploading) return;*/
+    /*const url = this.images[index];*/
+    /*if (url) { delete this.annotationsByUrl[url]; delete this.previewsByUrl[url]; delete this.brokenImages[url]; }*/
+    /*this.setImages(this.images.filter((_, i) => i !== index));*/
+    /*console.log('[Fotografía] Eliminada de la lista local:', url);*/
+  /*}*/
+
   private setImages(images: string[]): void {
     this.images = [...images];
     this.imagenes = [...images];
@@ -206,80 +211,71 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
   // El editor mantiene la imagen original en resolución completa.
   imageSrc(url: string): string { return this.previewsByUrl[url] || url; }
 
-  // Cada operación sobre ini escribe el arreglo completo; bloquear operaciones simultáneas.
+  // Se conserva data.ini sin tocarla. Solo se escribe el arreglo data.end.
   private get busy(): boolean { return this.saving || this.uploading || this.savingEdited; }
 
-  private storedIni(): any[] {
-    return Array.isArray(this.task?.data?.ini) ? this.task.data.ini : [];
+  private storedEnd(): any[] {
+    return Array.isArray(this.task?.data?.end) ? this.task.data.end : [];
   }
 
-  // Convierte registros antiguos con img[] a objetos independientes al persistir.
-  private normalizedIni(): any[] {
-    const result: any[] = [];
-    for (const item of this.storedIni()) {
-      if (typeof item === 'string') {
-        result.push({ img: item, date: '', status: 'c', note: '' });
-      } else if (item && typeof item === 'object') {
-        const urls = Array.isArray(item.img) ? item.img : [item.img];
-        for (const url of urls) {
-          if (typeof url === 'string' && url) result.push({ ...item, img: url });
-        }
+  private persistEnd(end: any[], onSuccess: () => void): void {
+    if (this.busy) return;
+    this.saving = true;
+    this.errorMessage = '';
+    this.tService.patchDataAttribute('mnt_t', this.task.id, 'end', end).subscribe({
+      next: () => {
+        this.task.data.end = end;
+        this.saving = false;
+        onSuccess();
+      },
+      error: err => {
+        console.error('[Fotografías] Error actualizando end:', err);
+        this.errorMessage = 'No se pudieron guardar las fotografías.';
+        this.saving = false;
       }
-    }
-    return result;
-  }
-
-  imagenesapv:any[]=[];
-  private persistIni(ini: any[], onSuccess: () => void): void {
-    this.imagenesapv.push(ini);
-    console.log('imagenes apv /urls',this.imagenesapv)
-/*    if (this.busy) return;*/
-    /*this.saving = true;*/
-    /*this.errorMessage = '';*/
-    /*this.tService.patchDataAttribute('mnt_t', this.task.id, 'ini', ini).subscribe({*/
-      /*next: () => {*/
-        /*this.task.data.ini = ini;*/
-        /*onSuccess();*/
-        /*this.saving = false;*/
-        /*this.refreshImages();*/
-      /*},*/
-      /*error: err => {*/
-        /*console.error('[Fotografías] Error actualizando ini:', err);*/
-        /*this.errorMessage = 'No se pudo actualizar la fotografía. Inténtalo nuevamente.';*/
-        /*this.saving = false;*/
-      /*}*/
-    /*});*/
-  }
-
-  // Se guarda solo la nota/registro de esta imagen. La subida a MinIO ya ocurrió.
-  savePhoto(photo: PhotoEntry): void {
-    if (this.busy || photo.saving || photo.status !== 'c') return;
-    const ini = this.normalizedIni();
-    const item = { img: photo.img, date: photo.date || this.now(), status: 'c', note: photo.note || '' };
-    if (photo.replacesUrl) {
-      const index = ini.findIndex(x => x.img === photo.replacesUrl);
-      if (index < 0) { this.errorMessage = 'No se encontró la fotografía original.'; return; }
-      ini[index] = { ...ini[index], ...item };
-    } else if (photo.pending) {
-      ini.push(item);
-    } else {
-      const index = ini.findIndex(x => x.img === photo.img);
-      if (index < 0) { this.errorMessage = 'No se encontró la fotografía en la base de datos.'; return; }
-      ini[index] = { ...ini[index], note: photo.note || '' };
-    }
-    this.persistIni(ini, () => {
-      photo.pending = false;
-      photo.dirty = false;
-      photo.date = item.date;
-      delete photo.replacesUrl;
-      // Releer para que todas las notas y estados coincidan con el servidor.
-      this.loadTaskById();
     });
   }
 
-  onNoteChange(photo: PhotoEntry, value: string | null | undefined): void {
-    photo.note = value || '';
-    photo.dirty = true;
+  // Un único botón guarda TODAS las fotografías nuevas con una nota global.
+  patch(): void {
+    if (this.busy) return;
+    const pending = this.photoEntries.filter(e => e.pending && e.status === 'c');
+    if (!pending.length) {
+      this.errorMessage = 'No hay fotografías nuevas para guardar.';
+      return;
+    }
+    const end = [...this.storedEnd()];
+    // Si una imagen guardada se editó, sustituir la URL dentro de su grupo.
+    for (const photo of pending) {
+      if (!photo.replacesUrl) continue;
+      const group = end.find((x: any) => Array.isArray(x?.imgs) && x.imgs.includes(photo.replacesUrl));
+      if (!group) {
+        this.errorMessage = 'No se encontró la imagen original para reemplazar.';
+        return;
+      }
+    }
+    const edited = pending.filter(e => !!e.replacesUrl);
+    for (const photo of edited) {
+      const groupIndex = end.findIndex((x: any) => Array.isArray(x?.imgs) && x.imgs.includes(photo.replacesUrl));
+      const group = { ...end[groupIndex], imgs: [...end[groupIndex].imgs] };
+      group.imgs[group.imgs.indexOf(photo.replacesUrl)] = photo.img;
+      end[groupIndex] = group;
+    }
+    const newUrls = pending.filter(e => !e.replacesUrl).map(e => e.img);
+    if (newUrls.length) {
+      const itr = {
+        date: this.dateService.getDate(),
+        imgs: newUrls,
+        status: 'c',
+        note: this.observations || ''
+      };
+      end.push(itr);
+    }
+    this.persistEnd(end, () => {
+      this.observations = '';
+      this.showObservations = false;
+      this.loadTaskById();
+    });
   }
 
   async removeImage(url: string): Promise<void> {
@@ -288,10 +284,10 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
     if (!photo) return;
     const alert = await this.alertController.create({
       header: 'Eliminar fotografía',
-      message: 'La fotografía dejará de mostrarse. Su estado cambiará a deleted.',
+      message: 'La fotografía dejará de mostrarse.',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive', handler: () => { this.markDeleted(photo); } }
+        { text: 'Eliminar', role: 'destructive', handler: () => this.markDeleted(photo) }
       ]
     });
     await alert.present();
@@ -299,23 +295,30 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
 
   private markDeleted(photo: PhotoEntry): void {
     if (this.busy) return;
-    // Incluso las imágenes recién subidas quedan registradas como deleted.
-    const ini = this.normalizedIni();
-    const original = photo.replacesUrl || photo.img;
-    const index = ini.findIndex(x => x.img === original);
-    if (index >= 0) {
-      ini[index] = { ...ini[index], status: 'deleted' };
-    } else if (!photo.pending) {
-      this.errorMessage = 'No se encontró la fotografía para eliminar.';
+    if (photo.pending && !photo.replacesUrl) {
+      // No se ha registrado en PostgreSQL: quitarla solo de la selección.
+      this.photoEntries = this.photoEntries.filter(e => e !== photo);
+      this.refreshImages();
       return;
     }
-    // Si es una imagen pendiente, registrar su URL como deleted para que no se muestre.
-    if (photo.pending && photo.img !== original) {
-      ini.push({ img: photo.img, date: photo.date, status: 'deleted', note: photo.note });
-    } else if (index < 0) {
-      ini.push({ img: photo.img, date: photo.date, status: 'deleted', note: photo.note });
+    const original = photo.replacesUrl || photo.img;
+    const end = [...this.storedEnd()];
+    const index = end.findIndex((x: any) => Array.isArray(x?.imgs) && x.imgs.includes(original));
+    if (index < 0) {
+      this.errorMessage = 'No se encontró la fotografía en data.end.';
+      return;
     }
-    this.persistIni(ini, () => this.loadTaskById());
+    const group = { ...end[index], imgs: [...end[index].imgs] };
+    // Un grupo tiene un solo status. Si quedan otras imágenes activas,
+    // mantenerlas y registrar la eliminada en otro grupo con status deleted.
+    group.imgs = group.imgs.filter((url: string) => url !== original);
+    if (group.imgs.length) {
+      end[index] = group;
+      end.push({ date: group.date, imgs: [original], status: 'deleted', note: group.note });
+    } else {
+      end[index] = { ...end[index], status: 'deleted' };
+    }
+    this.persistEnd(end, () => this.loadTaskById());
   }
 
   showNote(photo: PhotoEntry): void {
@@ -557,24 +560,10 @@ console.log('[Editor] ÉXITO: imagen modificada almacenada en MinIO:', { bucket:
   onSearch(_value: any): void {}
 
 
-// Compatibilidad: no existe guardado global. Cada foto tiene su propio botón.
-patch(): void {
-
-  const iter={
-    note:this.observations,
-    imgs:this.imagenesapv,
-  } 
-
-  console.log('iter',iter)
-  /*this.tService.patchDataAttribute().subscribe({*/
-    /*next:(r)=>{*/
-      /*console.log('patch response ',r);*/
-    /*},*/
-    /*error:err=>console.error('patch apv',err)*/
-  /*})*/
-
-
-}
+/*// Compatibilidad: no existe guardado global. Cada foto tiene su propio botón.*/
+/*patch(): void {*/
+  /*this.errorMessage = 'Utiliza el botón Guardar de la fotografía correspondiente.';*/
+/*}*/
 
   patchModified(): void { void this.saveEditedImage(); }
 

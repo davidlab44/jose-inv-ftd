@@ -1,7 +1,7 @@
 <ion-header translucent="true">
   <ion-toolbar>
     <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
-    <ion-title><span style="font-size:small;" >{{passedTask?.data?.ats?.data?.stg?.data?.name}} => {{passedTask?.data?.ats?.data?.name}}</span></ion-title>
+    <ion-title>Fotografías</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -18,9 +18,6 @@
           <div class="photo-details">
             <ion-note color="medium">{{ photo.date ? (photo.date | date:'dd/MM/yyyy HH:mm') : 'Sin fecha histórica' }}</ion-note>
             <div class="photo-actions">
-              <ion-button size="small" fill="outline" (click)="showNote(photo)" aria-label="Ver nota">
-                <ion-icon slot="icon-only" name="document-text-outline"></ion-icon>
-              </ion-button>
               <ion-button size="small" fill="outline" (click)="openEditor(photo.img)" aria-label="Editar imagen">
                 <ion-icon slot="icon-only" name="create-outline"></ion-icon>
               </ion-button>
@@ -29,15 +26,7 @@
                 <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
               </ion-button>
             </div>
-            <ion-textarea label="Nota de esta fotografía (opcional)" labelPlacement="stacked"
-                          [autoGrow]="true" [rows]="2" placeholder="Observación de la imagen..."
-                          [ngModel]="photo.note" (ngModelChange)="onNoteChange(photo, $event)"></ion-textarea>
-            <ion-button expand="block" size="small" [disabled]="saving || uploading || savingEdited || (!photo.pending && !photo.dirty)"
-                        (click)="savePhoto(photo)">
-              <ion-icon name="save-outline" slot="start"></ion-icon>
-              {{ photo.pending ? 'Guardar imagen y nota' : 'Guardar nota' }}
-            </ion-button>
-            <ion-note *ngIf="photo.pending" color="primary">Imagen subida a MinIO · pendiente de registrar</ion-note>
+            <ion-note *ngIf="photo.pending" color="primary">Imagen subida a MinIO · pendiente de guardar</ion-note>
           </div>
         </div>
       </ion-col>
@@ -48,26 +37,19 @@
       </ion-col>
     </ion-row></ion-grid>
 
+    <ion-item>
+      <ion-textarea label="Observaciones generales (opcional)" labelPlacement="stacked"
+                    [(ngModel)]="observations" [autoGrow]="true" [rows]="3"
+                    placeholder="Una nota para todas las fotografías nuevas..."></ion-textarea>
+    </ion-item>
+    <ion-button expand="block" [disabled]="saving || uploading || savingEdited || pendingCount === 0" (click)="patch()">
+      <ion-icon name="save-outline" slot="start"></ion-icon>
+      Guardar fotografías ({{ pendingCount }})
+    </ion-button>
     <ion-progress-bar *ngIf="uploading" [value]="uploadProgress / 100"></ion-progress-bar>
     <ion-note *ngIf="uploading">Subiendo fotografía: {{ uploadProgress }}%</ion-note>
     <ion-note color="danger" *ngIf="errorMessage">{{ errorMessage }}</ion-note>
     <ion-note color="medium">{{ orderedPhotos.length }} fotografías visibles · {{ pendingCount }} pendientes</ion-note>
-  </div>
-
-  <div>
-    <ion-grid><ion-row><ion-col>
-      <ion-card>
-        <ion-card-header><ion-card-title>Observaciones</ion-card-title></ion-card-header>
-        <ion-card-content>
-          <ion-textarea label="Observaciones" labelPlacement="stacked" fill="outline"
-                        [autoGrow]="true" [rows]="3" placeholder="Escribe tus observaciones..."
-                        [(ngModel)]="observations"></ion-textarea>
-          <ion-button expand="block" (click)="patch()">
-            <ion-icon name="send-outline" slot="start"></ion-icon>Enviar
-          </ion-button>
-        </ion-card-content>
-      </ion-card>
-    </ion-col></ion-row></ion-grid>
   </div>
 </ion-content>
 
@@ -99,7 +81,7 @@
         </div>
         <ion-note *ngIf="selectedUrl && brokenImages[selectedUrl]" color="warning">No se pudo cargar la imagen desde S3. Comprueba permisos de lectura y URL.</ion-note>
         <div class="viewer-note" *ngIf="selectedPhoto">
-          <strong>Nota:</strong> {{ selectedPhoto.note || 'Sin nota' }}
+          <strong>Observaciones:</strong> {{ selectedPhoto.pending ? (observations || 'Sin observaciones') : (selectedPhoto.note || 'Sin observaciones') }}
         </div>
         <ion-note *ngIf="editorMode" color="light">Punto: toca la imagen. Círculo y flecha: arrastra el dedo.</ion-note>
         <div class="editor-actions" *ngIf="editorMode">
@@ -120,15 +102,3 @@
 </ion-modal>
 
 
-<ion-modal [isOpen]="noteModalOpen" (didDismiss)="closeNote()" cssClass="photo-note-modal">
-  <ng-template>
-    <ion-header><ion-toolbar>
-      <ion-title>Nota de la fotografía</ion-title>
-      <ion-buttons slot="end"><ion-button (click)="closeNote()">Cerrar</ion-button></ion-buttons>
-    </ion-toolbar></ion-header>
-    <ion-content class="ion-padding">
-      <p>{{ notePhoto?.note || 'Esta fotografía no tiene nota.' }}</p>
-      <ion-note color="medium">{{ notePhoto?.date | date:'dd/MM/yyyy HH:mm' }}</ion-note>
-    </ion-content>
-  </ng-template>
-</ion-modal>
