@@ -214,7 +214,7 @@ export class GetallPage implements OnInit {
 
   goToPatch(p: any) {
     p.oid = this.dateService.getDate();
-    const pageRoute = `/app/tabs/mnt-t-stend`;
+    const pageRoute = `/app/tabs/mnt-t-ini`;
     this.router.navigate([pageRoute], {
       state: {
         item: p,

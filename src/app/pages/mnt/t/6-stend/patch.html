@@ -1,0 +1,143 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-title><span style="font-size:small;" >{{passedTask?.data?.ats?.data?.stg?.data?.name}} => {{passedTask?.data?.ats?.data?.name}}</span></ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="image-picker ion-padding">
+    <ion-grid>
+
+      <ion-row>
+        <ion-col size="6" size-sm="4" size-md="3" *ngIf="canAdd">
+          <button type="button" class="add-tile" [disabled]="!canAdd" (click)="addImage()">
+            <ion-icon name="add-outline"></ion-icon><span>Agregar foto</span>
+          </button>
+        </ion-col>     
+      </ion-row>
+      <ion-row>
+        <ion-col size="6" size-sm="4" size-md="3" *ngFor="let photo of orderedPhotos; let i = index">
+          <div class="photo-record">
+            <div class="photo-tile">
+              <img [src]="thumbnailUrl(photo.img)" (error)="imageFailed(photo.img)"
+                   [alt]="'Fotografía ' + (i + 1)" (click)="openViewer(photo.img)" />
+            </div>
+            <div class="photo-details">
+              <ion-note color="medium">{{ photo.date ? (photo.date | date:'dd/MM/yyyy HH:mm') : 'Sin fecha histórica' }}</ion-note>
+              <div class="photo-actions">
+                <ion-button size="small" fill="outline" (click)="showNote(photo)" aria-label="Ver nota">
+                  <ion-icon slot="icon-only" name="document-text-outline"></ion-icon>
+                </ion-button>
+                <ion-button size="small" fill="outline" (click)="openEditor(photo.img)" aria-label="Editar imagen">
+                  <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+                </ion-button>
+                <ion-button size="small" fill="outline" color="danger" [disabled]="saving || uploading || savingEdited"
+                            (click)="removeImage(photo.img)" aria-label="Eliminar imagen">
+                  <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                </ion-button>
+              </div>
+              <ion-textarea label="Nota de esta fotografía (opcional)" labelPlacement="stacked"
+                            [autoGrow]="true" [rows]="2" placeholder="Observación de la imagen..."
+                            [ngModel]="photo.note" (ngModelChange)="onNoteChange(photo, $event)"></ion-textarea>
+              <ion-button expand="block" size="small" [disabled]="saving || uploading || savingEdited || (!photo.pending && !photo.dirty)"
+                          (click)="savePhoto(photo)">
+                <ion-icon name="save-outline" slot="start"></ion-icon>
+                {{ photo.pending ? 'Guardar imagen y nota' : 'Guardar nota' }}
+              </ion-button>
+              <ion-note *ngIf="photo.pending" color="primary">Imagen subida a MinIO · pendiente de registrar</ion-note>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+      <!--<ion-row>-->
+        <!--<ion-col size="6" size-sm="4" size-md="3" *ngIf="canAdd">-->
+          <!--<button type="button" class="add-tile" [disabled]="!canAdd" (click)="addImage()">-->
+            <!--<ion-icon name="checkmark-outline"></ion-icon><span>Aprobar</span>-->
+          <!--</button>-->
+        <!--</ion-col>-->
+      <!--</ion-row>-->
+    </ion-grid>
+
+    <ion-progress-bar *ngIf="uploading" [value]="uploadProgress / 100"></ion-progress-bar>
+    <ion-note *ngIf="uploading">Subiendo fotografía: {{ uploadProgress }}%</ion-note>
+    <ion-note color="danger" *ngIf="errorMessage">{{ errorMessage }}</ion-note>
+    <ion-note color="medium">{{ orderedPhotos.length }} fotografías visibles · {{ pendingCount }} pendientes</ion-note>
+  </div>
+
+  <br>
+  <div class="image-picker ion-padding">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6" size-sm="4" size-md="3" *ngIf="canAdd">
+          <button  type="button" class="add-tile" style="color:#3e7b24;background:#b9fa9c;"  [disabled]="!canAdd" (click)="apvTask()">
+            <ion-icon name="checkmark-outline"></ion-icon><span>Aprobar</span>
+          </button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>
+
+<ion-modal [isOpen]="viewerOpen" (didDismiss)="closeViewer()" cssClass="photo-editor-modal">
+  <ng-template>
+    <ion-header><ion-toolbar>
+      <ion-title>{{ editorMode ? 'Editar fotografía' : 'Ver fotografía' }}</ion-title>
+      <ion-buttons slot="end"><ion-button (click)="closeViewer()">Cerrar</ion-button></ion-buttons>
+    </ion-toolbar></ion-header>
+    <ion-content class="viewer-content">
+      <div class="viewer-layout">
+        <div class="viewer-stage" *ngIf="modalPreviewSrc">
+          <img [src]="modalPreviewSrc" (error)="imageFailed(selectedUrl!)" alt="Fotografía ampliada" draggable="false" />
+          <svg class="annotation-layer" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs><marker id="photo-arrowhead" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L5,2.5 L0,5 Z" fill="#ff3838" /></marker></defs>
+            <ng-container *ngFor="let mark of annotations.concat(draftAnnotation ? [draftAnnotation] : [])">
+              <circle *ngIf="mark.type === 'point'" [attr.cx]="mark.x1" [attr.cy]="mark.y1" r="1.3" fill="#ff3838" stroke="white" stroke-width="0.35" />
+              <ellipse *ngIf="mark.type === 'circle'" [attr.cx]="(mark.x1 + mark.x2!) / 2" [attr.cy]="(mark.y1 + mark.y2!) / 2"
+                       [attr.rx]="(mark.x1 > mark.x2! ? mark.x1 - mark.x2! : mark.x2! - mark.x1) / 2"
+                       [attr.ry]="(mark.y1 > mark.y2! ? mark.y1 - mark.y2! : mark.y2! - mark.y1) / 2"
+                       fill="none" stroke="#ff3838" stroke-width="0.7" />
+              <line *ngIf="mark.type === 'arrow'" [attr.x1]="mark.x1" [attr.y1]="mark.y1"
+                    [attr.x2]="mark.x2" [attr.y2]="mark.y2" stroke="#ff3838" stroke-width="0.7" marker-end="url(#photo-arrowhead)" />
+            </ng-container>
+          </svg>
+          <div *ngIf="editorMode" class="drawing-surface" (pointerdown)="pointerDown($event)"
+               (pointermove)="pointerMove($event)" (pointerup)="pointerUp($event)"
+               (pointercancel)="cancelPointer()" (lostpointercapture)="cancelPointer()"></div>
+        </div>
+        <ion-note *ngIf="selectedUrl && brokenImages[selectedUrl]" color="warning">No se pudo cargar la imagen desde S3. Comprueba permisos de lectura y URL.</ion-note>
+        <div class="viewer-note" *ngIf="selectedPhoto">
+          <strong>Nota:</strong> {{ selectedPhoto.note || 'Sin nota' }}
+        </div>
+        <ion-note *ngIf="editorMode" color="light">Punto: toca la imagen. Círculo y flecha: arrastra el dedo.</ion-note>
+        <div class="editor-actions" *ngIf="editorMode">
+          <ion-button [fill]="activeTool === 'point' ? 'solid' : 'outline'" (click)="selectTool('point')">Punto</ion-button>
+          <ion-button [fill]="activeTool === 'circle' ? 'solid' : 'outline'" (click)="selectTool('circle')">Círculo</ion-button>
+          <ion-button [fill]="activeTool === 'arrow' ? 'solid' : 'outline'" (click)="selectTool('arrow')">Flecha</ion-button>
+          <ion-button color="medium" fill="outline" [disabled]="!annotations.length" (click)="undoAnnotation()">Deshacer</ion-button>
+        </div>
+        <ion-progress-bar *ngIf="savingEdited" [value]="uploadProgress / 100"></ion-progress-bar>
+        <ion-note *ngIf="savingEdited" color="light">Subiendo imagen editada: {{ uploadProgress }}%</ion-note>
+        <ion-note *ngIf="errorMessage" color="danger">{{ errorMessage }}</ion-note>
+        <!--<ion-button expand="block" [disabled]="savingEdited || !annotations.length || images.length >= maxImages" (click)="saveEditedImage()">Guardar edición (reemplazar imagen)</ion-button>-->
+        <ion-button *ngIf="editorMode" expand="block" [disabled]="savingEdited || saving || uploading || !annotations.length" (click)="patchModified()">Guardar edición (reemplazar imagen)</ion-button>
+        <!--<ion-button expand="block" fill="outline" [disabled]="savingEdited" (click)="sendAnnotations()">Solo enviar anotaciones (console.log)</ion-button>-->
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+
+<ion-modal [isOpen]="noteModalOpen" (didDismiss)="closeNote()" cssClass="photo-note-modal">
+  <ng-template>
+    <ion-header><ion-toolbar>
+      <ion-title>Nota de la fotografía</ion-title>
+      <ion-buttons slot="end"><ion-button (click)="closeNote()">Cerrar</ion-button></ion-buttons>
+    </ion-toolbar></ion-header>
+    <ion-content class="ion-padding">
+      <p>{{ notePhoto?.note || 'Esta fotografía no tiene nota.' }}</p>
+      <ion-note color="medium">{{ notePhoto?.date | date:'dd/MM/yyyy HH:mm' }}</ion-note>
+    </ion-content>
+  </ng-template>
+</ion-modal>

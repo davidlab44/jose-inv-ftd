@@ -14,6 +14,7 @@ export class PatchPage {
   @Input() maxImages = 10;
   @Input() bucket = 'mntdev';
   task: any;
+  passedTask: any;
   uploading = false;
   uploadProgress = 0;
   errorMessage = '';
@@ -52,6 +53,7 @@ export class PatchPage {
     }
     console.log('item recibido router',item)
     this.task=item;
+    this.passedTask=item;
   }
 
   get canAdd(): boolean { return !this.uploading && !this.saving && !this.savingEdited && this.photoEntries.filter(e => e.pending && e.status === 'c').length < this.maxImages; }
