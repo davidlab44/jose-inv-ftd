@@ -16,29 +16,8 @@ const routes: Routes = [
             path: '',
             component: SchedulePage,
           },
-/*        {*/
-            /*path: 'session/:sessionId',*/
-            /*loadChildren: () => import('../session-detail/session-detail.module').then(m => m.SessionDetailModule)*/
-          /*}*/
         ]
       },
-/*      {*/
-        /*path: 'speakers',*/
-        /*children: [*/
-          /*{*/
-            /*path: '',*/
-            /*loadChildren: () => import('../speaker-list/speaker-list.module').then(m => m.SpeakerListModule)*/
-          /*},*/
-          /*{*/
-            /*path: 'session/:sessionId',*/
-            /*loadChildren: () => import('../session-detail/session-detail.module').then(m => m.SessionDetailModule)*/
-          /*},*/
-          /*{*/
-            /*path: 'speaker-details/:speakerId',*/
-            /*loadChildren: () => import('../speaker-detail/speaker-detail.module').then(m => m.SpeakerDetailModule)*/
-          /*}*/
-        /*]*/
-      /*},*/
       {
         path: 'map',
         children: [
@@ -48,24 +27,6 @@ const routes: Routes = [
           }
         ]
       },
-      /*      {*/
-        /*path: 'about',*/
-        /*children: [*/
-          /*{*/
-            /*path: '',*/
-            /*loadChildren: () => import('../about/about.module').then(m => m.AboutModule)*/
-          /*}*/
-        /*]*/
-      /*},*/
-/*      {*/
-        /*path: 'order',*/
-        /*children: [*/
-          /*{*/
-            /*path: '',*/
-            /*loadChildren: () => import('../order/order.module').then(m => m.OrderModule)*/
-          /*}*/
-        /*]*/
-      /*},*/
       {
         path: 'scnbrcd',
         children: [
@@ -75,15 +36,6 @@ const routes: Routes = [
           }
         ]
       },
-/*      {*/
-        /*path: 'kitchen',*/
-        /*children: [*/
-          /*{*/
-            /*path: '',*/
-            /*loadChildren: () => import('../kitchen/kitchen.module').then(m => m.KitchenModule)*/
-          /*}*/
-        /*]*/
-      /*},*/
       {
         path: 'readprd',
         children: [
@@ -139,24 +91,6 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'ats-blg-getall',
-        children: [
-          {
-            path: '',
-            loadChildren: () => import('../ats/blg/getall/getall.module').then(m =>m.GetallModule )
-          }
-        ]
-      },
-      {
-        path: 'ats-blg-post',
-        children: [
-          {
-            path: '',
-            loadChildren: () => import('../ats/blg/post/post.module').then(m =>m.AssetSupplyPostModule )
-          }
-        ]
-      },
-      {
         path: 'ats-ats-getall',
         children: [
           {
@@ -171,6 +105,15 @@ const routes: Routes = [
           {
             path: '',
             loadChildren: () => import('../ats/ats/post/post.module').then(m =>m.AssetSupplyPostModule )
+          }
+        ]
+      },
+      {
+        path: 'ats-ats-patch',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../ats/ats/patch/post.module').then(m =>m.AssetSupplyPostModule )
           }
         ]
       },
@@ -247,20 +190,55 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'mnt-t-stend',
+        path: 'mnt-t-ini',
         children: [
           {
             path: '',
-            loadChildren:()=>import('../mnt/t/stend/patch.module').then(m =>m.PatchModule)
+            loadChildren:()=>import('../mnt/t/ini/patch.module').then(m =>m.PatchModule)
           }
         ]
       },
       {
-        path: 'mnt-t-apv',
+        path: 'mnt-t-end',
         children: [
           {
             path: '',
-            loadChildren: () => import('../mnt/t/apv/patch.module').then(m =>m.PatchModule)
+            loadChildren:()=>import('../mnt/t/end/patch.module').then(m =>m.PatchModule)
+          }
+        ]
+      },
+      /*{*/
+        /*path: 'mnt-boss-getall',*/
+        /*children: [*/
+          /*{*/
+            /*path: '',*/
+            /*loadChildren:()=>import('../mnt/boss/getall/getall.module').then(m =>m.GetallModule)*/
+          /*}*/
+        /*]*/
+       /*}, */    {
+        path: 'mnt-boss-post',
+        children: [
+          {
+            path: '',
+            loadChildren:()=>import('../mnt/boss/post/post.module').then(m =>m.AssetSupplyPostModule)
+          }
+        ]
+      },
+      {
+        path: 'mnt-ws-ws',
+        children: [
+          {
+            path: '',
+            loadChildren:()=>import('../mnt/ws/ws/patch.module').then(m =>m.PatchModule)
+          }
+        ]
+      },
+      {
+        path: 'mnt-ws-own',
+        children: [
+          {
+            path: '',
+            loadChildren:()=>import('../mnt/ws/own/patch.module').then(m =>m.PatchModule)
           }
         ]
       },
@@ -273,7 +251,7 @@ const routes: Routes = [
           }
         ]
       },
-     {
+      {
         path: 'mnt-t-jse',
         children: [
           {

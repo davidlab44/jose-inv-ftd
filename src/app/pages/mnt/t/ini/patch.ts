@@ -3,6 +3,7 @@ import { ActionSheetController, AlertController } from '@ionic/angular';
 import { PhotoService } from '../../../../services/asset/photo.service';
 import { TService } from '../../../../services/mnt/t.service';
 import { UtilService } from '../../../../services/util.service';
+import { UserService } from '../../../../services/user.service';
 import { DateService } from '../../../../services/local/date.service';
 import { Router } from '@angular/router';
 interface PhotoEntry { img: string; date: string; status: string; note: string; pending?: boolean; replacesUrl?: string; saving?: boolean; dirty?: boolean; }
@@ -46,6 +47,7 @@ export class PatchPage {
               private tService: TService, 
               private utilService: UtilService, 
               private dateService: DateService, 
+              private userService: UserService, 
              ) {
     const navigation = this.router.getCurrentNavigation();
     console.log("Item recibido en patch:", navigation);
@@ -60,6 +62,44 @@ export class PatchPage {
     this.passedTask=item;
   }
 
+
+  ngOnInit(){}
+
+  ionViewWillEnter(): void {
+    this.getTaskById();
+    // Ionic conserva instancias al navegar entre tabs; ngOnInit no se repite.
+    const raw = sessionStorage.getItem(this.tankResultKey);
+    if (!raw) return;
+    sessionStorage.removeItem(this.tankResultKey);
+    try {
+      const result = JSON.parse(raw);
+      if (this.task?.id != null && result.taskId != null && String(this.task.id) !== String(result.taskId)) {
+        console.warn('[mnt-t-ini] Selección de otra tarea ignorada', result);
+        return;
+      }
+      this.tankCoordinates = result;
+      console.log('[mnt-t-ini] Coordenadas seleccionadas en tank:', result);
+      console.table(result.zones || []);
+    } catch (error) {
+      console.error('[mnt-t-ini] Error al leer coordenadas del tanque', error);
+    }
+  }
+
+
+
+
+
+  /** Selección devuelta por el visor 3D; no se persiste en backend. */
+  tankCoordinates: any = null;
+  private readonly tankResultKey = 'mnt-t-ini:tank-coordinates';
+
+  openTankCoordinates(): void {
+    // La navegación transporta el contexto sin modificar la tarea original.
+    this.router.navigate(['/app/tabs/tank-tank-post'], {
+      state: { tankSelectionMode: true, returnUrl: '/app/tabs/mnt-t-ini', taskId: this.task?.id }
+    });
+  }
+
   get canAdd(): boolean { return !this.uploading && !this.saving && !this.savingEdited && this.photoEntries.filter(e => e.pending && e.status === 'c').length < this.maxImages; }
   get pendingCount(): number { return this.photoEntries.filter(e => e.pending).length; }
   get orderedPhotos(): PhotoEntry[] { return this.photoEntries.filter(e => e.status === 'c').sort((a, b) => (Date.parse(b.date) || 0) - (Date.parse(a.date) || 0)); }
@@ -67,13 +107,31 @@ export class PatchPage {
   private refreshImages(): void { this.setImages(this.photoEntries.filter(e => e.status === 'c').map(e => e.img)); }
 
 
-  ngOnInit(){
-    this.loadTaskById();
-  }
+
+
 
   imagenes:any[]=[];
-  loadTaskById(){
-    console.log('entro a loadTaskById')
+  asignedUser: any = null;
+  /*  get assignedUserName(): string | null {*/
+    /*const name = this.asignedUser?.data?.name;*/
+    /*return typeof name === 'string' && name.trim() ? name.trim() : null;*/
+  /*}*/
+
+  private loadAssignedUser(task:any): void {
+    this.asignedUser = null;
+    console.log('task en loadAssignedUser method es: ',task)
+    if (this.task?.data?.asgn[0]<= 0) return;
+    this.userService.getById(task.data.asgn[0]).subscribe({
+      next: (res: any) => { 
+        this.asignedUser = res[0]; /*Array.isArray(res) ? (res[0] ?? null) : (res ?? null);*/
+        console.log('getuserById response',this.asignedUser)
+      },
+      error: (err) => { this.asignedUser = null; console.error('Error loadAssignedUser', err); }
+    });
+  }
+
+  getTaskById(){
+    console.log('entro a getTaskById')
     this.tService.getOne(this.task.id).subscribe({ 
       next: (res) => {      
         this.task=res[0];
@@ -97,13 +155,15 @@ export class PatchPage {
             }
           });
         }
+        this.loadAssignedUser(this.task)
         this.photoEntries = entries;
         this.refreshImages();
         console.log('imgs IMGS', this.imagenes)
       }, 
       error: (err) => {      
         console.error(new Error('stack_name:').stack, err);
-      } 
+      },
+
     }); 
   }
 
@@ -121,75 +181,99 @@ export class PatchPage {
     await sheet.present();
   }
 
-
-async upload(source: 'camera' | 'gallery'): Promise<void> {
-  if (!this.canAdd) return;
-  this.uploading = true;
-  this.uploadProgress = 0;
-  this.errorMessage = '';
-  try {
-    const base64 = source === 'camera'
-      ? await this.photoService.takePicture()
-      : await this.photoService.pickImage();
-    if (!base64) return;
-    this.showObservations = true;
-    console.log('[Fotografía] Imagen seleccionada.');
-    console.log('[Fotografía] Bucket:', this.bucket);
-    console.log('[Fotografía] Endpoint: s3mnt');
-    const { progress$, url$ } =
-      this.photoService.uploadBase64Image(base64, this.bucket, 's3mnt');
-    console.log('[Fotografía] Servicio uploadBase64Image iniciado.');
-    const progressSub = progress$.subscribe({
-      next: (p: number) => {
-        this.uploadProgress = p;
-        console.log(`[Fotografía] Progreso: ${p}%`);
-      },
-      error: err => {
-        console.error('[Fotografía] Error de progreso:', err);
-      },
-      complete: () => {
-        console.log('[Fotografía] Observable progress$ completado.');
-      }
+  /** La imagen JPEG comprimida al 25 % será la única fuente original en MinIO. */
+  private async compressOriginalImage(base64: string): Promise<string> {
+    const source = this.asImageSrc(base64);
+    return new Promise<string>((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = image.naturalWidth;
+          canvas.height = image.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) throw new Error('No se pudo crear el contexto del canvas');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(image, 0, 0);
+          resolve(canvas.toDataURL('image/jpeg', 0.25));
+        } catch (error) { reject(error); }
+      };
+      image.onerror = () => reject(new Error('No se pudo decodificar la imagen seleccionada'));
+      image.src = source;
     });
-    try {
-             const url = await new Promise<string>((resolve, reject) => {
-         let received = false;
-         url$.subscribe({
-           next: value => {
-             // El servicio puede emitir inicialmente una cadena vacía.
-             if (!received && typeof value === 'string' && value.trim().length > 2) {
-               received = true;
-               resolve(value);
-             }
-           },
-           error: reject,
-           complete: () => { if (!received) reject(new Error('La subida terminó sin URL')); }
-         });
-       });
-      // URL definitiva generada por el servicio
-      //console.log('======================================');
-      //console.log('[Fotografía] URL FINAL MINIO:', url);
-      //console.log('======================================');
-      // La URL remota se conserva en images.
-      // La imagen local se utiliza únicamente para visualizar.
-      this.previewsByUrl[url] = this.asImageSrc(base64);
-      this.photoEntries.push({ img: url, date: this.now(), status: 'c', note: '', pending: true });
-      this.refreshImages();
-      console.log('[Fotografía] URLs almacenadas:', this.images);
-      //console.log('[Fotografía] Subida completada correctamente.');
-    } finally {
-      progressSub.unsubscribe();
-    }
-  } catch (err) {
-    console.error('[Fotografía] Error subiendo:', err);
-    this.errorMessage =
-      'No fue posible subir la fotografía. Inténtalo nuevamente.';
-  } finally {
-    this.uploading = false;
-    console.log('[Fotografía] Proceso upload() finalizado.');
   }
-}
 
+  async upload(source: 'camera' | 'gallery'): Promise<void> {
+    if (!this.canAdd) return;
+    this.uploading = true;
+    this.uploadProgress = 0;
+    this.errorMessage = '';
+    try {
+      const base64 = source === 'camera'
+        ? await this.photoService.takePicture()
+        : await this.photoService.pickImage();
+      if (!base64) return;
+      // Comprimir ANTES de subir: la versión JPEG 25 % es nuestra fuente de verdad.
+      const compressedBase64 = await this.compressOriginalImage(base64);
+      console.log('[Fotografía] JPEG original comprimido a calidad 0.25');
+      this.showObservations = true;
+      console.log('[Fotografía] Imagen seleccionada.');
+      console.log('[Fotografía] Bucket:', this.bucket);
+      console.log('[Fotografía] Endpoint: s3mnt');
+      const { progress$, url$ } =
+        this.photoService.uploadBase64Image(compressedBase64, this.bucket, 's3mnt');
+      console.log('[Fotografía] Servicio uploadBase64Image iniciado.');
+      const progressSub = progress$.subscribe({
+        next: (p: number) => {
+          this.uploadProgress = p;
+          console.log(`[Fotografía] Progreso: ${p}%`);
+        },
+        error: err => {
+          console.error('[Fotografía] Error de progreso:', err);
+        },
+        complete: () => {
+          console.log('[Fotografía] Observable progress$ completado.');
+        }
+      });
+      try {
+               const url = await new Promise<string>((resolve, reject) => {
+           let received = false;
+           url$.subscribe({
+             next: value => {
+               // El servicio puede emitir inicialmente una cadena vacía.
+               if (!received && typeof value === 'string' && value.trim().length > 2) {
+                 received = true;
+                 resolve(value);
+               }
+             },
+             error: reject,
+             complete: () => { if (!received) reject(new Error('La subida terminó sin URL')); }
+           });
+         });
+        // URL definitiva generada por el servicio
+        //console.log('======================================');
+        //console.log('[Fotografía] URL FINAL MINIO:', url);
+        //console.log('======================================');
+        // La URL remota se conserva en images.
+        // La imagen local se utiliza únicamente para visualizar.
+        this.previewsByUrl[url] = compressedBase64;
+        this.photoEntries.push({ img: url, date: this.now(), status: 'c', note: '', pending: true });
+        this.refreshImages();
+        console.log('[Fotografía] URLs almacenadas:', this.images);
+        //console.log('[Fotografía] Subida completada correctamente.');
+      } finally {
+        progressSub.unsubscribe();
+      }
+    } catch (err) {
+      console.error('[Fotografía] Error subiendo:', err);
+      this.errorMessage =
+        'No fue posible subir la fotografía. Inténtalo nuevamente.';
+    } finally {
+      this.uploading = false;
+      console.log('[Fotografía] Proceso upload() finalizado.');
+    }
+  }
 
    /*removeImage(index: number): void {*/
     /*if (this.uploading) return;*/
@@ -282,7 +366,7 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
       photo.date = item.date;
       delete photo.replacesUrl;
       // Releer para que todas las notas y estados coincidan con el servidor.
-      this.loadTaskById();
+      this.getTaskById();
     });
   }
 
@@ -324,7 +408,7 @@ async upload(source: 'camera' | 'gallery'): Promise<void> {
     } else if (index < 0) {
       ini.push({ img: photo.img, date: photo.date, status: 'deleted', note: photo.note });
     }
-    this.persistIni(ini, () => this.loadTaskById());
+    this.persistIni(ini, () => this.getTaskById());
   }
 
   showNote(photo: PhotoEntry): void {
@@ -591,8 +675,6 @@ console.log('[Editor] ÉXITO: imagen modificada almacenada en MinIO:', { bucket:
     /*this.utilService.presentToast('no se encontro task activa','danger',1000)*/
   /*}*/
 
-
-
   goToTaskEnd() {
     //p.oid = this.dateService.getDate();
     const pageRoute = `/app/tabs/mnt-t-end`;
@@ -604,8 +686,15 @@ console.log('[Editor] ÉXITO: imagen modificada almacenada en MinIO:', { bucket:
     });
   }
 
-
-
+  selectUser() {
+    const pageRoute = `/app/tabs/mnt-boss-post`;
+    this.router.navigate([pageRoute], {
+      state: {
+        task: this.task,
+        custom: 'prueba'
+      }
+    });
+  }
 
 
 }

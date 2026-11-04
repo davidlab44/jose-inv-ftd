@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Usuarios</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="loadUsers()" [disabled]="loading">
+        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="status" *ngIf="loading"><ion-spinner name="crescent"></ion-spinner><p>Cargando usuarios...</p></div>
+  <div class="status" *ngIf="!loading && errorMessage">
+    <p>{{ errorMessage }}</p><ion-button (click)="loadUsers()">Reintentar</ion-button>
+  </div>
+  <div class="status" *ngIf="!loading && !errorMessage && users.length === 0">No hay usuarios registrados.</div>
+
+  <ion-grid *ngIf="!loading && !errorMessage">
+    <ion-row>
+      <ion-col size="6" size-sm="4" size-md="3" size-lg="2" *ngFor="let usuario of users; trackBy: trackById">
+        <ion-card class="user-card" button="true" (click)="openUser(usuario)">
+          <div class="photo-container">
+            <img [src]="usuario.data?.img || defaultImage" [alt]="usuario.data?.name || 'Usuario'" (error)="imageError($event)" loading="lazy" />
+          </div>
+          <ion-card-content>
+            <div class="user-name">{{ usuario.data?.name || 'Sin nombre' }}</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

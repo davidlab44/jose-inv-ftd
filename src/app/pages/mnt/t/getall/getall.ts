@@ -140,10 +140,6 @@ export class GetallPage implements OnInit {
     }); 
   }     
 
-
-
-
-
   builTaskFullList(){
     this.fltrdTList.map((task)=>{
       this.mntList.forEach((mnt)=>{
@@ -153,23 +149,19 @@ export class GetallPage implements OnInit {
       })
       this.atsList.forEach((ats)=>{
         if(task.data.id_ats===ats.i){
-
            this.stgList.forEach((stg)=>{ 
-              if(ats.data.id_stg===stg.i){
-                ats.data.stg=stg;     
-              }
-            })
-            task.data.ats=ats;   
-            task.data.prueba="prueba";   
+             if(ats.data.id_stg===stg.i){
+               ats.data.stg=stg;     
+             }
+           })
+           task.data.ats=ats;   
+           task.data.prueba="prueba";   
         }
       }) 
     });
     console.log('load/build full fltrdTList',this.fltrdTList)
     this.fltrdTList=this.fltrdTList.sort((a, b) => a?.data?.ats?.data?.stg?.data?.order-b?.data?.ats?.data?.stg?.data?.order);
-
-
   }
-
 
   //Buscador Cco
   selectedItem(p:any){
@@ -211,7 +203,6 @@ export class GetallPage implements OnInit {
     //this.router.navigate(['/app/tabs/mnt-stg-getall'],   { replaceUrl: true }); 
   }
 
-
   goToPatch(p: any) {
     p.oid = this.dateService.getDate();
     const pageRoute = `/app/tabs/mnt-t-ini`;
@@ -222,8 +213,6 @@ export class GetallPage implements OnInit {
       }
     });
   }
-
-
 
   /*goToPatch(p:any){*/
     /*const pageRoute = `/app/tabs/mnt-t-stend`;*/
@@ -236,8 +225,6 @@ export class GetallPage implements OnInit {
     /*}); */
     /*//this.router.navigate(['/app/tabs/mnt-stg-getall'],   { replaceUrl: true }); */
   /*}*/
-
-
 
 
 }

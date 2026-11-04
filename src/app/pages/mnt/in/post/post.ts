@@ -133,9 +133,6 @@ export class AssetSupplyPostPage {
     this.filteredProductList=[] 
   }
 
- 
-
-
   getDate(){
     const now = new Date();
     const dateNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -180,7 +177,6 @@ export class AssetSupplyPostPage {
     });
   }
 
-
   loadStgs(){
     this.stgService.getAll().subscribe({
       next: (data) => {
@@ -204,9 +200,6 @@ export class AssetSupplyPostPage {
       }
     });
   }
-
-
-
 
   async post() {
     if(this.isotanq1.id_cco>0&&this.isotanq2.id_cco==0){
@@ -245,7 +238,6 @@ export class AssetSupplyPostPage {
         console.log('io res',res)
         //if(this.atsList?.length==0){this.utilService.presentToast('No atsList','danger',500); return;}
         this.triggerMnt(res[0].data.id_cco);
-
       },
       error:(err)=>{
         console.error('error',err)
@@ -294,6 +286,7 @@ export class AssetSupplyPostPage {
       ini: [],
       end: [],
       apv: [],
+      asgn:[18],
     })); 
     console.log('Lo que se enviara en el atsDataList',this.atsDataList)
     this.TService.postDataListStrgth(this.atsDataList).subscribe({

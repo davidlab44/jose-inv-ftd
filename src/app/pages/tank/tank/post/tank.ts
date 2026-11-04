@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import * as THREE from 'three';
+import { Router } from '@angular/router';
 
 interface TankZone {
   id: string;
@@ -15,6 +16,37 @@ interface TankZone {
   styleUrls: ['./tank.scss']
 })
 export class TankPage implements AfterViewInit, OnDestroy {
+  private readonly tankResultKey = 'mnt-t-ini:tank-coordinates';
+  selectionMode = false;
+  private returnUrl = '/app/tabs/mnt-t-ini';
+  private sourceTaskId: number | string | null = null;
+
+  constructor(private router: Router) {
+    const state = this.router.getCurrentNavigation()?.extras?.state ?? history.state ?? {};
+    this.selectionMode = state.tankSelectionMode === true;
+    if (this.selectionMode) {
+      this.sourceTaskId = state.taskId ?? null;
+    }
+  }
+
+  confirmCoordinates(): void {
+    if (!this.selectedZones.length) return;
+    const result = {
+      taskId: this.sourceTaskId,
+      selectedAt: new Date().toISOString(),
+      sides: this.selectedSides,
+      area_m2: Number(this.totalArea.toFixed(3)),
+      zones: this.selectedZones.map(z => ({ id: z.id, side: z.side, area_m2: Number(z.area.toFixed(3)) }))
+    };
+    sessionStorage.setItem(this.tankResultKey, JSON.stringify(result));
+    console.log('[tank] Coordenadas enviadas a mnt-t-ini:', result);
+    this.router.navigateByUrl(this.returnUrl);
+  }
+
+  cancelCoordinates(): void {
+    this.router.navigateByUrl(this.returnUrl);
+  }
+
   @ViewChild('rendererContainer', { static: false }) rendererContainer!: ElementRef<HTMLDivElement>;
 
   private scene!: THREE.Scene;
@@ -25,6 +57,7 @@ export class TankPage implements AfterViewInit, OnDestroy {
   private tankGroup = new THREE.Group();
   private zonesGroup = new THREE.Group();
   private animationId = 0;
+  private resizeObserver?: ResizeObserver;
   private dragging = false;
   private previousX = 0;
   private previousY = 0;
@@ -47,12 +80,21 @@ export class TankPage implements AfterViewInit, OnDestroy {
     this.createHeadZones();
     this.createLabels();
     this.animate();
+    const el = this.rendererContainer.nativeElement;
+    this.resizeObserver = new ResizeObserver(() => this.onResize());
+    this.resizeObserver.observe(el);
     window.addEventListener('resize', this.onResize);
+    requestAnimationFrame(() => this.onResize());
+  }
+
+  ionViewDidEnter() {
+    requestAnimationFrame(() => this.onResize());
   }
 
   ngOnDestroy() {
     cancelAnimationFrame(this.animationId);
     window.removeEventListener('resize', this.onResize);
+    this.resizeObserver?.disconnect();
     this.renderer?.dispose();
   }
 
@@ -60,12 +102,14 @@ export class TankPage implements AfterViewInit, OnDestroy {
     const el = this.rendererContainer.nativeElement;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xf4f5f8);
-    this.camera = new THREE.PerspectiveCamera(45, el.clientWidth / el.clientHeight, 0.1, 100);
+    const width = Math.max(1, el.clientWidth);
+    const height = Math.max(1, el.clientHeight);
+    this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
     this.camera.position.set(7.8, 4.2, 8.2);
     this.camera.lookAt(0, 0, 0);
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setSize(el.clientWidth, el.clientHeight);
+    this.renderer.setSize(width, height);
     el.appendChild(this.renderer.domElement);
 
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0x777777, 1.8));
@@ -359,10 +403,13 @@ export class TankPage implements AfterViewInit, OnDestroy {
   };
 
   private onResize = () => {
-    if (!this.rendererContainer || !this.renderer) return;
+    if (!this.rendererContainer || !this.renderer || !this.camera) return;
     const el = this.rendererContainer.nativeElement;
-    this.camera.aspect = el.clientWidth / el.clientHeight;
+    const width = el.clientWidth;
+    const height = el.clientHeight;
+    if (width <= 0 || height <= 0) return;
+    this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(el.clientWidth, el.clientHeight);
+    this.renderer.setSize(width, height);
   };
 }

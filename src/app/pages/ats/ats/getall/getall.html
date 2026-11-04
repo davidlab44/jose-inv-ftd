@@ -22,8 +22,9 @@
 </ion-header>
 
 <ion-content>
-  <ion-list>
 
+  <h2>ATS</h2>
+  <ion-list>
     <ion-grid
       *ngFor="let p of taskList"
       class="subtask">
@@ -40,7 +41,7 @@
         *ngFor="let item of p?.data?.bom"
         class="bom-row">
 
-        <ion-col size="2"></ion-col>
+        <ion-col size="2">bomPrueb2</ion-col>
 
         <ion-col size="7" class="bom-name">
           {{ item?.data?.name }}

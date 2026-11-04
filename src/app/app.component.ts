@@ -188,8 +188,8 @@ export class AppComponent implements OnInit {
    },
    {
      title: 'Asignar tarea',
-     url: '/app/tabs/ats-blg-post',
-     icon: 'add'
+     url: '/app/tabs/mnt-boss-getall',
+     icon: 'document-text'
    },
    {
      title: 'Listado tareas',
@@ -202,6 +202,11 @@ export class AppComponent implements OnInit {
      icon: 'add'
    },
    {
+     title: 'Modificar tarea',
+     url: '/app/tabs/ats-ats-patch',
+     icon: 'pencil'
+   },
+   {
      title: 'Listado sub tareas',
      url: '/app/tabs/ats-src-getall',
      icon: 'Document-text'
@@ -210,6 +215,11 @@ export class AppComponent implements OnInit {
      title: 'Crear sub tarea',
      url: '/app/tabs/ats-src-post',
      icon: 'add'
+   },
+   {
+     title: 'Taller',
+     url: '/app/tabs/mnt-ws-ws',
+     icon: 'build'
    },
    {
      title: 'Isotanque',

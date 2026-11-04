@@ -40,14 +40,14 @@
         [class.approved]="p?.data?.mnt?.data?.dateapv != null"
         [class.pending]="p?.data?.mnt?.data?.dateapv == null">
         <ion-col size="1" class="subtask-title">
-          {{ p?.id }}
+          {{ p?.i }}
         </ion-col>
-        <ion-col size="4" class="subtask-title">
-          {{ p?.created_at }}
-        </ion-col>
-        <ion-col size="2" class="subtask-title" *ngIf="p.data.in" >
-          {{ p?.data?.in }}
-        </ion-col>
+<!--        <ion-col size="4" class="subtask-title">-->
+          <!--{{ p?.created_at }}-->
+        <!--</ion-col>-->
+<!--        <ion-col size="2" class="subtask-title" *ngIf="p.data.in" >-->
+          <!--{{ p?.data?.in }}-->
+        <!--</ion-col>-->
         <ion-col *ngIf="p?.data?.mnt?.data?.id_cco"
           size="1"
           class="subtask-title"
@@ -55,10 +55,10 @@
           {{ p?.data?.mnt?.data?.id_cco }}
         </ion-col>
         <ion-col *ngIf="p?.data?.id_ats"
-          size="1"
+          size="4"
           class="subtask-title"
           (click)="goToPatch(p)">
-          {{ p?.data?.id_ats }}
+          {{ p?.data?.ats?.data?.name }}
         </ion-col>
         <ion-col *ngIf="p?.state" 
           size="2"

@@ -1,15 +1,57 @@
-<ion-header translucent="true">
+<ion-header translucent="true" class="task-header">
   <ion-toolbar>
-    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
-    <ion-title><span style="font-size:small;" >{{passedTask?.data?.ats?.data?.stg?.data?.name}} => {{passedTask?.data?.ats?.data?.name}}</span></ion-title>
+    <ion-buttons slot="start"><ion-menu-button aria-label="Abrir menú"></ion-menu-button></ion-buttons>
+    <ion-title>Registro fotográfico</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="selectUser()" aria-label="Asignar usuario" title="Asignar usuario">
+        <ion-icon slot="icon-only" name="person-add-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="task-content">
+  <div class="page-shell">
+    <section class="task-summary" aria-label="Información de la tarea">
+      <div class="section-eyebrow"><ion-icon name="clipboard-outline"></ion-icon> Tarea de mantenimiento</div>
+      <h1>{{ passedTask?.data?.ats?.data?.name || 'Registro de tarea' }}</h1>
+      <p class="task-stage" *ngIf="passedTask?.data?.ats?.data?.stg?.data?.name">
+        <ion-icon name="git-branch-outline"></ion-icon>
+        {{ passedTask?.data?.ats?.data?.stg?.data?.name }}
+      </p>
+      <div class="assignment">
+        <ion-icon name="person-circle-outline"></ion-icon>
+        <span><small>Asignado a</small><strong>{{ asignedUser?.data?.name }}</strong></span>
+      </div>
 
-  <div class="image-picker ion-padding">
-    <ion-grid>
+      <!--      <div class="assignment" *ngIf="assignedUserName as name">-->
+        <!--<ion-icon name="person-circle-outline"></ion-icon>-->
+        <!--<span><small>Asignado a</small><strong>{{ name }}</strong></span>-->
+      <!--</div>-->
+    </section>
 
+    <section class="tank-coordinate-section" aria-label="Ubicación en isotanque">
+      <div class="tank-coordinate-copy">
+        <ion-icon name="cube-outline" aria-hidden="true"></ion-icon>
+        <div><h2>Ubicación en isotanque</h2><p>Selecciona las zonas directamente sobre el modelo 3D.</p></div>
+      </div>
+      <ion-button expand="block" (click)="openTankCoordinates()">
+        <ion-icon slot="start" name="locate-outline"></ion-icon>
+        {{ tankCoordinates?.zones?.length ? 'Modificar coordenadas' : 'Seleccionar coordenadas' }}
+      </ion-button>
+      <p class="tank-coordinate-result" *ngIf="tankCoordinates?.zones?.length">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        {{ tankCoordinates.zones.length }} zonas seleccionadas · Lados: {{ tankCoordinates.sides.join(', ') }}
+      </p>
+    </section>
+
+    <section class="gallery-section" aria-label="Fotografías de la tarea">
+      <div class="section-heading">
+        <div><h2>Fotografías</h2><p>Documenta los avances y agrega observaciones.</p></div>
+        <span class="photo-counter">{{ orderedPhotos.length }} fotos</span>
+      </div>
+      <div class="image-picker">
+        <ion-grid class="gallery-grid">
       <ion-row>
         <ion-col size="6" size-sm="4" size-md="3" *ngIf="canAdd">
           <button type="button" class="add-tile" [disabled]="!canAdd" (click)="addImage()">
@@ -60,23 +102,21 @@
       <!--</ion-row>-->
     </ion-grid>
 
-    <ion-progress-bar *ngIf="uploading" [value]="uploadProgress / 100"></ion-progress-bar>
-    <ion-note *ngIf="uploading">Subiendo fotografía: {{ uploadProgress }}%</ion-note>
-    <ion-note color="danger" *ngIf="errorMessage">{{ errorMessage }}</ion-note>
-    <ion-note color="medium">{{ orderedPhotos.length }} fotografías visibles · {{ pendingCount }} pendientes</ion-note>
-  </div>
+    <div class="gallery-status" aria-live="polite">
+      <ion-progress-bar *ngIf="uploading" [value]="uploadProgress / 100"></ion-progress-bar>
+      <ion-note *ngIf="uploading">Subiendo fotografía: {{ uploadProgress }}%</ion-note>
+      <ion-note color="danger" *ngIf="errorMessage">{{ errorMessage }}</ion-note>
+      <ion-note color="medium">{{ orderedPhotos.length }} fotografías visibles · {{ pendingCount }} pendientes</ion-note>
+    </div>
+      </div>
+    </section>
 
-  <br>
-  <div class="image-picker ion-padding">
-    <ion-grid>
-      <ion-row>
-        <ion-col size="6" size-sm="4" size-md="3" *ngIf="canAdd">
-          <button  type="button" class="add-tile" style="color:#3e7b24;background:#b9fa9c;"  [disabled]="!canAdd" (click)="goToTaskEnd()">
-            <ion-icon name="checkmark-outline"></ion-icon><span>Aprobar</span>
-          </button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+    <section class="approval-section" *ngIf="canAdd">
+      <div><h2>Finalizar registro</h2><p>Continúa con la revisión y aprobación de la tarea.</p></div>
+      <ion-button color="success" (click)="goToTaskEnd()">
+        <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>Aprobar
+      </ion-button>
+    </section>
   </div>
 </ion-content>
 

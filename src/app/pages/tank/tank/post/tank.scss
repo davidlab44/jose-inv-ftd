@@ -9,3 +9,7 @@
 .side-key b{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:#30343b;color:#fff;margin-right:4px}
 .selected-list{font-size:12px;line-height:1.6;margin:14px 0;padding:10px;background:#f1f1f1;border-radius:6px;word-break:break-word}
 @media(max-width:850px){.tank-page{display:block}.viewer,.renderer{min-height:55vh;height:55vh}.panel{margin:8px}.dimensions{max-width:70%}}
+
+/* Controles de retorno en el flujo INI → Tank → INI */
+ion-toolbar ion-button { --padding-start: 8px; --padding-end: 8px; }
+.panel ion-button { margin-top: 12px; }

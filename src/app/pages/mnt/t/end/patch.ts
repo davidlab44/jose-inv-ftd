@@ -559,7 +559,6 @@ console.log('[Editor] ÉXITO: imagen modificada almacenada en MinIO:', { bucket:
 
   onSearch(_value: any): void {}
 
-
 /*// Compatibilidad: no existe guardado global. Cada foto tiene su propio botón.*/
 /*patch(): void {*/
   /*this.errorMessage = 'Utiliza el botón Guardar de la fotografía correspondiente.';*/

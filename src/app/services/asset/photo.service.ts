@@ -35,22 +35,6 @@ export class PhotoService {
     };
   }
 
-  /*constructor() {*/
-    /*const config = {*/
-      /*region: 'us-east-1',*/
-      /*credentials: {*/
-        /*accessKeyId: 'miusuarioseguro',*/
-        /*secretAccessKey: 'mipasswordsuperseguro',*/
-      /*},*/
-      /*forcePathStyle: true,*/
-    /*};*/
-
-    /*this.s3Clients = {*/
-      /*s3aws: new S3Client({ ...config, endpoint: environment.s3aws }),*/
-      /*s3mnt: new S3Client({ ...config, endpoint: environment.s3mnt }),*/
-    /*};*/
-  /*}*/
-
   private getS3Client(endpoint: 's3aws' | 's3mnt'): S3Client {
     return this.s3Clients[endpoint];
   }
@@ -74,6 +58,7 @@ export class PhotoService {
     return { bytes, mimeType };
   }
 
+  //DOCUMENTACION:
   /*Subir al servidor anterior:*/
   /*this.photoService.uploadBase64Image(*/
     /*base64,*/
