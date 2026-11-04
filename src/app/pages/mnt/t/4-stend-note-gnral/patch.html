@@ -1,0 +1,90 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-title>Fotografías</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="image-picker ion-padding">
+    <ion-grid><ion-row>
+      <ion-col size="4" size-sm="3" size-md="2" *ngFor="let image of images; let i = index">
+        <div class="photo-tile">
+          <img [src]="imageSrc(image)" (error)="imageFailed(image)" [alt]="'Fotografía ' + (i + 1)" (click)="openViewer(image)" />
+          <ion-button class="remove" color="danger" size="small" [disabled]="uploading"
+                      (click)="removeImage(i)" aria-label="Quitar fotografía de la lista">
+            <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-col>
+      <ion-col size="4" size-sm="3" size-md="2" *ngIf="images.length < maxImages">
+        <button type="button" class="add-tile" [disabled]="uploading" (click)="addImage()">
+          <ion-icon name="add-outline"></ion-icon><span>Agregar foto</span>
+        </button>
+      </ion-col>
+    </ion-row></ion-grid>
+
+    <ion-progress-bar *ngIf="uploading" [value]="uploadProgress / 100"></ion-progress-bar>
+    <ion-note *ngIf="uploading">Subiendo fotografía: {{ uploadProgress }}%</ion-note>
+    <ion-note color="danger" *ngIf="errorMessage">{{ errorMessage }}</ion-note>
+    <ion-note color="medium">{{ images.length }} / {{ maxImages }} fotografías</ion-note>
+
+    <ion-card *ngIf="showObservations">
+      <ion-card-header><ion-card-title>Observaciones</ion-card-title></ion-card-header>
+      <ion-card-content>
+        <ion-textarea label="Observaciones" labelPlacement="stacked" fill="outline"
+                      [autoGrow]="true" [rows]="3" placeholder="Escribe tus observaciones..."
+                      [(ngModel)]="observations"></ion-textarea>
+        <ion-button expand="block" (click)="patch()">
+          <ion-icon name="send-outline" slot="start"></ion-icon>Enviar
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
+
+<ion-modal [isOpen]="viewerOpen" (didDismiss)="closeViewer()" cssClass="photo-editor-modal">
+  <ng-template>
+    <ion-header><ion-toolbar>
+      <ion-title>Marcar fotografía</ion-title>
+      <ion-buttons slot="end"><ion-button (click)="closeViewer()">Cerrar</ion-button></ion-buttons>
+    </ion-toolbar></ion-header>
+    <ion-content class="viewer-content">
+      <div class="viewer-layout">
+        <div class="viewer-stage" *ngIf="modalPreviewSrc">
+          <img [src]="modalPreviewSrc" (error)="imageFailed(selectedUrl!)" alt="Fotografía ampliada" draggable="false" />
+          <svg class="annotation-layer" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs><marker id="photo-arrowhead" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L5,2.5 L0,5 Z" fill="#ff3838" /></marker></defs>
+            <ng-container *ngFor="let mark of annotations.concat(draftAnnotation ? [draftAnnotation] : [])">
+              <circle *ngIf="mark.type === 'point'" [attr.cx]="mark.x1" [attr.cy]="mark.y1" r="1.3" fill="#ff3838" stroke="white" stroke-width="0.35" />
+              <ellipse *ngIf="mark.type === 'circle'" [attr.cx]="(mark.x1 + mark.x2!) / 2" [attr.cy]="(mark.y1 + mark.y2!) / 2"
+                       [attr.rx]="(mark.x1 > mark.x2! ? mark.x1 - mark.x2! : mark.x2! - mark.x1) / 2"
+                       [attr.ry]="(mark.y1 > mark.y2! ? mark.y1 - mark.y2! : mark.y2! - mark.y1) / 2"
+                       fill="none" stroke="#ff3838" stroke-width="0.7" />
+              <line *ngIf="mark.type === 'arrow'" [attr.x1]="mark.x1" [attr.y1]="mark.y1"
+                    [attr.x2]="mark.x2" [attr.y2]="mark.y2" stroke="#ff3838" stroke-width="0.7" marker-end="url(#photo-arrowhead)" />
+            </ng-container>
+          </svg>
+          <div class="drawing-surface" (pointerdown)="pointerDown($event)"
+               (pointermove)="pointerMove($event)" (pointerup)="pointerUp($event)"
+               (pointercancel)="cancelPointer()" (lostpointercapture)="cancelPointer()"></div>
+        </div>
+        <ion-note *ngIf="selectedUrl && brokenImages[selectedUrl]" color="warning">No se pudo cargar la imagen desde S3. Comprueba permisos de lectura y URL.</ion-note>
+        <ion-note color="light">Punto: toca la imagen. Círculo y flecha: arrastra el dedo.</ion-note>
+        <div class="editor-actions">
+          <ion-button [fill]="activeTool === 'point' ? 'solid' : 'outline'" (click)="selectTool('point')">Punto</ion-button>
+          <ion-button [fill]="activeTool === 'circle' ? 'solid' : 'outline'" (click)="selectTool('circle')">Círculo</ion-button>
+          <ion-button [fill]="activeTool === 'arrow' ? 'solid' : 'outline'" (click)="selectTool('arrow')">Flecha</ion-button>
+          <ion-button color="medium" fill="outline" [disabled]="!annotations.length" (click)="undoAnnotation()">Deshacer</ion-button>
+        </div>
+        <ion-progress-bar *ngIf="savingEdited" [value]="uploadProgress / 100"></ion-progress-bar>
+        <ion-note *ngIf="savingEdited" color="light">Subiendo imagen editada: {{ uploadProgress }}%</ion-note>
+        <ion-note *ngIf="errorMessage" color="danger">{{ errorMessage }}</ion-note>
+        <!--<ion-button expand="block" [disabled]="savingEdited || !annotations.length || images.length >= maxImages" (click)="saveEditedImage()">Guardar edición como nueva imagen en S3</ion-button>-->
+        <ion-button expand="block" (click)="patchModified()">Guardar edición como nueva imagen en S3</ion-button>
+        <!--<ion-button expand="block" fill="outline" [disabled]="savingEdited" (click)="sendAnnotations()">Solo enviar anotaciones (console.log)</ion-button>-->
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

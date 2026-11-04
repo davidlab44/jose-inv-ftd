@@ -1,0 +1,54 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-searchbar
+      placeholder="Buscar"
+      (ionInput)="onSearch($event.target.value)">
+    </ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button>
+        <span>
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  
+  <ion-list>
+      <ion-button expand="block" (click)="takePhotoAndUpload()">
+        📸 Tomar foto
+      </ion-button>
+      <ion-button expand="block" color="secondary" (click)="pickImageAndUpload()">
+        🖼 Elegir de galería
+      </ion-button>
+      <ion-progress-bar
+        *ngIf="uploading"
+        [value]="uploadProgress / 100">
+      </ion-progress-bar>
+      <p *ngIf="uploading">
+        Subiendo: {{ uploadProgress }} %
+      </p>
+      <ion-card *ngIf="uploadedUrl">
+        <ion-card-header>
+          <ion-card-title>Imagen subida</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <img [src]="uploadedUrl" />
+          <p>{{ uploadedUrl }}</p>
+        </ion-card-content>
+      </ion-card>
+  </ion-list>
+
+  <div>
+  <pre>{{task | json}}</pre>
+  </div>
+
+</ion-content>
+
+
+

@@ -1,0 +1,11 @@
+.tank-page{display:grid;grid-template-columns:minmax(0,1fr) 370px;height:100%;background:#f4f5f8}
+.viewer{position:relative;min-height:620px;overflow:hidden}
+.renderer{width:100%;height:100%;min-height:620px;cursor:crosshair;touch-action:none}
+.viewer-help,.dimensions{position:absolute;left:16px;background:rgba(0,0,0,.68);color:#fff;padding:8px 12px;border-radius:8px;font-size:12px;pointer-events:none}
+.viewer-help{bottom:16px}.dimensions{top:16px}
+.area-badge{position:absolute;right:16px;top:16px;background:#fff;padding:10px 16px;border-radius:20px;font-size:18px;font-weight:700;box-shadow:0 2px 12px rgba(0,0,0,.15);pointer-events:none}
+.panel{margin:12px;height:max-content}
+.side-key{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;padding:10px;background:#eef1f4;border-radius:8px;font-size:12px}
+.side-key b{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:#30343b;color:#fff;margin-right:4px}
+.selected-list{font-size:12px;line-height:1.6;margin:14px 0;padding:10px;background:#f1f1f1;border-radius:6px;word-break:break-word}
+@media(max-width:850px){.tank-page{display:block}.viewer,.renderer{min-height:55vh;height:55vh}.panel{margin:8px}.dimensions{max-width:70%}}

@@ -1,0 +1,77 @@
+:host {
+  --card-radius: 16px;
+}
+
+.assignment-content {
+  --background: var(--ion-background-color, #f6f8fc);
+}
+
+.assignment-container {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 8px 0 28px;
+}
+
+.selected-user-card {
+  padding: 18px 16px;
+  border: 1px solid var(--ion-color-light-shade, #e3e8ef);
+  border-radius: var(--card-radius);
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
+  box-shadow: 0 5px 20px rgba(25, 45, 80, 0.06);
+}
+
+.section-eyebrow {
+  margin: 0 0 12px;
+  color: var(--ion-color-medium);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.selected-user-row { margin: 0; }
+.selected-user-row ion-col { padding: 4px; min-width: 0; }
+
+.selected-user-name {
+  margin: 0;
+  font-size: clamp(16px, 3vw, 21px);
+  font-weight: 650;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  color: var(--ion-text-color);
+}
+
+.save-column { display: flex; justify-content: flex-end; align-items: center; }
+.save-button {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  margin: 0;
+  --border-radius: 11px;
+  --box-shadow: none;
+}
+.save-button ion-icon { font-size: 21px; }
+
+.users-section { margin-top: 26px; }
+.section-title { margin: 0 0 12px 4px; font-size: 17px; font-weight: 700; }
+.users-list { padding: 0; background: transparent; }
+.user-item {
+  --background: var(--ion-card-background, var(--ion-item-background, #fff));
+  --border-radius: 12px;
+  --padding-start: 14px;
+  --inner-padding-end: 14px;
+  --min-height: 58px;
+  margin-bottom: 8px;
+  border: 1px solid var(--ion-color-light-shade, #e3e8ef);
+  border-radius: 12px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.user-item.is-selected {
+  border-color: var(--ion-color-primary);
+  box-shadow: 0 0 0 1px var(--ion-color-primary);
+}
+.user-avatar { font-size: 27px; color: var(--ion-color-medium); margin-right: 12px; }
+.user-item.is-selected .user-avatar { color: var(--ion-color-primary); }
+.user-item ion-label { font-size: 15px; font-weight: 500; white-space: normal; }
+.empty-message { text-align: center; padding: 20px; color: var(--ion-color-medium); }

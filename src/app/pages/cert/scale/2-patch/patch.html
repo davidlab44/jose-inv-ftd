@@ -1,0 +1,92 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-searchbar
+      placeholder="Buscar"
+      (ionInput)="onSearch($event.target.value)">
+    </ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="form">    
+    <input type="hidden" formControlName="id">
+    <ion-list>
+      <ion-button expand="block" (click)="takePhotoAndUpload()">
+        📸 Tomar fotox
+      </ion-button>
+      <ion-button expand="block" color="secondary" (click)="pickImageAndUpload()">
+        🖼 Elegir de galería
+      </ion-button>
+      <ion-progress-bar
+        *ngIf="uploading"
+        [value]="uploadProgress / 100">
+      </ion-progress-bar>
+      <p *ngIf="uploading">
+        Subiendo: {{ uploadProgress }} %
+      </p>
+      <ion-card *ngIf="uploadedUrl">
+        <ion-card-header>
+          <ion-card-title>Imagen subida</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <h6>Imagen</h6>
+          <img [src]="uploadedUrl" />
+          <p>
+            imgUrl:
+            <a [href]="uploadedUrl" target="_blank">
+              {{ bucket+uploadedUrl }}
+            </a>
+          </p>
+          <!--<p>{{ uploadedUrl }}</p>-->
+        </ion-card-content>
+      </ion-card>
+          <ion-item>
+          <ion-label position="floating">Container:</ion-label>
+            <ion-input formControlName="container"></ion-input>
+        </ion-item>       
+        <ion-item>
+          <ion-label position="floating">Container2:</ion-label>
+            <ion-input formControlName="container2"></ion-input>
+        </ion-item>       
+        <ion-item>
+          <ion-label position="floating">Ticket Nro: <span style="font-size:xx-small;" > (sin comas ni puntos)</span> </ion-label>
+            <ion-input type="number" formControlName="wticket"></ion-input>
+        </ion-item>   
+        <ion-item>
+          <ion-label position="floating">Peso bruto:</ion-label>
+          <ion-input type="number" formControlName="wgross"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Peso tara:</ion-label>
+          <ion-input type="number" formControlName="wtare"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Peso neto:</ion-label>
+          <ion-input type="number" formControlName="wnet"></ion-input>
+        </ion-item>
+    </ion-list>
+    <br>
+    <ion-button expand="block" (click)="patch()">
+      Guardar
+    </ion-button>
+  </form>
+
+
+
+
+</ion-content>
+
+
+
+

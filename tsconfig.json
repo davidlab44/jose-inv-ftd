@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "downlevelIteration": true,
+    "importHelpers": true,
+    "module": "es2020",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": false,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "ES2022",
+    "skipLibCheck": true,
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "useDefineForClassFields": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    "baseUrl": "./src",
+    "paths": {
+      "@app/*": ["app/*"],
+      "@services/*": ["app/services/*"],
+      "@interfaces/*": ["app/interfaces/*"],
+      "@components/*": ["app/components/*"],
+      "@models/*": ["app/models/*"],
+      "@shared/*": ["app/shared/*"]
+    }
+  }
+}
+

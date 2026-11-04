@@ -1,0 +1,43 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Asignar usuario</ion-title>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <ion-icon slot="icon-only" name="options-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="assignment-content ion-padding">
+  <ion-grid class="assignment-container">
+    <section class="selected-user-card">
+      <p class="section-eyebrow">Usuario seleccionado</p>
+      <ion-row class="selected-user-row ion-align-items-center">
+        <ion-col size="10">
+          <h2 class="selected-user-name">{{ user?.data?.name || 'Selecciona un usuario' }}</h2>
+        </ion-col>
+        <ion-col size="2" class="save-column">
+          <ion-button class="save-button" expand="block" (click)="guardar()" [disabled]="!user || !task" aria-label="Guardar usuario seleccionado" title="Guardar usuario">
+            <ion-icon slot="icon-only" name="save-outline"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </section>
+
+    <section class="users-section">
+      <h3 class="section-title">Usuarios disponibles</h3>
+      <ion-list class="users-list" lines="none">
+        <ion-item *ngFor="let u of userList" button detail="false" class="user-item" [class.is-selected]="user?.id === u.id" (click)="selectUser(u)">
+          <ion-icon name="person-circle-outline" slot="start" class="user-avatar"></ion-icon>
+          <ion-label>{{ u?.data?.name }}</ion-label>
+          <ion-icon *ngIf="user?.id === u.id" name="checkmark-circle" slot="end" color="primary"></ion-icon>
+        </ion-item>
+      </ion-list>
+      <p class="empty-message" *ngIf="!userList?.length">No hay usuarios disponibles.</p>
+    </section>
+  </ion-grid>
+</ion-content>

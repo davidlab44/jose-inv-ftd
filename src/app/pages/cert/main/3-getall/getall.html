@@ -1,0 +1,195 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-searchbar
+      placeholder="Buscar CCO (ej: TCSU 500046)"
+      show-clear-button="always"
+      (ionInput)="onCcoSearch($event.detail.value)">
+    </ion-searchbar>
+
+    <ion-buttons slot="end">
+      <ion-button
+        *ngIf="!showSearchbar"
+        (click)="presentFilter()">
+
+        <span *ngIf="ios">
+          Filter
+        </span>
+
+        <span *ngIf="!ios">
+          <ion-icon
+            slot="icon-only"
+            name="options">
+          </ion-icon>
+        </span>
+
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+
+  <ion-fab
+    vertical="bottom"
+    horizontal="end"
+    slot="fixed">
+
+    <ion-fab-button
+      class="fab-premium"
+      (click)="plexaUploader('no estoy pasando nada')">
+
+      <ion-icon name="add"></ion-icon>
+
+    </ion-fab-button>
+
+  </ion-fab>
+
+  <ion-grid class="withdrawn-grid">
+
+
+
+
+
+    <ion-card  *ngFor="let g of fullCertList"  class="cert-card">
+
+      <ion-card-header>
+
+        <div class="card-header">
+
+          <div>
+
+            <div
+              class="cco-pill"
+              [style.background]="g.color">
+
+              {{g.name}}
+
+            </div>
+
+            <div class="card-subtitle">
+
+              ID {{g.istq_id}}
+
+              ·
+
+              {{g.certs.length}}
+
+              {{g.certs.length==1?'certificado':'certificados'}}
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <ion-grid class="withdrawn-grid">
+
+          <ng-container *ngFor="let p of g.certs">
+
+            <ion-row
+              class="withdrawn-row ion-align-items-center"
+              [style.background]="p.data.type==1 ? '#A6B7FF' : '#C2FF9E'"
+              [ngClass]="{'row-erp':p.state==='erp'}">
+
+              <ion-col size="3">
+
+                <strong>
+
+                  {{p.data.type==1?'TOTAL':'PARCIAL'}}
+
+                </strong>
+
+              </ion-col>
+
+              <ion-col size="2">
+
+                {{p.data.year}}
+
+              </ion-col>
+
+              <ion-col size="2">
+
+              </ion-col>
+
+              <ion-col
+                size="1"
+                class="actions-col">
+
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  class="btn-compact"
+                  (click)="openCert(p,g.name);$event.stopPropagation()">
+
+                  <ion-icon
+                    name="eye-outline">
+                  </ion-icon>
+
+                </ion-button>
+
+              </ion-col>
+
+              <ion-col
+                size="1"
+                class="actions-col">
+
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  class="btn-compact">
+
+                  <ion-icon
+                    name="download-outline">
+                  </ion-icon>
+
+                </ion-button>
+
+              </ion-col>
+
+              <ion-col
+                size="1"
+                class="actions-col">
+
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  class="btn-compact">
+
+                  <ion-icon
+                    name="share-social-outline">
+                  </ion-icon>
+
+                </ion-button>
+
+              </ion-col>
+
+            </ion-row>
+
+          </ng-container>
+
+        </ion-grid>
+
+      </ion-card-content>
+
+    </ion-card>
+
+
+
+
+
+
+
+  </ion-grid>
+
+</ion-content>

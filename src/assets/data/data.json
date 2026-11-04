@@ -1,0 +1,467 @@
+{
+  "schedule": [
+    {
+      "date": "2047-05-17",
+      "groups": [
+        {
+          "time": "8:00 am",
+          "sessions": [
+            {
+              "name": "Breakfast",
+              "timeStart": "8:00 am",
+              "timeEnd": "9:00 am",
+              "location": "Cll 42 No 25-65",
+              "tracks": ["Gastronomia"],
+              "id": "1"
+            }
+          ]
+        },
+        {
+          "time": "9:15 am",
+          "sessions": [
+            {
+              "name": "Getting Started with Violet",
+              "location": "Hall 2",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Marina Holguin"],
+              "timeStart": "9:30 am",
+              "timeEnd": "9:45 am",
+              "tracks": ["Violet"],
+              "id": "2"
+            },
+            {
+              "name": "Violet Tooling",
+              "location": "Executive Ballroom",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Raquel Lettau"],
+              "timeStart": "9:45 am",
+              "timeEnd": "10:00 am",
+              "tracks": ["Gastronomia"],
+              "id": "3"
+            },
+            {
+              "name": "How Violet Works",
+              "location": "Hall 3",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Edith Pava"],
+              "timeStart": "9:15 am",
+              "timeEnd": "9:30 am",
+              "tracks": ["Violet"],
+              "id": "4"
+            }
+          ]
+        },
+        {
+          "time": "10:00 am",
+          "sessions": [
+            {
+              "name": "Starting with Violet",
+              "location": "Hall 1",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Eva Pereira"],
+              "timeStart": "10:00 am",
+              "timeEnd": "10:15 am",
+              "tracks": ["Violet"],
+              "id": "5"
+            },
+            {
+              "name": "What's New in Violet",
+              "location": "Hall 3",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Raquel Lettau"],
+              "timeStart": "10:15 am",
+              "timeEnd": "10:30 am",
+              "tracks": ["Violet"],
+              "id": "6"
+            },
+            {
+              "name": "The Evolution of Violet",
+              "location": "Hall 2",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Isabel Lafaurie"],
+              "timeStart": "10:15 am",
+              "timeEnd": "10:30 am",
+              "tracks": ["Hosteleria"],
+              "id": "7"
+            },
+            {
+              "name": "Violet Pro",
+              "location": "Grand Ballroom A",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Laura Quinones"],
+              "timeStart": "10:45 am",
+              "timeEnd": "11:00 am",
+              "tracks": ["Manicure"],
+              "id": "8"
+            }
+          ]
+        },
+        {
+          "time": "11:00 am",
+          "sessions": [
+            {
+              "name": "Violet Workshop",
+              "location": "Hall 1",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Carla Moreno"],
+              "timeStart": "11:00 am",
+              "timeEnd": "11:45 am",
+              "tracks": ["Pedicure"],
+              "id": "9"
+            },
+            {
+              "name": "Community Interaction",
+              "location": "Hall 3",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Petrona Bello"],
+              "timeStart": "11:30 am",
+              "timeEnd": "11:50 am",
+              "tracks": ["Mesa"],
+              "id": "10"
+            },
+            {
+              "name": "Navigation in Violet",
+              "location": "Grand Ballroom A",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Alma Sofia Buritica"],
+              "timeStart": "11:30 am",
+              "timeEnd": "12:00 pm",
+              "tracks": ["Peinados"],
+              "id": "11"
+            }
+          ]
+        },
+        {
+          "time": "12:00 pm",
+          "sessions": [
+            {
+              "name": "Lunch",
+              "location": "Dining Hall",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+              "timeStart": "12:00 pm",
+              "timeEnd": "1:00 pm",
+              "tracks": ["Maquillaje"],
+              "id": "12"
+            }
+          ]
+        },
+        {
+          "time": "1:00 pm",
+          "sessions": [
+            {
+              "name": "Enterprise",
+              "location": "Hall 1",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Yorsaris Miranda"],
+              "timeStart": "1:00 pm",
+              "timeEnd": "1:15 pm",
+              "tracks": ["Gastronomia"],
+              "id": "13"
+            },
+            {
+              "name": "Violet Worldwide",
+              "location": "Hall 1",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Yulieth Monroy"],
+              "timeStart": "1:15 pm",
+              "timeEnd": "1:30 pm",
+              "tracks": ["Belleza"],
+              "id": "14"
+            },
+            {
+              "name": "The Violet Package",
+              "location": "Grand Ballroom B",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Evelyn Castillo"],
+              "timeStart": "1:30 pm",
+              "timeEnd": "2:00 pm",
+              "tracks": ["Manicure"],
+              "id": "15"
+            }
+          ]
+        },
+        {
+          "time": "2:00 pm",
+          "sessions": [
+            {
+              "name": "Push Notifications to Violet",
+              "location": "Hall 2",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Karina Bustos Molina"],
+              "timeStart": "2:00 pm",
+              "timeEnd": "2:30 pm",
+              "tracks": ["Pedicure"],
+              "id": "16"
+            },
+            {
+              "name": "Violet Documentation",
+              "location": "Grand Ballroom B",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Yohana Cueto"],
+              "timeStart": "2:30 pm",
+              "timeEnd": "2:45 pm",
+              "tracks": ["Bar"],
+              "id": "17"
+            },
+            {
+              "name": "UX in Violet",
+              "location": "Hall 3",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Silvia Araugo"],
+              "timeStart": "2:45 pm",
+              "timeEnd": "3:00 pm",
+              "tracks": ["Hosteleria"],
+              "id": "18"
+            }
+          ]
+        },
+        {
+          "time": "3:00",
+          "sessions": [
+            {
+              "name": "Violet Directives in Violet",
+              "location": "Hall 1",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Vanessa Perez"],
+              "timeStart": "3:00 pm",
+              "timeEnd": "3:30 pm",
+              "tracks": ["Violet"],
+              "id": "19"
+            },
+            {
+              "name": "Mobile States",
+              "location": "Hall 2",
+              "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+              "speakerNames": ["Raquel Pereira"],
+              "timeStart": "3:30 pm",
+              "timeEnd": "3:45 pm",
+              "tracks": ["Mesa"],
+              "id": "20"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "speakers": [
+    {
+      "name": "Yorcelis Cantillo",
+      "profilePic": "/assets/img/speakers/bear.jpg",
+      "instagram": "Violetframework",
+      "twitter": "Violetframework",
+      "about": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+      "title": "Manicurista",
+      "location": "Everywhere",
+      "email": "ycantillo02@gmail.com",
+      "phone": "3234468545",
+      "id": "1"
+    },
+    {
+      "name": "Yulis Paola Mosquera",
+      "profilePic": "/assets/img/speakers/cheetah.jpg",
+      "instagram": "Violetframework",
+      "twitter": "Violetframework",
+      "about": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit accusantium",
+      "title": "Manicurista",
+      "location": "Everywhere",
+      "email": "yulilam24@gmail.com",
+      "phone": "3156614141",
+      "id": "2"
+    },
+    {
+      "name": "Yohana Pereira Posada",
+      "profilePic": "/assets/img/speakers/duck.jpg",
+      "instagram": "Violetframework",
+      "twitter": "Violetframework",
+      "about": "Nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat ad minim veniamd",
+      "title": "Manicurista",
+      "location": "Everywhere",
+      "email": "donald@example.com",
+      "phone": "yohaps01@gmail.com",
+      "id": "3"
+    },
+    {
+      "name": "Rubiela Iriarte",
+      "profilePic": "/assets/img/speakers/eagle.jpg",
+      "instagram": "Violetframework",
+      "twitter": "Violetframework",
+      "about": "Nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat ad minim veniamd",
+      "title": "Estilista",
+      "location": "Everywhere",
+      "email": "iriartedns84@gmail.com",
+      "phone": "3015549865",
+      "id": "4"
+    },
+    {
+      "name": "Angela Redondo",
+      "profilePic": "/assets/img/speakers/elephant.jpg",
+      "instagram": "Violetframework",
+      "twitter": "Violetframework",
+      "about": "Nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat ad minim veniamd",
+      "title": "Manicurista",
+      "location": "Everywhere",
+      "email": "aredondo77@gmail.com",
+      "phone": "3025267847",
+      "id": "5"
+    },
+    {
+      "name": "Petrona Bello Mosquera",
+      "profilePic": "/assets/img/speakers/giraffe.jpg",
+      "instagram": "Violetframework",
+      "twitter": "Violetframework",
+      "about": "Nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat ad minim veniamd",
+      "title": "Manicurista",
+      "location": "Everywhere",
+      "email": "belloma64@gmail.com",
+      "phone": "3145558484",
+      "id": "6"
+    },
+    {
+      "name": "Daniela Rebolledo",
+      "profilePic": "/assets/img/speakers/iguana.jpg",
+      "instagram": "Violetframework",
+      "twitter": "Violetframework",
+      "about": "Nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat ad minim veniamd",
+      "title": "Manicurista",
+      "location": "Everywhere",
+      "email": "dnreb5324@gmail.com",
+      "phone": "3004425153",
+      "id": "7"
+    },
+    {
+      "name": "Ester Moncada",
+      "profilePic": "/assets/img/speakers/kitten.jpg",
+      "instagram": "Violetframework",
+      "twitter": "Violetframework",
+      "about": "Nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat ad minim veniamd",
+      "title": "Estilista",
+      "location": "Everywhere",
+      "email": "estmnc929@gmail.com",
+      "phone": "3015149944",
+      "id": "8"
+    },
+    {
+      "name": "Liliana Cabrales Yoyoma",
+      "profilePic": "/assets/img/speakers/lion.jpg",
+      "instagram": "Violetframework",
+      "twitter": "Violetframework",
+      "about": "Nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat ad minim veniamd",
+      "title": "Estilista",
+      "location": "Everywhere",
+      "email": "liliana09@gmail.com",
+      "phone": "3106548575",
+      "id": "9"
+    },
+    {
+      "name": "Margarita Melendes Biojo",
+      "profilePic": "/assets/img/speakers/mouse.jpg",
+      "instagram": "Violetframework",
+      "twitter": "Violetframework",
+      "about": "Buki ut aliquip ex ea commodo consequat ad minim veniamd",
+      "title": "Manicurista",
+      "location": "Everywhere",
+      "email": "margarita@gmail.com",
+      "phone": "3208465747",
+      "id": "10"
+    },
+    {
+      "name": "Maryuri Julio Herrera",
+      "profilePic": "/assets/img/speakers/puppy.jpg",
+      "instagram": "Violetframework",
+      "twitter": "Violetframework",
+      "about": "Ullamco laboris nisi ut aliquip ex ea commodo consequat ad minim veniamd",
+      "title": "Manicurista",
+      "location": "Everywhere",
+      "email": "mjulio@gmail.com",
+      "phone": "3186694841",
+      "id": "11"
+    },
+    {
+      "name": "Raquel Lettau",
+      "profilePic": "/assets/img/speakers/rabbit.jpg",
+      "instagram": "Violetframework",
+      "twitter": "Violetframework",
+      "about": "Nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat ad minim veniamd",
+      "title": "Manicurista",
+      "location": "Everywhere",
+      "email": "rach0124@gmail.com",
+      "phone": "3164481418",
+      "id": "12"
+    },
+    {
+      "name": "Briana Moncayo",
+      "profilePic": "/assets/img/speakers/turtle.jpg",
+      "instagram": "Violetframework",
+      "twitter": "Violetframework",
+      "about": "Laboris nisi ut aliquip ex ea commodo consequat ad minim veniamd",
+      "title": "Manicurista",
+      "location": "Everywhere",
+      "email": "bmoncayo28@gmail.com",
+      "phone": "3129855454",
+      "id": "13"
+    }
+  ],
+
+  "map": [
+    {
+      "name": "Monona Terrace Convention Center",
+      "lat": 43.071584,
+      "lng": -89.38012,
+      "center": true
+    },
+    {
+      "name": "Violet",
+      "lat": 43.074395,
+      "lng": -89.381056
+    },
+    {
+      "name": "Afterparty - Brocach Irish Pub",
+      "lat": 43.07336,
+      "lng": -89.38335
+    }
+  ],
+
+  "tracks": [
+    {
+      "name": "Gastronomía",
+      "icon": "logo-Violet"
+    },
+    {
+      "name": "Belleza",
+      "icon": "document"
+    },
+    {
+      "name": "Maquillaje",
+      "icon": "restaurant"
+    },
+    {
+      "name": "Peinados",
+      "icon": "logo-Violet"
+    },
+    {
+      "name": "Manicure",
+      "icon": "hammer"
+    },
+    {
+      "name": "Pedicure",
+      "icon": "color-palette"
+    },
+    {
+      "name": "Mesa",
+      "icon": "cog"
+    },
+    {
+      "name": "Bar",
+      "icon": "construct"
+    },
+    {
+      "name": "Componente Afro",
+      "icon": "call"
+    },
+    {
+      "name": "Hostelería",
+      "icon": "compass"
+    }
+  ]
+}

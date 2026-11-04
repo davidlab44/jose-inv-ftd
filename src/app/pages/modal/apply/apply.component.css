@@ -1,0 +1,251 @@
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #barcode, #barcode * {
+    visibility: visible;
+  }
+}
+
+
+
+
+
+
+/*.product-card {*/
+  /*border-radius: 16px;*/
+  /*box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);*/
+  /*transition: transform 0.15s ease, box-shadow 0.2s ease;*/
+  /*cursor: pointer;*/
+
+  /*.title {*/
+    /*font-size: 16px;*/
+    /*font-weight: 400;*/
+    /*color: #2c3e50;*/
+  /*}*/
+
+  /*ion-card-content {*/
+    /*font-size: 14px;*/
+  /*}*/
+
+  /*.price {*/
+    /*font-size: 14px;*/
+    /*color: #6c757d;*/
+    /*margin-bottom: 6px;*/
+  /*}*/
+
+  /*.stock {*/
+    /*font-size: 13px;*/
+  /*}*/
+/*}*/
+
+/*[> Efecto visual al tocar / seleccionar <]*/
+/*.product-card:active {*/
+  /*transform: scale(0.96);*/
+  /*box-shadow: 0 4px 12px rgba(56, 128, 255, 0.3);*/
+/*}*/
+
+
+
+
+
+
+/* General */
+ion-content {
+  --background: #f2f4f8;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Escáner */
+.scan-container {
+  background: #fff;
+  border-radius: 12px;
+  margin: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding-bottom: 1rem;
+}
+
+.video-preview {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 0.5rem;
+}
+
+.scan-result {
+  margin-top: 0.5rem;
+}
+
+/* Card de producto */
+.product-card {
+  margin: 1rem;
+  border-radius: 16px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  background: #ffffff;
+  padding-bottom: 0.5rem;
+}
+
+.product-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #222;
+  margin-top: 0.3rem;
+}
+
+.category {
+  color: #3880ff;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.product-qty {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Input y botones de cantidad */
+.quantity-container {
+  background: #fff;
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.quantity-item {
+  --background: transparent;
+  margin-bottom: 0.75rem;
+}
+
+.quantity-input {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #222;
+  width: 100%;
+}
+
+.quantity-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+ion-button {
+  flex: 1;
+  font-size: 1.1rem;
+  border-radius: 10px;
+}
+
+/* Estado de carga */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 3rem;
+  color: #555;
+}
+
+.loading-container p {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .product-name {
+    font-size: 1.2rem;
+  }
+
+  .quantity-input {
+    font-size: 1.4rem;
+  }
+
+  .quantity-container {
+    margin: 0.75rem;
+    padding: 0.75rem;
+  }
+}
+
+
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(60%);
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.quantity-input.minus-prefix {
+  padding-left: 1.2em; /* espacio para el signo */
+  position: relative;
+}
+
+.quantity-input.minus-prefix::before {
+  content: "-";
+  position: absolute;
+  left: 0.5em;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #000;
+  font-weight: bold;
+  pointer-events: none; /* no interfiere al escribir */
+}
+
+
+.action-buttons-row {
+  display: flex;
+  justify-content: center; /* centra la fila */
+  gap: 20px; /* espacio entre los botones */
+  margin-top: 20px;
+}
+
+.button-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.button-spacer {
+  flex: 1;
+}
+
+
+
+
+
+
+
+.scan-row {
+  display: flex;
+  align-items: center; /* centra verticalmente todo */
+  margin-top:-10px;
+  width: 100%;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+/* Botones más pequeños y cuadrados */
+.scan-btn {
+  --padding-start: 6px;
+  --padding-end: 6px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  height: 40px;
+  width: 40px;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+/* Input ocupa la mayor parte de la fila */
+.scan-input {
+  flex: 1;
+  margin: 0;
+}
+
+
+
+

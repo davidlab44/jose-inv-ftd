@@ -1,0 +1,344 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-searchbar
+      placeholder="Buscar CCO (ej: TCSU 500046)"
+      show-clear-button="always"
+      (ionInput)="onCcoSearch($event.detail.value)"> 
+    </ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12">
+        <ion-list>
+          <ion-item *ngFor="let item of topFilteredList" button (click)="selectCco(item)">
+            <div class="cco-item">
+              <ion-label>
+                <h2>{{ item.data.name }}</h2>
+              </ion-label>
+              <ion-badge
+                *ngIf="item.data.color"
+                [style.background]="item.data.color">
+              </ion-badge>
+            </div>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <ion-text *ngIf="filteredList.length === 0" color="medium">
+          <p class="empty-text">No se encontraron resultados</p>
+        </ion-text>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-grid *ngIf="viajanJuntosList && viajanJuntosList.length>0" >
+    <ion-row> 
+      <ion-col size="10">
+        <ion-grid class="viajanjuntos-grid">
+          <ion-row class="withdrawn-header ion-align-items-center">
+            <ion-col size="1"><ion-label></ion-label></ion-col>
+            <ion-col size="1"><ion-label>Entrega:</ion-label></ion-col>
+            <ion-col size="1"><ion-label>F.vacio</ion-label></ion-col>
+            <ion-col size="2"><ion-label>Isotanq.</ion-label></ion-col>
+            <ion-col size="1"><ion-label>Tkt.</ion-label></ion-col>
+            <ion-col size="1"><ion-label>kg</ion-label></ion-col>
+            <ion-col size="5"></ion-col>
+          </ion-row>
+          <ng-container *ngIf="viajanJuntosList?.length">
+            <ion-row
+              *ngFor="let p of viajanJuntosList"
+              class="viajanjuntos-row ion-align-items-center">
+              <ion-col size="1">
+                {{ p.id }}
+              </ion-col>
+              <ion-col size="2">
+                {{ p.data.datein | date:'dd/MM/yyyy' }}
+              </ion-col>
+              <ion-col size="2">
+                {{ p.data.deliveryin }}
+              </ion-col>
+              <ion-col size="4" [style.background]="ccoMap[+p.data.name]?.color || '#eee'" (click)="discoverTwins(p)">
+                {{ ccoMap[+p.data.name]?.name || 'N/A' }}
+              </ion-col>
+              <ion-col size="1">
+                {{ p.data.ticket }}
+              </ion-col>
+              <ion-col size="2">
+                {{ p.data.kg }}
+              </ion-col>
+            </ion-row>
+          </ng-container>
+        </ion-grid>
+      </ion-col> 
+      <ion-col size="2">
+        <br><br>
+        <ion-grid class="viajanjuntos-grid">
+          <ion-row>
+            <ion-col size="12">
+              <br><br>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="6" *ngIf='hasTwin()'>
+              <ion-button
+                fill="clear"
+                size="small"
+                class="btn-compact"
+                title="Desenganchar"
+                [color]="viajanJuntosList?.length > 0 && viajanJuntosList[0]?.data?.twin > 0 ? 'success' : 'dark'"
+                [disabled]="!viajanJuntosList?.length"
+                (click)="desenganchar(viajanJuntosList); $event.stopPropagation()">
+                <ion-icon name="lock-open-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+             <ion-col size="6" *ngIf='!hasTwin()'>
+              <ion-button
+                fill="clear"
+                size="small"
+                class="btn-compact"
+                title="Desenganchar"
+                [color]="viajanJuntosList?.length > 0 && viajanJuntosList[0]?.data?.twin > 0 ? 'success' : 'dark'"
+                [disabled]="!viajanJuntosList?.length"
+                (click)="enganchar(viajanJuntosList); $event.stopPropagation()">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="6">
+              <ion-button
+                fill="clear"
+                size="small"
+                class="btn-compact"
+                title="Limpiar | Cancelar"
+                [color]="viajanJuntosList?.length > 0 && viajanJuntosList[0]?.data?.twin > 0 ? 'success' : 'dark'"
+                [disabled]="!viajanJuntosList?.length"
+                (click)="clearViajanJuntosList(); $event.stopPropagation()">
+                <ion-icon name="close-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+
+
+          </ion-row>
+        </ion-grid>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button class="fab-premium" (click)="plexaUploader('no estoy pasando nada')">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <br>
+  <ion-item class="range-container" lines="none">
+    <div class="date-boxes">
+      <!-- DESDE -->
+      <div class="date-box">
+        <div class="controls">
+          <ion-button size="small" fill="clear" (click)="changeStartDay(-1)">
+            ◀
+          </ion-button>
+          <span class="value">{{ formatDay(startDay) }}</span>
+          <ion-button size="small" fill="clear" (click)="changeStartDay(1)">
+            ▶
+          </ion-button>
+        </div>
+      </div>
+      <!-- HASTA -->
+      <div class="date-box">
+        <div class="controls">
+          <ion-button size="small" fill="clear" (click)="changeEndDay(-1)">
+            ◀
+          </ion-button>
+         <span class="value">{{ formatDay(endDay) }}</span> 
+          <ion-button size="small" fill="clear" (click)="changeEndDay(1)">
+            ▶
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </ion-item>
+
+  <ion-segment (ionChange)="quickRange($event)">
+    <ion-segment-button style="font-size:xx-small"  value="month">30 días</ion-segment-button>
+    <ion-segment-button style="font-size:xx-small"  value="week">7 días</ion-segment-button>
+    <ion-segment-button style="font-size:xx-small"  value="today">Hoy</ion-segment-button>
+  </ion-segment>
+
+  <ion-item lines="none" style="margin-top:-5px;"  >
+    <ion-range
+      class="day-range"
+      min="1"
+      max="365"
+      step="1"
+      dualKnobs="true"
+      snaps="true"
+      ticks="true"
+      [(ngModel)]="dayRange"
+      (ionChange)="onRangeChange($event)">
+    </ion-range>
+  </ion-item>
+ <br>
+<!-- ================= HEADER COLUMNAS ================= -->
+
+<ion-grid class="withdrawn-header">
+  <ion-row class="ion-align-items-center header-row">
+  <ion-col size="1" class="header-col">
+     <ion-label></ion-label>
+  </ion-col>
+  <ion-col size="1" class="header-col">
+      <ion-label>Entrega:</ion-label>
+   </ion-col>
+   <ion-col size="1" class="header-col">
+      <ion-label>F.vacio</ion-label>
+    </ion-col>
+    <ion-col size="2" class="header-col">
+      <ion-label>Isotanq.</ion-label>
+    </ion-col>
+    <ion-col size="1" class="header-col">
+      <ion-label>Tkt.</ion-label>
+    </ion-col>
+    <ion-col size="1" class="header-col">
+      <ion-label>kg</ion-label>
+    </ion-col>
+    <ion-col size="5" class="header-col">
+      <ion-label></ion-label>
+    </ion-col>
+  </ion-row>
+</ion-grid>
+
+<!-- LISTA DE REGISTROS -->
+<ng-container *ngIf="fullWithdrawnList && fullWithdrawnList.length>0">
+  <ng-container *ngFor="let item of fullWithdrawnList">
+    <ng-container
+      *ngIf="
+        !displayToEnevis ||
+        (
+          item?.data?.deliveryout?.length ==0 ||
+          item?.data?.shipout == 0 ||
+          item?.data?.imgout?.length ==0 
+        )
+      ">
+      <ng-container
+        *ngTemplateOutlet="withdrawnRow; context:{p:item}">
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</ng-container>
+<!-- ================= TEMPLATE ROW ================= -->
+<ng-template #withdrawnRow let-p="p">
+  <ion-grid class="withdrawn-grid">
+    <ion-row
+      class="withdrawn-row ion-align-items-center"
+      [ngClass]="{ 'row-erp': p.state === 'erp' }">
+      <ion-col size="1">
+        {{ p.id }}
+      </ion-col>
+      <ion-col size="1">
+        {{ p.data.datein | date:'dd/MM/yyyy' }}
+      </ion-col>
+      <ion-col size="1">
+        {{ p.data.deliveryin }}
+      </ion-col>
+      <!-- ISOTANQ -->
+      <ion-col size="2" [style.background]="ccoMap[+p.data.name]?.color || '#eee'" (click)="discoverTwins(p)"> {{ ccoMap[+p.data.name]?.name || 'N/A' }} </ion-col>
+      <!-- TICKET -->
+      <ion-col size="1">
+        {{ p.data.ticket }}
+      </ion-col>
+      <!-- KG -->
+      <ion-col size="1">
+        {{ p.data.kg }}
+      </ion-col>
+      <ion-col size="1" class="actions-col">
+       <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Viajes | Llegadas"
+          [color]="p.data.shipin > 0 ? 'success' : 'dark'"
+          (click)="patch(p,'in'); $event.stopPropagation()">
+          <ion-icon name="boat-outline"></ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col size="1" class="actions-col">
+        <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Plexa"
+          [color]="p.data.kg > 0 ? 'success' : 'dark'"
+          (click)="patch(p,'vendor'); $event.stopPropagation()">
+          <ion-icon name="logo-amplify"></ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col size="1" class="actions-col">
+        <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Bascula"
+          [color]="p.data.wnet > 0 ? 'success' : 'dark'"
+          (click)="patch(p,'scale'); $event.stopPropagation()">
+          <ion-icon name="scale-outline"></ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col size="1" class="actions-col">
+       <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Viajes | Salidas"
+          [color]="p.data.shipout > 0 ? 'success' : 'dark'"
+          (click)="patch(p,'out'); $event.stopPropagation()">
+          <ion-icon name="basket-outline"></ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col size="1" class="actions-col">
+        <ion-button
+          fill="clear"
+          size="small"
+          class="btn-compact"
+          title="Clone"
+          color="primary"
+          (click)="cloneWithdrawn(p)">
+          <ion-icon name="bookmarks-outline"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ng-template>
+
+

@@ -1,0 +1,73 @@
+<ion-header>
+  <ion-toolbar style="text-align: center;">
+    <br><br>
+    <span>INBEMETAL</span><br> 
+    <br><br>
+    <span style="font-size:small;"></span>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+<!--  <div class="login-logo">-->
+    <!--<img src="assets/img/appicon.png" alt="App logo">-->
+  <!--</div>-->
+  <div class="login-form">
+    <form #loginForm="ngForm" novalidate>
+      <ion-input
+        label="Usuario"
+        labelPlacement="stacked"
+        fill="solid"
+        [(ngModel)]="login.u"
+        name="username"
+        type="text"
+        #username="ngModel"
+        spellcheck="false"
+        autocapitalize="off"
+        errorText="Username is required"
+        required>
+      </ion-input>
+      <ion-input
+        label="Contraseña"
+        labelPlacement="stacked"
+        fill="solid"
+        [(ngModel)]="login.p"
+        name="password"
+        type="password"
+        #password="ngModel"
+        errorText="Password is required"
+        required>
+      </ion-input>
+      <br>
+      <ion-row>
+        <ion-col>
+          <ion-button  color='default' style="background-color:#4d8dff;color:#f0f0f0;" (click)="onLogin(loginForm)" type="submit" expand="block">Iniciar sesión</ion-button>
+        </ion-col>
+      </ion-row>
+    </form>
+  </div>
+  <br><br>
+<!--  <div>-->
+    <!--<table width="100%" border="1" style="color:#585858;">-->
+      <!--<tr>-->
+        <!--<td style="font-size: x-small;text-align: center;">-->
+          <!--<span style="color:#fff;">CONTRATAR</span>-->
+        <!--</td>-->
+        <!--<td style="font-size: x-small;text-align: center;">-->
+          <!--<span style="color:#fff;">TRABAJAR</span>-->
+        <!--</td>-->
+      <!--</tr>-->
+      <!--<tr>-->
+        <!--<td>-->
+          <!--<ion-col>-->
+            <!--<ion-button color='default' style="background-color:#4d8dff;color:#f0f0f0;" (click)="onSignup()" expand="block">Registrarse como cliente</ion-button>-->
+          <!--</ion-col>-->
+        <!--</td>-->
+        <!--<td>-->
+          <!--<ion-col>-->
+            <!--<ion-button color='default' style="background-color:#4d8dff;color:#f0f0f0;" (click)="onSignupTecnico()" expand="block">Registrarse como técnico</ion-button>-->
+          <!--</ion-col>-->
+        <!--</td>-->
+      <!--</tr>-->
+    <!--</table>-->
+  <!--</div>-->
+</ion-content>
+

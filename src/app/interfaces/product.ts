@@ -1,0 +1,123 @@
+
+
+
+export interface Product {
+  id: number;
+  creado_en: string;               // ISO datetime string
+  data: {
+    um: string;     
+    qty: number;
+    name: string;
+    barcode: string;
+    categ: number[];
+  };
+}
+
+export const defaultProduct: Product = {
+  id: 0,
+  creado_en: new Date().toISOString(),
+  data: {
+    um: "0",
+    qty: 0,
+    name: "",
+    barcode: "",
+    categ: []
+  }
+};
+
+export function createDefaultWithdrawn(): Withdrawn {
+  return {
+    id: 0,
+    ext_id: null,
+    created_at: '',
+    updated_at: '',
+    data: { ...defaultWithdrawnData },
+    refdate: '',
+    state: '',
+    diff: 0
+  };
+}
+
+export const defaultWithdrawnData: WithdrawnData = {
+  kg: 0,
+  img: '',
+  imgin: '',
+  imgout: '',
+  imgscale: '',
+  psi: 0,
+  date: '',
+  name: 0,
+  seal: [],
+  twin: 0,
+  wnet: 0,
+  price: '',
+  id_replenishment_product: 0,
+  wtare: 0,
+  wgross: 0,
+  datein: '',
+  dateout: '',
+  shipin: 0,
+  shipout: 0,
+  tripin: '',
+  tripout: '',
+  ticket: '',
+  wticket: 0,
+  vendor: 0,
+  rotogage: 0,
+  deliveryin: '',
+  deliveryout:'',
+};  
+
+export interface WithdrawnData {
+  kg: number;
+  img: string;
+  imgin: string;
+  imgout: string;
+  imgscale: string;
+  psi: number;
+  date: string;
+  name: number;
+  seal: string[];
+  twin: number;
+  wnet: number;
+  price: string;
+  id_replenishment_product: number;
+  wtare: number;
+  wgross: number;
+  datein: string;
+  dateout: string;
+  shipin: number;
+  shipout: number;
+  tripin: string;
+  tripout: string;
+  ticket: string;
+  wticket: number;
+  vendor: number;
+  rotogage: number;
+  deliveryin: string;
+  deliveryout: string;
+}
+
+export interface Withdrawn {
+  id: number;
+  ext_id: number | null;
+  created_at: string;
+  updated_at: string;
+  data: WithdrawnData;
+  refdate: string;
+  state: string;
+  diff: number;
+}
+
+export const defaultWithdrawn: Withdrawn= {
+    id: 0,
+    ext_id: null,
+    created_at: '',
+    updated_at: '',
+    data: defaultWithdrawnData,
+    refdate: '',
+    state: '',
+    diff: 0
+}
+
+

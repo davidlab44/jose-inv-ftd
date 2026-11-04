@@ -1,0 +1,237 @@
+.datetime-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  ion-item {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  ion-datetime {
+    margin: 0 auto;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+media print {
+  body * {
+    visibility: hidden;
+  }
+  #barcode, #barcode * {
+    visibility: visible;
+  }
+}
+
+.subheader-toolbar {
+  --min-height: 32px;   /* más delgado que un toolbar normal */
+}
+
+.subheader-title {
+  text-align: center;
+  font-size: 12px;      /* más pequeño */
+  font-weight: 500;     /* opcional, un poco más marcado */
+  width: 100%;          /* asegura centrado perfecto */
+  margin: 0;
+  padding: 0;
+}
+
+.user-table {
+  margin: 10px;
+
+  .header {
+    font-weight: bold;
+    background: #f1f1f1;
+    padding: 8px 0;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .user-row {
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .check-col {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.current-price {
+  justify-content: flex-end !important;
+  text-align: right;
+  font-weight: bold;        
+  color: var(--ion-color-primary); 
+}
+
+
+/* FONDO GENERAL SEGÚN OPCIÓN */
+
+.bg-nacional {
+  --background: #ceedca;
+}
+
+.bg-importado {
+  --background: #fce6e6;
+}
+
+/* FILA DEL PRECIO ACTUAL – Nacional */
+.row-nacional {
+  background-color: #99da91 !important;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+/* Importado */
+.row-importado {
+  background-color: #ef7d7d !important;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+
+/* FILA DEL PRECIO ACTUAL */
+.tbl-row {
+  background-color: #d5d5d5;
+  padding: 8px;
+}
+
+/* ITEMS DEL HISTORICO */
+.titulo-historico,
+.item-historico {
+  background-color: transparent !important;
+  color: #555;
+  font-weight: 400;
+  font-size: small;
+}
+
+
+
+
+/* Quitar fondo a ion-list */
+ion-list {
+  --background: transparent !important;
+}
+
+/* Quitar fondo a ion-item */
+ion-item {
+  --background: transparent !important;
+  background: transparent !important;
+}
+
+/* Mantener los títulos del histórico sin fondo */
+.titulo-historico,
+.item-historico {
+  --background: transparent !important;
+  background: transparent !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.edit-form {
+  margin-top: 24px;
+}
+
+.edit-form ion-card {
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.fc-daygrid-event {
+  font-weight: 600;
+  text-align: center;
+}
+

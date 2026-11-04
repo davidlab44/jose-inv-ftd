@@ -1,0 +1,125 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons *ngIf="!showSearchbar" slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-searchbar
+      placeholder="Buscar CCO (ej: TCSU 500046)"
+      show-clear-button="always"
+      (ionInput)="onCcoSearch($event.detail.value)"> 
+    </ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-grid *ngIf="viajanJuntosList && viajanJuntosList.length>0" >
+    <ion-row> 
+      <ion-col size="10">
+        <ion-grid class="viajanjuntos-grid">
+          <ion-row class="withdrawn-header ion-align-items-center">
+            <ion-col size="1"><ion-label></ion-label></ion-col>
+            <ion-col size="1"><ion-label>Entrega:</ion-label></ion-col>
+            <ion-col size="1"><ion-label>F.vacio</ion-label></ion-col>
+            <ion-col size="2"><ion-label>Isotanq.</ion-label></ion-col>
+            <ion-col size="1"><ion-label>Tkt.</ion-label></ion-col>
+            <ion-col size="1"><ion-label>kg</ion-label></ion-col>
+            <ion-col size="5"></ion-col>
+          </ion-row>
+          <ng-container *ngIf="viajanJuntosList?.length">
+            <ion-row
+              *ngFor="let p of viajanJuntosList"
+              class="viajanjuntos-row ion-align-items-center">
+              <ion-col size="1">
+                {{ p.id }}
+              </ion-col>
+              <ion-col size="2">
+                {{ p.data.datein | date:'dd/MM/yyyy' }}
+              </ion-col>
+              <ion-col size="2">
+                {{ p.data.deliveryin }}
+              </ion-col>
+              <ion-col size="4" [style.background]="ccoMap[+p.data.name]?.color || '#eee'" (click)="discoverTwins(p)">
+                {{ ccoMap[+p.data.name]?.name || 'N/A' }}
+              </ion-col>
+              <ion-col size="1">
+                {{ p.data.ticket }}
+              </ion-col>
+              <ion-col size="2">
+                {{ p.data.kg }}
+              </ion-col>
+            </ion-row>
+          </ng-container>
+        </ion-grid>
+      </ion-col> 
+      <ion-col size="2">
+        <br><br>
+        <ion-grid class="viajanjuntos-grid">
+          <ion-row>
+            <ion-col size="12">
+              <br><br>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+<!--            <ion-col size="6" >-->
+              <!--<ion-button-->
+                <!--fill="clear"-->
+                <!--size="small"-->
+                <!--class="btn-compact"-->
+                <!--title="Desenganchar"-->
+                <!--[color]="viajanJuntosList?.length > 0 && viajanJuntosList[0]?.data?.twin > 0 ? 'success' : 'dark'"-->
+                <!--[disabled]="!viajanJuntosList?.length"-->
+                <!--(click)="desenganchar(viajanJuntosList); $event.stopPropagation()">-->
+                <!--<ion-icon name="lock-open-outline"></ion-icon>-->
+              <!--</ion-button>-->
+            <!--</ion-col>-->
+             <ion-col size="6" >
+              <ion-button
+                fill="clear"
+                size="small"
+                class="btn-compact"
+                title="Desenganchar"
+                [color]="viajanJuntosList?.length > 0 && viajanJuntosList[0]?.data?.twin > 0 ? 'success' : 'dark'"
+                [disabled]="!viajanJuntosList?.length"
+                (click)="enganchar(viajanJuntosList); $event.stopPropagation()">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="6">
+              <ion-button
+                fill="clear"
+                size="small"
+                class="btn-compact"
+                title="Limpiar | Cancelar"
+                [color]="viajanJuntosList?.length > 0 && viajanJuntosList[0]?.data?.twin > 0 ? 'success' : 'dark'"
+                [disabled]="!viajanJuntosList?.length"
+                (click)="clearViajanJuntosList(); $event.stopPropagation()">
+                <ion-icon name="close-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+
+
+          </ion-row>
+        </ion-grid>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+  <!--<ion-fab vertical="bottom" horizontal="end" slot="fixed">-->
+    <!--<ion-fab-button class="fab-premium" (click)="plexaUploader('no estoy pasando nada')">-->
+      <!--<ion-icon name="add"></ion-icon>-->
+    <!--</ion-fab-button>-->
+  <!--</ion-fab>-->
+  <!--<br>-->
+
+
+
