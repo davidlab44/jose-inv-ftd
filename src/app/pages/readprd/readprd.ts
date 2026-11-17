@@ -182,29 +182,29 @@ export class ReadprdPage {
   onSearch(text: string) {
     this.searchSubject.next(text);
   }
-  enviar() {
-    const items = [
-      {
-        ext_id: 101,
-        data: {
-          nombre: 'Producto de prueba',
-          precio: 249.90,
-          categoria: 'Electrónica',
-          stock: 12
-        }
-      },
-      {
-        ext_id: 102,
-        data: {
-          nombre: 'Audífonos Bluetooth',
-          precio: 89.50,
-          categoria: 'Accesorios',
-          stock: 50
-        }
-      }
-    ];
-    return items;
-  }
+/*  enviar() {*/
+    /*const items = [*/
+      /*{*/
+        /*ext_id: 101,*/
+        /*data: {*/
+          /*nombre: 'Producto de prueba',*/
+          /*precio: 249.90,*/
+          /*categoria: 'Electrónica',*/
+          /*stock: 12*/
+        /*}*/
+      /*},*/
+      /*{*/
+        /*ext_id: 102,*/
+        /*data: {*/
+          /*nombre: 'Audífonos Bluetooth',*/
+          /*precio: 89.50,*/
+          /*categoria: 'Accesorios',*/
+          /*stock: 50*/
+        /*}*/
+      /*}*/
+    /*];*/
+    /*return items;*/
+  /*}*/
   out(item: any) {
     this.router.navigate(['/app/tabs/asset-supply-out'], { state: { item } });
   }
