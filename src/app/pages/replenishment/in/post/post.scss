@@ -109,3 +109,40 @@ ion-content.ocr-success {
 }
 
 
+
+.date-picker-item {
+  --border-radius: 12px;
+  --background: var(--ion-card-background, var(--ion-item-background, #fff));
+  --padding-start: 14px;
+  --inner-padding-end: 12px;
+  margin: 12px 0;
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 12px;
+  ion-label { margin: 13px 0; }
+  ion-label h3 { font-size: 13px; font-weight: 600; color: var(--ion-color-medium); }
+  ion-label p { font-size: 15px; margin-top: 5px; white-space: normal; }
+}
+.field-space { height: 16px; }
+.cco-item { display: flex; width: 100%; align-items: center; justify-content: space-between; }
+ion-button { text-transform: none; }
+@media (max-width: 480px) {
+  ion-content.ion-padding { --padding-start: 12px; --padding-end: 12px; }
+  ion-grid { padding-left: 0; padding-right: 0; }
+}
+ion-modal.post-date-modal {
+  --width: min(100%, 440px);
+  --height: min(100%, 600px);
+  --border-radius: 16px;
+}
+ion-modal.post-date-modal .mobile-datetime {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  background: transparent;
+}
+ion-modal.post-date-modal .date-confirm { margin-top: 18px; }
+@media (max-width: 480px) {
+  ion-modal.post-date-modal { --width: 100%; --height: 100%; --border-radius: 0; }
+}
+
+ion-modal.post-date-modal .year-picker-item { --padding-start: 0; margin-bottom: 8px; }
