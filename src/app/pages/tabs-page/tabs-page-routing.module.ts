@@ -100,6 +100,15 @@ const routes: Routes = [
         ]   
       },
       {
+        path: 'rpl-geo-get',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../replenishment/geo/get/getall.module').then(m =>m.GetallModule)
+          }
+        ]   
+      },
+      {
         path: 'ats-ats-post',
         children: [
           {

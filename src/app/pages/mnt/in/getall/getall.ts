@@ -7,6 +7,7 @@ import { AlertController,Config,IonList,LoadingController,ModalController,ToastC
 import { ActivatedRoute,Router } from '@angular/router';
 import { IoService } from '../../../../services/mnt/io.service';
 import { CcoService } from '../../../../services/cc/cco.service';
+import { DateService } from '../../../../services/local/date.service';
 
 @Component({
   selector:'app-getall',
@@ -32,17 +33,18 @@ export class GetallPage implements OnInit {
     private menu: MenuController,
     private ioService: IoService,
     private ccoService: CcoService,
+    private dateService: DateService,
   ) {}
 
   ionViewWillEnter() {
     this.loadIo();
-    this.loadCco();
   }
 
   ionViewWillLeave() {}
 
   ngOnInit() {}
   filteredCcoList:any[] =[];
+
   onSearch(text: string | null | undefined) {
     const value = text ?? '';
     this.hash = value;
@@ -57,19 +59,6 @@ export class GetallPage implements OnInit {
     return list.filter((it)=>it.data.name.includes(hash));
   }
 
-  ccoList: any[] = []; 
-  loadCco(){                
-    this.ccoService.getAll().subscribe({ 
-      next: (res) => {      
-        this.ccoList=res;
-        console.log('ccoList :', res);    
-      }, 
-      error: (err) => {      
-        console.error(new Error('stack_name:').stack, err);
-      } 
-    }); 
-  }     
-
   ioList: any[] = []; 
   fltrdIoList: any[] = []; 
   loadIo() {                
@@ -78,6 +67,7 @@ export class GetallPage implements OnInit {
         this.ioList=res;
         console.log('ioList :', res);
         this.fltrdIoList=this.ioList;
+        this.loadCco();
       }, 
       error: (err) => {      
         console.error(new Error('stack_name:').stack, err);
@@ -85,16 +75,42 @@ export class GetallPage implements OnInit {
     }); 
   }     
 
+  ccoList: any[] = [];
+  loadCco() {
+    this.ccoService.getAll().subscribe({
+      next: (res) => {
+        this.ccoList = res;
+        const ccoMap = new Map(
+          this.ccoList.map((cco) => [cco.id, cco])
+        );
+        this.fltrdIoList = this.fltrdIoList.filter((io) => {
+          const cco = ccoMap.get(io.data.id_cco);
+          if (!cco) return false;
+          io.data.date = this.formatDate(io.created_at);
+          io.data.cco = cco;
+          return true;
+        }).reverse();
+        console.log('fltrdIoList:', this.fltrdIoList);
+      },
+      error: (err) => {
+        console.error(new Error('stack_name:').stack, err);
+      }
+    });
+  }
+
   selectedItem(p:any){
     console.log('selectedItem', p)
     this.filteredCcoList=[];
-    this.filterMntList(p);
   }
 
-  filterMntList(p:any){
-    this.fltrdIoList=this.ioList.filter((it)=>it.data.id_cco==p.id);     
+  formatDate(date:any){
+    return this.dateService.formatFechaEsCo(date);
   }
-  
+
+  /*filterMntList(p:any){*/
+    /*this.fltrdIoList=this.ioList.filter((it)=>it.data.id_cco==p.id);     */
+  /*}*/
+
 
 }
 

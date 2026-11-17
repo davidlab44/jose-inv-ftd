@@ -20,46 +20,90 @@
   <form [formGroup]="form">    
     <input type="hidden" formControlName="id">
     <ion-list>
-      <ion-button expand="block" (click)="takePhotoAndUpload()">
-        📸 Tomar foto
-      </ion-button>
-      <ion-button expand="block" color="secondary" (click)="pickImageAndUpload()">
-        🖼 Elegir de galería
-      </ion-button>
-      <ion-progress-bar
-        *ngIf="uploading"
-        [value]="uploadProgress / 100">
-      </ion-progress-bar>
-      <p *ngIf="uploading">
-        Subiendo: {{ uploadProgress }} %
-      </p>
-      <ion-card *ngIf="uploadedUrl">
+
+      <!-- Capturar desde cámara -->  
+      <ion-button              
+        expand="block"
+        [disabled]="uploading"
+        (click)="takePhotoAndUpload()"> 
+        <ion-icon name="camera-outline" slot="start"></ion-icon>
+        {{ uploading ? 'Procesando OCR...' : 'Capturar imagen' }}                                                                                     
+      </ion-button>            
+      <!-- Seleccionar desde galería -->
+      <ion-button
+        expand="block"
+        color="secondary"      
+        [disabled]="uploading" 
+        (click)="pickImageAndUpload()"> 
+        <ion-icon name="images-outline" slot="start"></ion-icon>                                                                                      
+        Seleccionar de galería 
+      </ion-button>                                                                                                                                   
+      <ion-spinner             
+        *ngIf="uploading"      
+        name="crescent">       
+      </ion-spinner>  
+
+      <!--<ion-button-->
+        <!--expand="block"-->
+        <!--[disabled]="uploading"-->
+        <!--(click)="takePhotoAndUpload()">-->
+        <!--<ion-spinner-->
+          <!--*ngIf="uploading"-->
+          <!--name="crescent"-->
+          <!--slot="start">-->
+        <!--</ion-spinner>-->
+        <!--{{ uploading ? 'Procesando OCR...' : 'Capturar imagen' }}-->
+      <!--</ion-button>-->
+
+      <!--      <ion-button expand="block" (click)="takePhotoAndUpload()">-->
+        <!--📸 Tomar foto-->
+      <!--</ion-button>-->
+      <!--<ion-button expand="block" color="secondary" (click)="pickImageAndUpload()">-->
+        <!--🖼 Elegir de galería-->
+      <!--</ion-button>-->
+      <!--<ion-progress-bar-->
+        <!--*ngIf="uploading"-->
+        <!--[value]="uploadProgress / 100">-->
+      <!--</ion-progress-bar>-->
+      <!--<p *ngIf="uploading">-->
+        <!--Subiendo: {{ uploadProgress }} %-->
+      <!--</p>-->
+      <ion-card *ngIf="rawImage">
         <ion-card-header>
           <ion-card-title>Imagen subida</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <img [src]="uploadedUrl" />
-          <p>{{ uploadedUrl }}</p>
+          <img [src]="rawImage"/>
+          <!--<p>{{ uploadedUrl }}</p>-->
         </ion-card-content>
       </ion-card>
 
-      <ion-grid style="border:solid 1px #d5d5d5;border-radius:3%;">
-        <ion-row class="ion-align-items-center">
-          <ion-col size="6">   
-            <ion-datetime
-              presentation="date-time"
-              [(ngModel)]="uiDate"
-              [ngModelOptions]="{ standalone: true }"
-              (ionChange)="onChange($event)">
-            </ion-datetime>    
-          </ion-col>           
-          <ion-col size="6">   
-            <p style="margin:0;">             
-              {{ uiDate || 'Sin fecha' }}
-            </p>               
-          </ion-col>           
-        </ion-row>             
-      </ion-grid> 
+      <ion-item class="date-picker-item" button detail="false" (click)="openDatePicker()">
+        <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>
+          <h3>Fecha y hora</h3>
+          <p>{{ uiDate ? formatFechaLatam(uiDate) : 'Seleccionar fecha y hora' }}</p>
+        </ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
+      </ion-item>
+
+      <!--<ion-grid style="border:solid 1px #d5d5d5;border-radius:3%;">-->
+        <!--<ion-row class="ion-align-items-center">-->
+          <!--<ion-col size="6">   -->
+            <!--<ion-datetime-->
+              <!--presentation="date-time"-->
+              <!--[(ngModel)]="uiDate"-->
+              <!--[ngModelOptions]="{ standalone: true }"-->
+              <!--(ionChange)="onChange($event)">-->
+            <!--</ion-datetime>    -->
+          <!--</ion-col>           -->
+          <!--<ion-col size="6">   -->
+            <!--<p style="margin:0;">             -->
+              <!--{{ uiDate || 'Sin fecha' }}-->
+            <!--</p>               -->
+          <!--</ion-col>           -->
+        <!--</ion-row>             -->
+      <!--</ion-grid> -->
 
         <!-- <ion-item>-->
           <!--<ion-label position="floating">Fecha remision (LLENOS) | 2026-02-25T00:00:00</ion-label>-->
@@ -72,14 +116,10 @@
         </ion-item>
 
 
-
-
         <ion-item>
           <ion-label position="floating">Viaje:</ion-label>
           <ion-input formControlName="tripout"></ion-input>
         </ion-item>
-       
-
 
         <br><br>
         <ion-item  *ngIf="shipList?.length"  >
@@ -96,8 +136,6 @@
           </ion-select>
         </ion-item>
         <br>
-
-
 
         <br>
         <div style="border:solid 1px #d5d5d5;padding:10px">
@@ -120,8 +158,6 @@
           </ion-row>
         </div>
 
-
-
         <!--<ion-item>-->
           <!--<ion-label position="floating">Barco:</ion-label>-->
           <!--<ion-input formControlName="shipout"></ion-input>-->
@@ -133,6 +169,40 @@
     </ion-button>
   </form>
 </ion-content>
+<ion-modal [isOpen]="datePickerOpen" (didDismiss)="closeDatePicker()" cssClass="post-date-modal">                                                     
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Fecha y hora</ion-title>
+        <ion-buttons slot="end">          
+          <ion-button (click)="closeDatePicker()">Cancelar</ion-button>                                                                               
+        </ion-buttons>         
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding"> 
+      <ion-item lines="none" class="year-picker-item">
+        <ion-label>Año</ion-label>      
+        <ion-select interface="action-sheet" [value]="selectedYear" (ionChange)="changeYear($event)">
+          <ion-select-option *ngFor="let year of years" [value]="year">{{ year }}</ion-select-option>                                                 
+        </ion-select>          
+      </ion-item>
+      <ion-datetime
+        [min]="minDate"
+        [max]="maxDate"        
+        class="mobile-datetime"                                                                                                                       
+        presentation="date-time"
+        locale="es-CO"
+        [preferWheel]="ios"
+        [ngModel]="pendingDate"
+        [ngModelOptions]="{ standalone: true }"
+        (ionChange)="onPendingDateChange($event)">
+      </ion-datetime>
+      <ion-button expand="block" class="date-confirm" (click)="confirmDatePicker()">
+        Confirmar fecha y hora
+      </ion-button>
+    </ion-content>
+  </ng-template>
+</ion-modal>
 
 
 

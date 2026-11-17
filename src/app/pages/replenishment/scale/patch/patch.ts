@@ -218,71 +218,74 @@ export class PatchPage {
     return `${fechaTexto} ${horasTexto}:${minutos}:${segundos} ${ampm}`;
   }
 
-  async takePhotoAndUpload() {
-    this.uploading = true;
-    this.uploadProgress = 0;
-    this.uploadedUrl = null;
-    const base64Image = await this.photoService.takePicture();
-    if (!base64Image) {
-      this.uploading = false;
-      console.error('No se pudo obtener la imagen');
-      return;
-    }
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
-    progress$.subscribe({
-      next: (p) => this.uploadProgress = p,
-      error: (err) => {
-        console.error('Error subiendo imagen', err);
-        this.uploading = false;
-      }
-    });
-    url$.subscribe({
-      next: (url) => {
-        this.uploadedUrl = url;
-        this.launchOcr(url);
-      },
-      error: (err) => {
-        console.error('Error obteniendo URL', err);
-      },
-      complete: () => {
-        this.uploading = false;
-      }
-    });
-  }
+  /*async takePhotoAndUpload() {*/
+    /*this.uploading = true;*/
+    /*this.uploadProgress = 0;*/
+    /*this.uploadedUrl = null;*/
+    /*const base64Image = await this.photoService.takePicture();*/
+    /*if (!base64Image) {*/
+      /*this.uploading = false;*/
+      /*console.error('No se pudo obtener la imagen');*/
+      /*return;*/
+    /*}*/
+    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');*/
+    /*progress$.subscribe({*/
+      /*next: (p) => this.uploadProgress = p,*/
+      /*error: (err) => {*/
+        /*console.error('Error subiendo imagen', err);*/
+        /*this.uploading = false;*/
+      /*}*/
+    /*});*/
+    /*url$.subscribe({*/
+      /*next: (url) => {*/
+        /*this.uploadedUrl = url;*/
+        /*this.launchOcr(url);*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error('Error obteniendo URL', err);*/
+      /*},*/
+      /*complete: () => {*/
+        /*this.uploading = false;*/
+      /*}*/
+    /*});*/
+  /*}*/
 
-  async pickImageAndUpload() {
-    this.uploading = true;
-    this.uploadProgress = 0;
-    this.uploadedUrl = null;
-    const base64Image = await this.photoService.pickImage();
-    if (!base64Image) {
-      this.uploading = false;
-      return;
-    }
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
-    progress$.subscribe(p => this.uploadProgress = p);
-    url$.subscribe({
-      next: (url) => {
-        this.uploadedUrl = url;
-        // 👇 lanzar OCR cuando la URL esté disponible
-        this.launchOcr(url);
-      },
-      error: (err) => {
-        console.error('Error upload', err);
-        this.uploading = false;
-      },
-      complete: () => {
-        this.uploading = false;
-      }
-    });
-  }
+  /*async pickImageAndUpload() {*/
+    /*this.uploading = true;*/
+    /*this.uploadProgress = 0;*/
+    /*this.uploadedUrl = null;*/
+    /*const base64Image = await this.photoService.pickImage();*/
+    /*if (!base64Image) {*/
+      /*this.uploading = false;*/
+      /*return;*/
+    /*}*/
+    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');*/
+    /*progress$.subscribe(p => this.uploadProgress = p);*/
+    /*url$.subscribe({*/
+      /*next: (url) => {*/
+        /*this.uploadedUrl = url;*/
+        /*// 👇 lanzar OCR cuando la URL esté disponible*/
+        /*this.launchOcr(url);*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error('Error upload', err);*/
+        /*this.uploading = false;*/
+      /*},*/
+      /*complete: () => {*/
+        /*this.uploading = false;*/
+      /*}*/
+    /*});*/
+  /*}*/
 
+  imageRaw:string | null=null;
   ocrResponse:any;
   isotanq1Name:string='';
   isotanq1Id:number=0;
   launchOcr(url: string) {
     this.ocrSuccess=true;
     this.startTimer();
+    this.imageRaw=url;
+    this.postImage(this.imageRaw)
     this.ocrService.postScale(url).subscribe({
       next: (res) => {
         this.ocrSuccess=false
@@ -455,9 +458,89 @@ export class PatchPage {
   } 
 
 
+  async takePhotoAndUpload(): Promise<void> { 
+      if (this.uploading) return;
+      this.uploading = true;
+      try {
+        const base64Image = await this.photoService.takePicture();
+        if (!base64Image) {
+          this.uploading = false;
+          return;
+        }
+        this.launchOcr(base64Image);
+      } catch (error) {
+        console.error('Error capturando imagen:', error);
+        this.uploading = false;
+      }
+    }
+    
+    /*launchOcr(base64Image: string): void {*/
+      /*console.time('OCR_PROCESS');*/
+      /*console.log('Base64 length:', base64Image.length);*/
+      /*console.log('Base64 prefix:', base64Image.substring(0, 30));*/
+      /*this.ocrService.postScale(base64Image).subscribe({*/
+        /*next: (response) => {*/
+          /*console.timeEnd('OCR_PROCESS');*/
+          /*console.log('scale-> OCR JSON COMPLETO:', response);*/
+        /*},*/
+        /*error: (error) => {*/
+          /*console.timeEnd('OCR_PROCESS');*/
+          /*console.error('OCR ERROR:', {*/
+            /*status: error.status,*/
+            /*message: error.message,*/
+            /*response: error.error*/
+          /*});*/
+        /*}*/
+      /*});*/
+    /*}*/
+      
 
 
+  async postImage(image:any) {
+    const base64Image = image;
+    if (!base64Image) {
+      this.uploading = false;
+      console.error('No se pudo obtener la imagen');
+      return;
+    }
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
+    progress$.subscribe({
+      next: (p) => this.uploadProgress = p,
+      error: (err) => {
+        console.error('Error subiendo imagen', err);
+        this.uploading = false;
+      }
+    });
+    url$.subscribe({
+      next: (url) => {
+        this.uploadedUrl = url;
+      },
+      error: (err) => {
+        console.error('Error obteniendo URL', err);
+      },
+      complete: () => {
+        this.uploading = false;
+      }
+    });
+  }
 
+
+  async pickImageAndUpload(): Promise<void> {
+    if (this.uploading) return;
+    this.uploading = true;   
+    try {   
+      const base64Image = await this.photoService.pickImage();
+      if (!base64Image) {    
+        this.uploading = false;
+        return;
+      }     
+      this.launchOcr(base64Image);  
+    } catch (error) {        
+      console.error('Error seleccionando imagen:', error);
+      this.uploading = false;
+    } 
+  }   
+ 
 
 }
 

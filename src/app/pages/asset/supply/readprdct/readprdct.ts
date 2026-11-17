@@ -80,7 +80,6 @@ export class AssetSupplyReadprdctPage {
   filteredProductsByCategory: any[] = [];
 
   async ngOnInit(){
-    //this.refreshView();
   }
 
   async ionViewWillEnter(){
@@ -115,7 +114,7 @@ export class AssetSupplyReadprdctPage {
             return coincide;
           });
 
-        const ids = this.filteredCategories.map(c => Number(c.ext_id));
+        const ids = this.filteredCategories.map(c => Number(c.i));
 
         this.filteredProductsByCategory = this.productListFull.filter(prod =>
           ids.includes(Number(prod?.data?.categ?.[0]))
@@ -225,7 +224,7 @@ export class AssetSupplyReadprdctPage {
     if (!Array.isArray(this.categories) || this.categories.length === 0) {
       return 'Sin categoría';
     }
-    const cat = this.categories.find(c => Number(c.ext_id) === Number(id));
+    const cat = this.categories.find(c => Number(c.i) === Number(id));
     const nombre = cat?.data?.name_es_CO;
     return typeof nombre === 'string' && nombre.trim() !== ''
       ? nombre

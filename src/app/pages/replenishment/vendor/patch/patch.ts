@@ -77,7 +77,6 @@ export class PatchPage {
     if (navigation?.extras?.state?.item) {
       this.movement = navigation.extras.state.item;
       this.uploadedUrl=this.movement.data.img;
-      this.vendorDate=this.movement.data.date;
       //this.imported=this.movement.id_replenishment_product;
     } else {
       // Si recargaron la página, puedes cargar el item desde un servicio o API
@@ -243,72 +242,76 @@ export class PatchPage {
   uploadedUrl: string | null = null;
   uploading = false;
 
-  async takePhotoAndUpload() {
-    this.uploading = true;
-    this.uploadProgress = 0;
-    this.uploadedUrl = null;
-    const base64Image = await this.photoService.takePicture();
-    if (!base64Image) {
-      this.uploading = false;
-      console.error('No se pudo obtener la imagen');
-      return;
-    }
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
-    progress$.subscribe({
-      next: (p) => this.uploadProgress = p,
-      error: (err) => {
-        console.error('Error subiendo imagen', err);
-        this.uploading = false;
-      }
-    });
-    url$.subscribe({
-      next: (url) => {
-        this.uploadedUrl = url;
-        // aquí llamas el OCR
-        this.launchOcr(url);
-      },
-      error: (err) => {
-        console.error('Error obteniendo URL', err);
-      },
-      complete: () => {
-        this.uploading = false;
-      }
-    });
-  }
+  /*async takePhotoAndUpload() {*/
+    /*this.uploading = true;*/
+    /*this.uploadProgress = 0;*/
+    /*this.uploadedUrl = null;*/
+    /*const base64Image = await this.photoService.takePicture();*/
+    /*if (!base64Image) {*/
+      /*this.uploading = false;*/
+      /*console.error('No se pudo obtener la imagen');*/
+      /*return;*/
+    /*}*/
+    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');*/
+    /*progress$.subscribe({*/
+      /*next: (p) => this.uploadProgress = p,*/
+      /*error: (err) => {*/
+        /*console.error('Error subiendo imagen', err);*/
+        /*this.uploading = false;*/
+      /*}*/
+    /*});*/
+    /*url$.subscribe({*/
+      /*next: (url) => {*/
+        /*this.uploadedUrl = url;*/
+        /*// aquí llamas el OCR*/
+        /*this.launchOcr(url);*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error('Error obteniendo URL', err);*/
+      /*},*/
+      /*complete: () => {*/
+        /*this.uploading = false;*/
+      /*}*/
+    /*});*/
+  /*}*/
 
-  async pickImageAndUpload() {
-    this.uploading = true;
-    this.uploadProgress = 0;
-    this.uploadedUrl = null;
-    const base64Image = await this.photoService.pickImage();
-    if (!base64Image) {
-      this.uploading = false;
-      return;
-    }
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
-    progress$.subscribe(p => this.uploadProgress = p);
-    url$.subscribe({
-      next: (url) => {
-        this.uploadedUrl = url;
-        // lanzar OCR cuando la URL esté disponible
-        this.launchOcr(url);
-      },
-      error: (err) => {
-        console.error('Error upload', err);
-        this.uploading = false;
-      },
-      complete: () => {
-        this.uploading = false;
-      }
-    });
-  }
+  /*async pickImageAndUpload() {*/
+    /*this.uploading = true;*/
+    /*this.uploadProgress = 0;*/
+    /*this.uploadedUrl = null;*/
+    /*const base64Image = await this.photoService.pickImage();*/
+    /*if (!base64Image) {*/
+      /*this.uploading = false;*/
+      /*return;*/
+    /*}*/
+    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');*/
+    /*progress$.subscribe(p => this.uploadProgress = p);*/
+    /*url$.subscribe({*/
+      /*next: (url) => {*/
+        /*this.uploadedUrl = url;*/
+        /*// lanzar OCR cuando la URL esté disponible*/
+        /*this.launchOcr(url);*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error('Error upload', err);*/
+        /*this.uploading = false;*/
+      /*},*/
+      /*complete: () => {*/
+        /*this.uploading = false;*/
+      /*}*/
+    /*});*/
+  /*}*/
 
+
+  imageRaw:string | null= null;
   ocrResponse:any;
   vendorDate:any='2000-01-01T00:01:00';;
   launchOcr(url: string) {
     console.time('time');
     this.startTimer();
     this.ocrSuccess = true;
+    this.imageRaw=url;
+    this.postImage(this.imageRaw);
     this.ocrService.postVendor(url).subscribe({
       next: (res) => {
         this.stopTimer();   
@@ -368,31 +371,25 @@ export class PatchPage {
     this.updateMovementFromForm();
     this.updateMovementFromForm();
     this.movement.data.img = this.uploadedUrl;
-    this.movement.data.date=this.vendorDate;
-    console.log('mi vendor date',this.vendorDate);
-    const itemPrice = this.getGlpPriceItemByDate(this.movement.data.date, 1);
-    console.log("itemPrice",itemPrice)
-    console.log("movement.data",this.movement.data)
-    this.movement.data.date=this.vendorDate;
-
-
+    //this.movement.data.date=this.vendorDate;
+    //const itemPrice = this.getGlpPriceItemByDate(this.movement.data.date, 1);
+    //console.log("itemPrice",itemPrice)
+    console.log("movement.data a enviar",this.movement.data)
     const date = this.movement.data.date;
     if (!date || new Date(date).getFullYear() <= 2020) {
       this.utilService.presentToast('fecha / año no valido','danger',800)
       return;
     }
-
-
-   if(itemPrice?.data) {
-      const { price, cents } = itemPrice.data;
-      this.movement.data.price = `${price}.${cents}`;
-    }else {
-      console.warn("No se encontró un precio válido para la fecha", this.movement.data.date);
-      this.utilService.presentToast('Revise la fecha ingresada Año-mes-dia','danger',2000)
-    }
-    const cop = itemPrice.data.price;
-    const cents = itemPrice.data.cents;
-    this.movement.data.price=`${cop}.${cents}`;
+    /*if(itemPrice?.data) {*/
+      /*const { price, cents } = itemPrice.data;*/
+      /*this.movement.data.price = `${price}.${cents}`;*/
+    /*}else {*/
+      /*console.warn("No se encontró un precio válido para la fecha", this.movement.data.date);*/
+      /*this.utilService.presentToast('Revise la fecha ingresada Año-mes-dia','danger',2000)*/
+    /*}*/
+    //const cop = itemPrice.data.price;
+    //const cents = itemPrice.data.cents;
+    //this.movement.data.price=`${cop}.${cents}`;
     this.movement.data.id_replenishment_product=1;
     let payload = this.movement.data;
     payload.name = this.ccoId;
@@ -564,12 +561,12 @@ export class PatchPage {
     return null;
   }
 
-  onChange(event: any) {
-    console.log('event',event.detail.value);
-    this.vendorDate=event.detail.value;
-    this.movement.data.date=event.detail.value;
-    console.log('movement.data.date',this.movement.data.date);
-  }
+  /*onChange(event: any) {*/
+    /*console.log('event',event.detail.value);*/
+    /*this.vendorDate=event.detail.value;*/
+    /*this.movement.data.date=event.detail.value;*/
+    /*console.log('movement.data.date',this.movement.data.date);*/
+  /*}*/
 
   private timerId: any = null;
   startTimer(): void {       
@@ -597,6 +594,160 @@ export class PatchPage {
   extractShipName(text: string): string {
     return text?.replace(/^IMO\s+\d+\s*/i, '').trim() ?? ''; 
   }  
+
+
+  async takePhotoAndUpload(): Promise<void> { 
+    if (this.uploading) return;
+    this.uploading = true;
+    try {
+      const base64Image = await this.photoService.takePicture();
+      if (!base64Image) {
+        this.uploading = false;
+        return;
+      }
+      this.launchOcr(base64Image);
+    } catch (error) {
+      console.error('Error capturando imagen:', error);
+      this.uploading = false;
+    }
+  }
+  
+
+  /*launchOcr(base64Image: string): void {*/
+    /*console.time('OCR_PROCESS');*/
+    /*console.log('Base64 length:', base64Image.length);*/
+    /*console.log('Base64 prefix:', base64Image.substring(0, 30));*/
+    /*this.ocrService.postVendor(base64Image).subscribe({*/
+      /*next: (response) => {*/
+        /*console.timeEnd('OCR_PROCESS');*/
+        /*console.log('OCR JSON COMPLETO:', response);*/
+      /*},*/
+      /*error: (error) => {*/
+        /*console.timeEnd('OCR_PROCESS');*/
+        /*console.error('OCR ERROR:', {*/
+          /*status: error.status,*/
+          /*message: error.message,*/
+          /*response: error.error*/
+        /*});*/
+      /*}*/
+    /*});*/
+  /*}*/
+    
+
+
+
+
+  async postImage(image:any) {
+    const base64Image = image;
+    if (!base64Image) {
+      this.uploading = false;
+      console.error('No se pudo obtener la imagen');
+      return;
+    }
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
+    progress$.subscribe({
+      next: (p) => this.uploadProgress = p,
+      error: (err) => {
+        console.error('Error subiendo imagen', err);
+        this.uploading = false;
+      }
+    });
+    url$.subscribe({
+      next: (url) => {
+        this.uploadedUrl = url;
+      },
+      error: (err) => {
+        console.error('Error obteniendo URL', err);
+      },
+      complete: () => {
+        this.uploading = false;
+      }
+    });
+  }
+
+
+
+
+  //uiDate:any='2011-11-11T11:11:11.776966-05:00';
+  //uiDate:any=this.localDateTime(new Date());
+  maxDate = this.localDateTime(new Date());
+  minDate = this.getMinDate();
+  years = Array.from({ length: 3 }, (_, i) => new Date().getFullYear() - i);
+  datePickerOpen = false;
+  pendingDate = '2011-11-11T11:11:11.776966-05:00';
+
+  toDateTimeValue(value: any): string {
+    if (!value) return '';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? '' : date.toISOString();
+  }
+  localDateTime(date: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}` +
+      `T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+  }
+  getMinDate(): string {
+    const date = new Date();
+    date.setFullYear(date.getFullYear()-2);
+    return this.localDateTime(date);
+  }
+  get selectedYear(): number { return Number((this.pendingDate || '').slice(0, 4)); }
+  changeYear(event: any): void {
+    const year = Number(event?.detail?.value);
+    if (!this.years.includes(year)) return;
+    const date = new Date(this.pendingDate);
+    if (Number.isNaN(date.getTime())) return;
+    const day = date.getDate();
+    date.setDate(1);
+    date.setFullYear(year);
+    date.setDate(Math.min(day, new Date(year, date.getMonth()+1, 0).getDate()));
+    const value = this.localDateTime(date);
+    this.pendingDate = value < this.minDate ? this.minDate : value > this.maxDate ? this.maxDate : value;
+  }
+  openDatePicker(): void {
+    this.maxDate = this.localDateTime(new Date());
+    this.minDate = this.getMinDate();
+    this.years = Array.from({ length: 3 }, (_, i) => new Date().getFullYear() - i);
+    const value = this.toDateTimeValue(this.movement.data.date);
+    const date = value ? this.localDateTime(new Date(value)) : this.maxDate;
+    this.pendingDate = date < this.minDate ? this.minDate : date > this.maxDate ? this.maxDate : date;
+    this.datePickerOpen = true;
+  }
+  closeDatePicker(): void { this.datePickerOpen = false; }
+  onPendingDateChange(event: any): void {
+    const value = event?.detail?.value;
+    if (typeof value === 'string' && value) {
+      this.pendingDate = value < this.minDate ? this.minDate : value > this.maxDate ? this.maxDate : value;
+    }
+  }
+  confirmDatePicker(): void {
+    this.onChange({ detail: { value: this.pendingDate } });
+    this.closeDatePicker();
+  }
+  onChange(event: any): void {
+    const value = event?.detail?.value;
+    if (typeof value !== 'string' || !value) return;
+    //this.uiDate = value;
+    this.movement.data.date = value;
+    //this.form?.patchValue({ date: value });
+  }
+
+  async pickImageAndUpload(): Promise<void> {
+    if (this.uploading) return;
+    this.uploading = true;   
+    try {   
+      const base64Image = await this.photoService.pickImage();
+      if (!base64Image) {    
+        this.uploading = false;
+        return;
+      }     
+      this.launchOcr(base64Image);  
+    } catch (error) {        
+      console.error('Error seleccionando imagen:', error);
+      this.uploading = false;
+    } 
+  }   
+        
 
 
 }

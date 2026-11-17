@@ -71,17 +71,11 @@ export class AssetSupplyReorderPage {
     private rexService: RexService
   ) {}
 
-  /*  printSelectedBarcodes(p: Product) {*/
-    /*const paddedId = p.id.toString().padStart(6, '0');*/
-    /*const selectedBarcodes = [paddedId];*/
-    /*this.barcodeService.downloadPDF(selectedBarcodes);*/
-  /*}*/
 
   filteredCategories: any[] = [];
   filteredProductsByCategory: any[] = [];
 
   async ngOnInit(){
-    //this.refreshView();
   }
 
   async ionViewWillEnter(){
@@ -99,102 +93,25 @@ export class AssetSupplyReorderPage {
     this.getAllProductsFull();
   }
 
-  /*async refreshView() {*/
-    /*console.log("ngOnInit")*/
-    /*await this.loadCategories();*/
-    /*await this.loadUms();*/
-    /*this.getAllProducts();*/
-    /*this.getAllProductsFull();*/
-
-    /*this.searchSubject.pipe(*/
-      /*debounceTime(500),*/
-      /*distinctUntilChanged(),*/
-
-      /*tap(text => {*/
-
-        /*const query = text.trim().toLowerCase();*/
-        /*if (query.length === 0) {*/
-          /*//this.productList = this.productListFull.slice(0, 20);*/
-          /*this.productList =  this.filterBelowReorder(this.productListFull);*/
-          /*console.log("FilteredBelowReOrder:", this.productList);*/
-          /*return; */
-        /*}*/
-
-        /*this.filteredCategories = this.categories.filter(cat => {*/
-            /*const nombre = cat?.data?.nombre?.toLowerCase() || "";*/
-            /*const coincide = nombre.includes(text.toLowerCase());*/
-            /*return coincide;*/
-          /*});*/
-
-        /*const ids = this.filteredCategories.map(c => Number(c.id));*/
-
-        /*this.filteredProductsByCategory = this.productListFull.filter(prod =>*/
-          /*ids.includes(Number(prod?.data?.categ?.[0]))*/
-        /*);*/
-
-        /*console.log("Productos filtrados por categoría:", this.filteredProductsByCategory);*/
-      /*}),*/
-
-      /*// 4. SEGUIR HACIENDO BÚSQUEDA REMOTA*/
-      /*switchMap(text => this.productService.searchProducts(text))*/
-
-    /*)*/
-    /*.subscribe({*/
-      /*next: results => {*/
-
-        /*// 1. Unir ambos arreglos*/
-        /*const combined = [...results, ...this.filteredProductsByCategory];*/
-
-        /*// 2. Eliminar duplicados por id*/
-        /*this.productList = combined.filter(*/
-          /*(item, index, self) =>*/
-            /*index === self.findIndex(p => p.id === item.id)*/
-        /*);*/
-
-        /*console.log("productList (sin duplicados):", this.productList);*/
-      /*},*/
-      /*error: err => console.error("Error en búsqueda:", err)*/
-    /*});*/
-
-  /*}*/
 
   selectedCategoryId: number | null = null;
   
   filterProductsByCategory(categoryId: number | null) {
-    // 👉 Caso "Todas"
+    //  Caso "Todas"
     if (categoryId === null) {
       this.refreshView();
       return;
     }
-    // 👉 Seguridad extra (por si llega algo raro)
+    //  seguridad extra (por si llega algo raro)
     if (categoryId === undefined) {
       return;
     }
-    // 👉 Filtrar por categoría
+    //  Filtrar por categoría
     this.productList = this.productList.filter(p =>
       Array.isArray(p?.data?.categ) &&
       p.data.categ.includes(categoryId)
     );
   }
-
-  /*v*/
-  /*filterProductsByCategory(categoryId: number | null) {*/
-    /*if (!categoryId) {*/
-      /*// Si no hay categoría seleccionada, mostrar todos*/
-      /*this.productList = [...this.productListFull];*/
-      /*return;*/
-    /*}*/
-
-    /*if (categoryId === null) {*/
-      /*this.refreshView();*/
-      /*return;*/
-    /*}*/
-
-    /*this.productList = this.productList.filter(p =>*/
-      /*p?.data?.categ?.includes(categoryId)*/
-    /*);*/
-  /*}*/
-
   
   updateSchedule() {
     if (this.point === 'reorder') {
@@ -258,7 +175,7 @@ export class AssetSupplyReorderPage {
           this.categoryService.saveCategoriesToLocal(res); // Guarda en localStorage 
         }, 
         error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
+          console.error(' Error al cargar categorías:', err); 
           this.categories = this.categoryService.getCategoriesFromLocal(); 
         } 
       }); 
@@ -274,7 +191,7 @@ export class AssetSupplyReorderPage {
           this.umService.saveUmsToLocal(res); 
         }, 
         error: (err) => {      
-          console.error('❌ Error al cargar categorías:', err); 
+          console.error(' Error al cargar categorías:', err); 
           this.ums = this.umService.getUmsFromLocal(); 
         } 
       }); 
@@ -284,20 +201,15 @@ export class AssetSupplyReorderPage {
       if (id === null || id === undefined) {
         return 'Sin categoría';
       }
-
       if (!Array.isArray(this.categories) || this.categories.length === 0) {
         return 'Sin categoría';
       }
-
-      const cat = this.categories.find(c => Number(c.id) === Number(id));
-
+      const cat = this.categories.find(c => Number(c.i) === Number(id));
       const nombre = cat?.data?.name_es_CO;
-
       return typeof nombre === 'string' && nombre.trim() !== ''
         ? nombre
         : 'Sin categoría';
     }
-
 
   getUmNameById(id: number | string | null | undefined): string {
     // Validar ID recibido
@@ -335,28 +247,6 @@ export class AssetSupplyReorderPage {
     this.searchSubject.next(text);
   }
 
-  enviar() {
-    const items = [
-      {
-        ext_id: 101,
-        data: {
-          nombre: 'Producto de prueba',
-          precio: 249.90,
-          categoria: 'Electrónica',
-          stock: 12
-        }
-      },
-      {
-        ext_id: 102,
-        data: {
-          nombre: 'Audífonos Bluetooth',
-          precio: 89.50,
-          categoria: 'Accesorios',
-          stock: 50
-        }
-      }
-    ];
-  }
 
   out(item:any){
     console.log("item to modifyqty",item);
@@ -422,9 +312,6 @@ export class AssetSupplyReorderPage {
     window.location.reload();
   }
 
-
-
-
   generatePurchaseOrderPDF() {
     const doc = new jsPDF();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -436,23 +323,18 @@ export class AssetSupplyReorderPage {
     doc.text('Orden de compra', 10, y);
     doc.setFontSize(10);
     doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 150, y);
-
     y += 12;
-
     /* ============== PROVEEDOR ================= */
     doc.setFontSize(10);
     doc.text('Proveedor: ____________________', 10, y);
     doc.text('NIT: ______', 110, y);
     doc.text('Dirección: ___________________________', 150, y);
-
     y += 7;
     doc.text('Teléfono: __________', 10, y);
     doc.text('Email: __________', 80, y);
     doc.text('Contacto: __________', 150, y);
-
     /* ========= ESPACIO / OXÍGENO ========= */
     y += 20;
-
     /* ================= TABLE HEADER ================= */
     doc.setFontSize(10);
     doc.text('#', 10, y);
@@ -460,11 +342,9 @@ export class AssetSupplyReorderPage {
     doc.text('UM', 120, y);
     doc.text('Precio Unit', 140, y);
     doc.text('Precio Total', 170, y);
-
     y += 3;
     doc.line(10, y, 200, y);
     y += 8;
-
     /* ================= PRODUCTS ================= */
     this.productList.forEach((p, index) => {
       // antes de escribir, validamos espacio
@@ -472,13 +352,10 @@ export class AssetSupplyReorderPage {
         doc.addPage();
         y = 20;
       }
-
       doc.text(String(index + 1), 10, y);
       doc.text(p?.data?.name || '', 20, y);
-
       y += 7;
     });
-
     /* ================= FOOTER (BOTTOM FIXED) ================= */
     const footerY = pageHeight - 35;
 
@@ -489,7 +366,6 @@ export class AssetSupplyReorderPage {
 
     doc.text('Autoriza:', 10, footerY + 15);
     doc.text('_______________________________', 40, footerY + 15);
-
     /* ================= SAVE ================= */
     doc.save('orden-compra.pdf');
   }

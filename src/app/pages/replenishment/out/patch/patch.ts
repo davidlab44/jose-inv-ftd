@@ -1,27 +1,11 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
+import { AlertController,IonList,LoadingController,ModalController,ToastController,Config } from '@ionic/angular';
 import { ConferenceData } from '../../../../providers/conference-data';
 import { UserData } from '../../../../providers/user-data';
-import { OpportunityService } from '../../../../services/opportunity.service';
-import { PosOrderService } from '../../../../services/pos-order.service';
-import { TableService } from '../../../../services/table.service';
-import { environment } from '../../../../../environments/environment';
-import { ActivatedRoute } from '@angular/router'
 import { Session } from '../../../../interfaces/session';
-import { SessionService } from '../../../../services/session.service';
 import { UtilService } from '../../../../services/util.service';
-import { ProductService } from '../../../../services/product.service';
-import { BarcodeService } from '../../../../services/barcode.service';
-import { CategoryService } from '../../../../services/category.service';
-import { UmService } from '../../../../services/um.service';
-import { Product } from '../../../../interfaces/product';
-import { BrowserMultiFormatReader } from '@zxing/browser';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { DateService } from '../../../../services/local/date.service';
-import { RexService } from '../../../../services/rex.service';
-import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PhotoService } from '../../../../services/asset/photo.service';
@@ -29,7 +13,6 @@ import { OcrService } from '../../../../services/ai/ocr.service';
 import { CcoService } from '../../../../services/cc/cco.service';
 import { ShipService } from '../../../../services/logistic/ship.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
-import { Withdrawn, WithdrawnData, createDefaultWithdrawn } from '../../../../interfaces/product';
 
 export interface Cco {
   id: number;
@@ -46,12 +29,12 @@ export interface CcoMap {
   };
 }
 
-
 @Component({
   selector: 'page-patch',
   templateUrl: 'patch.html',
   styleUrls: ['./patch.scss'],
 })
+
 export class PatchPage {
 
   ios: boolean;
@@ -103,6 +86,7 @@ export class PatchPage {
       this.movement = navigation.extras.state.item;
       this.uploadedUrl = this.movement.data.imgout;
       this.uiDate=this.movement.data.dateout;
+      this.movement.data.datein=this.movement.data.dateout;
     } else {
       console.warn('No se recibió item por NavigationExtras.state');
     }
@@ -211,107 +195,63 @@ export class PatchPage {
   uploadedUrl: string | null = null;
   uploading = false;
 
-  async takePhotoAndUpload() {
-    this.uploading = true;
-    this.uploadProgress = 0;
-    this.uploadedUrl = null;
-    const base64Image = await this.photoService.takePicture();
-    if (!base64Image) {
-      this.uploading = false;
-      console.error('No se pudo obtener la imagen');
-      return;
-    }
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
-    progress$.subscribe({
-      next: (p) => this.uploadProgress = p,
-      error: (err) => {
-        console.error('Error subiendo imagen', err);
-        this.uploading = false;
-      }
-    });
-    url$.subscribe({
-      next: (url) => {
-        this.uploadedUrl = url;
-        this.launchOcr(url);
-      },
-      error: (err) => {
-        console.error('Error obteniendo URL', err);
-      },
-      complete: () => {
-        this.uploading = false;
-      }
-    });
-  }
+  /*async takePhotoAndUpload() {*/
+    /*this.uploading = true;*/
+    /*this.uploadProgress = 0;*/
+    /*this.uploadedUrl = null;*/
+    /*const base64Image = await this.photoService.takePicture();*/
+    /*if (!base64Image) {*/
+      /*this.uploading = false;*/
+      /*console.error('No se pudo obtener la imagen');*/
+      /*return;*/
+    /*}*/
+    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');*/
+    /*progress$.subscribe({*/
+      /*next: (p) => this.uploadProgress = p,*/
+      /*error: (err) => {*/
+        /*console.error('Error subiendo imagen', err);*/
+        /*this.uploading = false;*/
+      /*}*/
+    /*});*/
+    /*url$.subscribe({*/
+      /*next: (url) => {*/
+        /*this.uploadedUrl = url;*/
+        /*this.launchOcr(url);*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error('Error obteniendo URL', err);*/
+      /*},*/
+      /*complete: () => {*/
+        /*this.uploading = false;*/
+      /*}*/
+    /*});*/
+  /*}*/
 
-  async pickImageAndUpload() {
-    this.uploading = true;
-    this.uploadProgress = 0;
-    this.uploadedUrl = null;
-    const base64Image = await this.photoService.pickImage();
-    if (!base64Image) {
-      this.uploading = false;
-      return;
-    }
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
-    progress$.subscribe(p => this.uploadProgress = p);
-    url$.subscribe({
-      next: (url) => {
-        this.uploadedUrl = url;
-        this.launchOcr(url);
-      },
-      error: (err) => {
-        console.error('Error upload', err);
-        this.uploading = false;
-      },
-      complete: () => {
-        this.uploading = false;
-      }
-    });
-  }
-
-  shipId:any;
-  shipNombreEsp:string | null; 
-  uiDate:any='2000-01-01T00:01:00';
-  launchOcr(url: string) {
-    this.startTimer();
-    this.ocrSuccess = true;
-    this.ocrService.postOut(url).subscribe({
-      next: (res) => {
-        this.stopTimer();
-        this.ocrSuccess = false;
-        console.log('OCR Response:', res);
-        this.shipId=this.getShipId(res,this.shipList);
-        if(this.shipId>0){
-          console.log('shipId',this.shipId)
-          this.shipNombreEsp=this.getShipNameById(this.shipId);
-          console.log('shipNombreEsp',this.shipNombreEsp)
-          this.shipNombreEsp=this.getShipNameById(this.shipId);
-        }else{
-          this.shipNombreEsp='Seleccionar'
-        }
-        const normalizedDate = this.normalizeOCRDate(res?.data?.date);
-        this.movement.data = {
-          ...this.movement.data,
-          deliveryout: res?.data?.deliveryout ?? 0,
-          dateout: res?.data.dateout ?? '',
-          //tripout: res?.data?.tripout ?? '',
-          tripout: 'TMSYP',
-          shipout: 3,
-        };
-        this.form.patchValue({
-          deliveryout: res?.data?.deliveryout ?? 0,
-          dateout: res?.data?.dateout ?? '',
-          tripout: 'TMSYP',
-          shipout: 3,
-        });
-        console.log("movement actualizado:", this.movement);
-        this.uiDate=res.data.dateout;
-      },
-      error: (err) => {
-        console.error('Error OCR:', err);
-      }
-    });
-  }
+  /*async pickImageAndUpload() {*/
+    /*this.uploading = true;*/
+    /*this.uploadProgress = 0;*/
+    /*this.uploadedUrl = null;*/
+    /*const base64Image = await this.photoService.pickImage();*/
+    /*if (!base64Image) {*/
+      /*this.uploading = false;*/
+      /*return;*/
+    /*}*/
+    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');*/
+    /*progress$.subscribe(p => this.uploadProgress = p);*/
+    /*url$.subscribe({*/
+      /*next: (url) => {*/
+        /*this.uploadedUrl = url;*/
+        /*this.launchOcr(url);*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error('Error upload', err);*/
+        /*this.uploading = false;*/
+      /*},*/
+      /*complete: () => {*/
+        /*this.uploading = false;*/
+      /*}*/
+    /*});*/
+  /*}*/
 
   updateMovementFromForm() {
     const f = this.form.value;
@@ -329,7 +269,6 @@ export class PatchPage {
     this.movement.data.imgout = this.uploadedUrl;
     this.movement.data.dateout=this.uiDate;
     console.log('antes del payload',this.movement)
-   
     const payload = { ...this.movement.data,shipout: 3  };
     console.log("payload to patch =>", payload);
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
@@ -343,7 +282,7 @@ export class PatchPage {
         }
         console.log('twin id es:',twinId);
         this.movement2.data.imgout = this.uploadedUrl;
-        this.movement2.data.dateout = this.movement.data.dateout;
+        this.movement2.data.dateout = this.movement.data.datein;
         this.movement2.data.deliveryout = this.movement.data.deliveryout;
         this.movement2.data.tripout = this.movement.data.tripout;
         this.movement2.data.shipout = this.movement.data.shipout;
@@ -391,8 +330,7 @@ export class PatchPage {
     return response;
   }
 
-
-   normalizeOCR(str) {
+  normalizeOCR(str) {
     if (!str) return '';
     return str
       .toLowerCase()
@@ -403,6 +341,7 @@ export class PatchPage {
       .replace(/[^a-z0-9]/g, '')  // elimina espacios, guiones, etc
       .trim();
   }
+
   levenshtein(a, b) {
     const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);
     for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
@@ -494,7 +433,6 @@ export class PatchPage {
     this.movement.data.ship=selectedId;
   }
 
-
   goToTwins(){
     console.log('this.movement',this.movement)
     this.router.navigate(
@@ -507,11 +445,11 @@ export class PatchPage {
     );
   }
 
-  onChange(event: any) {
-      console.log('onchange event',event.detail.value);
-      this.uiDate=event.detail.value;
-      this.movement.data.date=event.detail.value;
-  }
+  /*onChange(event: any) {*/
+      /*console.log('onchange event',event.detail.value);*/
+      /*this.uiDate=event.detail.value;*/
+      /*this.movement.data.date=event.detail.value;*/
+  /*}*/
 
   private timerId: any = null;
   startTimer(): void {
@@ -540,7 +478,199 @@ export class PatchPage {
     return text?.replace(/^IMO\s+\d+\s*/i, '').trim() ?? '';
   }
 
+  async takePhotoAndUpload(): Promise<void> { 
+      if (this.uploading) return;
+      this.uploading = true;
+      try {
+        const base64Image = await this.photoService.takePicture();
+        if (!base64Image) {
+          this.uploading = false;
+          return;
+        }
+        this.launchOcr(base64Image);
+      } catch (error) {
+        console.error('Error capturando imagen:', error);
+        this.uploading = false;
+      }
+    }
+    
+    /*launchOcr(base64Image: string): void {*/
+      /*console.time('OCR_PROCESS');*/
+      /*console.log('Base64 length:', base64Image.length);*/
+      /*console.log('Base64 prefix:', base64Image.substring(0, 30));*/
+      /*this.ocrService.postOut(base64Image).subscribe({*/
+        /*next: (response) => {*/
+          /*console.timeEnd('OCR_PROCESS');*/
+          /*console.log('out -> OCR JSON COMPLETO:', response);*/
+        /*},*/
+        /*error: (error) => {*/
+          /*console.timeEnd('OCR_PROCESS');*/
+          /*console.error('OCR ERROR:', {*/
+            /*status: error.status,*/
+            /*message: error.message,*/
+            /*response: error.error*/
+          /*});*/
+        /*}*/
+      /*});*/
+    /*}*/
 
+  rawImage: string | null = null;
+  shipId:any;
+  shipNombreEsp:string | null; 
+  //uiDate:any='2000-01-01T00:01:00';
+  launchOcr(url: string) {
+    this.startTimer();
+    this.ocrSuccess = true;
+    this.rawImage=url;
+    this.postImage(this.rawImage);
+    this.ocrService.postOut(url).subscribe({
+      next: (res) => {
+        this.stopTimer();
+        this.ocrSuccess = false;
+        console.log('OCR Response:', res);
+        this.shipId=this.getShipId(res,this.shipList);
+        if(this.shipId>0){
+          console.log('shipId',this.shipId)
+          this.shipNombreEsp=this.getShipNameById(this.shipId);
+          console.log('shipNombreEsp',this.shipNombreEsp)
+          this.shipNombreEsp=this.getShipNameById(this.shipId);
+        }else{
+          this.shipNombreEsp='Seleccionar'
+        }
+        const normalizedDate = this.normalizeOCRDate(res?.data?.date);
+        this.movement.data = {
+          ...this.movement.data,
+          deliveryout: res?.data?.deliveryout ?? 0,
+          dateout: res?.data.dateout ?? '',
+          //tripout: res?.data?.tripout ?? '',
+          tripout: 'TMSYP',
+          shipout: 3,
+        };
+        this.form.patchValue({
+          deliveryout: res?.data?.deliveryout ?? 0,
+          dateout: res?.data?.dateout ?? '',
+          tripout: 'TMSYP',
+          shipout: 3,
+        });
+        console.log("movement actualizado:", this.movement);
+        this.uiDate=res.data.dateout;
+      },
+      error: (err) => {
+        console.error('Error OCR:', err);
+      }
+    });
+  }
+
+  async postImage(image:any) {
+    const base64Image = image;
+    if (!base64Image) {
+      this.uploading = false;
+      console.error('No se pudo obtener la imagen');
+      return;
+    }
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
+    progress$.subscribe({
+      next: (p) => this.uploadProgress = p,
+      error: (err) => {
+        console.error('Error subiendo imagen', err);
+        this.uploading = false;
+      }
+    });
+    url$.subscribe({
+      next: (url) => {
+        this.uploadedUrl = url;
+      },
+      error: (err) => {
+        console.error('Error obteniendo URL', err);
+      },
+      complete: () => {
+        this.uploading = false;
+      }
+    });
+  }
+
+
+
+  uiDate:any='2011-11-11T11:11:11.776966-05:00'; 
+  //uiDate:any=this.localDateTime(new Date());
+  maxDate = this.localDateTime(new Date());
+  minDate = this.getMinDate();
+  years = Array.from({ length: 3 }, (_, i) => new Date().getFullYear() - i);
+  datePickerOpen = false;
+  pendingDate = this.uiDate;
+
+  toDateTimeValue(value: any): string {
+    if (!value) return '';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? '' : date.toISOString();
+  }
+  localDateTime(date: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}` +
+      `T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+  }
+  getMinDate(): string {
+    const date = new Date();
+    date.setFullYear(date.getFullYear()-2);
+    return this.localDateTime(date);
+  }
+  get selectedYear(): number { return Number((this.pendingDate || '').slice(0, 4)); }
+  changeYear(event: any): void {
+    const year = Number(event?.detail?.value);
+    if (!this.years.includes(year)) return;
+    const date = new Date(this.pendingDate);
+    if (Number.isNaN(date.getTime())) return;
+    const day = date.getDate();
+    date.setDate(1);
+    date.setFullYear(year);
+    date.setDate(Math.min(day, new Date(year, date.getMonth()+1, 0).getDate()));
+    const value = this.localDateTime(date);
+    this.pendingDate = value < this.minDate ? this.minDate : value > this.maxDate ? this.maxDate : value;
+  }
+  openDatePicker(): void {
+    this.maxDate = this.localDateTime(new Date());
+    this.minDate = this.getMinDate();
+    this.years = Array.from({ length: 3 }, (_, i) => new Date().getFullYear() - i);
+    const value = this.toDateTimeValue(this.uiDate);
+    const date = value ? this.localDateTime(new Date(value)) : this.maxDate;
+    this.pendingDate = date < this.minDate ? this.minDate : date > this.maxDate ? this.maxDate : date;
+    this.datePickerOpen = true;
+  }
+  closeDatePicker(): void { this.datePickerOpen = false; }
+  onPendingDateChange(event: any): void {
+    const value = event?.detail?.value;
+    if (typeof value === 'string' && value) {
+      this.pendingDate = value < this.minDate ? this.minDate : value > this.maxDate ? this.maxDate : value;
+    }
+  }
+  confirmDatePicker(): void {
+    this.onChange({ detail: { value: this.pendingDate } });
+    this.closeDatePicker();
+  }
+  onChange(event: any): void {
+    const value = event?.detail?.value;
+    if (typeof value !== 'string' || !value) return;
+    this.uiDate = value;
+    this.movement.data.datein = value;
+    this.form?.patchValue({ datein: value });
+  }
+
+  async pickImageAndUpload(): Promise<void> {
+    if (this.uploading) return;
+    this.uploading = true;   
+    try {   
+      const base64Image = await this.photoService.pickImage();
+      if (!base64Image) {    
+        this.uploading = false;
+        return;
+      }     
+      this.launchOcr(base64Image);  
+    } catch (error) {        
+      console.error('Error seleccionando imagen:', error);
+      this.uploading = false;
+    } 
+  }   
+        
 
 }
 

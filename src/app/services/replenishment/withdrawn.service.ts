@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { map } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
+
 
 @Injectable({
   providedIn: 'root'
@@ -13,10 +15,22 @@ export class WithdrawnService {
   private model = 'withdrawn';
 
   constructor(private http: HttpClient) {}   
-      
-  getAll(): Observable<any[]> {   
-    return this.http.get<any[]>(`${this.apiUrl}/${this.model}`);
-  }   
+
+  getAll(): Observable<any[]> {
+    const url = `${this.apiUrl}/${this.model}`;
+    console.log('[WithdrawnService] GET URL:', url);
+    console.log('[WithdrawnService] REQUEST:', { method: 'GET', url });
+    return this.http.get<any[]>(url).pipe(
+      tap({
+        next: (response) => console.log('[WithdrawnService] RESPONSE:', response),
+        error: (err) => console.error('[WithdrawnService] ERROR:', err)
+      })
+    );
+  }
+
+  /*getAll(): Observable<any[]> {   */
+    /*return this.http.get<any[]>(`${this.apiUrl}/${this.model}`);*/
+  /*}   */
   
   getById(id: number): Observable<any> {
     const url = `${this.apiUrl}/${this.model}?id=eq.${id}`;

@@ -322,7 +322,7 @@ export class SchedulePage{
   }
 
   getCategoryNameById(id: number): string {
-    const cat = this.categories.find(c => c.ext_id === id);
+    const cat = this.categories.find(c => c.i === id);
     return cat ? cat.data?.name_es_CO || 'Sin categoría' : 'Sin categoría';
   }
 

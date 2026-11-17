@@ -61,7 +61,18 @@ export class PostPage {
   form!: FormGroup;
   replenishmentList: any[] = [];
   replenishment:any;
-  movement:any;
+  ocrResponse:any;
+  withdrawnList:any[]=[];
+  movement: any = {
+   data:{
+    name:0
+   },
+   data2:{
+     name:0
+   }
+  };
+  ocrSuccess: boolean = false;
+
 
   constructor(
     private barcodeService: BarcodeService,
@@ -92,41 +103,42 @@ export class PostPage {
     private shipService : ShipService,
     private withdrawnService : WithdrawnService,
     private ccoService : CcoService,
-  ) {
-    const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras?.state?.item) {
-      this.movement = navigation.extras.state.item;
-      this.uploadedUrl = this.movement.data.imgin;
-      this.uiDate=this.movement.data.datein;
-      //this.ship.data.name=this.movement.data.shipin;
-      //this.shipNameEsp=
-    } else {
-      console.warn('No se recibió item por NavigationExtras.state');
-    }
-    console.log("Item recibido shipin patch:", this.movement);
-  }
+  ) {}
 
+  searchCcoSubject = new Subject<string>(); 
+  hash:string='';
+  table:any
+  rexDocument:any;
+  item:any;
   ngOnInit() {
-    this.initForm();
-  }
-
-  initForm() {
+    this.movement.date='2026'
+    console.log('fake movement',this.movement)
+    const nav = history.state;
+    this.item = nav.item;
+    this.withdrawnList = nav.list;
     this.form = this.fb.group({
-      id: [null],
-      deliveryin: [''],
       datein: [''],
+      deliveryin: [''],
+      cco: [''],
       tripin: [''],
-      shipin: [0],
+      shipin: [''],
+    });
+    const ahora = new Date();
+    this.searchCcoSubject.pipe( 
+      debounceTime(300), 
+      distinctUntilChanged()
+    ).subscribe(text => {  
+      this.applyFilter(text);
     });
   }
 
   ionViewWillEnter() {
     this.form.patchValue({
-      id: this.movement?.id ?? null,
-      deliveryin: this.movement?.data?.deliveryin ?? '',
-      datein: this.movement?.data?.datein ?? '',
-      tripin: this.movement?.data?.tripin ?? '',
-      shipin: this.movement?.data?.shipin ?? null,
+      deliveryin: '',
+      datein: '',
+      cco: '',
+      tripin: '',
+      shipin: '',
     });
     this.getShip();
     this.loadCcos();         
@@ -147,20 +159,9 @@ export class PostPage {
     this.uploading = false;
   }
 
-  slideOpts = {
-    initialSlide: 0,
-    slidesPerView: 1,
-    speed: 300
-  };
+  updateSchedule(){}
 
-  updateSchedule(){
-     
-  }
-
-  prodrexList:any[]=[];
-  ionViewDidEnter() {
-    //this.resetForm(); 
-  }
+  ionViewDidEnter() {}
 
   onSearch(text: string) {
     this.searchSubject.next(text);
@@ -247,60 +248,73 @@ export class PostPage {
     });
   }
 
-  contenedores:any[]=[];
   shipId:number=0;
   shipNombreEsp:string | null;
   uiDate:any='2000-01-01T00:01:00';;
   launchOcr(url: string) {
+    console.time('PROCESS');
+    this.startTimer1();
+    this.ocrSuccess=true;
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
+        this.ocrSuccess=false;
         console.log('ocrResponse:', res);
-        this.contenedores=res.data.contenedores;
-        if(this.contenedores[0]&&this.contenedores[0].length>0){
+        console.timeEnd('PROCESS');
+        this.stopTimer1();
+        this.ocrResponse=res.data;
+        if(this.ocrResponse.contenedores[0]&&this.ocrResponse.contenedores[0].length>0){
           const hasOne = this.thersIsSomeCCoLikeThis(res.data.contenedores[0])
           console.log("hasOne",hasOne)
           if(hasOne){
-            this.ccoName="TCSU "+res.data.contenedores[0];
-            this.movement.data.name=this.ccoService.getIdByName(this.ccoName);     
-          }
+            this.form.patchValue({
+              cco:"TCSU "+res.data.contenedores[0]
+            });
+            this.movement.data.name=this.ccoService.getIdByName("TCSU "+res.data.contenedores[0]);
+            this.ccoName4Search="TCSU "+res.data.contenedores[0];
+         }            
         }else{
           this.utilService.presentToast('no se reconocieron isotanques','danger',500);
-        }
+        }       
         console.log('res 4 abb:', res.data.tripin.slice(0,2).toUpperCase());
         console.log('abb obtenida del trip:', res.data.tripin.slice(0,2).toUpperCase());
         console.log('are equals:',  this.shipList[2].data.abb===res.data.tripin.slice(0,2).toUpperCase());
         console.log('are equals:', res.data.tripin.slice(0,2).toUpperCase()==this.shipList[2].data.abb);
-        const shipin=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
+        //const shipin=this.shipService.findShipByAbbreviation(this.shipList,res.data.tripin.slice(0,2).toUpperCase()); 
+        this.movement.data = {
+          ...this.movement.data,        
+          deliveryin: res?.data?.deliveryin ?? '',
+          datein: res?.data?.datein ?? '',
+          tripin: res?.data?.tripin ?? '',
+          shipin: this.movement.data.shipin ?? '',
+        };
+        console.log('movement antes de patch', this.movement.data)
+        this.form.patchValue({
+          deliveryin: res?.data?.deliveryin ?? '',
+          datein: res?.data?.datein ?? '',
+          tripin: res?.data?.tripin ?? '',
+        });
+
+        const hash=this.extractShipName(res.data.shipin);
+        const shipin=this.shipService.findBestShipId(hash,this.shipList)
         console.log("ship obtenido",shipin)
         if(!shipin){
           this.utilService.presentToast('Ingrese el barco manualmente','primary',1500)
           return;
         }
-        if(shipin.id>0){
-          this.movement.data.shipin=shipin.id
-          console.log('shipinId1',this.movement.data.shipin)
+        if(shipin>0){
+          this.movement.data.shipin=shipin
           this.shipNombreEsp=this.getShipNameById(this.movement.data.shipin)
           const normalizedDate = this.normalizeOCRDate(res?.data?.date);
-          this.movement.data = {
-            ...this.movement.data,
-            deliveryin: res?.data?.deliveryin ?? '',
-            datein: res?.data?.datein ?? '',
-            tripin: res?.data?.tripin ?? '',
-            shipin: this.movement.data.shipin ?? '',
-          };
-
           console.log('movement antes de patch', this.movement.data)
           this.form.patchValue({
-            deliveryin: res?.data?.deliveryin ?? '',
-            datein: res?.data?.datein ?? '',
-            tripin: res?.data?.tripin ?? '',
             shipin: this.getShipNameById(this.movement.data.shipin) ?? 'Unable',
           });
           console.log("movement actualizado:", this.movement);
           this.uiDate=res.data.datein;
         }else{
-          console.log('shipinIdELSE',shipin.id)
+          console.log('shipinIdELSE',shipin)
         }
+        //this.stopTimer();
       },
       error: (err) => {
         console.error('Error OCR:', err);
@@ -314,41 +328,6 @@ export class PostPage {
     );
   }
 
-  /*updateMovementFromForm() {*/
-    /*const f = this.form.value;*/
-    /*this.movement.data = {*/
-      /*...this.movement.data,*/
-      /*deliveryin: f.deliveryin ?? '',*/
-      /*datein: f.datein ?? '',*/
-      /*tripin: f.tripin ?? '',*/
-      /*shipin: Number(f.shipin ?? 0),*/
-    /*};*/
-  /*}*/
-
-  patch() {
-    console.log('movement en el patch ', this.movement)
-    //this.updateMovementFromForm();
-    this.movement.data.imgin = this.uploadedUrl;
-    this.movement.data.datein=this.uiDate;
-    if(!this.ccoName&&this.ccoName.length<2){this.utilService.presentToast('revise isotanque','danger'); return;}
-    //this.movement.data.name=this.ccoService.getIdByName(this.ccoName); 
-    const payload = {...this.movement.data};
-    console.log('uploadedUrl',this.uploadedUrl)
-    payload.imgin=this.uploadedUrl;
-    console.log("payload to patch =>", payload);
-    this.withdrawnService.patch(this.movement.id, payload).subscribe({
-      next: (response) => {
-        console.log("Withdrawn patch response", response);
-        this.resetForm();
-        this.utilService.presentToast("registro actualizado exitosamente","success",1000);
-        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],   { replaceUrl: true });  
-      },
-      error: (err) => {
-        console.error("Withdrawn patch error", err);
-      }
-    });
-  }
-  
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;
     const date = new Date(dateStr);
@@ -370,9 +349,6 @@ export class PostPage {
     this.shipService.getAll().subscribe(resp => {
       this.shipList = resp;
       console.log('shipList',this.shipList);
-      this.form.patchValue({
-        shipin: this.getShipNameById(this.movement.data.shipin) ?? null,
-      });
     });
   }
 
@@ -390,10 +366,8 @@ export class PostPage {
     const selectedShip = this.shipList.find(s => s.id === selectedId);
     console.log('Ship seleccionado =>', selectedShip);
     this.movement.data.shipin=selectedId;
-    //this.shipId=selectedId;
   }
 
-  /*[>---- CCO------ <]*/
   onCcoSearch(text: string) {
     console.log('text to search',text)
     this.applyFilter(text);  
@@ -406,7 +380,6 @@ export class PostPage {
     const search = text.trim().toLowerCase();
     this.filteredList = this.ccoList.filter(item => {
       const name = (item?.data?.name || '').toLowerCase();
-
       return name.includes(search);
     });
     console.log('filteredList', this.filteredList);
@@ -418,7 +391,7 @@ export class PostPage {
       next:(map)=>{
         this.ccoMap=map;     
         this.ccoService.debugMapping(this.filteredList);
-        this.ccoName = this.ccoService.getName(this.movement.data.name)
+        //this.ccoName = this.ccoService.getName(this.movement.data.name)
       },    
       error:(err)=>{
         console.error('Error loading ccos',err); 
@@ -437,14 +410,13 @@ export class PostPage {
       }
     });
   }
-  ccoName: string = '';   // nombre a mostrar
+  ccoName4Search: string = '';   
   selectCco(item: any) {
     this.cco = item;
-    //this.ccoName = item.data.name;
-    this.movement.data.name = item.id;
-    //actualizar movement (muy importante en tu flujo)
     console.log('item pasado:', item);
-    this.ccoName=this.getCcoNameById(item.id);
+    this.ccoName4Search=this.getCcoNameById(item.id);
+    this.movement.data.name = item.id;
+    this.filteredList=[];
   }
   cco:any;  
   isotanq:any;
@@ -464,18 +436,213 @@ export class PostPage {
   onChange(event: any) {
       console.log(event.detail.value);
       this.uiDate=event.detail.value;
-      this.movement.data.date=event.detail.value;
+      this.movement.data.datein=event.detail.value;
   }
-
 
   getCcoNameById(id:number):string{
     const name= this.ccoService.getName(id);
     console.log("name obtenido",name)
-
     return name;
   }
 
+  updateUi(){
+    const data = this.ocrResponse;
+    const normalizedDate = this.normalizeOCRDate(data.date);
+    this.form.patchValue({
+      datein: data.datein ?? null,
+      deliveryin: data.deliveryin ?? null,
+      tripin: data.tripin ?? null,
+      shipin: data.shipin ?? null,
+    });
+  }
 
+  withdrawn:any;
+  post() {
+    const payload: Withdrawn = createDefaultWithdrawn();
+    payload.data.shipin=this.movement.data.shipin;
+    payload.data.name=this.movement.data.name;  
+    payload.data.deliveryin=this.form.value.deliveryin;  
+    payload.data.tripin=this.form.value.tripin;  
+    payload.data.imgin=this.uploadedUrl;  
+    payload.data.datein=this.uiDate;  
+    console.log('payload',payload)
+    this.withdrawnService.post(payload.data).subscribe({
+      next: (response) => {
+        console.log("post response", response);
+        this.utilService.presentToast("registro actualizado exitosamente","success",1000);
+        this.setWithdrawnState(response[0]?.id,'in');
+        console.log('typeOf',typeof(this.ocrResponse.contenedores))
+        if((this.ocrResponse?.contenedores?.[1]?.length ?? 0) > 0) {
+          console.log('contenedores',this.ocrResponse.contenedores)
+          const container2Id=this.ccoService.getIdByName(this.ocrResponse.contenedores[1])
+          console.log('container2id', container2Id);
+          if(container2Id&&container2Id>0){
+            this.cloneWithdrawn(response[0].id,payload,container2Id);
+          }else{
+            console.log('container2id no valido')
+          }
+        }else{ 
+          this.updateUi()
+          this.utilService.presentToast("registro actualizado exitosamente","success",1000);  
+          this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true });  
+        }
+      },
+      error: (err) => {
+        console.error("Withdrawn post error", err);
+      }
+    });
+  }
+
+  setWithdrawnState(id:number,state:string){
+    this.withdrawnService.updateWithdrawnState(id,state).subscribe({
+      next: response => {
+        console.log('Response from server:',response);
+        this.updateUi();
+        this.utilService.presentToast("state actualizado exitosamente","success",1000);  
+        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true });  
+      },
+      error: err => {
+        console.error('Error updating state:', err);
+      }
+    });
+  }
+
+
+  shipMap: Record<string, number> = {};
+  imoMap: Record<string, number> = {};
+  idMap: Record<number, any> = {};
+  buildShipMap(shipList: any[]): Record<string, number> {
+    const map: Record<string, number> = {};
+    for (let i = 0; i < shipList.length; i++) {
+      const s = shipList[i];
+      const name = s?.data?.name;
+      if (name) map[name.trim().toUpperCase()] = s.id;
+    }
+    return map;
+  }
+
+  buildShipMaps(shipList: any[]) {
+    const nameMap: Record<string, number> = {};
+    const imoMap: Record<string, number> = {};
+    const idMap: Record<number, any> = {};
+
+    for (let i = 0; i < shipList.length; i++) {
+      const s = shipList[i];
+      const name = s?.data?.name;
+      const imo  = s?.data?.imo;
+      if (name) nameMap[this.normalize(name)] = s.id;
+      if (imo)  imoMap[this.normalize(imo)]   = s.id;
+      idMap[s.id] = s;
+    }
+
+    this.shipMap = nameMap;
+    this.imoMap  = imoMap;
+    this.idMap   = idMap;
+    this.shipList = shipList; 
+  }
+
+  normalize(v: string): string {
+    return v
+      ?.toUpperCase()
+      .replace(/\s+/g, '')   // quitarespacios
+      .replace(/[^A-Z0-9]/g, '') // limpiar ruido OCR
+      .trim();
+  }
+
+  ccoId: number = 0;   // id cco seleccionado a mostrar
+
+  /*---- CCO2------ */
+  filteredList2: any[] = [];     //lista filtrada
+  onCco2Search(text: string) {
+    console.log('text to search',text)
+    this.applyFilter2(text);  
+  }  
+  applyFilter2(text: string) {
+    if (!text || text.trim() === '') {
+      this.filteredList2 = this.ccoList;
+      return;
+    }
+    const search = text.trim().toLowerCase();
+    this.filteredList2= this.ccoList.filter(item => {
+      const name = (item?.data?.name || '').toLowerCase();
+
+      return name.includes(search);
+    });
+    console.log('filteredList2', this.filteredList2);
+    this.filteredList2=[];
+  }
+ 
+  cco2Name: string = '';   // nombre a mostrar
+  cco2Id: number = 0;   // id cco seleccionado a mostrar
+  select2Cco(item: any) {
+    this.movement.data2.name = item.id;
+    console.log('movement.data2 :', this.movement);
+  }
+
+ async  cloneWithdrawn(idCont1:number,item: any,contenedor2Id) {
+    console.log("idCont1 pasado para clonar:", idCont1);
+    console.log("item pasado para clonar:", item);
+    console.log("contenedor2Id pasado para clonar:", contenedor2Id);
+    item.name=contenedor2Id; 
+    item.twin=idCont1; 
+    const payload =item; 
+    console.log("Payload a enviar:", payload);
+    this.withdrawnService.post(payload).subscribe({
+      next: (response) => {
+        console.log("Clone creado", response);
+        this.selfPatch(item,response[0].id);
+      },
+      error: (err) => {
+        console.error("Error al clonar", err);
+      }
+    });
+  }
+
+
+  async selfPatch(item:any,twin:number) {
+    console.log("item to selfpatch ",item)
+    console.log("twin to selfpatch ",twin)
+    item.twin=twin;
+    this.withdrawnService.patch(item.id,item.data).subscribe({
+      next: (response) => {
+        console.log("Withdrawn selfpatch response", response);
+        this.utilService.presentToast("movimiento actualizado",'success',500)
+        this.updateUi();
+        this.utilService.presentToast("state actualizado exitosamente","success",1000);  
+        this.router.navigate(['/app/tabs/replenishment-withdrawn-getall'],{ replaceUrl: true }); 
+      },
+      error: (err) => {
+        console.error("Withdrawn selfpatch error", err);
+      }
+    });
+  }
+
+  private timerId: any = null;
+  startTimer1(): void {
+    this.stopTimer1();
+    let seconds = 89;
+    console.log('1:29');
+    this.timerId = setInterval(() => {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      console.log(`${minutes}:${secs.toString().padStart(2, '0')}`);
+      if (seconds === 0) {
+        this.stopTimer1();
+        return;
+      }
+      seconds--;
+    }, 1000);
+  }
+  stopTimer1(): void {
+    if (this.timerId !== null) {
+      clearInterval(this.timerId);
+      this.timerId = null;
+    }
+  }
+
+  extractShipName(text: string): string {
+    return text?.replace(/^IMO\s+\d+\s*/i, '').trim() ?? '';
+  }
 
 }
 

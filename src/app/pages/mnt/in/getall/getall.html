@@ -39,14 +39,11 @@
         <ion-col size="1" class="subtask-title">
           {{ p?.id }}
         </ion-col>
-        <ion-col size="4" class="subtask-title">
-          {{ p?.created_at }} 
+        <ion-col size="5" class="subtask-title">
+          {{ p?.data.date }} 
         </ion-col>
-        <ion-col size="2" class="subtask-title">
-          {{ p?.data?.in }}  
-        </ion-col>
-        <ion-col size="2" class="subtask-title">
-          {{ p?.data?.id_cco }}  
+        <ion-col size="6" class="subtask-title">
+          {{ p?.data?.cco?.data.name }}
         </ion-col>
       </ion-row>
     </ion-grid>

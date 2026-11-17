@@ -1,0 +1,54 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="menu.toggle()" aria-label="Abrir menú">
+        <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Ubicación de contenedores</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Buscar contenedor" [debounce]="200"
+      (ionInput)="onSearch($event.detail.value || '')"></ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="loadCco()" aria-label="Actualizar">
+        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="summary">
+    <span class="summary-title">Contenedores: {{ fltCcoList.length }}</span>
+    <span class="summary-subtitle">Último movimiento registrado</span>
+  </div>
+  <ion-progress-bar *ngIf="loading" type="indeterminate"></ion-progress-bar>
+  <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+  <div class="withdrawn-table-container">
+    <table class="withdrawn-table">
+      <thead>
+        <tr>
+          <th *ngFor="let column of columns">
+            <span>{{ column.label }}</span>
+            <span class="count">{{ getCount(column.key) }}</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of fltCcoList; trackBy:trackById">
+          <td *ngFor="let column of columns" [class.active-cell]="item.data.lct[column.key]">
+            <button *ngIf="item.data.lct[column.key]" type="button" class="container-chip"
+              [style.--container-color]="item.data.color || '#3478c0'" (click)="patchItem(item)">
+              <span class="color-dot"></span>
+              <span>{{ item.data.name }}</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="empty-state" *ngIf="!loading && !fltCcoList.length">
+    No se encontraron contenedores.
+  </div>
+  <div class="hint"></div>
+</ion-content>

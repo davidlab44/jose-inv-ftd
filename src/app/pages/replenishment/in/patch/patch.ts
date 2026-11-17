@@ -214,73 +214,75 @@ export class PatchPage {
   uploadedUrl: string | null = null;
   uploading = false;
 
-  async takePhotoAndUpload() {
-    this.uploading = true;
-    this.uploadProgress = 0;
-    this.uploadedUrl = null;
-    const base64Image = await this.photoService.takePicture();
-    if (!base64Image) {
-      this.uploading = false;
-      console.error('No se pudo obtener la imagen');
-      return;
-    }
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
-    progress$.subscribe({
-      next: (p) => this.uploadProgress = p,
-      error: (err) => {
-        console.error('Error subiendo imagen', err);
-        this.uploading = false;
-      }
-    });
-    url$.subscribe({
-      next: (url) => {
-        this.uploadedUrl = url;
-        this.launchOcr(url);
-      },
-      error: (err) => {
-        console.error('Error obteniendo URL', err);
-      },
-      complete: () => {
-        this.uploading = false;
-      }
-    });
-  }
+  /*async takePhotoAndUpload() {*/
+    /*this.uploading = true;*/
+    /*this.uploadProgress = 0;*/
+    /*this.uploadedUrl = null;*/
+    /*const base64Image = await this.photoService.takePicture();*/
+    /*if (!base64Image) {*/
+      /*this.uploading = false;*/
+      /*console.error('No se pudo obtener la imagen');*/
+      /*return;*/
+    /*}*/
+    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');*/
+    /*progress$.subscribe({*/
+      /*next: (p) => this.uploadProgress = p,*/
+      /*error: (err) => {*/
+        /*console.error('Error subiendo imagen', err);*/
+        /*this.uploading = false;*/
+      /*}*/
+    /*});*/
+    /*url$.subscribe({*/
+      /*next: (url) => {*/
+        /*this.uploadedUrl = url;*/
+        /*this.launchOcr(url);*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error('Error obteniendo URL', err);*/
+      /*},*/
+      /*complete: () => {*/
+        /*this.uploading = false;*/
+      /*}*/
+    /*});*/
+  /*}*/
 
-  async pickImageAndUpload() {
-    this.uploading = true;
-    this.uploadProgress = 0;
-    this.uploadedUrl = null;
-    const base64Image = await this.photoService.pickImage();
-    if (!base64Image) {
-      this.uploading = false;
-      return;
-    }
-    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
-    progress$.subscribe(p => this.uploadProgress = p);
-    url$.subscribe({
-      next: (url) => {
-        this.uploadedUrl = url;
-        this.launchOcr(url);
-      },
-      error: (err) => {
-        console.error('Error upload', err);
-        this.uploading = false;
-      },
-      complete: () => {
-        this.uploading = false;
-      }
-    });
-  }
+  /*async pickImageAndUpload() {*/
+    /*this.uploading = true;*/
+    /*this.uploadProgress = 0;*/
+    /*this.uploadedUrl = null;*/
+    /*const base64Image = await this.photoService.pickImage();*/
+    /*if (!base64Image) {*/
+      /*this.uploading = false;*/
+      /*return;*/
+    /*}*/
+    /*const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');*/
+    /*progress$.subscribe(p => this.uploadProgress = p);*/
+    /*url$.subscribe({*/
+      /*next: (url) => {*/
+        /*this.uploadedUrl = url;*/
+        /*this.launchOcr(url);*/
+      /*},*/
+      /*error: (err) => {*/
+        /*console.error('Error upload', err);*/
+        /*this.uploading = false;*/
+      /*},*/
+      /*complete: () => {*/
+        /*this.uploading = false;*/
+      /*}*/
+    /*});*/
+  /*}*/
 
+  rawImage:string | null=null;
   contenedores:any[]=[];
   shipId:number=0;
-  shipNombreEsp:string | null;
-  uiDate:any='2000-01-01T00:01:00';
+  shipNombreEsp:string | null=null;
+  //uiDate:any='2000-01-01T00:01:00';
   launchOcr(url: string) {
     console.time('PROCESS');
     this.startTimer1();
     this.ocrSuccess=true;
-
+    this.rawImage=url;
+    this.postImage(this.rawImage)
     this.ocrService.postIn(url).subscribe({
       next: (res) => {
         this.stopTimer1();
@@ -411,7 +413,7 @@ export class PatchPage {
     const nombre = cco?.data?.name;
     return typeof nombre === 'string' && nombre.trim() !== ''
       ? nombre
-      : 'Sin Nombre';
+      : '';
   }
 
   onShipSelect(ev: any) {
@@ -419,10 +421,10 @@ export class PatchPage {
     const selectedShip = this.shipList.find(s => s.id === selectedId);
     console.log('Ship seleccionado =>', selectedShip);
     this.movement.data.shipin=selectedId;
+    this.shipNombreEsp=this.getShipNameById(this.movement.data.shipin);
     //this.shipId=selectedId;
   }
 
-  /*[>---- CCO------ <]*/
   onCcoSearch(text: string) {
     console.log('text to search',text)
     this.applyFilter(text);  
@@ -447,7 +449,7 @@ export class PatchPage {
       next:(map)=>{
         this.ccoMap=map;     
         this.ccoService.debugMapping(this.filteredList);
-        this.ccoName = this.ccoService.getName(this.movement.data.name)
+        this.ccoName = this.ccoService.getName2(this.movement.data.name)
       },    
       error:(err)=>{
         console.error('Error loading ccos',err); 
@@ -466,7 +468,7 @@ export class PatchPage {
       }
     });
   }
-  ccoName: string = '';   // nombre a mostrar
+  ccoName: string  | null=null;   // nombre a mostrar
   selectCco(item: any) {
     this.cco = item;
     //this.ccoName = item.data.name;
@@ -481,29 +483,20 @@ export class PatchPage {
   ccos: any[] = []; 
   loadCco() {                
     this.ccoService.getAll().subscribe({ 
-        next: (res) => {       
-          console.log('Cco:', res);    
-          this.ccos = res;
-        }, 
-        error: (err) => {      
-          console.error(' Error al cargar cco:', err); 
-        } 
-      }); 
-   } 
-
-  onChange(event: any) {
-      console.log(event.detail.value);
-      this.uiDate=event.detail.value;
-      this.movement.data.datein=event.detail.value;
-  }
-
+      next: (res) => {       
+        console.log('Cco:', res);    
+        this.ccos = res;
+      }, 
+      error: (err) => {      
+        console.error(' Error al cargar cco:', err); 
+      } 
+    }); 
+  } 
   getCcoNameById(id:number):string{
-    const name= this.ccoService.getName(id);
+    const name= this.ccoService.getName2(id);
     console.log("name obtenido",name)
     return name;
   }
-
-
 
   private timerId: any = null;
   startTimer1(): void {
@@ -533,7 +526,161 @@ export class PatchPage {
   }
 
 
+  async takePhotoAndUpload(): Promise<void> {                                                                                                       
+      if (this.uploading) return;
+      this.uploading = true;
+      try {
+        const base64Image = await this.photoService.takePicture();
+        if (!base64Image) {
+          this.uploading = false;
+          return;
+        }
+        this.launchOcr(base64Image);
+      } catch (error) {
+        console.error('Error capturando imagen:', error);
+        this.uploading = false;
+      }
+    }
+    
+    /*launchOcr(base64Image: string): void {*/
+      /*console.time('OCR_PROCESS');*/
+      /*console.log('Base64 length:', base64Image.length);*/
+      /*console.log('Base64 prefix:', base64Image.substring(0, 30));*/
+      /*this.ocrService.postIn(base64Image).subscribe({*/
+        /*next: (response) => {*/
+          /*console.timeEnd('OCR_PROCESS');*/
+          /*console.log('OCR JSON COMPLETO:', response);*/
+        /*},*/
+        /*error: (error) => {*/
+          /*console.timeEnd('OCR_PROCESS');*/
+          /*console.error('OCR ERROR:', {*/
+            /*status: error.status,*/
+            /*message: error.message,*/
+            /*response: error.error*/
+          /*});*/
+        /*}*/
+      /*});*/
+    /*}*/
+      
 
+  async postImage(image:any) {
+    const base64Image = image;
+    if (!base64Image) {
+      this.uploading = false;
+      console.error('No se pudo obtener la imagen');
+      return;
+    }
+    const { progress$, url$ } = this.photoService.uploadBase64Image(base64Image,'fotos');
+    progress$.subscribe({
+      next: (p) => this.uploadProgress = p,
+      error: (err) => {
+        console.error('Error subiendo imagen', err);
+        this.uploading = false;
+      }
+    });
+    url$.subscribe({
+      next: (url) => {
+        this.uploadedUrl = url;
+      },
+      error: (err) => {
+        console.error('Error obteniendo URL', err);
+      },
+      complete: () => {
+        this.uploading = false;
+      }
+    });
+  }
+
+
+
+  uiDate:any='2011-11-11T11:11:11.776966-05:00'; 
+  //uiDate:any=this.localDateTime(new Date());
+  maxDate = this.localDateTime(new Date());
+  minDate = this.getMinDate();
+  years = Array.from({ length: 3 }, (_, i) => new Date().getFullYear() - i);
+  datePickerOpen = false;
+  pendingDate = this.uiDate;
+
+
+  toDateTimeValue(value: any): string {
+    if (!value) return '';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? '' : date.toISOString();
+  }
+  localDateTime(date: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}` +
+      `T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+  }
+  getMinDate(): string {
+    const date = new Date();
+    date.setFullYear(date.getFullYear()-2);
+    return this.localDateTime(date);
+  }
+  get selectedYear(): number { return Number((this.pendingDate || '').slice(0, 4)); }
+  changeYear(event: any): void {
+    const year = Number(event?.detail?.value);
+    if (!this.years.includes(year)) return;
+    const date = new Date(this.pendingDate);
+    if (Number.isNaN(date.getTime())) return;
+    const day = date.getDate();
+    date.setDate(1);
+    date.setFullYear(year);
+    date.setDate(Math.min(day, new Date(year, date.getMonth()+1, 0).getDate()));
+    const value = this.localDateTime(date);
+    this.pendingDate = value < this.minDate ? this.minDate : value > this.maxDate ? this.maxDate : value;
+  }
+  openDatePicker(): void {
+    this.maxDate = this.localDateTime(new Date());
+    this.minDate = this.getMinDate();
+    this.years = Array.from({ length: 3 }, (_, i) => new Date().getFullYear() - i);
+    const value = this.toDateTimeValue(this.uiDate);
+    const date = value ? this.localDateTime(new Date(value)) : this.maxDate;
+    this.pendingDate = date < this.minDate ? this.minDate : date > this.maxDate ? this.maxDate : date;
+    this.datePickerOpen = true;
+  }
+  closeDatePicker(): void { this.datePickerOpen = false; }
+  onPendingDateChange(event: any): void {
+    const value = event?.detail?.value;
+    if (typeof value === 'string' && value) {
+      this.pendingDate = value < this.minDate ? this.minDate : value > this.maxDate ? this.maxDate : value;
+    }
+  }
+  confirmDatePicker(): void {
+    this.onChange({ detail: { value: this.pendingDate } });
+    this.closeDatePicker();
+  }
+  onChange(event: any): void {
+    const value = event?.detail?.value;
+    if (typeof value !== 'string' || !value) return;
+    this.uiDate = value;
+    this.movement.data.datein = value;
+    this.form?.patchValue({ datein: value });
+  }
+
+  /*closeDatePicker*/
+  /*onChange(event: any) {*/
+    /*console.log(event.detail.value);*/
+    /*this.uiDate=event.detail.value;*/
+    /*this.movement.data.datein=event.detail.value;*/
+  /*}*/
+
+  async pickImageAndUpload(): Promise<void> {
+    if (this.uploading) return;
+    this.uploading = true;   
+    try {   
+      const base64Image = await this.photoService.pickImage();
+      if (!base64Image) {    
+        this.uploading = false;
+        return;
+      }     
+      this.launchOcr(base64Image);  
+    } catch (error) {        
+      console.error('Error seleccionando imagen:', error);
+      this.uploading = false;
+    } 
+  }   
+          
 
 }
 

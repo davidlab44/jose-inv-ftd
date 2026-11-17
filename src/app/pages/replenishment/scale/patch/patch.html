@@ -22,19 +22,53 @@
   <form [formGroup]="form">    
     <input type="hidden" formControlName="id">
     <ion-list>
-      <ion-button expand="block" (click)="takePhotoAndUpload()">
-        📸 Tomar foto
+
+      <!-- Capturar desde cámara -->  
+      <ion-button              
+        expand="block"
+        [disabled]="uploading"
+        (click)="takePhotoAndUpload()"> 
+        <ion-icon name="camera-outline" slot="start"></ion-icon>
+        {{ uploading ? 'Procesando OCR...' : 'Capturar imagen' }}
+      </ion-button>            
+      <!-- Seleccionar desde galería -->
+      <ion-button
+        expand="block"
+        color="secondary"      
+        [disabled]="uploading" 
+        (click)="pickImageAndUpload()"> 
+        <ion-icon name="images-outline" slot="start"></ion-icon>
+        Seleccionar de galería 
       </ion-button>
-      <ion-button expand="block" color="secondary" (click)="pickImageAndUpload()">
-        🖼 Elegir de galería
-      </ion-button>
-      <ion-progress-bar
-        *ngIf="uploading"
-        [value]="uploadProgress / 100">
-      </ion-progress-bar>
-      <p *ngIf="uploading">
-        Subiendo: {{ uploadProgress }} %
-      </p>
+      <ion-spinner             
+        *ngIf="uploading"      
+        name="crescent">       
+      </ion-spinner>  
+
+      <!--<ion-button-->
+        <!--expand="block"-->
+        <!--[disabled]="uploading"-->
+        <!--(click)="takePhotoAndUpload()">-->
+        <!--<ion-spinner-->
+          <!--*ngIf="uploading"-->
+          <!--name="crescent"-->
+          <!--slot="start">-->
+        <!--</ion-spinner>-->
+        <!--{{ uploading ? 'Procesando OCR...' : 'Capturar imagen' }}-->
+      <!--</ion-button>-->
+      <!--<ion-button expand="block" (click)="takePhotoAndUpload()">-->
+        <!--📸 Tomar foto-->
+      <!--</ion-button>-->
+      <!--<ion-button expand="block" color="secondary" (click)="pickImageAndUpload()">-->
+        <!--🖼 Elegir de galería-->
+      <!--</ion-button>-->
+      <!--<ion-progress-bar-->
+        <!--*ngIf="uploading"-->
+        <!--[value]="uploadProgress / 100">-->
+      <!--</ion-progress-bar>-->
+      <!--<p *ngIf="uploading">-->
+        <!--Subiendo: {{ uploadProgress }} %-->
+      <!--</p>-->
       <ion-card *ngIf="uploadedUrl">
         <ion-card-header>
           <ion-card-title>Imagen subida</ion-card-title>
@@ -42,12 +76,12 @@
         <ion-card-content>
           <h6>Imagen</h6>
           <img [src]="uploadedUrl" />
-          <p>
-            imgUrl:
-            <a [href]="uploadedUrl" target="_blank">
-              {{ uploadedUrl }}
-            </a>
-          </p>
+          <!--<p>-->
+            <!--imgUrl:-->
+            <!--<a [href]="uploadedUrl" target="_blank">-->
+              <!--{{ uploadedUrl }}-->
+            <!--</a>-->
+          <!--</p>-->
         </ion-card-content>
       </ion-card>
         <ion-item>
@@ -88,7 +122,6 @@
             </ion-col>
           </ion-row>
         </div>
-
 
     </ion-list>
     <br>

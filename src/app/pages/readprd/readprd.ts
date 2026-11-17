@@ -20,12 +20,15 @@ import { RexService } from '../../services/rex.service';
 import { RateClientComponent } from '../../pages/modal/rate-client/rate-client.component';
 import { ExcelService } from '../../services/local/excel.service';
 declare const require: any;
+
 const shared = require('./readprd.js');
+
 @Component({
   selector: 'page-readprd',
   templateUrl: 'readprd.html',
   styleUrls: ['./readprd.scss']
 })
+
 export class ReadprdPage {
   @ViewChild('searchbar', { static: false }) searchbar!: IonSearchbar;
   ios: boolean;
@@ -120,7 +123,7 @@ export class ReadprdPage {
       error: e => console.error('Error:', e)
     });
   }
-/*  getAllProductsFull() {*/
+  /*getAllProductsFull() {*/
     /*this.productService.getAll().subscribe({*/
       /*next: r => {*/
         /*this.productListFull = r;*/
@@ -128,9 +131,11 @@ export class ReadprdPage {
       /*error: e => console.error('Error:', e)*/
     /*});*/
   /*}*/
+
   searchProducts(hash: string, list: any[]): any[] {
     return shared.searchProducts(hash, list);
   }
+  
   loadCategories() {
     this.categoryService.getAllCategories().subscribe({
       next: r => {
@@ -145,6 +150,7 @@ export class ReadprdPage {
       }
     });
   }
+  
   loadUms() {
     this.umService.getAllUms().subscribe({
       next: r => {

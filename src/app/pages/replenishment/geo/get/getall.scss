@@ -1,0 +1,38 @@
+:host { display:block; }
+ion-content { --background:#f3f5f9; }
+ion-toolbar { --background:#fff; --color:#26354a; }
+ion-title { font-size:16px; font-weight:700; }
+ion-searchbar { --background:#f1f4f8; --border-radius:12px; padding:4px 10px; }
+.summary { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:16px 14px 10px; }
+.summary-title { color:#233247; font-size:15px; font-weight:700; }
+.summary-subtitle { color:#7b8798; font-size:11px; text-align:right; }
+.withdrawn-table-container { margin:4px 10px 12px; border-radius:12px; background:#fff; overflow:auto;
+  box-shadow:0 3px 16px rgba(26,45,75,.07); max-height:calc(100vh - 230px); }
+.withdrawn-table { border-collapse:separate; border-spacing:0; width:100%; min-width:780px; table-layout:fixed; }
+.withdrawn-table th { position:sticky; top:0; z-index:2; padding:13px 8px; background:#26384f; color:#fff;
+  text-align:center; font-size:11px; font-weight:600; letter-spacing:.2px; }
+.withdrawn-table th + th { border-left:1px solid rgba(255,255,255,.12); }
+.count { display:block; margin:7px auto 0; width:max-content; min-width:25px; padding:3px 7px;
+  border-radius:20px; background:rgba(255,255,255,.16); font-size:11px; }
+.withdrawn-table td { height:46px; padding:5px; text-align:center; border-bottom:1px solid #edf0f4;
+  border-right:1px solid #edf0f4; }
+.withdrawn-table tbody tr:nth-child(even) { background:#fafbfd; }
+.withdrawn-table tbody tr:hover { background:#f2f6fc; }
+.withdrawn-table td.active-cell { background:#eaf5f0; }
+.container-chip { display:inline-flex; align-items:center; justify-content:center; gap:6px; max-width:100%;
+  padding:7px 9px; border:1px solid #cddfd6; border-radius:8px; background:#fff; color:#264b3c;
+  font-size:12px; font-weight:650; cursor:pointer; overflow-wrap:anywhere; }
+.color-dot { flex:none; width:9px; height:9px; border-radius:50%; background:var(--container-color); }
+.container-chip:active { transform:scale(.97); }
+.error-message { margin:12px; color:#a52b2b; font-size:13px; }
+.empty-state { padding:32px 12px; text-align:center; color:#667487; font-size:13px; }
+.hint { margin:8px 14px 20px; color:#8290a1; font-size:11px; }
+@media(max-width:600px) {
+  ion-title { font-size:14px; }
+  .summary { padding:12px 10px 8px; }
+  .summary-subtitle { font-size:10px; }
+  .withdrawn-table-container { margin:4px 6px 10px; border-radius:9px; }
+  .withdrawn-table { min-width:720px; }
+  .withdrawn-table th { padding:11px 5px; font-size:10px; }
+  .container-chip { font-size:11px; padding:7px 5px; }
+}

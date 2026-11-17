@@ -125,6 +125,10 @@ export class CcoService {
     return this.ccoMap[Number(id)]?.name || 'N/A';
   }
 
+  getName2(id: number | string): string {
+    return this.ccoMap[Number(id)]?.name || '';
+  }
+
   getColor(id: number | string): string {
     return this.ccoMap[Number(id)]?.color || '#ccc';
   }

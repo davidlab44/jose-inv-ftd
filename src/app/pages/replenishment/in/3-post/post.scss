@@ -1,0 +1,146 @@
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #barcode, #barcode * {
+    visibility: visible;
+  }
+}
+
+.subheader-toolbar {
+  --min-height: 32px;   /* más delgado que un toolbar normal */
+}
+
+.subheader-title {
+  text-align: center;
+  font-size: 12px;      /* más pequeño */
+  font-weight: 500;     /* opcional, un poco más marcado */
+  width: 100%;          /* asegura centrado perfecto */
+  margin: 0;
+  padding: 0;
+}
+
+.user-table {
+  margin: 10px;
+
+  .header {
+    font-weight: bold;
+    background: #f1f1f1;
+    padding: 8px 0;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .user-row {
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .check-col {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+/* Contenedor con scroll horizontal suave en iOS */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* importante para iOS */
+  background: transparent;
+}
+
+/* Forzamos que la tabla tenga un ancho mínimo para que aparezca scroll si la pantalla es pequeña */
+.wide-table {
+  min-width: 720px; /* ajústalo según cuántas columnas tengas */
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+/* Header */
+.wide-table thead th {
+  position: sticky;
+  top: 0;
+  background: #ffffff; /* color del header */
+  z-index: 10;
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 700;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 13px;
+}
+
+/* Celdas */
+.wide-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  vertical-align: middle;
+  white-space: nowrap; /* evita que los contenidos se rompan en varias líneas */
+}
+
+/* Alternado de filas (opcional) */
+.wide-table tbody tr:nth-child(odd) {
+  background: rgba(0,0,0,0.02);
+}
+
+/* Primera columna fija (sticky a la izquierda) */
+.sticky-col {
+  position: sticky;
+  left: 0;
+  background: #fff;
+  z-index: 11;   /* mayor que thead para que quede encima */
+  box-shadow: 2px 0 4px rgba(0,0,0,0.03); /* pequeña separación visual */
+}
+
+/* Ajustes para pantallas muy pequeñas: puedes reducir la min-width o los paddings */
+@media (max-width: 420px) {
+  .wide-table { min-width: 600px; }
+  .wide-table thead th,
+  .wide-table tbody td { padding: 8px 10px; font-size: 13px; }
+}
+
+
+
+ion-content.ocr-success {
+  --background: #fce986;
+}
+
+
+
+.date-picker-item {
+  --border-radius: 12px;
+  --background: var(--ion-card-background, var(--ion-item-background, #fff));
+  --padding-start: 14px;
+  --inner-padding-end: 12px;
+  margin: 12px 0;
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 12px;
+  ion-label { margin: 13px 0; }
+  ion-label h3 { font-size: 13px; font-weight: 600; color: var(--ion-color-medium); }
+  ion-label p { font-size: 15px; margin-top: 5px; white-space: normal; }
+}
+.field-space { height: 16px; }
+.cco-item { display: flex; width: 100%; align-items: center; justify-content: space-between; }
+ion-button { text-transform: none; }
+@media (max-width: 480px) {
+  ion-content.ion-padding { --padding-start: 12px; --padding-end: 12px; }
+  ion-grid { padding-left: 0; padding-right: 0; }
+}
+ion-modal.post-date-modal {
+  --width: min(100%, 440px);
+  --height: min(100%, 600px);
+  --border-radius: 16px;
+}
+ion-modal.post-date-modal .mobile-datetime {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  background: transparent;
+}
+ion-modal.post-date-modal .date-confirm { margin-top: 18px; }
+@media (max-width: 480px) {
+  ion-modal.post-date-modal { --width: 100%; --height: 100%; --border-radius: 0; }
+}

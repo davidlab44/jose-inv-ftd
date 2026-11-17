@@ -31,62 +31,15 @@ export class AppComponent implements OnInit {
        url: '/app/tabs/schedule',
        icon: 'calendar'
      },
-     {
-       title: 'Productos',
-       url: '/app/tabs/readprdct',
-       icon: 'construct'
-     },
-     {
-       title: 'Entrada',
-       url: '/app/tabs/kitchen',
-       icon: 'arrow-down'
-     },
-     {
-       title: 'Ingresos de mercancia',
-       url: '/app/tabs/readren',
-       icon: 'chevron-forward-circle'
-     },
-     {
-       title: 'Listar productos ',
-       url: '/app/tabs/asset-supply-readprdct',
-       icon: 'document-text'
-     },
-     {
-       title: 'Registrar producto',
-       url: '/app/tabs/asset-supply-post',
-       icon: 'add-circle'
-     },
-     {
-       title: 'Kilos retirados',
-       url: '/app/tabs/replenishment-withdrawn-getall',
-       icon: 'checkbox'
-     },
-     {
-       title: 'Registrar retiro',
-       url: '/app/tabs/replenishment-withdrawn-post',
-       icon: 'add-circle'
-     },
-   ];
-   appPages2 = [
-     {
-       title: 'Inicio',
-       url: '/app/tabs/schedule',
-       icon: 'calendar'
-     },
-      {
-       title: 'Productos',
-       url: '/app/tabs/readprd',
-       icon: 'construct'
-     },
    ];
 
-   appPages3 = [
+   appPages2 = [//yair
      {
        title: 'Inicio',
        url: '/app/tabs/schedule',
        icon: 'calendar'
      },
-      {
+     {
        title: 'Productos',
        url: '/app/tabs/readprd',
        icon: 'construct'
@@ -96,73 +49,47 @@ export class AppComponent implements OnInit {
        url: '/app/tabs/asset-supply-reorder',
        icon: 'layers'
      },
+     {
+       title: 'Taller',
+       url: '/app/tabs/mnt-ws-ws',
+       icon: 'build'
+     },
+     {
+       title: 'Tareas',
+       url: '/app/tabs/mnt-t-getall',
+       icon: 'build'
+     },
+   ];
+
+   appPages3 = [ //frank
+     {
+       title: 'Inicio',
+       url: '/app/tabs/schedule',
+       icon: 'calendar'
+     },
+     {
+       title: 'Productos',
+       url: '/app/tabs/readprd',
+       icon: 'construct'
+     },
+     {
+       title: 'Reabastecimiento',
+       url: '/app/tabs/asset-supply-reorder',
+       icon: 'layers'
+     },
+     {
+       title: 'Ubicación',
+       url: '/app/tabs/rpl-geo-get',
+       icon: 'golf'
+     },
+
    ];
     
    appPages7 = [
      {
-       title: 'Inicio',
-       url: '/app/tabs/schedule',
-       icon: 'calendar'
-     },
-     {
-       title: 'Productos',   
-       url: '/app/tabs/readprd',       
-       icon: 'construct'
-     },
-     {
-       title: 'Reabastecimiento',
-       url: '/app/tabs/asset-supply-reorder',
-       icon: 'layers'
-     },
-     {
-       title: 'Entrada',
-       url: '/app/tabs/kitchen',
-       icon: 'arrow-down'
-     },
-     {
-       title: 'Ingresos de mercancia',
-       url: '/app/tabs/readren',
-       icon: 'chevron-forward-circle'
-     },
-     {
-       title: 'Listar productos ',
-       url: '/app/tabs/asset-supply-readprdct',
-       icon: 'document-text'
-     },
-     {
-       title: 'Certificados',
-       url: '/app/tabs/cert-main-getall',
-       icon: 'ribbon'
-     },
-     {
-       title: 'Compras',
-       url: '/app/tabs/pchs-withdrawn-getall',
-       icon: 'document-text'
-     },
-     {
-       title: 'Glp precios',
-       url: '/app/tabs/glpprices',
-       icon: 'cash'
-     },
-     {
-       title: 'Bolsas | Cupo | Quota',
-       url: '/app/tabs/replenishment-allocated',
-       icon: 'pie-chart'
-     },
-     {
-       title: 'Registrar producto',
-       url: '/app/tabs/asset-supply-post',
-       icon: 'add-circle'
-     },
-     {
-       title: 'Registrar retiro',
-       url: '/app/tabs/replenishment-withdrawn-post',
-       icon: 'swap-horizontal'
-     },
-     {
-       title: 'Plexa',
-       url: '/app/tabs/replenishment-withdrawn-getall',
-       icon: 'git-commit'
+       title: 'Ubicación',
+       url: '/app/tabs/rpl-geo-get',
+       icon: 'golf'
      },
      {
        title: 'Kilos retirados',
@@ -177,6 +104,16 @@ export class AppComponent implements OnInit {
        title: 'Plexa',
        url: '/app/tabs/replenishment-withdrawn-getall',
        icon: 'scale'
+     },
+     {
+       title: 'Registrar ingreso a patio',
+       url: '/app/tabs/sgc-in-post',
+       icon: 'barcode'
+     },
+     {
+       title: 'Consultar ingreso a patio',
+       url: '/app/tabs/sgc-in-getall',
+       icon: 'barcode'
      },
    ];
 
@@ -215,6 +152,11 @@ export class AppComponent implements OnInit {
      title: 'Crear sub tarea',
      url: '/app/tabs/ats-src-post',
      icon: 'add'
+   },
+   {
+     title: 'Ubicación',
+     url: '/app/tabs/rpl-geo-get',
+     icon: 'golf'
    },
    {
      title: 'Taller',
@@ -371,10 +313,8 @@ export class AppComponent implements OnInit {
     this.checkForUpdates();
     console.log("constructor")
     this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe((event: any) => {
- 
     console.log("event url",event.url);
     console.log("urlAfterRedirects",event.urlAfterRedirects);
-
       if (event.url === '/app/tabs/replenishment-get-getall') {
         this.showMenu = false; //  ocultar menú
       } else {
@@ -404,7 +344,7 @@ export class AppComponent implements OnInit {
         if(this.storedObject && this.storedObject.data && this.storedObject.data.role==3){
           this.appPages=this.appPages3;
         }
-        if(this.storedObject && this.storedObject.data && this.storedObject.data.role==7){
+        if(this.storedObject && this.storedObject.data && this.storedObject.data.role==7){///jose ocampo
           this.appPages=this.appPages7;
           //this.router.navigate(['/app/tabs/prodrex']);
           //this.router.navigateByUrl('/app/tabs/replenishment-withdrawn-getall');
