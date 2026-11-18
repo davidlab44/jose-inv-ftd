@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AlertController, LoadingController, ModalController, ToastController, Config, IonSearchbar } from '@ionic/angular';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ConferenceData } from '../../providers/conference-data';
 import { UserData } from '../../providers/user-data';
 import { OpportunityService } from '../../services/opportunity.service';
@@ -19,9 +19,6 @@ import { Product } from '../../interfaces/product';
 import { RexService } from '../../services/rex.service';
 import { RateClientComponent } from '../../pages/modal/rate-client/rate-client.component';
 import { ExcelService } from '../../services/local/excel.service';
-declare const require: any;
-
-const shared = require('./readprd.js');
 
 @Component({
   selector: 'page-readprd',
@@ -89,64 +86,100 @@ export class ReadprdPage {
     this.loadCategories();
     this.loadUms();
     this.getAllProducts();
-    //this.getAllProductsFull();
+    this.getAllProductsFull();
     this.searchSubject.pipe(
-      debounceTime(500),
-      distinctUntilChanged(),
-      tap(text => {
-        const query = text.trim().toLowerCase();
-        if (!query.length) {
-          this.productList = this.productListFull.slice(0, 20);
-          return;
-        }
-        const f = shared.filterByCategory(this.categories, this.productListFull, text);
-        this.filteredCategories = f.filteredCategories;
-        this.filteredProductsByCategory = f.filteredProductsByCategory;
-      }),
-      switchMap(text => this.productService.searchProducts(text))
-    ).subscribe({
-      next: results => {
-        this.productList = shared.mergeProducts(results, this.filteredProductsByCategory);
-        this.mapProductList();
-      },
-      error: err => console.error('Error en búsqueda:', err)
-    });
+      debounceTime(350),
+      distinctUntilChanged()
+    ).subscribe(text => this.applySearch(text));
   }
+
+  private normalize(value: any): string {
+    return String(value == null ? '' : value)
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .trim().toLowerCase();
+  }
+
+  private categoryMatches(product: any, matchingIds: Set<number>): boolean {
+    const ids = product?.data?.categ;
+    return Array.isArray(ids) && ids.some((id: any) => matchingIds.has(Number(id)));
+  }
+
+  private mergeProducts(...lists: any[][]): any[] {
+    const found = new Map<string, any>();
+    for (const list of lists) {
+      for (const item of (Array.isArray(list) ? list : [])) {
+        if (item && item.id != null) found.set(String(item.id), item);
+      }
+    }
+    return Array.from(found.values());
+  }
+
+  private applySearch(text: string): void {
+    this.queryText = text || '';
+    const query = this.normalize(this.queryText);
+    if (!query) {
+      this.filteredCategories = [];
+      this.filteredProductsByCategory = [];
+      this.productList = this.mapProducts(this.productListFull.slice(0, 20));
+      return;
+    }
+
+    this.filteredCategories = this.categories.filter(cat =>
+      this.normalize(cat?.data?.name).includes(query) ||
+      this.normalize(cat?.data?.name_es_CO).includes(query)
+    );
+    const ids = new Set<number>(this.filteredCategories.map(c => Number(c.i)));
+    this.filteredProductsByCategory = this.productListFull.filter(p => this.categoryMatches(p, ids));
+    const byName = this.productListFull.filter(p => this.normalize(p?.data?.name).includes(query));
+    this.productList = this.mapProducts(this.mergeProducts(byName, this.filteredProductsByCategory));
+  }
+
+  private mapProducts(products: any[]): any[] {
+    return products.map(item => ({
+      ...item,
+      ctgname: this.getCategoryNameById(item?.data?.categ?.[0])
+    }));
+  }
+
   updateSchedule() {}
   ionViewDidEnter() {}
   getAllProducts() {
     this.productService.getAllProducts().subscribe({
       next: r => {
-        this.productList = r;
-        this.mapProductList();
+        this.productList = this.mapProducts(Array.isArray(r) ? r : []);
+        if (!this.productListFull.length) this.productListFull = [...this.productList];
+        this.applySearch(this.queryText || '');
       },
-      error: e => console.error('Error:', e)
+      error: e => console.error('Error al cargar productos:', e)
     });
   }
-  /*getAllProductsFull() {*/
-    /*this.productService.getAll().subscribe({*/
-      /*next: r => {*/
-        /*this.productListFull = r;*/
-      /*},*/
-      /*error: e => console.error('Error:', e)*/
-    /*});*/
-  /*}*/
+
+  getAllProductsFull() {
+    this.productService.getAll().subscribe({
+      next: r => {
+        this.productListFull = Array.isArray(r) ? r : [];
+        this.applySearch(this.queryText || '');
+      },
+      error: e => console.error('Error al cargar inventario completo:', e)
+    });
+  }
 
   searchProducts(hash: string, list: any[]): any[] {
-    return shared.searchProducts(hash, list);
+    const query = this.normalize(hash);
+    return !query ? list : list.filter(p => this.normalize(p?.data?.name).includes(query));
   }
-  
+
   loadCategories() {
     this.categoryService.getAllCategories().subscribe({
       next: r => {
         this.categories = r;
         this.categoryService.saveCategoriesToLocal(r);
-        setTimeout(()=>{this.mapProductList()},3000)
-        console.log("ctg list1",this.categories)
+        this.applySearch(this.queryText || '');
       },
       error: e => {
         console.error('Error categorías:', e);
-        this.categories = this.categoryService.getCategoriesFromLocal();
+        this.categories = this.categoryService.getCategoriesFromLocal() || [];
+        this.applySearch(this.queryText || '');
       }
     });
   }
@@ -165,20 +198,23 @@ export class ReadprdPage {
   }
 
   mapProductList(): void {
-    this.productList = this.productList.map(item => ({
-      ...item,
-      ctgname: this.getCategoryNameById(item.data.categ[0])
-    }));
-    console.log("productlist con ctgname",this.productList)
-    console.log("ctg list",this.categories)
+    this.productList = this.mapProducts(this.productList);
   }
 
   getCategoryNameById(id: number | null | undefined): string {
-    return shared.getCategoryNameById(this.categories, id);
+    if (id == null) return 'Sin categoría';
+    const cat = this.categories.find(c => Number(c.i) === Number(id));
+    const name = cat?.data?.name_es_CO || cat?.data?.name;
+    return typeof name === 'string' && name.trim() ? name : 'Sin categoría';
   }
+
   getUmNameById(id: number | string | null | undefined): string {
-    return shared.getUmNameById(this.ums, id);
+    if (id == null || id === '') return 'Sin UM';
+    const um = this.ums.find(u => Number(u.id) === Number(id));
+    const name = um?.data?.name;
+    return typeof name === 'string' && name.trim() ? name : 'Sin UM';
   }
+
   onSearch(text: string) {
     this.searchSubject.next(text);
   }
@@ -214,6 +250,7 @@ export class ReadprdPage {
   }
   clearSearch() {
     this.searchSubject.next('');
+    this.applySearch('');
   }
   delete(p: any) {
     this.productService.delete(p.id).subscribe({
