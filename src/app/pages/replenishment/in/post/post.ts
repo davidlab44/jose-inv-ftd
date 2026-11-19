@@ -157,7 +157,7 @@ export class PostPage {
     });
     this.uploadProgress = 0; 
     this.uploadedUrl= null;
-    this.uploading = false;
+    //this.uploading = false;
   }
 
   updateSchedule(){}

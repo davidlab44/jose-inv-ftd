@@ -51,12 +51,14 @@ export class WithdrawnService {
       );
   }
 
-   getIntervalByAdate(since: string, until: string): Observable<any[]> {
+
+
+  //el que se usaba hasta noviembre 2026
+  getIntervalByAdate(since: string, until: string): Observable<any[]> {
     const params = [
       `data->>date=gte.${since}`,
       `data->>date=lte.${until}`
     ].join('&');
-
     return this.http
       .get<any[]>(`${this.apiUrl}/${this.model}?${params}`)
       .pipe(

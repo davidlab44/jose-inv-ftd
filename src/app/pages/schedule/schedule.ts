@@ -98,13 +98,13 @@ export class SchedulePage{
       this.router.navigateByUrl('/login');
       return;
     }
-    else{
-       console.log("navigate to plexa")
-       if(this.storedObject && this.storedObject.data && this.storedObject.data.role==7){
-         console.log("navigate to plexa1")
-         this.router.navigate(['/app/tabs/replenishment-get-getall']);
-        }
-    }
+  /*  else{*/
+       /*console.log("navigate to plexa")*/
+       /*if(this.storedObject && this.storedObject.data && this.storedObject.data.role==7){*/
+         /*console.log("navigate to plexa1")*/
+         /*this.router.navigate(['/app/tabs/replenishment-get-getall']);*/
+        /*}*/
+    /*}*/
   }
 
   refreshView() {

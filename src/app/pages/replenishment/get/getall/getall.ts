@@ -114,9 +114,8 @@ export class GetallPage implements OnInit {
   getAll() {
     const since = this.dayOfYearToISO(this.startDay);
     const until = this.dayOfYearToISO(this.endDay, true);
-    this.withdrawnService
-      .getIntervalByAdate(since, until)
-      .subscribe({
+    //this.withdrawnService.getIntervalByAdate(since, until).subscribe({
+    this.withdrawnService.getAll().subscribe({
         next: response => {
           this.withdrawnList = response;
           this.prepareWithdrawnList(this.withdrawnList);
@@ -185,48 +184,62 @@ export class GetallPage implements OnInit {
   }
 
 
+  // Registros pendientes: sin data.date, pero con data.datein válida.
+  private isPendingDate(item: any): boolean {
+    const d = item?.data;
+    return (d?.date === '' || d?.date == null) &&
+      typeof d?.datein === 'string' && d.datein.trim().length > 0 &&
+      Number.isFinite(new Date(d.datein).getTime());
+  }
+
+  private movementTimestamp(item: any): number {
+    const d = item?.data;
+    const value = this.isPendingDate(item) ? d.datein : d?.date;
+    const timestamp = new Date(value || 0).getTime();
+    return Number.isFinite(timestamp) ? timestamp : 0;
+  }
+
   private buildMovementList(withdrawnList: any[]): any[] {
     const byId = new Map<number, any>();
-    withdrawnList.forEach(item => {
-      byId.set(item.id, item);
-    });
+    withdrawnList.forEach(item => byId.set(Number(item.id), item));
     const visited = new Set<number>();
-    const movements: {
-      date: number;
-      rows: any[];
-    }[] = [];
-    for (const item of withdrawnList) {
-      if (visited.has(item.id))
-        continue;
+    const movements: { date: number; pending: boolean; rows: any[] }[] = [];
 
-      visited.add(item.id);
+    for (const item of withdrawnList) {
+      const id = Number(item.id);
+      if (visited.has(id)) continue;
+      visited.add(id);
       const rows = [item];
       const twinId = Number(item.data?.twin);
       if (twinId > 0) {
         const twin = byId.get(twinId);
-        if (twin && !visited.has(twin.id)) {
-
+        if (twin && !visited.has(Number(twin.id))) {
           rows.push(twin);
-          visited.add(twin.id);
+          visited.add(Number(twin.id));
         }
       }
-      rows.sort((a, b) => {
-        return new Date(a.data.date).getTime()
-          - new Date(b.data.date).getTime();
-      });
+
+      // Mantener juntos los registros gemelos, ordenados por fecha efectiva.
+      rows.sort((a, b) => this.movementTimestamp(a) - this.movementTimestamp(b));
+      const pending = rows.some(row => this.isPendingDate(row));
       movements.push({
-        date: new Date(rows[0].data.date).getTime(),
+        pending,
+        date: pending
+          ? Math.max(...rows.filter(row => this.isPendingDate(row)).map(row => this.movementTimestamp(row)))
+          : this.movementTimestamp(rows[0]),
         rows
       });
     }
-    // Movimientos más recientes primero
-    movements.sort((a, b) => b.date - a.date);
-    // Construir fullWithdrawnList
+
+    // Pendientes arriba; los demás conservan el orden descendente habitual.
+    movements.sort((a, b) =>
+      Number(b.pending) - Number(a.pending) || b.date - a.date
+    );
+
     const result: any[] = [];
     for (const movement of movements) {
       movement.rows.forEach((row, index) => {
-        row.showSeparator =
-          index === movement.rows.length - 1;
+        row.showSeparator = index === movement.rows.length - 1;
         result.push(row);
       });
     }
@@ -532,7 +545,9 @@ export class GetallPage implements OnInit {
   }
 
   goBack() {
-    this.location.back();
+  
+  this.router.navigate(['/app/tabs/schedule'],{ replaceUrl: true });
+    //this.location.back();
   }
 
   onColorPickerOpen(item: any, color: string): void {

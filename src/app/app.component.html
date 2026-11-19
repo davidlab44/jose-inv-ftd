@@ -25,15 +25,14 @@
             </ion-item>
           </ion-menu-toggle> -->
         </ion-list>
+        
         <!-- Rest of the menu -->
-
         <ion-menu-toggle autoHide="false">
             <ion-item routerLink="/login" routerLinkActive="active" routerDirection="root" detail="false">
               <ion-icon slot="start" name="log-in"></ion-icon>
               <ion-label>Módulo Autenticación</ion-label>
             </ion-item>
           </ion-menu-toggle>
-
 
         <ion-list *ngIf="loggedIn" lines="none">
           <ion-list-header>Account</ion-list-header>

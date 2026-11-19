@@ -85,11 +85,16 @@ export class AppComponent implements OnInit {
 
    ];
     
-   appPages7 = [
+   appPages7 = [   //jose
      {
-       title: 'Ubicación',
+       title: 'Almacen',
+       url: '/app/tabs/schedule',
+       icon: 'calendar'
+     },
+     {
+       title: 'Ubicaciones',
        url: '/app/tabs/rpl-geo-get',
-       icon: 'golf'
+       icon: 'location'
      },
      {
        title: 'Kilos retirados',
@@ -117,7 +122,7 @@ export class AppComponent implements OnInit {
      },
    ];
 
- appPages9 = [
+   appPages9 = [
    {
      title: 'Tareas activas',
      url: '/app/tabs/ats-blg-getall',
@@ -367,7 +372,7 @@ export class AppComponent implements OnInit {
     ];
 
     this.showSplitPane = !fullScreenRoutes.includes(event.url);
-        /*        if (event.url === '/app/tabs/replenishment-get-getall') {*/
+        /*if (event.url === '/app/tabs/replenishment-get-getall') {*/
           /*//this.dark = false; // Hide the menu*/
           /*this.showMenu=false*/
         /*}*/
@@ -398,7 +403,7 @@ export class AppComponent implements OnInit {
   }
 
   ionViewDidEnter() {
-    console.log("ionviewdidenter")
+    //console.log("ionviewdidenter")
   }
 
   initializeApp() {

@@ -25,16 +25,14 @@
       <!-- Capturar desde cámara -->
       <ion-button
         expand="block"
-        [disabled]="uploading"
         (click)="takePhotoAndUpload()">
         <ion-icon name="camera-outline" slot="start"></ion-icon>
-        {{ uploading ? 'Procesando OCR...' : 'Capturar imagen' }}
+        {{ uploading ? 'Procesando...' : 'Capturar imagen' }}
       </ion-button>
       <!-- Seleccionar desde galería -->
       <ion-button
         expand="block"
         color="secondary"
-        [disabled]="uploading"
         (click)="pickImageAndUpload()">
         <ion-icon name="images-outline" slot="start"></ion-icon>
         Seleccionar de galería
