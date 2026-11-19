@@ -24,7 +24,10 @@ export class GetallPage implements OnInit {
   @ViewChild(IonList,{ static:false }) ionList!:IonList;
   withdrawnList:any[]=[];
   fullWithdrawnList:any[]=[];
+  filteredList:any[]=[];
+  private processingVersion = 0;
   ccoMap:CcoMap={};
+  ccoList:any[]=[];
   shipList:Ship[]=[];
   shipMap:ShipMap={};
   dayRange={
@@ -83,48 +86,90 @@ export class GetallPage implements OnInit {
   ngOnInit() {
     this.initCurrentMonthRange();
     this.loadShips();
-    this.loadCcos();
+    this.loadCco();
   }
   ionViewWillEnter() {
     this.menu.enable(false);
     this.getAll();
   }
-  loadCcos() {
-    this.ccoService.load().subscribe({
-      next:(map)=>{
-        this.ccoMap=map;
-        this.ccoService.debugMapping(this.filteredList);
+  // Componer el nombre visible usando data.name (ID de CCO).
+  loadCco() {
+    this.ccoService.getAll().subscribe({
+      next: (ccos: any[]) => {
+        this.ccoList = ccos || [];
+        const map: any = {};
+        for (const cco of this.ccoList) {
+          const id = Number(cco?.data?.id ?? cco?.id);
+          if (!Number.isFinite(id)) continue;
+          map[id] = {
+            name: String(cco?.data?.name ?? 'N/A'),
+            color: cco?.data?.color ?? '#eee'
+          };
+        }
+        this.ccoMap = map as CcoMap;
+        this.refreshFilteredList();
       },
-      error:(err)=>{
-        console.error('Error loading ccos',err);
-      }
+      error: err => console.error('Error loading CCO', err)
     });
   }
   loadShips() {
     this.shipService.getAll().subscribe({
       next:(ships)=>{
         this.shipList=ships;
-        console.log('shipList',ships);
+
         this.shipMap=this.buildShipMap(ships);
+        this.updateShipNames();
       },
       error:(err)=>console.error(err)
     });
   }
 
+  // Publicar los registros inmediatamente; enriquecerlos por lotes sin bloquear la UI.
   getAll() {
-    const since = this.dayOfYearToISO(this.startDay);
-    const until = this.dayOfYearToISO(this.endDay, true);
-    //this.withdrawnService.getIntervalByAdate(since, until).subscribe({
+    const version = ++this.processingVersion;
     this.withdrawnService.getAll().subscribe({
-        next: response => {
-          this.withdrawnList = response;
-          this.prepareWithdrawnList(this.withdrawnList);
-          this.fullWithdrawnList =
-          this.buildMovementList(this.withdrawnList);
-          console.log('fullWithdrawnList',this.fullWithdrawnList);
-          this.fullWithdrawnList = this.mapFullWithdrawnList(this.fullWithdrawnList);
+      next: (response: any[]) => {
+        if (version !== this.processingVersion) return;
+        this.withdrawnList = Array.isArray(response) ? response : [];
+        for (const item of this.withdrawnList) {
+          if (!item.data) item.data = {};
+          item.level = '';
         }
-      });
+        this.fullWithdrawnList = this.buildMovementList(this.withdrawnList);
+        this.refreshFilteredList();
+        // Permite pintar primero IDs y valores originales.
+        setTimeout(() => this.enrichInBatches(version, 0), 0);
+      },
+      error: err => console.error('Error loading withdrawn records', err)
+    });
+  }
+
+  private enrichInBatches(version: number, offset: number): void {
+    if (version !== this.processingVersion) return;
+    const batchSize = 100;
+    const end = Math.min(offset + batchSize, this.withdrawnList.length);
+    // Calcular niveles por lotes, sin crear copias de todos los objetos.
+    for (let i = offset; i < end; i++) {
+      const item = this.withdrawnList[i];
+      item.level = this.getLevel(item);
+      const data = item.data;
+      data.shipoutName = this.shipMap[data.shipout]?.name ?? '';
+      data.shipinName = this.shipMap[data.shipin]?.name ?? '';
+    }
+    if (end < this.withdrawnList.length) {
+      setTimeout(() => this.enrichInBatches(version, end), 0);
+    } else {
+      this.prepareWithdrawnList(this.withdrawnList);
+      this.refreshFilteredList();
+    }
+  }
+
+  private updateShipNames(): void {
+    for (const item of this.withdrawnList) {
+      if (!item.data) continue;
+      item.data.shipoutName = this.shipMap[item.data.shipout]?.name ?? '';
+      item.data.shipinName = this.shipMap[item.data.shipin]?.name ?? '';
+    }
   }
 
   private prepareWithdrawnList(withdrawnList: any[]): void {
@@ -173,10 +218,8 @@ export class GetallPage implements OnInit {
           map.set(key, item);
         }
       }
-      data.shipoutName =
-        this.shipMap[data.shipout]?.name ?? 'N/A';
-      data.shipinName =
-        this.shipMap[data.shipin]?.name ?? 'N/A';
+      data.shipoutName = this.shipMap[data.shipout]?.name ?? '';
+      data.shipinName = this.shipMap[data.shipin]?.name ?? '';
     }
     this.totalKg = total;
     this.totalGlpOpc = totalOpc;
@@ -184,62 +227,27 @@ export class GetallPage implements OnInit {
   }
 
 
-  // Registros pendientes: sin data.date, pero con data.datein válida.
-  private isPendingDate(item: any): boolean {
-    const d = item?.data;
-    return (d?.date === '' || d?.date == null) &&
-      typeof d?.datein === 'string' && d.datein.trim().length > 0 &&
-      Number.isFinite(new Date(d.datein).getTime());
-  }
-
-  private movementTimestamp(item: any): number {
-    const d = item?.data;
-    const value = this.isPendingDate(item) ? d.datein : d?.date;
-    const timestamp = new Date(value || 0).getTime();
-    return Number.isFinite(timestamp) ? timestamp : 0;
-  }
-
+  // Agrupar por twin, primando el ID mayor; cada fila aparece exactamente una vez.
   private buildMovementList(withdrawnList: any[]): any[] {
-    const byId = new Map<number, any>();
-    withdrawnList.forEach(item => byId.set(Number(item.id), item));
+    const sorted = [...withdrawnList].sort((a, b) => Number(b.id) - Number(a.id));
+    const byId = new Map<number, any>(sorted.map(item => [Number(item.id), item]));
     const visited = new Set<number>();
-    const movements: { date: number; pending: boolean; rows: any[] }[] = [];
+    const result: any[] = [];
 
-    for (const item of withdrawnList) {
+    for (const item of sorted) {
       const id = Number(item.id);
       if (visited.has(id)) continue;
       visited.add(id);
-      const rows = [item];
+      const group = [item];
       const twinId = Number(item.data?.twin);
-      if (twinId > 0) {
-        const twin = byId.get(twinId);
-        if (twin && !visited.has(Number(twin.id))) {
-          rows.push(twin);
-          visited.add(Number(twin.id));
-        }
+      const twin = twinId > 0 ? byId.get(twinId) : undefined;
+      if (twin && !visited.has(Number(twin.id))) {
+        group.push(twin);
+        visited.add(Number(twin.id));
       }
-
-      // Mantener juntos los registros gemelos, ordenados por fecha efectiva.
-      rows.sort((a, b) => this.movementTimestamp(a) - this.movementTimestamp(b));
-      const pending = rows.some(row => this.isPendingDate(row));
-      movements.push({
-        pending,
-        date: pending
-          ? Math.max(...rows.filter(row => this.isPendingDate(row)).map(row => this.movementTimestamp(row)))
-          : this.movementTimestamp(rows[0]),
-        rows
-      });
-    }
-
-    // Pendientes arriba; los demás conservan el orden descendente habitual.
-    movements.sort((a, b) =>
-      Number(b.pending) - Number(a.pending) || b.date - a.date
-    );
-
-    const result: any[] = [];
-    for (const movement of movements) {
-      movement.rows.forEach((row, index) => {
-        row.showSeparator = index === movement.rows.length - 1;
+      group.sort((a, b) => Number(b.id) - Number(a.id));
+      group.forEach((row, index) => {
+        row.showSeparator = index === group.length - 1;
         result.push(row);
       });
     }
@@ -309,7 +317,8 @@ export class GetallPage implements OnInit {
     this.filterVendor=event?.detail?.value??this.filterVendor;
   }
   onSearch(text:string) {
-    this.searchSubject.next(text);
+    this.searchTerm = (text || '').trim();
+    this.refreshFilteredList();
   }
   formatFechaLatam(dateInput:string|Date|number):string {
     if(!dateInput)
@@ -352,17 +361,36 @@ export class GetallPage implements OnInit {
         return this.sortDirection==='asc'?1:-1;
       return 0;
     });
+    this.refreshFilteredList();
   }
-  get filteredList() {
-    if(!this.searchTerm)
-      return this.fullWithdrawnList;
-    const term=this.searchTerm.toLowerCase();
-    return this.fullWithdrawnList.filter(item=>
-      Object.values(item.data).some(val=>
-        String(val).toLowerCase().includes(term)
-      )
-    );
+  // Cachear el resultado: no reconstruir Maps/Sets en cada detección de cambios.
+  private refreshFilteredList(): void {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) {
+      this.filteredList = this.fullWithdrawnList;
+      return;
+    }
+    const matches = new Set<number>();
+    const byId = new Map<number, any>();
+    for (const row of this.fullWithdrawnList) byId.set(Number(row.id), row);
+    for (const row of this.fullWithdrawnList) {
+      const name = this.ccoMap[Number(row.data?.name)]?.name ?? '';
+      if (!String(name).toLowerCase().includes(term)) continue;
+      matches.add(Number(row.id));
+      const twin = Number(row.data?.twin);
+      if (byId.has(twin)) matches.add(twin);
+    }
+    this.filteredList = this.fullWithdrawnList.filter(row => matches.has(Number(row.id)));
   }
+
+  // Sólo oculta cero numérico/textual y N/A; preserva IDs y demás datos.
+  displayCell(value: any): any {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'number' && value === 0) return '';
+    if (typeof value === 'string' && (value.trim() === '0' || value.trim().toUpperCase() === 'N/A')) return '';
+    return value;
+  }
+
   getValue(item:any,column:string) {
     return column.includes('data.')
       ?column.split('.').reduce((o,i)=>o?.[i],item)
@@ -545,9 +573,7 @@ export class GetallPage implements OnInit {
   }
 
   goBack() {
-  
-  this.router.navigate(['/app/tabs/schedule'],{ replaceUrl: true });
-    //this.location.back();
+    this.location.back();
   }
 
   onColorPickerOpen(item: any, color: string): void {
@@ -637,7 +663,7 @@ export class GetallPage implements OnInit {
     const olderThan8Days = diffDays > 8;
     //console.log('updated_at', item.updated_at);
     //console.log('diffDays', diffDays);
-    console.log('olderThan8Days', olderThan8Days);
+
     const data = item.data;
     if (data?.shipout > 0 && data?.shipout != 3 && olderThan8Days) return 'sai';
     if (data?.shipout > 0 && data?.shipout != 3) return '->sai';
