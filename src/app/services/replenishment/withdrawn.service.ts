@@ -51,7 +51,16 @@ export class WithdrawnService {
       );
   }
 
-
+  getIntervalByCreatedAt(since: string, untilExclusive: string): Observable<any[]> {
+    const params = [
+      `created_at=gte.${encodeURIComponent(since)}`,
+      `created_at=lt.${encodeURIComponent(untilExclusive)}`,
+      `order=id.desc`            
+    ].join('&');
+    return this.http
+      .get<any[]>(`${this.apiUrl}/${this.model}?${params}`)
+      .pipe(map(response => response ?? []));
+  }   
 
   //el que se usaba hasta noviembre 2026
   getIntervalByAdate(since: string, until: string): Observable<any[]> {

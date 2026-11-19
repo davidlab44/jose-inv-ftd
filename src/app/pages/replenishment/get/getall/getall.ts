@@ -127,7 +127,10 @@ export class GetallPage implements OnInit {
   // Publicar los registros inmediatamente; enriquecerlos por lotes sin bloquear la UI.
   getAll() {
     const version = ++this.processingVersion;
-    this.withdrawnService.getAll().subscribe({
+    // Consultar exclusivamente el intervalo seleccionado sobre created_at.
+    const since = this.dayOfYearToISO(this.startDay);
+    const until = this.dayOfYearToISO(this.endDay, true);
+    this.withdrawnService.getIntervalByCreatedAt(since, until).subscribe({
       next: (response: any[]) => {
         if (version !== this.processingVersion) return;
         this.withdrawnList = Array.isArray(response) ? response : [];
@@ -260,19 +263,23 @@ export class GetallPage implements OnInit {
   onRangeChange(event:any) {
     this.startDay=event.detail.value.lower;
     this.endDay=event.detail.value.upper;
-    this.getAll();
+    this.updateRangeAndFetch();
   }
   syncDays() {
     this.startDay=this.dayRange.lower;
     this.endDay=this.dayRange.upper;
   }
   formatDay(day:number):string {
-    const base=new Date('2026-01-01T00:00:00');
+    const base=new Date(new Date().getFullYear(), 0, 1);
     base.setDate(base.getDate()+(day-1));
     return base.toLocaleDateString('es-ES',{
       day:'2-digit',
       month:'short'
     });
+  }
+  daysInCurrentYear(): number {
+    const year = new Date().getFullYear();
+    return new Date(year, 1, 29).getMonth() === 1 ? 366 : 365;
   }
   getTodayDayOfYear():number {
     const today=new Date();
@@ -291,15 +298,13 @@ export class GetallPage implements OnInit {
       )
     );
   }
+  // ISO UTC completo: conserva la conversión correcta desde la zona horaria local.
+  // El límite final es exclusivo: medianoche del día siguiente.
   dayOfYearToISO(day:number,endOfDay=false):string {
-    const year=2026;
-    const date=new Date(year,0);
-    date.setDate(day);
-    if(endOfDay)
-      date.setHours(23,59,59,999);
-    else
-      date.setHours(0,0,0,0);
-    return date.toISOString().slice(0,19);
+    const year = new Date().getFullYear();
+    const date = new Date(year, 0, day + (endOfDay ? 1 : 0));
+    date.setHours(0, 0, 0, 0);
+    return date.toISOString();
   }
   calcularResultado():number {
     return (this.valor1||0)*(this.valor2||0);
@@ -420,13 +425,13 @@ export class GetallPage implements OnInit {
     });
   }
   changeStartDay(delta:number) {
-    this.startDay=Math.max(1,Math.min(365,this.startDay+delta));
+    this.startDay=Math.max(1,Math.min(this.daysInCurrentYear(),this.startDay+delta));
     if(this.startDay>this.endDay)
       this.startDay=this.endDay;
     this.updateRangeAndFetch();
   }
   changeEndDay(delta:number) {
-    this.endDay=Math.max(1,Math.min(365,this.endDay+delta));
+    this.endDay=Math.max(1,Math.min(this.daysInCurrentYear(),this.endDay+delta));
     if(this.endDay<this.startDay)
       this.endDay=this.startDay;
     this.updateRangeAndFetch();
@@ -448,11 +453,11 @@ export class GetallPage implements OnInit {
       this.endDay=today;
     }
     if(ev.detail.value==='week') {
-      this.startDay=today-7;
+      this.startDay=Math.max(1,today-6);
       this.endDay=today;
     }
     if(ev.detail.value==='month') {
-      this.startDay=today-30;
+      this.startDay=Math.max(1,today-29);
       this.endDay=today;
     }
     this.updateRangeAndFetch();

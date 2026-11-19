@@ -57,7 +57,7 @@
     <ion-range
       class="day-range"
       min="1"
-      max="365"
+      [max]="daysInCurrentYear()"
       step="1"
       dualKnobs="true"
       snaps="true"
