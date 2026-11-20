@@ -493,6 +493,15 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'rpl-bulk-sail',
+        children: [
+          {
+            path: '',
+            loadChildren:()=>import('../replenishment/sail/sail/shipout-bulk.module').then(m=>m.ShipoutBulkModule)
+          }
+        ]
+      },
+      {
         path: 'tank-tank-post',
         children: [
           {

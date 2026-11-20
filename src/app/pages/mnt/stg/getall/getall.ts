@@ -15,6 +15,7 @@ import { TService } from '../../../../services/mnt/t.service';
 })
 
 export class GetallPage implements OnInit {
+
   showSearchbar:boolean;
   searchSubject=new Subject<string>();
   searchTerm:string='';
@@ -72,9 +73,6 @@ export class GetallPage implements OnInit {
     return [];
   }
 
-
-
-
   /*ccoList: any[] = []; */
   /*loadCco() {                */
     /*this.ccoService.getAll().subscribe({ */
@@ -87,7 +85,6 @@ export class GetallPage implements OnInit {
       /*} */
     /*}); */
   /*}     */
-
 
   /*tList: any[] = []; */
   /*loadT(id_cco) {                */

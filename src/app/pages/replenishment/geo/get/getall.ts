@@ -47,10 +47,10 @@ export class GetallPage {
   readonly columns:{key:LocationKey;label:string}[]=[
     {key:'sai',label:'SAI'},
     {key:'tsai',label:'En tránsito SAI'},
-    {key:'empty',label:'Puerto CTG vacío'},
-    {key:'ctg',label:'CTG'},
+    {key:'empty',label:'CTG vacio'},
+    {key:'ctg',label:'CTG lleno'},
     {key:'inb',label:'INBEMETAL'},
-    {key:'full',label:'Puerto CTG lleno'}
+    {key:'full',label:'Puerto esperando embarque'}
   ];
 
   constructor(

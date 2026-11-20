@@ -27,7 +27,8 @@
         expand="block"
         (click)="takePhotoAndUpload()">
         <ion-icon name="camera-outline" slot="start"></ion-icon>
-        {{ uploading ? 'Procesando...' : 'Capturar imagen' }}
+        Capturar imagen
+        <!--{{ uploading ? 'Procesando...' : 'Capturar imagen' }}-->
       </ion-button>
       <!-- Seleccionar desde galería -->
       <ion-button
@@ -37,10 +38,10 @@
         <ion-icon name="images-outline" slot="start"></ion-icon>
         Seleccionar de galería
       </ion-button>
-      <ion-spinner
-        *ngIf="uploading"
-        name="crescent">
-      </ion-spinner>
+<!--      <ion-spinner-->
+        <!--*ngIf="uploading"-->
+        <!--name="crescent">-->
+      <!--</ion-spinner>-->
 
       <!--<ion-button-->
         <!--expand="block"-->

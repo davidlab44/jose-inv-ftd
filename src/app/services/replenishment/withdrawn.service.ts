@@ -164,6 +164,24 @@ export class WithdrawnService {
     );
   }
 
+
+  updateShipout(list: any, shipId: number): Observable<any[]> {
+    const ids = [...new Set((Array.isArray(list) ? list : []).map((x: any) =>
+      Number(typeof x === 'object' && x !== null ? x.id : x)
+    ))].filter((id: number) => Number.isInteger(id) && id > 0);
+    if (!ids.length) throw new Error('No hay IDs válidos para actualizar');
+    if (!Number.isInteger(shipId) || shipId <= 0 || shipId === 3) {
+      throw new Error('El barco seleccionado no es válido');
+    }
+    return this.http.post<any[]>(`${this.apiUrl}/rpc/update_withdrawn_shipout_bulk`, {
+      p_ids: ids,
+      p_ship_id: shipId
+    });
+  }
+
+
+
+
 }
 
 

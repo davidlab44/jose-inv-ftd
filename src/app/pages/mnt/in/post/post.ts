@@ -29,6 +29,8 @@ export class AssetSupplyPostPage {
   storedObject: any;
   filteredProductList: any[] = [];
   stgList: any[] = [];
+  ioList: any[] = [];
+  latestIoByCco = new Map<number, any>();
   queryText:any
   searchSubject = new Subject<string>();
   todayDate:any;
@@ -71,11 +73,68 @@ export class AssetSupplyPostPage {
         console.error('[SEARCH][ERROR] error cargando productListCaos:', err);
       }
     });
+    this.loadIo();
     this.loadAtss();
     this.loadStgs();
     this.loadMnt();
   }
    
+  hasDate(value: any): boolean {
+    return typeof value === 'string' && value.trim() !== '' &&
+      !Number.isNaN(new Date(value).getTime());
+  }
+
+  isInside(record: any): boolean {
+    return this.hasDate(record?.in) && !this.hasDate(record?.out);
+  }
+
+  getLatestIo(idCco: number): any {
+    return this.latestIoByCco.get(Number(idCco));
+  }
+
+  isProductInside(product: any): boolean {
+    return this.isInside(this.getLatestIo(product?.id));
+  }
+
+  get actionLabel(): string {
+    return this.isInside(this.isotanq1) ? 'Registrar salida' : 'Reportar ingreso a patio';
+  }
+
+  loadIo() {
+    this.ioService.getAll().subscribe({
+      next: (data) => {
+        this.ioList = data || [];
+        this.latestIoByCco.clear();
+        for (const item of this.ioList) {
+          const record = item?.data ?? item;
+          const id = Number(record?.id_cco);
+          if (!id) continue;
+          const previous = this.latestIoByCco.get(id);
+          const previousTime = new Date(previous?.created_at || previous?.updated_at || previous?.in || 0).getTime() || 0;
+          const currentTime = new Date(item?.created_at || item?.updated_at || record?.in || 0).getTime() || 0;
+          const previousId = Number(previous?._rowId || 0);
+          const currentId = Number(item?.id || 0);
+          if (!previous || currentTime > previousTime || (currentTime === previousTime && currentId > previousId)) {
+            this.latestIoByCco.set(id, { ...record, _rowId: currentId, created_at: item?.created_at, updated_at: item?.updated_at });
+          }
+        }
+        // Actualizar el estado si los activos ya estaban seleccionados.
+        if (this.isotanq1.id_cco > 0) this.isotanq1 = this.buildMovement(this.isotanq1.id_cco);
+        if (this.isotanq2.id_cco > 0) this.isotanq2 = this.buildMovement(this.isotanq2.id_cco);
+      },
+      error: (err) => console.error('load_io_error:', err)
+    });
+  }
+
+  buildMovement(idCco: number): any {
+    const latest = this.getLatestIo(idCco);
+    return {
+      id_cco: idCco,
+      in: this.isInside(latest) ? latest.in : '',
+      out: ''
+    };
+  }
+
   onSearch(text: string | null | undefined) {
     const value = text ?? '';
     this.hash = value;
@@ -84,56 +143,55 @@ export class AssetSupplyPostPage {
   }
 
   searchProducts(hash: string, productList: any[]): any[] {
-    console.log('[SEARCH][6.2] lista recibida -> cantidad:', productList?.length ?? 0);
+    //console.log('[SEARCH][6.2] lista recibida -> cantidad:', productList?.length ?? 0);
     const term = (hash || '').trim().toLowerCase();
     if (!term) {
       return [];
     }
     const matches = (productList || []).filter((product, index) => {
       const name = product?.data.name;
-      console.log('elemento lista',productList)
-      console.log('elemento product',product)
-      console.log('elemento name',name)
+      //console.log('elemento lista',productList)
+      //console.log('elemento product',product)
+      //console.log('elemento name',name)
       const validName = typeof name === 'string';
       const match = validName && name.toLowerCase().includes(term);
-      if (match) {
-        console.log(`[SEARCH][7] MATCH index=${index} name=`, name, 'producto=', product);
-      }
+      /*      if (match) {*/
+        /*console.log(`[SEARCH][7] MATCH index=${index} name=`, name, 'producto=', product);*/
+      /*}*/
       return match;
     });
-    console.log('[SEARCH][8] coincidencias totales antes de limitar:', matches.length);
+    //console.log('[SEARCH][8] coincidencias totales antes de limitar:', matches.length);
     const visibleResults = matches.slice(0, 20);
     return visibleResults;
   }
 
-  postReq(data:any,r:number) {
-    this.ioService.post(data).subscribe({
-      next: (response) => {
-        console.log("mnt=>in post response", response);
-        if(response && response.length>0){
-          //this.utilservice.presenttoast(response.tostring())
-          //this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceurl: true });    
-        }
-      }
-    });
-  }
+  /*postReq(data:any,r:number) {*/
+    /*console.log('data to postReq',data);*/
+    /*this.ioService.post(data).subscribe({*/
+      /*next: (response) => {*/
+        /*console.log("mnt=>in post response", response);*/
+        /*if(response && response.length>0){*/
+          /*//this.utilservice.presenttoast(response.tostring())*/
+          /*//this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceurl: true });    */
+        /*}*/
+      /*}*/
+    /*});*/
+  /*}*/
+
   isotanq1:any={"id_cco":0,"in":'',"out":""};
   isotanq2:any={"id_cco":0,"in":'',"out":""};
   iso1:any;
   iso2:any;
 
-  selectProduct(p){
-    console.log('this.isotanq1?.data?.name.length',this.isotanq1?.data?.name.length)
-    if(this.isotanq1?.id_cco>0){
-      this.iso2=p;
-      this.isotanq2.id_cco =p.id;
-    }else{
-      this.isotanq1.id_cco=p.id;
-      this.iso1=p;
+  selectProduct(p: any) {
+    if (this.isotanq1?.id_cco > 0) {
+      this.iso2 = p;
+      this.isotanq2 = this.buildMovement(p.id);
+    } else {
+      this.iso1 = p;
+      this.isotanq1 = this.buildMovement(p.id);
     }
-    console.log("isotanq1",this.isotanq1);
-    console.log("isotanq2",this.isotanq2);
-    this.filteredProductList=[] 
+    this.filteredProductList = [];
   }
 
   getDate(){
@@ -145,12 +203,12 @@ export class AssetSupplyPostPage {
     return dateNow;
   }
 
-  notifyUser(){
-    this.utilService.presentToast("Movimiento registrado",'success',500)
-    //this.updateUi();
-    this.utilService.presentToast("State actualizado exitosamente","success",1000);  
-    this.router.navigate(['/app/tabs/sgc-in-getall'],{ replaceUrl: true }); 
-  }
+  /*notifyUser(){*/
+    /*this.utilService.presentToast("Movimiento registrado",'success',500)*/
+    /*//this.updateUi();*/
+    /*this.utilService.presentToast("State actualizado exitosamente","success",1000);  */
+    /*this.router.navigate(['/app/tabs/sgc-in-getall'],{ replaceUrl: true }); */
+  /*}*/
 
   discoverPendingOrExpired(id_cco: number): boolean {
     return this.stgList.some((it) => it.id_cco === id_cco && it.state === 'pending');
@@ -207,7 +265,7 @@ export class AssetSupplyPostPage {
   async post() {
     if(this.isotanq1.id_cco>0&&this.isotanq2.id_cco==0){
       console.log('esta seguro que desea enviar un solo tanque?')     
-      if(this.isotanq1.in.length>1){
+      if(this.isInside(this.isotanq1)){
         this.isotanq1.out=this.getDate();
       }else{
         this.isotanq1.in=this.getDate();
@@ -216,12 +274,12 @@ export class AssetSupplyPostPage {
     }
     if(this.isotanq1.id_cco&&this.isotanq1.id_cco>0&&this.isotanq2.id_cco&&this.isotanq2.id_cco>0){
       //console.log("todo en orden, enviando los dos tanques")
-      if(this.isotanq1.in.length>1){
+      if(this.isInside(this.isotanq1)){
         this.isotanq1.out=this.getDate();
       }else{
         this.isotanq1.in=this.getDate();
       }     
-      if(this.isotanq2.in.length>1){
+      if(this.isInside(this.isotanq2)){
         this.isotanq2.out=this.getDate();
       }else{
         this.isotanq2.in=this.getDate();
@@ -239,7 +297,8 @@ export class AssetSupplyPostPage {
     this.ioService.post(data).subscribe({
       next:(res)=>{
         console.log('io res',res)
-        this.utilService.presentToast('ingreso registrado exitosamente','primary',1000);
+        this.utilService.presentToast(this.hasDate(data.out) ? 'Salida registrada exitosamente' : 'Ingreso registrado exitosamente','primary',1000);
+        this.loadIo();
         //window.location.reload();
         this.router.navigate(['/app/tabs/sgc-in-getall'],{ replaceUrl: true });
       },
@@ -293,7 +352,8 @@ export class AssetSupplyPostPage {
     /*this.TService.postDataListStrgth(this.atsDataList).subscribe({*/
       /*next:(res)=>{*/
         /*console.log('mnt_t insert response',res)*/
-        /*this.utilService.presentToast('ingreso registrado exitosamente','primary',1000);*/
+        /*this.utilService.presentToast(this.hasDate(data.out) ? 'Salida registrada exitosamente' : 'Ingreso registrado exitosamente','primary',1000);
+        this.loadIo();*/
         /*window.location.reload();*/
         /*[>this.router.navigate(['/app/tabs/asset-supply-readprdct'],{ replaceurl: true });<]*/
         /*this.location.back();*/

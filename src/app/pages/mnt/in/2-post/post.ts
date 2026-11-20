@@ -54,6 +54,7 @@ export class AssetSupplyPostPage {
     private atsService: AtsService,
     private mntService: MntService,
   ) {}
+
   ngOnInit() {}
   hash:string='';
   atsList:any[]=[];
@@ -83,29 +84,30 @@ export class AssetSupplyPostPage {
   }
 
   searchProducts(hash: string, productList: any[]): any[] {
-    console.log('[SEARCH][6.2] lista recibida -> cantidad:', productList?.length ?? 0);
+    //console.log('[SEARCH][6.2] lista recibida -> cantidad:', productList?.length ?? 0);
     const term = (hash || '').trim().toLowerCase();
     if (!term) {
       return [];
     }
     const matches = (productList || []).filter((product, index) => {
       const name = product?.data.name;
-      console.log('elemento lista',productList)
-      console.log('elemento product',product)
-      console.log('elemento name',name)
+      //console.log('elemento lista',productList)
+      //console.log('elemento product',product)
+      //console.log('elemento name',name)
       const validName = typeof name === 'string';
       const match = validName && name.toLowerCase().includes(term);
-      if (match) {
-        console.log(`[SEARCH][7] MATCH index=${index} name=`, name, 'producto=', product);
-      }
+      /*      if (match) {*/
+        /*console.log(`[SEARCH][7] MATCH index=${index} name=`, name, 'producto=', product);*/
+      /*}*/
       return match;
     });
-    console.log('[SEARCH][8] coincidencias totales antes de limitar:', matches.length);
+    //console.log('[SEARCH][8] coincidencias totales antes de limitar:', matches.length);
     const visibleResults = matches.slice(0, 20);
     return visibleResults;
   }
 
   postReq(data:any,r:number) {
+    console.log('data to postReq',data);
     this.ioService.post(data).subscribe({
       next: (response) => {
         console.log("mnt=>in post response", response);
@@ -238,8 +240,9 @@ export class AssetSupplyPostPage {
     this.ioService.post(data).subscribe({
       next:(res)=>{
         console.log('io res',res)
-        //if(this.atsList?.length==0){this.utilService.presentToast('No atsList','danger',500); return;}
-        this.triggerMnt(res[0].data.id_cco);
+        this.utilService.presentToast('ingreso registrado exitosamente','primary',1000);
+        //window.location.reload();
+        //this.router.navigate(['/app/tabs/sgc-in-getall'],{ replaceUrl: true });
       },
       error:(err)=>{
         console.error('error',err)
@@ -247,63 +250,60 @@ export class AssetSupplyPostPage {
     })   
   }
 
-  triggerMnt(id_cco:number){
-    console.log('id_cco  en triggermnt',id_cco) 
-    console.log('mntList en trigger mnt  (todavia no se ha creado ningun mnt)',this.mntList)
-    //const filteredMntLista = this.mntList?.filter(it => it?.data.id_cco === id_cco);
-    //console.log('filteredMntLista ',filteredMntLista)
-    //let orderedMntList = filteredMntLista?.sort((a, b) => b.i - a.i)[0];
-    const mnt = this.mntList?.filter(it => it?.data.id_cco === id_cco).sort((a, b) => b.i - a.i)[0];
-    //console.log('orderedMntList ',orderedMntList)
-    console.log('mnt despues de todos los filtros ',mnt)
-    //el metodo mas importante (dispara la creacion de mantenimiento )
-    if(mnt===undefined||mnt.state==='done'||mnt?.length===0){
-      this.postMnt(mnt,id_cco);
-    }else{
-      console.log('mnt no se puede crear ')
-    }
-  }
 
-  postMnt(mnt:any,id_cco:number){
-    console.log('post Mnt!!')
-    const data={
-      id_cco:id_cco,
-      status:'created',
-    }
-    this.mntService.post(data).subscribe({
-      next:res=>{
-       console.log('mnt_service post',res);
-       this.postTasks(res,id_cco);
-      },
-      error:err=>console.error('postMnt err',err)
-    })
-  }
 
-  postTasks(mnt:any,id_cco:number){
-    if(this.atsList?.length==0){this.utilService.presentToast('No atsList','danger',500); return;}
-    console.log('ats list',this.atsList);
-    this.atsDataList = this.atsList.map((it) => ({
-      id_ats: it.i,
-      id_mnt: mnt[0].i,
-      ini: [],
-      end: [],
-      apv: [],
-      asgn:[],
-    })); 
-    console.log('Lo que se enviara en el atsDataList',this.atsDataList)
-    this.TService.postDataListStrgth(this.atsDataList).subscribe({
-      next:(res)=>{
-        console.log('mnt_t insert response',res)
-        this.utilService.presentToast('ingreso registrado exitosamente','primary',1000);
-        window.location.reload();
-        /*this.router.navigate(['/app/tabs/asset-supply-readprdct'],{ replaceurl: true });*/
-        this.location.back();
-      },
-      error:(stgerr)=>{
-        console.error('mnt_t insert err ',stgerr) 
-      }
-    })
-  }
+  /*triggerMnt(id_cco:number){*/
+    /*console.log('id_cco  en triggermnt',id_cco) */
+    /*console.log('mntList en trigger mnt  (todavia no se ha creado ningun mnt)',this.mntList)*/
+    /*const mnt = this.mntList?.filter(it => it?.data.id_cco === id_cco).sort((a, b) => b.i - a.i)[0];*/
+    /*console.log('mnt despues de todos los filtros ',mnt)*/
+    /*if(mnt===undefined||mnt.state==='done'||mnt?.length===0){*/
+      /*this.postMnt(mnt,id_cco);*/
+    /*}else{*/
+      /*console.log('mnt no se puede crear ')*/
+    /*}*/
+  /*}*/
+
+  /*postMnt(mnt:any,id_cco:number){*/
+    /*console.log('post Mnt!!')*/
+    /*const data={*/
+      /*id_cco:id_cco,*/
+      /*status:'created',*/
+    /*}*/
+    /*this.mntService.post(data).subscribe({*/
+      /*next:res=>{*/
+       /*console.log('mnt_service post',res);*/
+       /*this.postTasks(res,id_cco);*/
+      /*},*/
+      /*error:err=>console.error('postMnt err',err)*/
+    /*})*/
+  /*}*/
+
+  /*postTasks(mnt:any,id_cco:number){*/
+    /*if(this.atsList?.length==0){this.utilService.presentToast('No atsList','danger',500); return;}*/
+    /*console.log('ats list',this.atsList);*/
+    /*this.atsDataList = this.atsList.map((it) => ({*/
+      /*id_ats: it.i,*/
+      /*id_mnt: mnt[0].i,*/
+      /*ini: [],*/
+      /*end: [],*/
+      /*apv: [],*/
+      /*asgn:[],*/
+    /*})); */
+    /*console.log('Lo que se enviara en el atsDataList',this.atsDataList)*/
+    /*this.TService.postDataListStrgth(this.atsDataList).subscribe({*/
+      /*next:(res)=>{*/
+        /*console.log('mnt_t insert response',res)*/
+        /*this.utilService.presentToast('ingreso registrado exitosamente','primary',1000);*/
+        /*window.location.reload();*/
+        /*[>this.router.navigate(['/app/tabs/asset-supply-readprdct'],{ replaceurl: true });<]*/
+        /*this.location.back();*/
+      /*},*/
+      /*error:(stgerr)=>{*/
+        /*console.error('mnt_t insert err ',stgerr) */
+      /*}*/
+    /*})*/
+  /*}*/
 
 
 }

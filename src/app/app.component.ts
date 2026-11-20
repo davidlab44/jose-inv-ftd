@@ -82,7 +82,6 @@ export class AppComponent implements OnInit {
        url: '/app/tabs/rpl-geo-get',
        icon: 'golf'
      },
-
    ];
     
    appPages7 = [   //jose
@@ -109,6 +108,11 @@ export class AppComponent implements OnInit {
        title: 'Plexa',
        url: '/app/tabs/replenishment-withdrawn-getall',
        icon: 'scale'
+     },
+     {
+       title: 'Barco',
+       url: '/app/tabs/rpl-bulk-sail',
+       icon: 'boat'
      },
      {
        title: 'Registrar ingreso a patio',
@@ -287,6 +291,11 @@ export class AppComponent implements OnInit {
      title: 'Plexa',
      url: '/app/tabs/replenishment-withdrawn-getall',
      icon: 'git-commit'
+   },
+   {
+     title: 'Barco',
+     url: '/app/tabs/rpl-bulk-sail',
+     icon: 'boat'
    },
    {
      title: 'Kilos retirados',

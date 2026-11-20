@@ -173,7 +173,7 @@ export class PatchPage {
     });
     this.uploadProgress = 0; 
     this.uploadedUrl= null;
-    this.uploading = false;
+    //this.uploading = false;
   }
 
   slideOpts = {
@@ -212,7 +212,7 @@ export class PatchPage {
 
   uploadProgress = 0;
   uploadedUrl: string | null = null;
-  uploading = false;
+  //uploading = false;
 
   /*async takePhotoAndUpload() {*/
     /*this.uploading = true;*/
@@ -527,18 +527,18 @@ export class PatchPage {
 
 
   async takePhotoAndUpload(): Promise<void> {                                                                                                       
-      if (this.uploading) return;
-      this.uploading = true;
+      //if (this.uploading) return;
+      //this.uploading = true;
       try {
         const base64Image = await this.photoService.takePicture();
         if (!base64Image) {
-          this.uploading = false;
+          //this.uploading = false;
           return;
         }
         this.launchOcr(base64Image);
       } catch (error) {
         console.error('Error capturando imagen:', error);
-        this.uploading = false;
+        //this.uploading = false;
       }
     }
     
@@ -566,7 +566,7 @@ export class PatchPage {
   async postImage(image:any) {
     const base64Image = image;
     if (!base64Image) {
-      this.uploading = false;
+      //this.uploading = false;
       console.error('No se pudo obtener la imagen');
       return;
     }
@@ -575,7 +575,7 @@ export class PatchPage {
       next: (p) => this.uploadProgress = p,
       error: (err) => {
         console.error('Error subiendo imagen', err);
-        this.uploading = false;
+        //this.uploading = false;
       }
     });
     url$.subscribe({
@@ -586,7 +586,7 @@ export class PatchPage {
         console.error('Error obteniendo URL', err);
       },
       complete: () => {
-        this.uploading = false;
+        //this.uploading = false;
       }
     });
   }
@@ -666,18 +666,18 @@ export class PatchPage {
   /*}*/
 
   async pickImageAndUpload(): Promise<void> {
-    if (this.uploading) return;
-    this.uploading = true;   
+    //if (this.uploading) return;
+    //this.uploading = true;   
     try {   
       const base64Image = await this.photoService.pickImage();
       if (!base64Image) {    
-        this.uploading = false;
+        //this.uploading = false;
         return;
       }     
       this.launchOcr(base64Image);  
     } catch (error) {        
       console.error('Error seleccionando imagen:', error);
-      this.uploading = false;
+      //this.uploading = false;
     } 
   }   
           

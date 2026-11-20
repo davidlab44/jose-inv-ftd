@@ -22,7 +22,8 @@
       button
       detail="false"
       *ngFor="let p of filteredProductList"
-      (click)="selectProduct(p)">
+      (click)="selectProduct(p)"
+      [class.asset-inside]="isProductInside(p)">
       <ion-label>
         {{ p.data.name }}
       </ion-label>
@@ -59,7 +60,7 @@
   </ion-grid>
 
   <ion-button expand="block" (click)="post()" *ngIf="this.isotanq1?.id_cco>0">
-    Guardar
+    {{ actionLabel }}
   </ion-button>
   <br>
 </ion-content>
