@@ -22,115 +22,50 @@
 </ion-header>
 
 <ion-content>
-  <ion-item class="range-container" lines="none">
-    <div class="date-boxes">
-      <div class="date-box">
-        <div class="controls tight">
-          <ion-button fill="clear" class="nav-btn" (click)="changeStartDay(-1)">
-            <ion-icon name="chevron-back-outline"></ion-icon>
-          </ion-button>
-          <span class="value">{{ formatDay(startDay) }}</span>
-          <ion-button fill="clear" class="nav-btn" (click)="changeStartDay(1)">
-            <ion-icon name="chevron-forward-outline"></ion-icon>
-          </ion-button>
-        </div>
-      </div>
-      <div class="date-box">
-        <div class="controls tight">
-          <ion-button fill="clear" class="nav-btn" (click)="changeEndDay(-1)">
-            <ion-icon name="chevron-back-outline"></ion-icon>
-          </ion-button>
-          <span class="value">{{ formatDay(endDay) }}</span>
-          <ion-button fill="clear" class="nav-btn" (click)="changeEndDay(1)">
-            <ion-icon name="chevron-forward-outline"></ion-icon>
-          </ion-button>
-        </div>
-      </div>
-    </div>
-  </ion-item>
-  <ion-segment (ionChange)="quickRange($event)">
-    <ion-segment-button style="font-size:xx-small"  value="month">30 días</ion-segment-button>
-    <ion-segment-button style="font-size:xx-small"  value="week">7 días</ion-segment-button>
-    <ion-segment-button style="font-size:xx-small"  value="today">Hoy</ion-segment-button>
-  </ion-segment>
-  <ion-item lines="none" style="margin-top:-5px;"  >
-    <ion-range
-      class="day-range"
-      min="1"
-      [max]="daysInCurrentYear()"
-      step="1"
-      dualKnobs="true"
-      snaps="true"
-      ticks="true"
-      [(ngModel)]="dayRange"
-      (ionChange)="onRangeChange($event)">
-    </ion-range>
-  </ion-item>
   <div class="shipout-actions">
     <ion-button (click)="openShipModal()" [disabled]="!selectedCount || savingShipout">
       <ion-icon name="boat-outline" slot="start"></ion-icon>
       Seleccionar barco ({{ selectedCount }})
     </ion-button>
     <ion-button fill="outline" color="medium" (click)="clearSelection()" [disabled]="!selectedCount || savingShipout">Limpiar selección</ion-button>
-    <ion-button fill="clear" size="small" (click)="selectVisible(true)" [disabled]="!filteredList.length">Seleccionar visibles</ion-button>
+    <ion-button fill="clear" size="small" (click)="selectVisible(true)" [disabled]="!visiblePendingCount || savingShipout">Seleccionar visibles</ion-button>
     <ion-button fill="clear" size="small" (click)="selectVisible(false)" [disabled]="!visibleSelectedCount">Deseleccionar visibles</ion-button>
-    <span class="selection-info">{{ filteredList.length }} pendientes visibles</span>
+    <span class="selection-info">{{ visiblePendingCount }} pendientes visibles ({{ filteredList.length - visiblePendingCount }} acompañantes)</span>
   </div>
   <ion-progress-bar *ngIf="loadingMovements" type="indeterminate"></ion-progress-bar>
-  <div *ngIf="!loadingMovements && !filteredList.length" class="empty-state">No hay movimientos pendientes (shipout = 3) en este rango.</div>
+  <div *ngIf="!loadingMovements && !filteredList.length" class="empty-state">No hay movimientos pendientes de asignación.</div>
   <div class="withdrawn-table-container">
     <table class="withdrawn-table">
       <thead>
         <tr>
           <th class="select-col">Sel.</th>
-          <th></th>
           <th>ID</th>
           <th>Fecha Ing</th>
-          <th>Rem v.</th>
           <th>In</th>
           <th>Trip In</th>
           <th>Ship In</th>
           <th>Fecha</th>
-          <th>Isotanq</th>
-          <th>Ticket</th>
+          <th style="width:20%">Isotanq</th>
           <th>Plx</th>
-          <th>Kg</th>
-          <th>Precio</th>
-          <th>PSI</th>
-          <th>Rt</th>
-          <th>Sellos</th>
           <th>Date Out</th>
           <th>Rem M LL</th>
           <th>Out</th>
-          <th>Trip Out</th>
-          <th>Ship Out</th>
-          <th>Diff</th>
-          <th>Wgross</th>
-          <th>Wtare</th>
-          <th>Wnet</th>
           <th>WTicket</th>
           <th>W</th>
-          <th></th>
+          <!--<th></th>-->
         </tr>
       </thead>
       <tbody>
         <ng-container *ngFor="let p of filteredList; trackBy: trackById">
           <tr
-            [ngClass]="{ 'row-erp': p.state === 'erp' }"
+            [ngClass]="{ 'row-erp': p.state === 'erp', 'row-ghost': p.isGhost }"
             [style.background-color]="p.data.color || '#d5d5d5'">
             <td class="select-col">
-              <ion-checkbox [checked]="isSelected(p.id)" (ionChange)="onSelectRow(p.id, $event.detail.checked)"></ion-checkbox>
-            </td>
-            <td class="color-cell">
-              <input
-                type="color"
-                [(ngModel)]="p.data.color"
-                (click)="onColorPickerOpen(p, p.data.color)"
-                (change)="onColorChange(p, $event.target.value)">
+              <ion-checkbox *ngIf="!p.isGhost" [disabled]="savingShipout" [checked]="isSelected(p.id)" (ionChange)="onSelectRow(p.id, $event.detail.checked)"></ion-checkbox>
+              <span *ngIf="p.isGhost" class="ghost-label" title="Ya tiene motonave asignada; sólo informativo">Ghost</span>
             </td>
             <td>{{ p.id }}</td>
             <td>{{ p.data.datein | date:'dd/MM/yyyy' }}</td>
-            <td>{{ displayCell(p.data.deliveryin) }}</td>
             <td class="icon-cell">
               <ion-button
                 *ngIf="p.data.imgin"
@@ -148,7 +83,6 @@
               (click)="discoverTwins(p)">
               {{ displayCell(ccoMap[+p.data.name]?.name || p.data.name) }}
             </td>
-            <td>{{ displayCell(p.data.ticket) }}</td>
             <td class="icon-cell">
               <ion-button
                 *ngIf="p.data.img"
@@ -158,11 +92,6 @@
                 <ion-icon name="open-outline"></ion-icon>
               </ion-button>
             </td>
-            <td>{{ displayCell(p.data.kg) }}</td>
-            <td>{{ displayCell(p.data.price) }}</td>
-            <td>{{ displayCell(p.data.psi) }}</td>
-            <td>{{ displayCell(p.data.rotogage) }}</td>
-            <td>{{ displayCell(p.data.seal?.join(', ')) }}</td>
             <td>{{ p.data.dateout | date:'dd/MM/yyyy' }}</td>
             <td>{{ displayCell(p.data.deliveryout) }}</td>
             <td class="icon-cell">
@@ -174,12 +103,6 @@
                 <ion-icon name="open-outline"></ion-icon>
               </ion-button>
             </td>
-            <td>{{ displayCell(p.data.tripout) }}</td>
-            <td>{{ displayCell(p.data.shipoutName) }}</td>
-            <td>{{ displayCell(p.data.diff) }}</td>
-            <td>{{ displayCell(p.data.wgross) }}</td>
-            <td>{{ displayCell(p.data.wtare) }}</td>
-            <td>{{ displayCell(p.data.wnet) }}</td>
             <!-- WTicket -->
             <td>{{ displayCell(p.data.wticket) }}</td>
             <td class="icon-cell">
@@ -187,10 +110,10 @@
                 <ion-icon name="open-outline"></ion-icon>
               </ion-button>
             </td>
-            <td>
-              <!--<span *ngIf="p.state=='plexa'">-->
-              <span>{{p.level}}</span>
-            </td>  
+<!--            <td>-->
+              <!--[><span *ngIf="p.state=='plexa'"><]-->
+              <!--<span>{{p.level}}</span>-->
+            <!--</td>  -->
           </tr>
           <tr *ngIf="p.showSeparator" class="movement-separator">
             <td colspan="30"></td>

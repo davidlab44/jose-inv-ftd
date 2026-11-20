@@ -20,8 +20,8 @@ ion-searchbar { --background:#f1f4f8; --border-radius:12px; padding:4px 10px; }
 .withdrawn-table tbody tr:hover { background:#f2f6fc; }
 .withdrawn-table td.active-cell { background:#eaf5f0; }
 .container-chip { display:inline-flex; align-items:center; justify-content:center; gap:6px; max-width:100%;
-  padding:7px 9px; border:1px solid #cddfd6; border-radius:8px; background:#fff; color:#264b3c;
-  font-size:12px; font-weight:650; cursor:pointer; overflow-wrap:anywhere; }
+  padding:7px 9px; border:1px solid #cddfd6; border-radius:8px; background:#fff; color:#111;
+  font-size:12px; font-weight:500; cursor:pointer; overflow-wrap:anywhere; }
 .color-dot { flex:none; width:9px; height:9px; border-radius:50%; background:var(--container-color); }
 .container-chip:active { transform:scale(.97); }
 .error-message { margin:12px; color:#a52b2b; font-size:13px; }
@@ -36,3 +36,5 @@ ion-searchbar { --background:#f1f4f8; --border-radius:12px; padding:4px 10px; }
   .withdrawn-table th { padding:11px 5px; font-size:10px; }
   .container-chip { font-size:11px; padding:7px 5px; }
 }
+
+.container-chip-full { background:#343a40; color:#fff; border-color:#343a40; font-weight:800; }

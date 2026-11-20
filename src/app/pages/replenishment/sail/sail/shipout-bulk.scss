@@ -581,3 +581,8 @@ ion-button {
 .select-col { text-align:center; min-width:48px; }
 .selection-info { font-size:12px; opacity:.75; margin-left:auto; }
 .empty-state { padding:18px; text-align:center; }
+
+/* Acompañante ya asignado: visible, pero no seleccionable. */
+.withdrawn-table tr.row-ghost { opacity: .48; filter: grayscale(.65); }
+.withdrawn-table tr.row-ghost td { font-style: italic; }
+.ghost-label { font-size: 10px; font-weight: 600; color: #555; }

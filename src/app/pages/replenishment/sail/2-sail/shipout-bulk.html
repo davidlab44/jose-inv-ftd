@@ -1,0 +1,198 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <!-- Botón personalizado (NO ion-menu-button) -->
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="goBack()">
+        <ion-icon slot="icon-only" name="menu"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-searchbar
+      placeholder="Buscar isotanque"
+      (ionInput)="onSearch($event.target.value)">
+    </ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
+        <span *ngIf="ios">Filter</span>
+        <span *ngIf="!ios">
+          <ion-icon slot="icon-only" name="options"></ion-icon>
+        </span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item class="range-container" lines="none">
+    <div class="date-boxes">
+      <div class="date-box">
+        <div class="controls tight">
+          <ion-button fill="clear" class="nav-btn" (click)="changeStartDay(-1)">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+          </ion-button>
+          <span class="value">{{ formatDay(startDay) }}</span>
+          <ion-button fill="clear" class="nav-btn" (click)="changeStartDay(1)">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+      <div class="date-box">
+        <div class="controls tight">
+          <ion-button fill="clear" class="nav-btn" (click)="changeEndDay(-1)">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+          </ion-button>
+          <span class="value">{{ formatDay(endDay) }}</span>
+          <ion-button fill="clear" class="nav-btn" (click)="changeEndDay(1)">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </ion-item>
+  <ion-segment (ionChange)="quickRange($event)">
+    <ion-segment-button style="font-size:xx-small"  value="month">30 días</ion-segment-button>
+    <ion-segment-button style="font-size:xx-small"  value="week">7 días</ion-segment-button>
+    <ion-segment-button style="font-size:xx-small"  value="today">Hoy</ion-segment-button>
+  </ion-segment>
+  <ion-item lines="none" style="margin-top:-5px;"  >
+    <ion-range
+      class="day-range"
+      min="1"
+      [max]="daysInCurrentYear()"
+      step="1"
+      dualKnobs="true"
+      snaps="true"
+      ticks="true"
+      [(ngModel)]="dayRange"
+      (ionChange)="onRangeChange($event)">
+    </ion-range>
+  </ion-item>
+  <div class="shipout-actions">
+    <ion-button (click)="openShipModal()" [disabled]="!selectedCount || savingShipout">
+      <ion-icon name="boat-outline" slot="start"></ion-icon>
+      Seleccionar barco ({{ selectedCount }})
+    </ion-button>
+    <ion-button fill="outline" color="medium" (click)="clearSelection()" [disabled]="!selectedCount || savingShipout">Limpiar selección</ion-button>
+    <ion-button fill="clear" size="small" (click)="selectVisible(true)" [disabled]="!filteredList.length">Seleccionar visibles</ion-button>
+    <ion-button fill="clear" size="small" (click)="selectVisible(false)" [disabled]="!visibleSelectedCount">Deseleccionar visibles</ion-button>
+    <span class="selection-info">{{ filteredList.length }} pendientes visibles</span>
+  </div>
+  <ion-progress-bar *ngIf="loadingMovements" type="indeterminate"></ion-progress-bar>
+  <div *ngIf="!loadingMovements && !filteredList.length" class="empty-state">No hay movimientos pendientes (shipout = 3) en este rango.</div>
+  <div class="withdrawn-table-container">
+    <table class="withdrawn-table">
+      <thead>
+        <tr>
+          <th class="select-col">Sel.</th>
+          <th>ID</th>
+          <th>Fecha Ing</th>
+          <th>In</th>
+          <th>Trip In</th>
+          <th>Ship In</th>
+          <th>Fecha</th>
+          <th style="width:20%">Isotanq</th>
+          <th>Plx</th>
+          <th>Date Out</th>
+          <th>Rem M LL</th>
+          <th>Out</th>
+          <th>WTicket</th>
+          <th>W</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let p of filteredList; trackBy: trackById">
+          <tr
+            [ngClass]="{ 'row-erp': p.state === 'erp' }"
+            [style.background-color]="p.data.color || '#d5d5d5'">
+            <td class="select-col">
+              <ion-checkbox [checked]="isSelected(p.id)" (ionChange)="onSelectRow(p.id, $event.detail.checked)"></ion-checkbox>
+            </td>
+            <td>{{ p.id }}</td>
+            <td>{{ p.data.datein | date:'dd/MM/yyyy' }}</td>
+            <td class="icon-cell">
+              <ion-button
+                *ngIf="p.data.imgin"
+                fill="clear"
+                size="small"
+                (click)="openLink(p.data.imgin)">
+                <ion-icon name="open-outline"></ion-icon>
+              </ion-button>
+            </td>
+            <td>{{ displayCell(p.data.tripin) }}</td>
+            <td>{{ displayCell(p.data.shipinName | slice:0:7) }}</td>
+            <td>{{ p.data.date | date:'dd/MM/yyyy' }}</td>
+            <td
+              [style.background]="ccoMap[+p.data.name]?.color || '#eee'"
+              (click)="discoverTwins(p)">
+              {{ displayCell(ccoMap[+p.data.name]?.name || p.data.name) }}
+            </td>
+            <td class="icon-cell">
+              <ion-button
+                *ngIf="p.data.img"
+                fill="clear"
+                size="small"
+                (click)="openLink(p.data.img)">
+                <ion-icon name="open-outline"></ion-icon>
+              </ion-button>
+            </td>
+            <td>{{ p.data.dateout | date:'dd/MM/yyyy' }}</td>
+            <td>{{ displayCell(p.data.deliveryout) }}</td>
+            <td class="icon-cell">
+              <ion-button
+                *ngIf="p.data.imgout"
+                fill="clear"
+                size="small"
+                (click)="openLink(p.data.imgout)">
+                <ion-icon name="open-outline"></ion-icon>
+              </ion-button>
+            </td>
+            <!-- WTicket -->
+            <td>{{ displayCell(p.data.wticket) }}</td>
+            <td class="icon-cell">
+              <ion-button *ngIf="p.data.imgscale" fill="clear" size="small" (click)="openLink(p.data.imgscale)">
+                <ion-icon name="open-outline"></ion-icon>
+              </ion-button>
+            </td>
+            <td>
+              <!--<span *ngIf="p.state=='plexa'">-->
+              <span>{{p.level}}</span>
+            </td>  
+          </tr>
+          <tr *ngIf="p.showSeparator" class="movement-separator">
+            <td colspan="30"></td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <ion-modal [isOpen]="shipModalOpen" (didDismiss)="closeShipModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Asignar barco</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeShipModal()" [disabled]="savingShipout">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <p>Se actualizará <strong>data.shipout</strong> en {{ selectedCount }} registro(s) seleccionados.</p>
+        <ion-item>
+          <ion-label position="stacked">Barco de salida</ion-label>
+          <ion-select interface="alert" placeholder="Selecciona un barco" [(ngModel)]="selectedShipId">
+            <ng-container *ngFor="let ship of shipList">
+              <ion-select-option *ngIf="+ship.id !== 3" [value]="+ship.id">{{ ship.data?.name || ship.id }}</ion-select-option>
+            </ng-container>
+          </ion-select>
+        </ion-item>
+        <p *ngIf="!shipList.length">No hay barcos cargados. Comprueba ShipService.getAll().</p>
+        <ion-button expand="block" (click)="saveShipout()" [disabled]="savingShipout || !selectedShipId || +selectedShipId === 3 || !selectedCount">
+          <ion-spinner *ngIf="savingShipout" slot="start"></ion-spinner>
+          Guardar ({{ selectedCount }})
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
+

@@ -1,100 +1,54 @@
 <ion-header translucent="true">
   <ion-toolbar>
-    <!-- Botón personalizado (NO ion-menu-button) -->
     <ion-buttons slot="start">
-      <ion-button>
-        <ion-icon slot="icon-only" name="menu"></ion-icon>
+      <ion-button (click)="menu.toggle()" aria-label="Abrir menú">
+        <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-searchbar
-      placeholder="Buscar"
-      (ionInput)="onSearch($event.target.value)">
-    </ion-searchbar>
+    <ion-title>Ubicación de contenedores</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Buscar contenedor" [debounce]="200"
+      (ionInput)="onSearch($event.detail.value || '')"></ion-searchbar>
     <ion-buttons slot="end">
-      <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
-        <span *ngIf="ios">Filter</span>
-        <span *ngIf="!ios">
-          <ion-icon slot="icon-only" name="options"></ion-icon>
-        </span>
+      <ion-button (click)="loadCco()" aria-label="Actualizar">
+        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-content>
-<!--  <ion-item class="range-container" lines="none">-->
-    <!--<div class="date-boxes">-->
-      <!--<div class="date-box">-->
-        <!--<div class="controls tight">-->
-          <!--<ion-button fill="clear" class="nav-btn" (click)="changeStartDay(-1)">-->
-            <!--<ion-icon name="chevron-back-outline"></ion-icon>-->
-          <!--</ion-button>-->
-          <!--<span class="value">{{ formatDay(startDay) }}</span>-->
-          <!--<ion-button fill="clear" class="nav-btn" (click)="changeStartDay(1)">-->
-            <!--<ion-icon name="chevron-forward-outline"></ion-icon>-->
-          <!--</ion-button>-->
-        <!--</div>-->
-      <!--</div>-->
-      <!--<div class="date-box">-->
-        <!--<div class="controls tight">-->
-          <!--<ion-button fill="clear" class="nav-btn" (click)="changeEndDay(-1)">-->
-            <!--<ion-icon name="chevron-back-outline"></ion-icon>-->
-          <!--</ion-button>-->
-          <!--<span class="value">{{ formatDay(endDay) }}</span>-->
-          <!--<ion-button fill="clear" class="nav-btn" (click)="changeEndDay(1)">-->
-            <!--<ion-icon name="chevron-forward-outline"></ion-icon>-->
-          <!--</ion-button>-->
-        <!--</div>-->
-      <!--</div>-->
-    <!--</div>-->
-  <!--</ion-item>-->
-  <!--<ion-segment (ionChange)="quickRange($event)">-->
-    <!--<ion-segment-button style="font-size:xx-small"  value="month">30 días</ion-segment-button>-->
-    <!--<ion-segment-button style="font-size:xx-small"  value="week">7 días</ion-segment-button>-->
-    <!--<ion-segment-button style="font-size:xx-small"  value="today">Hoy</ion-segment-button>-->
-  <!--</ion-segment>-->
-<!--  <ion-item lines="none" style="margin-top:-5px;"  >-->
-    <!--<ion-range-->
-      <!--class="day-range"-->
-      <!--min="1"-->
-      <!--max="365"-->
-      <!--step="1"-->
-      <!--dualKnobs="true"-->
-      <!--snaps="true"-->
-      <!--ticks="true"-->
-      <!--[(ngModel)]="dayRange"-->
-      <!--(ionChange)="onRangeChange($event)">-->
-    <!--</ion-range>-->
-  <!--</ion-item>-->
-  <br>
+  <div class="summary">
+    <span class="summary-title">Contenedores: {{ fltCcoList.length }}</span>
+    <span class="summary-subtitle">Último movimiento registrado</span>
+  </div>
+  <ion-progress-bar *ngIf="loading" type="indeterminate"></ion-progress-bar>
+  <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
   <div class="withdrawn-table-container">
     <table class="withdrawn-table">
       <thead>
         <tr>
-          <th width=20% >SAI</th>
-          <th width=20% >PUERTO CTG vacio</th>
-          <th width=20% >CTG</th>
-          <th width=20% >INBEMETAL</th>
-          <th width=20% >PUERTO CTG lleno</th>
+          <th *ngFor="let column of columns">
+            <span>{{ column.label }}</span>
+            <span class="count">{{ getCount(column.key) }}</span>
+          </th>
         </tr>
       </thead>
       <tbody>
-        <ng-container *ngFor="let p of fltCcoList">
-          <tr>
-            <td>{{ p.data.id }}</td>
-            <td>{{ p.data.id }}</td>
-            <td>{{ p.data.id }}</td>
-            <td>{{ p.data.id }}</td>
-            <td>{{ p.data.id }}</td>
-          </tr>
-        </ng-container>
+        <tr *ngFor="let item of fltCcoList; trackBy:trackById">
+          <td *ngFor="let column of columns" [class.active-cell]="item.data.lct[column.key]">
+            <button *ngIf="item.data.lct[column.key]" type="button" class="container-chip"
+              [style.--container-color]="item.data.color || '#3478c0'" (click)="patchItem(item)">
+              <span class="color-dot"></span>
+              <span>{{ item.data.name }}</span>
+            </button>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
-
-<!--  <div class="kg-total">-->
-    <!--<h6>Total contenedores: {{ totalKg }}</h6>-->
-  <!--</div>-->
-
+  <div class="empty-state" *ngIf="!loading && !fltCcoList.length">
+    No se encontraron contenedores.
+  </div>
+  <div class="hint"></div>
 </ion-content>
-

@@ -11,6 +11,7 @@ import { IoService } from '../../../../services/mnt/io.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 
 type LocationKey='empty'|'sai'|'tsai'|'full'|'inb'|'ctg';
+type LoadState='empty'|'full'|'unknown';
 interface LocationEvent {
   key:LocationKey;
   date:string;
@@ -142,10 +143,29 @@ export class GetallPage {
     return {key,date:String(value),timestamp,source,record};
   }
 
+  // La fecha de llenado solo es válida si es posterior a la creación del ciclo.
+  private isFilled(wdn:any):boolean {
+    if (!wdn) return false;
+    const created=this.getTimestamp(wdn.created_at);
+    const filled=this.getTimestamp(wdn.data?.date);
+    const weight=Number(wdn.data?.wnet);
+    return created>0 && filled>created && wdn.data?.wnet!=null &&
+      String(wdn.data.wnet).trim()!=='' && Number.isFinite(weight) && weight>0;
+  }
+
+  private getCycle(id:any):{wdn:any|null;io:any|null} {
+    const wdn=this.getLatestRecord(this.wdnList,id,'name');
+    const latestIo=this.getLatestRecord(this.ioList,id,'id_cco');
+    // Un IO anterior al registro Withdrawn actual pertenece a un ciclo anterior.
+    const cycleStart=this.getTimestamp(wdn?.created_at);
+    const io=latestIo && (!wdn || this.getTimestamp(latestIo.created_at)>=cycleStart)
+      ?latestIo:null;
+    return {wdn,io};
+  }
+
   private getEvents(id:any):LocationEvent[] {
     const events:LocationEvent[]=[];
-    const wdn=this.getLatestRecord(this.wdnList,id,'name');
-    const io=this.getLatestRecord(this.ioList,id,'id_cco');
+    const {wdn,io}=this.getCycle(id);
     const add=(key:LocationKey,value:any,source:'io'|'wdn',record:any):void=>{
       const result=this.event(key,value,source,record);
       if (result) events.push(result);
@@ -153,44 +173,61 @@ export class GetallPage {
 
     if (wdn) {
       const data=wdn.data||{};
-
-      // 1. Puerto CTG vacío
-      add('empty',data.datein,'wdn',wdn);
-
-      // 2. CTG
-      add('ctg',data.date,'wdn',wdn);
-
-      // 3. CTG por peso neto
-      const wnet=Number(data.wnet);
-      if (data.wnet!=null && data.wnet!=='' && Number.isFinite(wnet) && wnet>0) {
-        add('ctg',data.date,'wdn',wdn);
-      }
-    }
-
-    if (io) {
-      // 4. INBEMETAL
-      //add('inb',io?.data?.dateout,'io',io);
-      add('inb',io?.created_at,'io',io);
-    }
-
-    if (wdn) {
-      const data=wdn.data||{};
-      const shipout=Number(data.shipout??0);
+      const created=this.getTimestamp(wdn.created_at);
+      const datein=this.getTimestamp(data.datein);
+      const date=this.getTimestamp(data.date);
       const dateout=this.getTimestamp(data.dateout);
+      const filled=this.isFilled(wdn);
+      const shipout=Number(data.shipout);
 
-      // 5. Puerto CTG lleno
-      if (dateout && shipout===0) add('full',data.dateout,'wdn',wdn);
+      // Inicio de un nuevo ciclo: contenedor vacío desde la creación del registro.
+      add('empty',wdn.created_at,'wdn',wdn);
+      if (datein && datein>=created) add('empty',data.datein,'wdn',wdn);
 
-      // 6 y 7. Tránsito SAI o SAI
-      if (dateout && Number.isFinite(shipout) && shipout>0) {
-        const elapsed=Date.now()-dateout;
-        const twoDays=2*24*60*60*1000;
-        const key:LocationKey=elapsed>=twoDays?'sai':'tsai';
-        add(key,data.dateout,'wdn',wdn);
+      // Planta: únicamente se confirma lleno con peso neto y fecha posterior a created_at.
+      if (filled) add('ctg',data.date,'wdn',wdn);
+
+      // Puerto y navegación solo son posibles después del llenado confirmado.
+      if (filled && dateout && dateout>=date && date>created) {
+        if (Number.isFinite(shipout) && shipout===0) {
+          add('full',data.dateout,'wdn',wdn);
+        } else if (Number.isFinite(shipout) && shipout>0) {
+          const twoDays=2*24*60*60*1000;
+          const updated=this.getTimestamp(wdn.updated_at);
+          // El barco asignado (shipout > 0) inicia el conteo desde updated_at.
+          // Hasta 2 días inclusive: tránsito; después de 2 días: SAI.
+          // La distinción lleno/vacío en SAI ocurre al superar 6 días.
+          if (updated>0) {
+            const elapsed=Math.max(0,Date.now()-updated);
+            add(elapsed<=twoDays?'tsai':'sai',wdn.updated_at,'wdn',wdn);
+          }
+        }
       }
     }
 
+    // Taller/patio opcional; no debe reemplazar un evento posterior del ciclo.
+    if (io) add('inb',io.created_at,'io',io);
     return events;
+  }
+
+  private getLoadState(key:LocationKey|null,wdn:any|null):LoadState {
+    if (key==='empty') return 'empty';
+    if (key==='ctg'||key==='full') return 'full';
+
+    // La asignación de barco marca el comienzo del plazo de seis días.
+    // updated_at es la referencia temporal, no dateout ni created_at.
+    // Mientras no hayan pasado seis días, el contenedor sigue lleno,
+    // tanto en tránsito como en SAI.
+    const shipout=Number(wdn?.data?.shipout);
+    if ((key==='tsai'||key==='sai') && wdn && wdn.data?.shipout!=null && String(wdn.data.shipout).trim()!=='' &&
+        Number.isFinite(shipout) && shipout>0) {
+      const updated=this.getTimestamp(wdn.updated_at);
+      const sixDays=6*24*60*60*1000;
+      return updated>0 && Date.now()-updated>sixDays?'empty':'full';
+    }
+
+    if (key==='inb') return this.isFilled(wdn)?'full':'unknown';
+    return 'unknown';
   }
 
   rebuildList():void {
@@ -199,12 +236,20 @@ export class GetallPage {
       if (!term) return true;
       return Object.values(item?.data||{}).some(value=>String(value).toLowerCase().includes(term));
     }).map(item=>{
+      const {wdn}=this.getCycle(item.id);
       const events=this.getEvents(item.id);
       const sorted=[...events].sort((a,b)=>b.timestamp-a.timestamp);
-      const latest=sorted[0]||null;
+      // Un embarque confirmado del ciclo vigente prevalece sobre eventos IO:
+      // el contenedor no puede aparecer simultáneamente en taller y en SAI.
+      const shipment=sorted.find(e=>e.source==='wdn' && (e.key==='tsai'||e.key==='sai'));
+      const latest=shipment||sorted[0]||null;
       const lct=this.emptyLocation();
-      lct[latest?.key||'sai']=true;
-      return {...item,data:{...item.data,lct,lctEvents:events,lctLatest:latest}};
+      // Mantener SAI como estado de espera si aún no existe un nuevo ciclo.
+      const key:LocationKey=latest?.key||'sai';
+      lct[key]=true;
+      const loadState=this.getLoadState(key,wdn);
+      return {...item,data:{...item.data,lct,lctEvents:events,lctLatest:latest,
+        loadState,isFull:loadState==='full'}};
     });
     console.log('fltCcoList rebuilded',this.fltCcoList);
   }

@@ -6,7 +6,8 @@ import { UserData } from '../../../../providers/user-data';
 import { Ship,ShipMap } from '../../../../interfaces/ship';
 import { UtilService } from '../../../../services/util.service';
 import { BarcodeService } from '../../../../services/barcode.service';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 import { Cco,CcoMap } from '../../../../interfaces/cco';
 import { CcoService } from '../../../../services/cc/cco.service';
@@ -32,15 +33,18 @@ export class ShipoutBulkPage implements OnInit {
   savingShipout = false;
   loadingMovements = false;
   get selectedCount(): number { return this.selectedIds.size; }
-  get visibleSelectedCount(): number { return this.filteredList.filter(r => this.selectedIds.has(Number(r.id))).length; }
+  get visibleSelectedCount(): number { return this.filteredList.filter(r => !r.isGhost && this.selectedIds.has(Number(r.id))).length; }
+  get visiblePendingCount(): number { return this.filteredList.filter(r => !r.isGhost).length; }
   isSelected(id: number): boolean { return this.selectedIds.has(Number(id)); }
   onSelectRow(id: number, checked: boolean): void {
     const key = Number(id);
+    if (!this.withdrawnList.some(row => Number(row.id) === key)) return;
     if (checked) this.selectedIds.add(key);
     else this.selectedIds.delete(key);
   }
   selectVisible(checked: boolean): void {
     for (const row of this.filteredList) {
+      if (row.isGhost) continue;
       const id = Number(row.id);
       if (checked) this.selectedIds.add(id);
       else this.selectedIds.delete(id);
@@ -61,7 +65,8 @@ export class ShipoutBulkPage implements OnInit {
       await this.showShipoutToast('Selecciona un barco válido (distinto de 3).', 'warning');
       return;
     }
-    const ids = [...this.selectedIds];
+    const pendingIds = new Set(this.withdrawnList.map(row => Number(row.id)));
+    const ids = [...this.selectedIds].filter(id => pendingIds.has(id));
     if (!ids.length || this.savingShipout) return;
     this.savingShipout = true;
     this.withdrawnService.updateShipout(ids, shipId).subscribe({
@@ -75,20 +80,11 @@ export class ShipoutBulkPage implements OnInit {
         this.getAll();
       },
 
-      error: (err: any) => {
-        console.error('HTTP STATUS:', err.status);
-        console.error('POSTGREST ERROR:', err.error);
-        console.error('MESSAGE:', err.error?.message);
-        console.error('CODE:', err.error?.code);
-        console.error('DETAILS:', err.error?.details);
-        console.error('HINT:', err.error?.hint);
+      error: async (err: any) => {
+        this.savingShipout = false;
+        console.error('Error actualizando shipout en bloque:', err);
+        await this.showShipoutToast('No se pudo guardar. La selección se conserva para reintentar.', 'danger');
       }
-
-      /* error: async err => {*/
-        /*this.savingShipout = false;*/
-        /*console.error('Error actualizando shipout en bloque:', err);*/
-        /*await this.showShipoutToast('No se pudo guardar. La selección se conserva.', 'danger');*/
-      /*}*/
     });
   }
   private async showShipoutToast(message: string, color: string): Promise<void> {
@@ -100,12 +96,6 @@ export class ShipoutBulkPage implements OnInit {
   ccoList:any[]=[];
   shipList:Ship[]=[];
   shipMap:ShipMap={};
-  dayRange={
-    lower:1,
-    upper:this.getTodayDayOfYear()
-  };
-  startDay=1;
-  endDay=this.dayRange.upper;
   types=[
     { value:1,name:'Nacional' },
     { value:2,name:'Importado' }
@@ -126,10 +116,10 @@ export class ShipoutBulkPage implements OnInit {
   ios:boolean;
   showSearchbar:boolean;
   searchSubject=new Subject<string>();
+  private searchSubscription?: Subscription;
   searchTerm:string='';
   sortColumn:string='';
   sortDirection:'asc'|'desc'='asc';
-  private rangeTimeout:any;
 
   constructor(
     private barcodeService:BarcodeService,
@@ -149,12 +139,19 @@ export class ShipoutBulkPage implements OnInit {
     private location: Location
   ) {}
 
+  ngOnDestroy() {
+    this.searchSubscription?.unsubscribe();
+    this.searchSubject.complete();
+  }
   ionViewWillLeave() {
       this.menu.enable(true);
   }
 
   ngOnInit() {
-    this.initCurrentMonthRange();
+    this.searchSubscription = this.searchSubject.pipe(debounceTime(400), distinctUntilChanged()).subscribe(term => {
+      this.searchTerm = term.trim();
+      this.refreshFilteredList();
+    });
     this.loadShips();
     this.loadCco();
   }
@@ -198,21 +195,22 @@ export class ShipoutBulkPage implements OnInit {
   getAll() {
     const version = ++this.processingVersion;
     this.loadingMovements = true;
-    // Consultar exclusivamente el intervalo seleccionado sobre created_at.
-    const since = this.dayOfYearToISO(this.startDay);
-    const until = this.dayOfYearToISO(this.endDay, true);
-    this.withdrawnService.getIntervalByCreatedAt(since, until).subscribe({
+    // Cargar todos los movimientos sin restricción por fecha.
+    // El filtrado por shipout y la incorporación de gemelos se hacen a continuación.
+    this.withdrawnService.getAll().subscribe({
       next: (response: any[]) => {
         if (version !== this.processingVersion) return;
         this.loadingMovements = false;
-        this.withdrawnList = (Array.isArray(response) ? response : []).filter(item => Number(item?.data?.shipout) === 3);
+        const allRows = Array.isArray(response) ? response : [];
+        // Pendiente: shipout NO es un entero positivo. Un entero positivo es un registro ghost.
+        this.withdrawnList = allRows.filter(item => !this.hasAssignedShipout(item));
         const validIds = new Set(this.withdrawnList.map(item => Number(item.id)));
         for (const id of [...this.selectedIds]) if (!validIds.has(id)) this.selectedIds.delete(id);
         for (const item of this.withdrawnList) {
           if (!item.data) item.data = {};
           item.level = '';
         }
-        this.fullWithdrawnList = this.buildMovementList(this.withdrawnList);
+        this.fullWithdrawnList = this.buildMovementList(allRows);
         this.refreshFilteredList();
         // Permite pintar primero IDs y valores originales.
         setTimeout(() => this.enrichInBatches(version, 0), 0);
@@ -300,26 +298,41 @@ export class ShipoutBulkPage implements OnInit {
   }
 
 
-  // Agrupar por twin, primando el ID mayor; cada fila aparece exactamente una vez.
-  private buildMovementList(withdrawnList: any[]): any[] {
-    const sorted = [...withdrawnList].sort((a, b) => Number(b.id) - Number(a.id));
-    const byId = new Map<number, any>(sorted.map(item => [Number(item.id), item]));
-    const visited = new Set<number>();
-    const result: any[] = [];
+  // Sólo enteros positivos (numéricos o cadenas enteras) representan una asignación.
+  private hasAssignedShipout(row: any): boolean {
+    const raw = row?.data?.shipout;
+    if (raw === null || raw === undefined || typeof raw === 'boolean') return false;
+    if (typeof raw === 'string' && !/^\d+$/.test(raw.trim())) return false;
+    const value = Number(raw);
+    return Number.isSafeInteger(value) && value > 0;
+  }
 
-    for (const item of sorted) {
-      const id = Number(item.id);
+  // Cada pendiente aparece una sola vez; su pareja asignada aparece sólo como ghost.
+  // Los grupos se ordenan por el ID mayor de sus integrantes, descendente.
+  private buildMovementList(allRows: any[]): any[] {
+    const byId = new Map<number, any>(allRows.map(row => [Number(row.id), row]));
+    const pending = allRows.filter(row => !this.hasAssignedShipout(row));
+    const visited = new Set<number>();
+    const groups: any[][] = [];
+    for (const row of [...pending].sort((a, b) => Number(b.id) - Number(a.id))) {
+      const id = Number(row.id);
       if (visited.has(id)) continue;
+      const group = [row];
       visited.add(id);
-      const group = [item];
-      const twinId = Number(item.data?.twin);
-      const twin = twinId > 0 ? byId.get(twinId) : undefined;
+      const twinId = Number(row.data?.twin);
+      const twin = twinId > 0 && twinId !== id ? byId.get(twinId) : undefined;
       if (twin && !visited.has(Number(twin.id))) {
         group.push(twin);
         visited.add(Number(twin.id));
       }
       group.sort((a, b) => Number(b.id) - Number(a.id));
+      groups.push(group);
+    }
+    groups.sort((a, b) => Math.max(...b.map(r => Number(r.id))) - Math.max(...a.map(r => Number(r.id))));
+    const result: any[] = [];
+    for (const group of groups) {
       group.forEach((row, index) => {
+        row.isGhost = this.hasAssignedShipout(row);
         row.showSeparator = index === group.length - 1;
         result.push(row);
       });
@@ -329,52 +342,6 @@ export class ShipoutBulkPage implements OnInit {
 
   trackByGroup(index:number,group:any):string {
     return group.refdate+'-'+index;
-  }
-  onRangeChange(event:any) {
-    this.startDay=event.detail.value.lower;
-    this.endDay=event.detail.value.upper;
-    this.updateRangeAndFetch();
-  }
-  syncDays() {
-    this.startDay=this.dayRange.lower;
-    this.endDay=this.dayRange.upper;
-  }
-  formatDay(day:number):string {
-    const base=new Date(new Date().getFullYear(), 0, 1);
-    base.setDate(base.getDate()+(day-1));
-    return base.toLocaleDateString('es-ES',{
-      day:'2-digit',
-      month:'short'
-    });
-  }
-  daysInCurrentYear(): number {
-    const year = new Date().getFullYear();
-    return new Date(year, 1, 29).getMonth() === 1 ? 366 : 365;
-  }
-  getTodayDayOfYear():number {
-    const today=new Date();
-    const start=new Date(today.getFullYear(),0,0);
-    const diff=today.getTime()-start.getTime()+
-      (
-        start.getTimezoneOffset()-today.getTimezoneOffset()
-      )*60*1000;
-    return Math.floor(
-      diff/
-      (
-        1000*
-        60*
-        60*
-        24
-      )
-    );
-  }
-  // ISO UTC completo: conserva la conversión correcta desde la zona horaria local.
-  // El límite final es exclusivo: medianoche del día siguiente.
-  dayOfYearToISO(day:number,endOfDay=false):string {
-    const year = new Date().getFullYear();
-    const date = new Date(year, 0, day + (endOfDay ? 1 : 0));
-    date.setHours(0, 0, 0, 0);
-    return date.toISOString();
   }
   calcularResultado():number {
     return (this.valor1||0)*(this.valor2||0);
@@ -392,8 +359,7 @@ export class ShipoutBulkPage implements OnInit {
     this.filterVendor=event?.detail?.value??this.filterVendor;
   }
   onSearch(text:string) {
-    this.searchTerm = (text || '').trim();
-    this.refreshFilteredList();
+    this.searchSubject.next(String(text ?? ''));
   }
   formatFechaLatam(dateInput:string|Date|number):string {
     if(!dateInput)
@@ -417,45 +383,40 @@ export class ShipoutBulkPage implements OnInit {
     return item.id;
   }
   sortData(column:string) {
-    if(this.sortColumn===column)
-      this.sortDirection=this.sortDirection==='asc'?'desc':'asc';
-    else {
-      this.sortColumn=column;
-      this.sortDirection='asc';
+    // Mantener parejas juntas: se ordenan grupos, nunca filas individuales.
+    if (this.sortColumn === column) this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    else { this.sortColumn = column; this.sortDirection = 'asc'; }
+    const groups: any[][] = [];
+    let group: any[] = [];
+    for (const row of this.fullWithdrawnList) {
+      group.push(row);
+      if (row.showSeparator) { groups.push(group); group = []; }
     }
-    this.fullWithdrawnList.sort((a:any,b:any)=>{
-      const valA=this.getValue(a,column);
-      const valB=this.getValue(b,column);
-      if(valA==null)
-        return -1;
-      if(valB==null)
-        return 1;
-      if(valA<valB)
-        return this.sortDirection==='asc'?-1:1;
-      if(valA>valB)
-        return this.sortDirection==='asc'?1:-1;
-      return 0;
+    if (group.length) groups.push(group);
+    groups.sort((a, b) => {
+      const valA = this.getValue(a.find(r => !r.isGhost) ?? a[0], column);
+      const valB = this.getValue(b.find(r => !r.isGhost) ?? b[0], column);
+      const cmp = valA == null ? (valB == null ? 0 : -1) : valB == null ? 1 : valA < valB ? -1 : valA > valB ? 1 : 0;
+      return cmp === 0 ? Number(b[0].id) - Number(a[0].id) : (this.sortDirection === 'asc' ? cmp : -cmp);
     });
+    this.fullWithdrawnList = groups.reduce((acc: any[], group: any[]) => acc.concat(group), []);
     this.refreshFilteredList();
   }
   // Cachear el resultado: no reconstruir Maps/Sets en cada detección de cambios.
   private refreshFilteredList(): void {
     const term = this.searchTerm.trim().toLowerCase();
-    if (!term) {
-      this.filteredList = this.fullWithdrawnList;
-      return;
-    }
-    const matches = new Set<number>();
-    const byId = new Map<number, any>();
-    for (const row of this.fullWithdrawnList) byId.set(Number(row.id), row);
+    if (!term) { this.filteredList = [...this.fullWithdrawnList]; return; }
+    const groups: any[][] = [];
+    let group: any[] = [];
     for (const row of this.fullWithdrawnList) {
-      const name = this.ccoMap[Number(row.data?.name)]?.name ?? '';
-      if (!String(name).toLowerCase().includes(term)) continue;
-      matches.add(Number(row.id));
-      const twin = Number(row.data?.twin);
-      if (byId.has(twin)) matches.add(twin);
+      group.push(row);
+      if (row.showSeparator) { groups.push(group); group = []; }
     }
-    this.filteredList = this.fullWithdrawnList.filter(row => matches.has(Number(row.id)));
+    if (group.length) groups.push(group);
+    this.filteredList = groups.filter(rows => rows.some(row => {
+      const name = this.ccoMap[Number(row.data?.name)]?.name ?? '';
+      return [name, row.data?.name, row.id, row.data?.wticket].some(value => String(value ?? '').toLowerCase().includes(term));
+    })).reduce((acc: any[], group: any[]) => acc.concat(group), []);
   }
 
   // Sólo oculta cero numérico/textual y N/A; preserva IDs y demás datos.
@@ -494,44 +455,6 @@ export class ShipoutBulkPage implements OnInit {
       }
     });
   }
-  changeStartDay(delta:number) {
-    this.startDay=Math.max(1,Math.min(this.daysInCurrentYear(),this.startDay+delta));
-    if(this.startDay>this.endDay)
-      this.startDay=this.endDay;
-    this.updateRangeAndFetch();
-  }
-  changeEndDay(delta:number) {
-    this.endDay=Math.max(1,Math.min(this.daysInCurrentYear(),this.endDay+delta));
-    if(this.endDay<this.startDay)
-      this.endDay=this.startDay;
-    this.updateRangeAndFetch();
-  }
-  updateRangeAndFetch() {
-    this.dayRange={
-      lower:this.startDay,
-      upper:this.endDay
-    };
-    clearTimeout(this.rangeTimeout);
-    this.rangeTimeout=setTimeout(()=>{
-      this.getAll();
-    },1000);
-  }
-  quickRange(ev:any) {
-    const today=this.getTodayDayOfYear();
-    if(ev.detail.value==='today') {
-      this.startDay=today;
-      this.endDay=today;
-    }
-    if(ev.detail.value==='week') {
-      this.startDay=Math.max(1,today-6);
-      this.endDay=today;
-    }
-    if(ev.detail.value==='month') {
-      this.startDay=Math.max(1,today-29);
-      this.endDay=today;
-    }
-    this.updateRangeAndFetch();
-  }
   formatDate(date:any):string {
     if(!date)
       return '';
@@ -539,36 +462,6 @@ export class ShipoutBulkPage implements OnInit {
     if(isNaN(d.getTime()))
       return '';
     return d.toLocaleDateString('es-CO');
-  }
-  initCurrentMonthRange() {
-    const today=new Date();
-    const todayDayOfYear=this.getTodayDayOfYear();
-    const firstDayOfMonth=new Date(today.getFullYear(),today.getMonth(),1);
-    const startDayOfYear=this.getDayOfYear(firstDayOfMonth);
-    this.dayRange={
-      lower:startDayOfYear,
-      upper:todayDayOfYear
-    };
-    this.syncDays();
-  }
-  getDayOfYear(date:Date):number {
-    const start=new Date(date.getFullYear(),0,0);
-    const diff=
-      date.getTime()-
-      start.getTime()+
-      (
-        start.getTimezoneOffset()-
-        date.getTimezoneOffset()
-      )*60*1000;
-    return Math.floor(
-      diff/
-      (
-        1000*
-        60*
-        60*
-        24
-      )
-    );
   }
   copyToClipboard(text:string|undefined) {
     if(!text)

@@ -37,9 +37,8 @@
       <tbody>
         <tr *ngFor="let item of fltCcoList; trackBy:trackById">
           <td *ngFor="let column of columns" [class.active-cell]="item.data.lct[column.key]">
-            <button *ngIf="item.data.lct[column.key]" type="button" class="container-chip"
-              [style.--container-color]="item.data.color || '#3478c0'" (click)="patchItem(item)">
-              <span class="color-dot"></span>
+            <button *ngIf="item.data.lct[column.key]" type="button" class="container-chip" [class.container-chip-full]="item.data.isFull"
+              [attr.title]="item.data.loadState === 'full' ? 'Lleno' : (item.data.loadState === 'empty' ? 'Vacío' : 'Sin confirmar')" (click)="patchItem(item)">
               <span>{{ item.data.name }}</span>
             </button>
           </td>
