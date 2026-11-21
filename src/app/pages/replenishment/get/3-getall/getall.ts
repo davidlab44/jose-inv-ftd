@@ -24,7 +24,10 @@ export class GetallPage implements OnInit {
   @ViewChild(IonList,{ static:false }) ionList!:IonList;
   withdrawnList:any[]=[];
   fullWithdrawnList:any[]=[];
+  filteredList:any[]=[];
+  private processingVersion = 0;
   ccoMap:CcoMap={};
+  ccoList:any[]=[];
   shipList:Ship[]=[];
   shipMap:ShipMap={};
   dayRange={
@@ -57,6 +60,87 @@ export class GetallPage implements OnInit {
   sortColumn:string='';
   sortDirection:'asc'|'desc'='asc';
   private rangeTimeout:any;
+  priceSelections: { [id: number]: 1 | 2 } = {};
+  priceModalOpen = false;
+  priceSaving = false;
+  priceType: 1 | 2 = 1;
+  priceInteger = '0';
+  priceCents = '0';
+  private priceEditId: number | null = null;
+
+  hasPrice(item: any): boolean {
+    const d = item?.data || {};
+    return (Number(d.type) === 1 || Number(d.type) === 2) &&
+      (Number(d.prci) > 0 || Number(d.prcf) > 0);
+  }
+  priceLabel(item: any): string {
+    const d = item.data || {};
+    return '$ ' + Number(d.prci || 0).toLocaleString('es-CO') + '.' + String(Number(d.prcf || 0)).padStart(2, '0');
+  }
+  togglePriceSelection(id: number, type: 1 | 2, checked: boolean): void {
+    if (checked) this.priceSelections[id] = type;
+    else if (this.priceSelections[id] === type) delete this.priceSelections[id];
+  }
+  get selectedPriceIds(): number[] {
+    return Object.keys(this.priceSelections).map(Number);
+  }
+  openBulkPriceModal(): void {
+    if (!this.selectedPriceIds.length) return;
+    const types = this.selectedPriceIds.map(id => this.priceSelections[id]);
+    if (!types.every(t => t === types[0])) {
+      this.utilService.presentToast('Seleccione solamente una clase de precio por operación', 'warning', 2500);
+      return;
+    }
+    this.priceEditId = null;
+    this.priceType = types[0];
+    this.priceInteger = '0'; this.priceCents = '0';
+    this.priceModalOpen = true;
+  }
+  openEditPriceModal(item: any): void {
+    this.priceEditId = Number(item.id);
+    this.priceType = Number(item.data.type) === 2 ? 2 : 1;
+    this.priceInteger = String(Number(item.data.prci || 0));
+    this.priceCents = String(Number(item.data.prcf || 0));
+    this.priceModalOpen = true;
+  }
+  onlyDigits(value: any, cents = false): string {
+    return String(value ?? '').replace(/[^0-9]/g, '').slice(0, cents ? 2 : 12);
+  }
+  get validPrice(): boolean {
+    return /^\d+$/.test(this.priceInteger) && /^\d{1,2}$/.test(this.priceCents) &&
+      Number.isSafeInteger(Number(this.priceInteger)) && Number(this.priceCents) <= 99;
+  }
+  savePrice(): void {
+    if (this.priceSaving || !this.validPrice) return;
+    const ids = this.priceEditId !== null ? [this.priceEditId] : this.selectedPriceIds;
+    if (!ids.length) return;
+    const prci = Number(this.priceInteger), prcf = Number(this.priceCents);
+    const type = prci === 0 && prcf === 0 ? 0 : this.priceType;
+    this.priceSaving = true;
+    this.withdrawnService.updatePricesBulk(ids, type, prci, prcf).subscribe({
+      next: () => {
+        const idSet = new Set(ids);
+        for (const item of this.withdrawnList) {
+          if (idSet.has(Number(item.id))) {
+            item.data = { ...item.data, type, prci, prcf };
+          }
+        }
+        for (const item of this.fullWithdrawnList) {
+          if (idSet.has(Number(item.id))) item.data = { ...item.data, type, prci, prcf };
+        }
+        ids.forEach(id => delete this.priceSelections[id]);
+        this.priceSaving = false;
+        this.priceModalOpen = false;
+        this.utilService.presentToast('Precio actualizado', 'success', 1500);
+      },
+      error: err => {
+        console.error('Error guardando precios:', err);
+        this.priceSaving = false;
+        this.utilService.presentToast('No fue posible guardar el precio', 'danger', 2500);
+      }
+    });
+  }
+
   constructor(
     private barcodeService:BarcodeService,
     public alertCtrl:AlertController,
@@ -83,48 +167,93 @@ export class GetallPage implements OnInit {
   ngOnInit() {
     this.initCurrentMonthRange();
     this.loadShips();
-    this.loadCcos();
+    this.loadCco();
   }
   ionViewWillEnter() {
     this.menu.enable(false);
     this.getAll();
   }
-  loadCcos() {
-    this.ccoService.load().subscribe({
-      next:(map)=>{
-        this.ccoMap=map;
-        this.ccoService.debugMapping(this.filteredList);
+  // Componer el nombre visible usando data.name (ID de CCO).
+  loadCco() {
+    this.ccoService.getAll().subscribe({
+      next: (ccos: any[]) => {
+        this.ccoList = ccos || [];
+        const map: any = {};
+        for (const cco of this.ccoList) {
+          const id = Number(cco?.data?.id ?? cco?.id);
+          if (!Number.isFinite(id)) continue;
+          map[id] = {
+            name: String(cco?.data?.name ?? 'N/A'),
+            color: cco?.data?.color ?? '#eee'
+          };
+        }
+        this.ccoMap = map as CcoMap;
+        this.refreshFilteredList();
       },
-      error:(err)=>{
-        console.error('Error loading ccos',err);
-      }
+      error: err => console.error('Error loading CCO', err)
     });
   }
   loadShips() {
     this.shipService.getAll().subscribe({
       next:(ships)=>{
         this.shipList=ships;
-        console.log('shipList',ships);
+
         this.shipMap=this.buildShipMap(ships);
+        this.updateShipNames();
       },
       error:(err)=>console.error(err)
     });
   }
 
+  // Publicar los registros inmediatamente; enriquecerlos por lotes sin bloquear la UI.
   getAll() {
+    const version = ++this.processingVersion;
+    // Consultar exclusivamente el intervalo seleccionado sobre created_at.
     const since = this.dayOfYearToISO(this.startDay);
     const until = this.dayOfYearToISO(this.endDay, true);
-    //this.withdrawnService.getIntervalByAdate(since, until).subscribe({
-    this.withdrawnService.getAll().subscribe({
-        next: response => {
-          this.withdrawnList = response;
-          this.prepareWithdrawnList(this.withdrawnList);
-          this.fullWithdrawnList =
-          this.buildMovementList(this.withdrawnList);
-          console.log('fullWithdrawnList',this.fullWithdrawnList);
-          this.fullWithdrawnList = this.mapFullWithdrawnList(this.fullWithdrawnList);
+    this.withdrawnService.getIntervalByCreatedAt(since, until).subscribe({
+      next: (response: any[]) => {
+        if (version !== this.processingVersion) return;
+        this.withdrawnList = Array.isArray(response) ? response : [];
+        for (const item of this.withdrawnList) {
+          if (!item.data) item.data = {};
+          item.level = '';
         }
-      });
+        this.fullWithdrawnList = this.buildMovementList(this.withdrawnList);
+        this.refreshFilteredList();
+        // Permite pintar primero IDs y valores originales.
+        setTimeout(() => this.enrichInBatches(version, 0), 0);
+      },
+      error: err => console.error('Error loading withdrawn records', err)
+    });
+  }
+
+  private enrichInBatches(version: number, offset: number): void {
+    if (version !== this.processingVersion) return;
+    const batchSize = 100;
+    const end = Math.min(offset + batchSize, this.withdrawnList.length);
+    // Calcular niveles por lotes, sin crear copias de todos los objetos.
+    for (let i = offset; i < end; i++) {
+      const item = this.withdrawnList[i];
+      item.level = this.getLevel(item);
+      const data = item.data;
+      data.shipoutName = this.shipMap[data.shipout]?.name ?? '';
+      data.shipinName = this.shipMap[data.shipin]?.name ?? '';
+    }
+    if (end < this.withdrawnList.length) {
+      setTimeout(() => this.enrichInBatches(version, end), 0);
+    } else {
+      this.prepareWithdrawnList(this.withdrawnList);
+      this.refreshFilteredList();
+    }
+  }
+
+  private updateShipNames(): void {
+    for (const item of this.withdrawnList) {
+      if (!item.data) continue;
+      item.data.shipoutName = this.shipMap[item.data.shipout]?.name ?? '';
+      item.data.shipinName = this.shipMap[item.data.shipin]?.name ?? '';
+    }
   }
 
   private prepareWithdrawnList(withdrawnList: any[]): void {
@@ -173,10 +302,8 @@ export class GetallPage implements OnInit {
           map.set(key, item);
         }
       }
-      data.shipoutName =
-        this.shipMap[data.shipout]?.name ?? 'N/A';
-      data.shipinName =
-        this.shipMap[data.shipin]?.name ?? 'N/A';
+      data.shipoutName = this.shipMap[data.shipout]?.name ?? '';
+      data.shipinName = this.shipMap[data.shipin]?.name ?? '';
     }
     this.totalKg = total;
     this.totalGlpOpc = totalOpc;
@@ -184,62 +311,27 @@ export class GetallPage implements OnInit {
   }
 
 
-  // Registros pendientes: sin data.date, pero con data.datein válida.
-  private isPendingDate(item: any): boolean {
-    const d = item?.data;
-    return (d?.date === '' || d?.date == null) &&
-      typeof d?.datein === 'string' && d.datein.trim().length > 0 &&
-      Number.isFinite(new Date(d.datein).getTime());
-  }
-
-  private movementTimestamp(item: any): number {
-    const d = item?.data;
-    const value = this.isPendingDate(item) ? d.datein : d?.date;
-    const timestamp = new Date(value || 0).getTime();
-    return Number.isFinite(timestamp) ? timestamp : 0;
-  }
-
+  // Agrupar por twin, primando el ID mayor; cada fila aparece exactamente una vez.
   private buildMovementList(withdrawnList: any[]): any[] {
-    const byId = new Map<number, any>();
-    withdrawnList.forEach(item => byId.set(Number(item.id), item));
+    const sorted = [...withdrawnList].sort((a, b) => Number(b.id) - Number(a.id));
+    const byId = new Map<number, any>(sorted.map(item => [Number(item.id), item]));
     const visited = new Set<number>();
-    const movements: { date: number; pending: boolean; rows: any[] }[] = [];
+    const result: any[] = [];
 
-    for (const item of withdrawnList) {
+    for (const item of sorted) {
       const id = Number(item.id);
       if (visited.has(id)) continue;
       visited.add(id);
-      const rows = [item];
+      const group = [item];
       const twinId = Number(item.data?.twin);
-      if (twinId > 0) {
-        const twin = byId.get(twinId);
-        if (twin && !visited.has(Number(twin.id))) {
-          rows.push(twin);
-          visited.add(Number(twin.id));
-        }
+      const twin = twinId > 0 ? byId.get(twinId) : undefined;
+      if (twin && !visited.has(Number(twin.id))) {
+        group.push(twin);
+        visited.add(Number(twin.id));
       }
-
-      // Mantener juntos los registros gemelos, ordenados por fecha efectiva.
-      rows.sort((a, b) => this.movementTimestamp(a) - this.movementTimestamp(b));
-      const pending = rows.some(row => this.isPendingDate(row));
-      movements.push({
-        pending,
-        date: pending
-          ? Math.max(...rows.filter(row => this.isPendingDate(row)).map(row => this.movementTimestamp(row)))
-          : this.movementTimestamp(rows[0]),
-        rows
-      });
-    }
-
-    // Pendientes arriba; los demás conservan el orden descendente habitual.
-    movements.sort((a, b) =>
-      Number(b.pending) - Number(a.pending) || b.date - a.date
-    );
-
-    const result: any[] = [];
-    for (const movement of movements) {
-      movement.rows.forEach((row, index) => {
-        row.showSeparator = index === movement.rows.length - 1;
+      group.sort((a, b) => Number(b.id) - Number(a.id));
+      group.forEach((row, index) => {
+        row.showSeparator = index === group.length - 1;
         result.push(row);
       });
     }
@@ -252,19 +344,23 @@ export class GetallPage implements OnInit {
   onRangeChange(event:any) {
     this.startDay=event.detail.value.lower;
     this.endDay=event.detail.value.upper;
-    this.getAll();
+    this.updateRangeAndFetch();
   }
   syncDays() {
     this.startDay=this.dayRange.lower;
     this.endDay=this.dayRange.upper;
   }
   formatDay(day:number):string {
-    const base=new Date('2026-01-01T00:00:00');
+    const base=new Date(new Date().getFullYear(), 0, 1);
     base.setDate(base.getDate()+(day-1));
     return base.toLocaleDateString('es-ES',{
       day:'2-digit',
       month:'short'
     });
+  }
+  daysInCurrentYear(): number {
+    const year = new Date().getFullYear();
+    return new Date(year, 1, 29).getMonth() === 1 ? 366 : 365;
   }
   getTodayDayOfYear():number {
     const today=new Date();
@@ -283,15 +379,13 @@ export class GetallPage implements OnInit {
       )
     );
   }
+  // ISO UTC completo: conserva la conversión correcta desde la zona horaria local.
+  // El límite final es exclusivo: medianoche del día siguiente.
   dayOfYearToISO(day:number,endOfDay=false):string {
-    const year=2026;
-    const date=new Date(year,0);
-    date.setDate(day);
-    if(endOfDay)
-      date.setHours(23,59,59,999);
-    else
-      date.setHours(0,0,0,0);
-    return date.toISOString().slice(0,19);
+    const year = new Date().getFullYear();
+    const date = new Date(year, 0, day + (endOfDay ? 1 : 0));
+    date.setHours(0, 0, 0, 0);
+    return date.toISOString();
   }
   calcularResultado():number {
     return (this.valor1||0)*(this.valor2||0);
@@ -309,7 +403,8 @@ export class GetallPage implements OnInit {
     this.filterVendor=event?.detail?.value??this.filterVendor;
   }
   onSearch(text:string) {
-    this.searchSubject.next(text);
+    this.searchTerm = (text || '').trim();
+    this.refreshFilteredList();
   }
   formatFechaLatam(dateInput:string|Date|number):string {
     if(!dateInput)
@@ -352,17 +447,36 @@ export class GetallPage implements OnInit {
         return this.sortDirection==='asc'?1:-1;
       return 0;
     });
+    this.refreshFilteredList();
   }
-  get filteredList() {
-    if(!this.searchTerm)
-      return this.fullWithdrawnList;
-    const term=this.searchTerm.toLowerCase();
-    return this.fullWithdrawnList.filter(item=>
-      Object.values(item.data).some(val=>
-        String(val).toLowerCase().includes(term)
-      )
-    );
+  // Cachear el resultado: no reconstruir Maps/Sets en cada detección de cambios.
+  private refreshFilteredList(): void {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) {
+      this.filteredList = this.fullWithdrawnList;
+      return;
+    }
+    const matches = new Set<number>();
+    const byId = new Map<number, any>();
+    for (const row of this.fullWithdrawnList) byId.set(Number(row.id), row);
+    for (const row of this.fullWithdrawnList) {
+      const name = this.ccoMap[Number(row.data?.name)]?.name ?? '';
+      if (!String(name).toLowerCase().includes(term)) continue;
+      matches.add(Number(row.id));
+      const twin = Number(row.data?.twin);
+      if (byId.has(twin)) matches.add(twin);
+    }
+    this.filteredList = this.fullWithdrawnList.filter(row => matches.has(Number(row.id)));
   }
+
+  // Sólo oculta cero numérico/textual y N/A; preserva IDs y demás datos.
+  displayCell(value: any): any {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'number' && value === 0) return '';
+    if (typeof value === 'string' && (value.trim() === '0' || value.trim().toUpperCase() === 'N/A')) return '';
+    return value;
+  }
+
   getValue(item:any,column:string) {
     return column.includes('data.')
       ?column.split('.').reduce((o,i)=>o?.[i],item)
@@ -392,13 +506,13 @@ export class GetallPage implements OnInit {
     });
   }
   changeStartDay(delta:number) {
-    this.startDay=Math.max(1,Math.min(365,this.startDay+delta));
+    this.startDay=Math.max(1,Math.min(this.daysInCurrentYear(),this.startDay+delta));
     if(this.startDay>this.endDay)
       this.startDay=this.endDay;
     this.updateRangeAndFetch();
   }
   changeEndDay(delta:number) {
-    this.endDay=Math.max(1,Math.min(365,this.endDay+delta));
+    this.endDay=Math.max(1,Math.min(this.daysInCurrentYear(),this.endDay+delta));
     if(this.endDay<this.startDay)
       this.endDay=this.startDay;
     this.updateRangeAndFetch();
@@ -420,66 +534,14 @@ export class GetallPage implements OnInit {
       this.endDay=today;
     }
     if(ev.detail.value==='week') {
-      this.startDay=today-7;
+      this.startDay=Math.max(1,today-6);
       this.endDay=today;
     }
     if(ev.detail.value==='month') {
-      this.startDay=today-30;
+      this.startDay=Math.max(1,today-29);
       this.endDay=today;
     }
     this.updateRangeAndFetch();
-  }
-  exportToExcel() {
-    try {
-      if(!this.filteredList||this.filteredList.length===0)
-        return;
-      const rows=this.filteredList.map(item=>({
-        'Fecha V':this.formatDate(item.data.date),
-        'Isotanq':this.ccoService.getName(item.data.name),
-        'Ticket':item.data.ticket,
-        'Img':item.data.img||'',
-        'Kg':item.data.kg,
-        'Price':item.data.price,
-        'PSI':item.data.psi,
-        'Rotogate':item.data.rotogate,
-        'Seal':item.data.seal?.join(', ')||'',
-        'Fecha Ing':this.formatDate(item.data.datein),
-        'Rem vacío':item.data.deliveryin,
-        'Img In':item.data.imgin||'',
-        'Trip In':item.data.tripin,
-        'Ship In':this.shipMap[item.data.shipin]?.name||'N/A',
-        'Date Out':this.formatDate(item.data.dateout),
-        'Rem M LL':item.data.deliveryout,
-        'Img Out':item.data.imgout||'',
-        'Trip Out':item.data.tripout,
-        'Ship Out':this.shipMap[item.data.shipout]?.name||'N/A',
-        'Diff':item.data.diff||'',
-        'Wgross':item.data.wgross,
-        'Wtare':item.data.wtare,
-        'Wnet':item.data.wnet,
-        'WTicket':item.data.wticket,
-        'Img Scale':item.data.imgscale||'',
-      }));
-      const csv=this.convertToCSV(rows);
-      const blob=new Blob([csv],{ type:'text/csv;charset=utf-8;' });
-      const link=document.createElement('a');
-      link.href=URL.createObjectURL(blob);
-      link.setAttribute('download','replenishment_export.csv');
-      link.click();
-    } catch(err) {
-      console.error('Error exportToExcel:',err);
-    }
-  }
-  convertToCSV(data:any[]):string {
-    if(!data.length)
-      return '';
-    const headers=Object.keys(data[0]);
-    const rows=data.map(row=>
-      headers.map(field=>
-        `"${(row[field]??'').toString().replace(/"/g,'""')}"`
-      ).join(',')
-    );
-    return [headers.join(','),...rows].join('\n');
   }
   formatDate(date:any):string {
     if(!date)
@@ -545,9 +607,7 @@ export class GetallPage implements OnInit {
   }
 
   goBack() {
-  
-  this.router.navigate(['/app/tabs/schedule'],{ replaceUrl: true });
-    //this.location.back();
+    this.location.back();
   }
 
   onColorPickerOpen(item: any, color: string): void {
@@ -606,30 +666,6 @@ export class GetallPage implements OnInit {
       .replace(/[^\w\s\-./]/g, "");
   }
 
-/*  mapFullWithdrawnList(list: any[]): any[] {*/
-    /*return list.map(item => {*/
-      /*const d = item.data;*/
-      /*let level = '';*/
-      /*if (d?.shipout > 0 && d?.shipout != 3) level = 'nivel5';*/
-      /*else if (d?.deliveryout?.length > 2) level = 'nivel4';*/
-      /*else if (d?.wtare > 1000 && d?.wnet > 1000) level = 'nivel3';*/
-      /*else if (d?.kg > 10) level = 'nivel2';*/
-      /*else if (d?.deliveryin?.length > 2 && d?.datein?.length > 2) level = 'nivel1';*/
-      /*return { ...item, level };*/
-    /*});*/
-  /*}*/
-
-/*getLevel(item: any): string {*/
-  /*console.log('updated_at',item.updated_at);*/
-  /*const data=item.data*/
-  /*if (data?.shipout > 0 && data?.shipout != 3) return '->sai';*/
-  /*if (data?.deliveryout?.length > 2) return 'puerto';*/
-  /*if (data?.wtare > 1000 && data?.wnet > 1000) return '->puerto';*/
-  /*if (data?.kg > 10) return 'ctg';*/
-  /*if (data?.deliveryin?.length > 2 && data?.datein?.length > 2) return 'ctg';*/
-  /*return '';*/
-/*}*/
-
   getLevel(item: any): string {
     const updatedAt = new Date(item.updated_at);
     const now = new Date();
@@ -637,7 +673,7 @@ export class GetallPage implements OnInit {
     const olderThan8Days = diffDays > 8;
     //console.log('updated_at', item.updated_at);
     //console.log('diffDays', diffDays);
-    console.log('olderThan8Days', olderThan8Days);
+
     const data = item.data;
     if (data?.shipout > 0 && data?.shipout != 3 && olderThan8Days) return 'sai';
     if (data?.shipout > 0 && data?.shipout != 3) return '->sai';
@@ -651,10 +687,6 @@ export class GetallPage implements OnInit {
   mapFullWithdrawnList(list: any[]): any[] {
     return list.map(item => ({ ...item, level: this.getLevel(item) }));
   }
-
-  /*mapFullWithdrawnList(fullWithdrawnList:any[]):any[]{*/
-    /*fullWithdrawnList.map((it)=>{it.})*/
-  /*}*/
 
 
 }

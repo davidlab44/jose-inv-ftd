@@ -24,7 +24,10 @@ export class GetallPage implements OnInit {
   @ViewChild(IonList,{ static:false }) ionList!:IonList;
   withdrawnList:any[]=[];
   fullWithdrawnList:any[]=[];
+  filteredList:any[]=[];
+  private processingVersion = 0;
   ccoMap:CcoMap={};
+  ccoList:any[]=[];
   shipList:Ship[]=[];
   shipMap:ShipMap={};
   dayRange={
@@ -83,49 +86,93 @@ export class GetallPage implements OnInit {
   ngOnInit() {
     this.initCurrentMonthRange();
     this.loadShips();
-    this.loadCcos();
+    this.loadCco();
   }
   ionViewWillEnter() {
     this.menu.enable(false);
     this.getAll();
   }
-  loadCcos() {
-    this.ccoService.load().subscribe({
-      next:(map)=>{
-        this.ccoMap=map;
-        this.ccoService.debugMapping(this.filteredList);
+  // Componer el nombre visible usando data.name (ID de CCO).
+  loadCco() {
+    this.ccoService.getAll().subscribe({
+      next: (ccos: any[]) => {
+        this.ccoList = ccos || [];
+        const map: any = {};
+        for (const cco of this.ccoList) {
+          const id = Number(cco?.data?.id ?? cco?.id);
+          if (!Number.isFinite(id)) continue;
+          map[id] = {
+            name: String(cco?.data?.name ?? 'N/A'),
+            color: cco?.data?.color ?? '#eee'
+          };
+        }
+        this.ccoMap = map as CcoMap;
+        this.refreshFilteredList();
       },
-      error:(err)=>{
-        console.error('Error loading ccos',err);
-      }
+      error: err => console.error('Error loading CCO', err)
     });
   }
   loadShips() {
     this.shipService.getAll().subscribe({
       next:(ships)=>{
         this.shipList=ships;
-        console.log('shipList',ships);
+
         this.shipMap=this.buildShipMap(ships);
+        this.updateShipNames();
       },
       error:(err)=>console.error(err)
     });
   }
 
+  // Publicar los registros inmediatamente; enriquecerlos por lotes sin bloquear la UI.
   getAll() {
+    const version = ++this.processingVersion;
+    // Consultar exclusivamente el intervalo seleccionado sobre created_at.
     const since = this.dayOfYearToISO(this.startDay);
     const until = this.dayOfYearToISO(this.endDay, true);
-    this.withdrawnService
-      .getIntervalByAdate(since, until)
-      .subscribe({
-        next: response => {
-          this.withdrawnList = response;
-          this.prepareWithdrawnList(this.withdrawnList);
-          this.fullWithdrawnList =
-          this.buildMovementList(this.withdrawnList);
-          console.log('fullWithdrawnList',this.fullWithdrawnList);
-          this.fullWithdrawnList = this.mapFullWithdrawnList(this.fullWithdrawnList);
+    this.withdrawnService.getIntervalByCreatedAt(since, until).subscribe({
+      next: (response: any[]) => {
+        if (version !== this.processingVersion) return;
+        this.withdrawnList = Array.isArray(response) ? response : [];
+        for (const item of this.withdrawnList) {
+          if (!item.data) item.data = {};
+          item.level = '';
         }
-      });
+        this.fullWithdrawnList = this.buildMovementList(this.withdrawnList);
+        this.refreshFilteredList();
+        // Permite pintar primero IDs y valores originales.
+        setTimeout(() => this.enrichInBatches(version, 0), 0);
+      },
+      error: err => console.error('Error loading withdrawn records', err)
+    });
+  }
+
+  private enrichInBatches(version: number, offset: number): void {
+    if (version !== this.processingVersion) return;
+    const batchSize = 100;
+    const end = Math.min(offset + batchSize, this.withdrawnList.length);
+    // Calcular niveles por lotes, sin crear copias de todos los objetos.
+    for (let i = offset; i < end; i++) {
+      const item = this.withdrawnList[i];
+      item.level = this.getLevel(item);
+      const data = item.data;
+      data.shipoutName = this.shipMap[data.shipout]?.name ?? '';
+      data.shipinName = this.shipMap[data.shipin]?.name ?? '';
+    }
+    if (end < this.withdrawnList.length) {
+      setTimeout(() => this.enrichInBatches(version, end), 0);
+    } else {
+      this.prepareWithdrawnList(this.withdrawnList);
+      this.refreshFilteredList();
+    }
+  }
+
+  private updateShipNames(): void {
+    for (const item of this.withdrawnList) {
+      if (!item.data) continue;
+      item.data.shipoutName = this.shipMap[item.data.shipout]?.name ?? '';
+      item.data.shipinName = this.shipMap[item.data.shipin]?.name ?? '';
+    }
   }
 
   private prepareWithdrawnList(withdrawnList: any[]): void {
@@ -174,10 +221,8 @@ export class GetallPage implements OnInit {
           map.set(key, item);
         }
       }
-      data.shipoutName =
-        this.shipMap[data.shipout]?.name ?? 'N/A';
-      data.shipinName =
-        this.shipMap[data.shipin]?.name ?? 'N/A';
+      data.shipoutName = this.shipMap[data.shipout]?.name ?? '';
+      data.shipinName = this.shipMap[data.shipin]?.name ?? '';
     }
     this.totalKg = total;
     this.totalGlpOpc = totalOpc;
@@ -185,48 +230,27 @@ export class GetallPage implements OnInit {
   }
 
 
+  // Agrupar por twin, primando el ID mayor; cada fila aparece exactamente una vez.
   private buildMovementList(withdrawnList: any[]): any[] {
-    const byId = new Map<number, any>();
-    withdrawnList.forEach(item => {
-      byId.set(item.id, item);
-    });
+    const sorted = [...withdrawnList].sort((a, b) => Number(b.id) - Number(a.id));
+    const byId = new Map<number, any>(sorted.map(item => [Number(item.id), item]));
     const visited = new Set<number>();
-    const movements: {
-      date: number;
-      rows: any[];
-    }[] = [];
-    for (const item of withdrawnList) {
-      if (visited.has(item.id))
-        continue;
-
-      visited.add(item.id);
-      const rows = [item];
-      const twinId = Number(item.data?.twin);
-      if (twinId > 0) {
-        const twin = byId.get(twinId);
-        if (twin && !visited.has(twin.id)) {
-
-          rows.push(twin);
-          visited.add(twin.id);
-        }
-      }
-      rows.sort((a, b) => {
-        return new Date(a.data.date).getTime()
-          - new Date(b.data.date).getTime();
-      });
-      movements.push({
-        date: new Date(rows[0].data.date).getTime(),
-        rows
-      });
-    }
-    // Movimientos más recientes primero
-    movements.sort((a, b) => b.date - a.date);
-    // Construir fullWithdrawnList
     const result: any[] = [];
-    for (const movement of movements) {
-      movement.rows.forEach((row, index) => {
-        row.showSeparator =
-          index === movement.rows.length - 1;
+
+    for (const item of sorted) {
+      const id = Number(item.id);
+      if (visited.has(id)) continue;
+      visited.add(id);
+      const group = [item];
+      const twinId = Number(item.data?.twin);
+      const twin = twinId > 0 ? byId.get(twinId) : undefined;
+      if (twin && !visited.has(Number(twin.id))) {
+        group.push(twin);
+        visited.add(Number(twin.id));
+      }
+      group.sort((a, b) => Number(b.id) - Number(a.id));
+      group.forEach((row, index) => {
+        row.showSeparator = index === group.length - 1;
         result.push(row);
       });
     }
@@ -239,19 +263,23 @@ export class GetallPage implements OnInit {
   onRangeChange(event:any) {
     this.startDay=event.detail.value.lower;
     this.endDay=event.detail.value.upper;
-    this.getAll();
+    this.updateRangeAndFetch();
   }
   syncDays() {
     this.startDay=this.dayRange.lower;
     this.endDay=this.dayRange.upper;
   }
   formatDay(day:number):string {
-    const base=new Date('2026-01-01T00:00:00');
+    const base=new Date(new Date().getFullYear(), 0, 1);
     base.setDate(base.getDate()+(day-1));
     return base.toLocaleDateString('es-ES',{
       day:'2-digit',
       month:'short'
     });
+  }
+  daysInCurrentYear(): number {
+    const year = new Date().getFullYear();
+    return new Date(year, 1, 29).getMonth() === 1 ? 366 : 365;
   }
   getTodayDayOfYear():number {
     const today=new Date();
@@ -270,15 +298,13 @@ export class GetallPage implements OnInit {
       )
     );
   }
+  // ISO UTC completo: conserva la conversión correcta desde la zona horaria local.
+  // El límite final es exclusivo: medianoche del día siguiente.
   dayOfYearToISO(day:number,endOfDay=false):string {
-    const year=2026;
-    const date=new Date(year,0);
-    date.setDate(day);
-    if(endOfDay)
-      date.setHours(23,59,59,999);
-    else
-      date.setHours(0,0,0,0);
-    return date.toISOString().slice(0,19);
+    const year = new Date().getFullYear();
+    const date = new Date(year, 0, day + (endOfDay ? 1 : 0));
+    date.setHours(0, 0, 0, 0);
+    return date.toISOString();
   }
   calcularResultado():number {
     return (this.valor1||0)*(this.valor2||0);
@@ -296,7 +322,8 @@ export class GetallPage implements OnInit {
     this.filterVendor=event?.detail?.value??this.filterVendor;
   }
   onSearch(text:string) {
-    this.searchSubject.next(text);
+    this.searchTerm = (text || '').trim();
+    this.refreshFilteredList();
   }
   formatFechaLatam(dateInput:string|Date|number):string {
     if(!dateInput)
@@ -339,17 +366,36 @@ export class GetallPage implements OnInit {
         return this.sortDirection==='asc'?1:-1;
       return 0;
     });
+    this.refreshFilteredList();
   }
-  get filteredList() {
-    if(!this.searchTerm)
-      return this.fullWithdrawnList;
-    const term=this.searchTerm.toLowerCase();
-    return this.fullWithdrawnList.filter(item=>
-      Object.values(item.data).some(val=>
-        String(val).toLowerCase().includes(term)
-      )
-    );
+  // Cachear el resultado: no reconstruir Maps/Sets en cada detección de cambios.
+  private refreshFilteredList(): void {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) {
+      this.filteredList = this.fullWithdrawnList;
+      return;
+    }
+    const matches = new Set<number>();
+    const byId = new Map<number, any>();
+    for (const row of this.fullWithdrawnList) byId.set(Number(row.id), row);
+    for (const row of this.fullWithdrawnList) {
+      const name = this.ccoMap[Number(row.data?.name)]?.name ?? '';
+      if (!String(name).toLowerCase().includes(term)) continue;
+      matches.add(Number(row.id));
+      const twin = Number(row.data?.twin);
+      if (byId.has(twin)) matches.add(twin);
+    }
+    this.filteredList = this.fullWithdrawnList.filter(row => matches.has(Number(row.id)));
   }
+
+  // Sólo oculta cero numérico/textual y N/A; preserva IDs y demás datos.
+  displayCell(value: any): any {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'number' && value === 0) return '';
+    if (typeof value === 'string' && (value.trim() === '0' || value.trim().toUpperCase() === 'N/A')) return '';
+    return value;
+  }
+
   getValue(item:any,column:string) {
     return column.includes('data.')
       ?column.split('.').reduce((o,i)=>o?.[i],item)
@@ -379,13 +425,13 @@ export class GetallPage implements OnInit {
     });
   }
   changeStartDay(delta:number) {
-    this.startDay=Math.max(1,Math.min(365,this.startDay+delta));
+    this.startDay=Math.max(1,Math.min(this.daysInCurrentYear(),this.startDay+delta));
     if(this.startDay>this.endDay)
       this.startDay=this.endDay;
     this.updateRangeAndFetch();
   }
   changeEndDay(delta:number) {
-    this.endDay=Math.max(1,Math.min(365,this.endDay+delta));
+    this.endDay=Math.max(1,Math.min(this.daysInCurrentYear(),this.endDay+delta));
     if(this.endDay<this.startDay)
       this.endDay=this.startDay;
     this.updateRangeAndFetch();
@@ -407,11 +453,11 @@ export class GetallPage implements OnInit {
       this.endDay=today;
     }
     if(ev.detail.value==='week') {
-      this.startDay=today-7;
+      this.startDay=Math.max(1,today-6);
       this.endDay=today;
     }
     if(ev.detail.value==='month') {
-      this.startDay=today-30;
+      this.startDay=Math.max(1,today-29);
       this.endDay=today;
     }
     this.updateRangeAndFetch();
@@ -622,7 +668,7 @@ export class GetallPage implements OnInit {
     const olderThan8Days = diffDays > 8;
     //console.log('updated_at', item.updated_at);
     //console.log('diffDays', diffDays);
-    console.log('olderThan8Days', olderThan8Days);
+
     const data = item.data;
     if (data?.shipout > 0 && data?.shipout != 3 && olderThan8Days) return 'sai';
     if (data?.shipout > 0 && data?.shipout != 3) return '->sai';

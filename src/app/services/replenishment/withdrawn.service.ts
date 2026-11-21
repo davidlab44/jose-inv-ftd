@@ -180,6 +180,12 @@ export class WithdrawnService {
   }
 
 
+  updatePricesBulk(ids: number[], type: number, prci: number, prcf: number) {
+    return this.http.post<{ id: number }[]>(
+      `${this.apiUrl}/rpc/update_withdrawn_prices_bulk`,
+      { p_ids: ids, p_type: type, p_prci: prci, p_prcf: prcf }
+    );
+  }
 
 
 }

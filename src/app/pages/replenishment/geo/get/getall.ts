@@ -10,7 +10,7 @@ import { CcoService } from '../../../../services/cc/cco.service';
 import { IoService } from '../../../../services/mnt/io.service';
 import { WithdrawnService } from '../../../../services/replenishment/withdrawn.service';
 
-type LocationKey='empty'|'sai'|'tsai'|'full'|'inb'|'ctg';
+type LocationKey='sai'|'tsai'|'ctg'|'port'|'inb';
 type LoadState='empty'|'full'|'unknown';
 interface LocationEvent {
   key:LocationKey;
@@ -21,10 +21,9 @@ interface LocationEvent {
 }
 
 interface LocationData {
-  empty:boolean;
   sai:boolean;
   tsai:boolean;
-  full:boolean;
+  port:boolean;
   inb:boolean;
   ctg:boolean;
 }
@@ -47,11 +46,10 @@ export class GetallPage {
   
   readonly columns:{key:LocationKey;label:string}[]=[
     {key:'sai',label:'SAI'},
-    {key:'tsai',label:'En tránsito SAI'},
-    {key:'empty',label:'CTG vacio'},
-    {key:'ctg',label:'CTG lleno'},
+    {key:'ctg',label:'CTG'},
     {key:'inb',label:'INBEMETAL'},
-    {key:'full',label:'Puerto esperando embarque'}
+    {key:'port',label:'Puerto / muelle'},
+    {key:'tsai',label:'En tránsito SAI'}
   ];
 
   constructor(
@@ -113,7 +111,7 @@ export class GetallPage {
   }
 
   private emptyLocation():LocationData {
-    return {empty:false,sai:false,tsai:false,full:false,inb:false,ctg:false};
+    return {sai:false,tsai:false,ctg:false,port:false,inb:false};
   }
 
   private sameCco(value:any,id:any):boolean {
@@ -181,8 +179,8 @@ export class GetallPage {
       const shipout=Number(data.shipout);
 
       // Inicio de un nuevo ciclo: contenedor vacío desde la creación del registro.
-      add('empty',wdn.created_at,'wdn',wdn);
-      if (datein && datein>=created) add('empty',data.datein,'wdn',wdn);
+      add('ctg',wdn.created_at,'wdn',wdn);
+      if (datein && datein>=created) add('ctg',data.datein,'wdn',wdn);
 
       // Planta: únicamente se confirma lleno con peso neto y fecha posterior a created_at.
       if (filled) add('ctg',data.date,'wdn',wdn);
@@ -190,7 +188,7 @@ export class GetallPage {
       // Puerto y navegación solo son posibles después del llenado confirmado.
       if (filled && dateout && dateout>=date && date>created) {
         if (Number.isFinite(shipout) && shipout===0) {
-          add('full',data.dateout,'wdn',wdn);
+          add('port',data.dateout,'wdn',wdn);
         } else if (Number.isFinite(shipout) && shipout>0) {
           const twoDays=2*24*60*60*1000;
           const updated=this.getTimestamp(wdn.updated_at);
@@ -210,9 +208,15 @@ export class GetallPage {
     return events;
   }
 
-  private getLoadState(key:LocationKey|null,wdn:any|null):LoadState {
-    if (key==='empty') return 'empty';
-    if (key==='ctg'||key==='full') return 'full';
+  private getLoadState(key:LocationKey|null,wdn:any|null,latest:LocationEvent|null):LoadState {
+    // CTG reúne vacío (inicio/datein) y lleno (date validada).
+    // Solo el evento de llenado confirmado permite mostrar CTG como lleno.
+    if (key==='ctg') {
+      const filledAt=this.getTimestamp(wdn?.data?.date);
+      return this.isFilled(wdn) && latest?.source==='wdn' &&
+        latest.timestamp===filledAt ? 'full' : 'empty';
+    }
+    if (key==='port') return 'full';
 
     // La asignación de barco marca el comienzo del plazo de seis días.
     // updated_at es la referencia temporal, no dateout ni created_at.
@@ -247,7 +251,7 @@ export class GetallPage {
       // Mantener SAI como estado de espera si aún no existe un nuevo ciclo.
       const key:LocationKey=latest?.key||'sai';
       lct[key]=true;
-      const loadState=this.getLoadState(key,wdn);
+      const loadState=this.getLoadState(key,wdn,latest);
       return {...item,data:{...item.data,lct,lctEvents:events,lctLatest:latest,
         loadState,isFull:loadState==='full'}};
     });

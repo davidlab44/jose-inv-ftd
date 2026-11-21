@@ -51,6 +51,8 @@ export class GetallPage implements OnInit {
   valor3=0;
   valor4=0;
   totalKg=0;
+  totalKgNacional=0;
+  totalKgImportadoPrecio=0;
   totalGlpOpc=0;
   totalGlpImportado=0;
   ios:boolean;
@@ -60,6 +62,93 @@ export class GetallPage implements OnInit {
   sortColumn:string='';
   sortDirection:'asc'|'desc'='asc';
   private rangeTimeout:any;
+  priceSelections: { [id: number]: 1 | 2 } = {};
+  priceModalOpen = false;
+  priceSaving = false;
+  priceType: 1 | 2 = 1;
+  priceInteger = '0';
+  priceCents = '0';
+  private priceEditId: number | null = null;
+
+  hasPrice(item: any): boolean {
+    const d = item?.data || {};
+    return (Number(d.type) === 1 || Number(d.type) === 2) &&
+      (Number(d.prci) > 0 || Number(d.prcf) > 0);
+  }
+  priceLabel(item: any): string {
+    const d = item.data || {};
+    return '$ ' + Number(d.prci || 0).toLocaleString('es-CO') + '.' + String(Number(d.prcf || 0)).padStart(2, '0');
+  }
+  get activeSelectionType(): 0 | 1 | 2 {
+    const ids = this.selectedPriceIds;
+    return ids.length ? this.priceSelections[ids[0]] : 0;
+  }
+  togglePriceSelection(id: number, type: 1 | 2, checked: boolean): void {
+    if (checked && this.activeSelectionType !== 0 && this.activeSelectionType !== type) return;
+    if (checked) this.priceSelections[id] = type;
+    else if (this.priceSelections[id] === type) delete this.priceSelections[id];
+  }
+  get selectedPriceIds(): number[] {
+    return Object.keys(this.priceSelections).map(Number);
+  }
+  openBulkPriceModal(): void {
+    if (!this.selectedPriceIds.length) return;
+    const types = this.selectedPriceIds.map(id => this.priceSelections[id]);
+    if (!types.every(t => t === types[0])) {
+      this.utilService.presentToast('Seleccione solamente una clase de precio por operación', 'warning', 2500);
+      return;
+    }
+    this.priceEditId = null;
+    this.priceType = types[0];
+    this.priceInteger = '0'; this.priceCents = '0';
+    this.priceModalOpen = true;
+  }
+  openEditPriceModal(item: any): void {
+    this.priceEditId = Number(item.id);
+    this.priceType = Number(item.data.type) === 2 ? 2 : 1;
+    this.priceInteger = String(Number(item.data.prci || 0));
+    this.priceCents = String(Number(item.data.prcf || 0));
+    this.priceModalOpen = true;
+  }
+  onlyDigits(value: any, cents = false): string {
+    return String(value ?? '').replace(/[^0-9]/g, '').slice(0, cents ? 2 : 12);
+  }
+  get validPrice(): boolean {
+    return /^\d+$/.test(this.priceInteger) && /^\d{1,2}$/.test(this.priceCents) &&
+      Number.isSafeInteger(Number(this.priceInteger)) && Number(this.priceCents) <= 99;
+  }
+  savePrice(): void {
+    if (this.priceSaving || !this.validPrice) return;
+    const ids = this.priceEditId !== null ? [this.priceEditId] : this.selectedPriceIds;
+    if (!ids.length) return;
+    const prci = Number(this.priceInteger), prcf = Number(this.priceCents);
+    const type = prci === 0 && prcf === 0 ? 0 : this.priceType;
+    this.priceSaving = true;
+    this.withdrawnService.updatePricesBulk(ids, type, prci, prcf).subscribe({
+      next: () => {
+        const idSet = new Set(ids);
+        for (const item of this.withdrawnList) {
+          if (idSet.has(Number(item.id))) {
+            item.data = { ...item.data, type, prci, prcf };
+          }
+        }
+        for (const item of this.fullWithdrawnList) {
+          if (idSet.has(Number(item.id))) item.data = { ...item.data, type, prci, prcf };
+        }
+        ids.forEach(id => delete this.priceSelections[id]);
+        this.updatePriceKgTotals();
+        this.priceSaving = false;
+        this.priceModalOpen = false;
+        this.utilService.presentToast('Precio actualizado', 'success', 1500);
+      },
+      error: err => {
+        console.error('Error guardando precios:', err);
+        this.priceSaving = false;
+        this.utilService.presentToast('No fue posible guardar el precio', 'danger', 2500);
+      }
+    });
+  }
+
   constructor(
     private barcodeService:BarcodeService,
     public alertCtrl:AlertController,
@@ -138,6 +227,8 @@ export class GetallPage implements OnInit {
           if (!item.data) item.data = {};
           item.level = '';
         }
+        this.priceSelections = {};
+        this.updatePriceKgTotals();
         this.fullWithdrawnList = this.buildMovementList(this.withdrawnList);
         this.refreshFilteredList();
         // Permite pintar primero IDs y valores originales.
@@ -173,6 +264,21 @@ export class GetallPage implements OnInit {
       item.data.shipoutName = this.shipMap[item.data.shipout]?.name ?? '';
       item.data.shipinName = this.shipMap[item.data.shipin]?.name ?? '';
     }
+  }
+
+  // Totales de todos los registros consultados en el intervalo, no sólo los visibles tras buscar.
+  private updatePriceKgTotals(): void {
+    let nacional = 0;
+    let importado = 0;
+    for (const item of this.withdrawnList) {
+      const d = item.data || {};
+      const kg = Number(d.kg) || 0;
+      if (Number(d.type) === 1 && this.hasPrice(item)) nacional += kg;
+      // Importado requiere explícitamente prci > 0.
+      if (Number(d.type) === 2 && Number(d.prci) > 0) importado += kg;
+    }
+    this.totalKgNacional = nacional;
+    this.totalKgImportadoPrecio = importado;
   }
 
   private prepareWithdrawnList(withdrawnList: any[]): void {
@@ -225,6 +331,7 @@ export class GetallPage implements OnInit {
       data.shipinName = this.shipMap[data.shipin]?.name ?? '';
     }
     this.totalKg = total;
+    this.updatePriceKgTotals();
     this.totalGlpOpc = totalOpc;
     this.totalGlpImportado = totalImportado;
   }
@@ -462,58 +569,6 @@ export class GetallPage implements OnInit {
     }
     this.updateRangeAndFetch();
   }
-  exportToExcel() {
-    try {
-      if(!this.filteredList||this.filteredList.length===0)
-        return;
-      const rows=this.filteredList.map(item=>({
-        'Fecha V':this.formatDate(item.data.date),
-        'Isotanq':this.ccoService.getName(item.data.name),
-        'Ticket':item.data.ticket,
-        'Img':item.data.img||'',
-        'Kg':item.data.kg,
-        'Price':item.data.price,
-        'PSI':item.data.psi,
-        'Rotogate':item.data.rotogate,
-        'Seal':item.data.seal?.join(', ')||'',
-        'Fecha Ing':this.formatDate(item.data.datein),
-        'Rem vacío':item.data.deliveryin,
-        'Img In':item.data.imgin||'',
-        'Trip In':item.data.tripin,
-        'Ship In':this.shipMap[item.data.shipin]?.name||'N/A',
-        'Date Out':this.formatDate(item.data.dateout),
-        'Rem M LL':item.data.deliveryout,
-        'Img Out':item.data.imgout||'',
-        'Trip Out':item.data.tripout,
-        'Ship Out':this.shipMap[item.data.shipout]?.name||'N/A',
-        'Diff':item.data.diff||'',
-        'Wgross':item.data.wgross,
-        'Wtare':item.data.wtare,
-        'Wnet':item.data.wnet,
-        'WTicket':item.data.wticket,
-        'Img Scale':item.data.imgscale||'',
-      }));
-      const csv=this.convertToCSV(rows);
-      const blob=new Blob([csv],{ type:'text/csv;charset=utf-8;' });
-      const link=document.createElement('a');
-      link.href=URL.createObjectURL(blob);
-      link.setAttribute('download','replenishment_export.csv');
-      link.click();
-    } catch(err) {
-      console.error('Error exportToExcel:',err);
-    }
-  }
-  convertToCSV(data:any[]):string {
-    if(!data.length)
-      return '';
-    const headers=Object.keys(data[0]);
-    const rows=data.map(row=>
-      headers.map(field=>
-        `"${(row[field]??'').toString().replace(/"/g,'""')}"`
-      ).join(',')
-    );
-    return [headers.join(','),...rows].join('\n');
-  }
   formatDate(date:any):string {
     if(!date)
       return '';
@@ -637,30 +692,6 @@ export class GetallPage implements OnInit {
       .replace(/[^\w\s\-./]/g, "");
   }
 
-/*  mapFullWithdrawnList(list: any[]): any[] {*/
-    /*return list.map(item => {*/
-      /*const d = item.data;*/
-      /*let level = '';*/
-      /*if (d?.shipout > 0 && d?.shipout != 3) level = 'nivel5';*/
-      /*else if (d?.deliveryout?.length > 2) level = 'nivel4';*/
-      /*else if (d?.wtare > 1000 && d?.wnet > 1000) level = 'nivel3';*/
-      /*else if (d?.kg > 10) level = 'nivel2';*/
-      /*else if (d?.deliveryin?.length > 2 && d?.datein?.length > 2) level = 'nivel1';*/
-      /*return { ...item, level };*/
-    /*});*/
-  /*}*/
-
-/*getLevel(item: any): string {*/
-  /*console.log('updated_at',item.updated_at);*/
-  /*const data=item.data*/
-  /*if (data?.shipout > 0 && data?.shipout != 3) return '->sai';*/
-  /*if (data?.deliveryout?.length > 2) return 'puerto';*/
-  /*if (data?.wtare > 1000 && data?.wnet > 1000) return '->puerto';*/
-  /*if (data?.kg > 10) return 'ctg';*/
-  /*if (data?.deliveryin?.length > 2 && data?.datein?.length > 2) return 'ctg';*/
-  /*return '';*/
-/*}*/
-
   getLevel(item: any): string {
     const updatedAt = new Date(item.updated_at);
     const now = new Date();
@@ -682,10 +713,6 @@ export class GetallPage implements OnInit {
   mapFullWithdrawnList(list: any[]): any[] {
     return list.map(item => ({ ...item, level: this.getLevel(item) }));
   }
-
-  /*mapFullWithdrawnList(fullWithdrawnList:any[]):any[]{*/
-    /*fullWithdrawnList.map((it)=>{it.})*/
-  /*}*/
 
 
 }

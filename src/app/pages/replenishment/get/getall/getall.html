@@ -11,6 +11,9 @@
       (ionInput)="onSearch($event.target.value)">
     </ion-searchbar>
     <ion-buttons slot="end">
+      <ion-button (click)="openBulkPriceModal()" [disabled]="!selectedPriceIds.length" title="Asignar precio">
+        <ion-icon slot="icon-only" name="cash-outline"></ion-icon>
+      </ion-button>
       <ion-button *ngIf="!showSearchbar" (click)="presentFilter()">
         <span *ngIf="ios">Filter</span>
         <span *ngIf="!ios">
@@ -83,7 +86,9 @@
           <th>Ticket</th>
           <th>Plx</th>
           <th>Kg</th>
-          <th>Precio</th>
+          <!--<th>Precio</th>-->
+          <th>opc</th>
+          <th>imp</th>
           <th>PSI</th>
           <th>Rt</th>
           <th>Sellos</th>
@@ -99,7 +104,7 @@
           <th>WTicket</th>
           <th>W</th>
           <th></th>
-          <!--<th></th>-->
+
         </tr>
       </thead>
       <tbody>
@@ -145,7 +150,15 @@
               </ion-button>
             </td>
             <td>{{ displayCell(p.data.kg) }}</td>
-            <td>{{ displayCell(p.data.price) }}</td>
+            <!--<td>{{ displayCell(p.data.price) }}</td>-->
+            <td class="price-cell">
+              <button *ngIf="hasPrice(p) && +p.data.type === 1" type="button" class="price-edit" (click)="openEditPriceModal(p)">{{ priceLabel(p) }}</button>
+              <input *ngIf="!hasPrice(p) && (activeSelectionType === 0 || activeSelectionType === 1)" type="checkbox" aria-label="Precio nacional" [checked]="priceSelections[p.id] === 1" (change)="togglePriceSelection(p.id, 1, $any($event.target).checked)">
+            </td>
+            <td class="price-cell">
+              <button *ngIf="hasPrice(p) && +p.data.type === 2" type="button" class="price-edit" (click)="openEditPriceModal(p)">{{ priceLabel(p) }}</button>
+              <input *ngIf="!hasPrice(p) && (activeSelectionType === 0 || activeSelectionType === 2)" type="checkbox" aria-label="Precio importado" [checked]="priceSelections[p.id] === 2" (change)="togglePriceSelection(p.id, 2, $any($event.target).checked)">
+            </td>
             <td>{{ displayCell(p.data.psi) }}</td>
             <td>{{ displayCell(p.data.rotogage) }}</td>
             <td>{{ displayCell(p.data.seal?.join(', ')) }}</td>
@@ -183,22 +196,48 @@
                 (blur)="onTextBlur(p, $event)">
               </textarea>
             </td>
-<!--            <td>-->
-              <!--[><span *ngIf="p.state=='plexa'"><]-->
-              <!--<span>{{p.level}}</span>-->
-            <!--</td>  -->
           </tr>
           <tr *ngIf="p.showSeparator" class="movement-separator">
-            <td colspan="29"></td>
+            <td colspan="30"></td>
           </tr>
         </ng-container>
       </tbody>
     </table>
   </div>
 
-  <div class="kg-total">
-    <h6>Total kilos retirados: {{ totalKg }}</h6>
+  <div style="font-size:small;">
+    <br>
+    <p>&nbsp;&nbsp;&nbsp;Nacional: {{ totalKgNacional }} kg</p>
+    <span>&nbsp;&nbsp;&nbsp;Importado: {{ totalKgImportadoPrecio }} kg</span>
+    <br>
+    <br>
+    <br>
+    <!--<h6>Total kilos retirados: {{ totalKg }}</h6>-->
   </div>
 
+  <ion-modal [isOpen]="priceModalOpen" (didDismiss)="priceModalOpen = false">
+    <ng-template>
+      <ion-header><ion-toolbar>
+        <ion-title>{{ priceEditId !== null ? 'Editar precio' : 'Asignar precio' }}</ion-title>
+        <ion-buttons slot="end"><ion-button (click)="priceModalOpen = false" [disabled]="priceSaving">Cerrar</ion-button></ion-buttons>
+      </ion-toolbar></ion-header>
+      <ion-content class="ion-padding">
+        <ion-item><ion-label>Tipo</ion-label><ion-select [(ngModel)]="priceType" [disabled]="priceEditId === null" interface="popover">
+          <ion-select-option [value]="1">Nacional (opc)</ion-select-option>
+          <ion-select-option [value]="2">Importado (imp)</ion-select-option>
+        </ion-select></ion-item>
+        <ion-item><ion-label position="stacked">Parte entera</ion-label>
+          <ion-input inputmode="numeric" type="text" [ngModel]="priceInteger" (ngModelChange)="priceInteger = onlyDigits($event)"></ion-input>
+        </ion-item>
+        <ion-item><ion-label position="stacked">Centavos (0–99)</ion-label>
+          <ion-input inputmode="numeric" type="text" [ngModel]="priceCents" (ngModelChange)="priceCents = onlyDigits($event, true)"></ion-input>
+        </ion-item>
+        <p></p>
+        <ion-button expand="block" (click)="savePrice()" [disabled]="!validPrice || priceSaving">
+          <ion-spinner *ngIf="priceSaving" name="crescent" slot="start"></ion-spinner>Guardar
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
 
