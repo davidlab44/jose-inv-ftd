@@ -366,6 +366,13 @@ export class PatchPage {
     console.log('uploadedUrl',this.uploadedUrl)
     payload.imgin=this.uploadedUrl;
     console.log("payload to patch =>", payload);
+  
+
+    if (!this.isValidMovementDate(this.movement.data.datein)) {
+      this.utilService.presentToast('fecha / año no valido','danger',800)
+      return;
+    }   
+
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
@@ -378,7 +385,13 @@ export class PatchPage {
       }
     });
   }
-  
+
+  isValidMovementDate(value: any): boolean {
+    if (typeof value !== 'string' || !value.trim()) return false; 
+    const parsed = new Date(value); 
+    return !Number.isNaN(parsed.getTime()) && parsed.getFullYear() > 2024; 
+  }   
+
   normalizeOCRDate(dateStr: string): string | null {
     if (!dateStr) return null;
     const date = new Date(dateStr);

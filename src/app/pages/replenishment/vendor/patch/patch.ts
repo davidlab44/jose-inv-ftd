@@ -353,6 +353,12 @@ export class PatchPage {
     });
   }
   
+  isValidMovementDate(value: any): boolean {
+    if (typeof value !== 'string' || !value.trim()) return false;
+    const parsed = new Date(value);
+    return !Number.isNaN(parsed.getTime()) && parsed.getFullYear() > 2024;
+  }
+
   updateMovementFromForm() {
     const f = this.form.value;
     this.movement.data = {
@@ -369,14 +375,13 @@ export class PatchPage {
 
   patch() {
     this.updateMovementFromForm();
-    this.updateMovementFromForm();
     this.movement.data.img = this.uploadedUrl;
     //this.movement.data.date=this.vendorDate;
     //const itemPrice = this.getGlpPriceItemByDate(this.movement.data.date, 1);
     //console.log("itemPrice",itemPrice)
     console.log("movement.data a enviar",this.movement.data)
     const date = this.movement.data.date;
-    if (!date || new Date(date).getFullYear() <= 2020) {
+    if (!this.isValidMovementDate(date)) {
       this.utilService.presentToast('fecha / año no valido','danger',800)
       return;
     }
@@ -394,7 +399,6 @@ export class PatchPage {
     let payload = this.movement.data;
     payload.name = this.ccoId;
     console.log("payload to patch =>", payload);
-    this.updateMovementFromForm();
     this.withdrawnService.patch(this.movement.id, payload).subscribe({
       next: (response) => {
         console.log("Withdrawn patch response", response);
@@ -722,6 +726,7 @@ export class PatchPage {
   }
   confirmDatePicker(): void {
     this.onChange({ detail: { value: this.pendingDate } });
+     console.log('pending date',this.pendingDate)
     this.closeDatePicker();
   }
   onChange(event: any): void {
@@ -729,7 +734,7 @@ export class PatchPage {
     if (typeof value !== 'string' || !value) return;
     //this.uiDate = value;
     this.movement.data.date = value;
-    //this.form?.patchValue({ date: value });
+    this.form?.patchValue({ fecha: value });
   }
 
   async pickImageAndUpload(): Promise<void> {

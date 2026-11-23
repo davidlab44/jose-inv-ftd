@@ -502,6 +502,12 @@ export class PostPage {
     payload.data.imgin=this.uploadedUrl;  
     payload.data.datein=this.uiDate;  
     console.log('payload',payload)
+  
+    if (!this.isValidMovementDate(payload.data.datein)) {
+      this.utilService.presentToast('fecha / año no valido','danger',800)
+      return;
+    }
+
     this.withdrawnService.post(payload.data).subscribe({
       next: (response) => {
         console.log("post response", response);
@@ -528,6 +534,15 @@ export class PostPage {
       }
     });
   }
+
+
+  isValidMovementDate(value: any): boolean {
+    if (typeof value !== 'string' || !value.trim()) return false; 
+    const parsed = new Date(value); 
+    return !Number.isNaN(parsed.getTime()) && parsed.getFullYear() > 2024; 
+  }   
+      
+
 
   setWithdrawnState(id:number,state:string){
     this.withdrawnService.updateWithdrawnState(id,state).subscribe({

@@ -65,14 +65,12 @@ export class AssetSupplyPostPage implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('embuste')
     this.receiveDataFromRouter();
     this.buildForm();
   }
 
-  get requiredAttributes(): Array<{
-    key: string;
-    config: ProductAttribute;
-  }> {
+  get requiredAttributes(): Array<{key: string;config: ProductAttribute;}> {
     return Object.entries(
       this.category.product_template
     )
@@ -85,15 +83,10 @@ export class AssetSupplyPostPage implements OnInit {
 
   private buildForm(): void {
 
-
-  if(!Number(this.categFull.ext_id)||Number(this.categFull.ext_id)<1 ){
+  if(!Number(this.categFull.i)||Number(this.categFull.i)<1 ){
       console.log ("Categoria No Valida")
       return;
     }
-    //this.requiredAttributes.data.categ = [this.categFull.ext_id];
-    //delete data.category;
-
-
     const controls: Record<string, FormControl> = {};
     for (const { key, config } of this.requiredAttributes) {
       let defaultValue: unknown;
@@ -122,7 +115,7 @@ export class AssetSupplyPostPage implements OnInit {
     }
     this.form = this.fb.group(controls);
     this.form.patchValue({
-      category:this.categFull.ext_id ?? null
+      category:this.categFull.i ?? null
     })
   }
   label(value: string): string {
@@ -143,11 +136,11 @@ export class AssetSupplyPostPage implements OnInit {
 
   guardar(prdtAtt:any) {
     const data: any = prdtAtt;
-    if(!Number(this.categFull.ext_id)||Number(this.categFull.ext_id)<1 ){
+    if(!Number(this.categFull.i)||Number(this.categFull.i)<1 ){
       console.log ("Categoria No Valida")
       return;
     }
-    data.categ = [this.categFull.ext_id];
+    data.categ = [this.categFull.i];
     delete data.category;
     console.log('Product to post =>', data);
     this.productService.post(data).subscribe({
@@ -170,7 +163,7 @@ export class AssetSupplyPostPage implements OnInit {
                   },
                   error:(err)=>console.error('patch_prdt_err',err)
                 });
-                this.productService.patchField(res[0].id,'ext_id',res[0].id).subscribe({
+                this.productService.patchField(res[0].id,'i',res[0].id).subscribe({
                   next:res=>console.log('create_prdt',res),
                   error:err=>console.error('create_prdt',err)
                 });

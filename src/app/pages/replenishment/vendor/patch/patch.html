@@ -95,6 +95,11 @@
         </ion-label>
         <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
       </ion-item>
+      <p [style.color]="isValidMovementDate(movement?.data?.date) ? 'inherit' : 'red'">
+        {{ isValidMovementDate(movement?.data?.date)
+            ? formatFechaLatam(movement.data.date)
+            : 'Seleccione una fecha válida posterior a 2024' }}
+      </p>
 
       <ion-grid>
           <ion-row>
