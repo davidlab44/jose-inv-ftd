@@ -6,7 +6,8 @@ import { UserData } from '../../providers/user-data';
 import { Session } from '../../interfaces/session';
 import { UtilService } from '../../services/util.service';
 import { ProductService } from '../../services/product.service';
-import { Subject } from 'rxjs';
+import { Subject, forkJoin, of } from 'rxjs';
+import { concatMap, finalize, take } from 'rxjs/operators';
 import { RexService } from '../../services/rex.service';
 import { ProdrexService } from '../../services/prodrex.service';
 import { UserService } from '../../services/user.service';
@@ -16,6 +17,7 @@ import { UserService } from '../../services/user.service';
   templateUrl: 'prodrex.html',
   styleUrls: ['./prodrex.scss'],
 })
+
 export class ProdrexPage {
 
   ios: boolean;
@@ -53,7 +55,7 @@ export class ProdrexPage {
     private prodrexService: ProdrexService,
     private userService: UserService
   ) {
-    this.loadUsers();
+
   }
 
   hash:string='';
@@ -62,38 +64,44 @@ export class ProdrexPage {
   async ngOnInit(){
   }
 
-  async refreshView() {
-    this.rexService.getLast().subscribe({
-      next: (response) => {
-        this.getProdrexList();
-        if(response && response.length && response.length>0){
-          console.log('getLast RSPNS',response)
-          if(response[0].state=='draft'){
-            this.rexDocument=response;
-            console.log('this.rexdocument',response)
-          }else{
-            this.utilService.presentToast('creando rex')
-            this.rexService.addRex().subscribe({
-              next: (r)=>{
-                console.log('addRex response ',r)
-                this.rexService.getLast().subscribe({
-                  next: (res)=>{
-                    console.log('getLast res response',res)
-                  }
-                })
-              }
-            })
-          }
-        }
-      }
-    })
+  loadingView = false;
+  removingId: number | null = null;
+  delivering = false;
 
-    this.productService.getCachedOrServer().subscribe(data => {
-      this.productListCaos = data;
-      console.log('this.productListCaos',this.productListCaos)
+  refreshView() {
+    if (this.loadingView) return;
+    this.loadingView = true;
+
+    forkJoin({
+      rex: this.rexService.getLast().pipe(take(1)),
+      products: this.productService.getCachedOrServer().pipe(take(1))
+    }).pipe(finalize(() => this.loadingView = false)).subscribe({
+      next: ({ rex, products }) => {
+        this.productListCaos = Array.isArray(products) ? products : [];
+        if (Array.isArray(rex) && rex.length && rex[0].state === 'draft') {
+          this.rexDocument = rex;
+          this.getProdrexList();
+        } else {
+          this.rexDocument = [];
+          this.utilService.presentToast('creando rex');
+          this.rexService.addRex().pipe(take(1)).subscribe({
+            next: () => {
+              this.rexService.getLast().pipe(take(1)).subscribe({
+                next: res => {
+                  this.rexDocument = Array.isArray(res) ? res : [];
+                  this.getProdrexList();
+                },
+                error: err => console.error('Error consultando rex:', err)
+              });
+            },
+            error: err => console.error('Error creando rex:', err)
+          });
+        }
+      },
+      error: err => console.error('Error cargando vista prodrex:', err)
     });
   }
-  
+
   userList:any[]=[];
   loadUsers(){
     this.userService.getAll().subscribe({
@@ -107,41 +115,33 @@ export class ProdrexPage {
   ionViewWillEnter() {}
 
   ionViewDidEnter(){
+    this.loadUsers();
     this.refreshView();
   }
 
   prodrexList:any[]=[];
   getProdrexList() {
-    this.prodrexList=[];
-    console.log('va a consultar prodrexservice')
-    this.prodrexService.getRecents().subscribe({
-      next: response=>{
-        console.log('prodRexService',response);
-        if(this.rexDocument.length && this.rexDocument.length>0){
-          response.forEach(prodrex => {
-            if(prodrex.data.id_rex==this.rexDocument[0].id){
-              this.prodrexList.push(prodrex);
-            }
-          });
-        }else{
-          this.utilService.presentToast('rexDocument is empty')
-        }
-        this.mapProdrexList()
-      }
-    })
+    const rexId = this.rexDocument?.[0]?.id;
+    if (rexId == null) {
+      this.prodrexList = [];
+      return;
+    }
+    this.prodrexService.getRecents().pipe(take(1)).subscribe({
+      next: response => {
+        const records = Array.isArray(response) ? response : [];
+        this.prodrexList = records
+          .filter(item => Number(item?.data?.id_rex) === Number(rexId))
+          .map(item => ({ ...item, prdtname: this.getProductNameById(item?.data?.id_product) }));
+      },
+      error: err => console.error('Error consultando prodrex:', err)
+    });
   }
 
-  mapProdrexList(): void {
-    console.log('prodrexLissss',this.prodrexList);
-    this.prodrexList = this.prodrexList.map(item => ({
-      ...item,
-      prdtname: this.getProductNameById(item.data?.id_product)
-    }));
-    console.log('prodrexListtt',this.prodrexList);
+  trackByProdrexId(index: number, item: any) {
+    return item.id;
   }
 
   getProductNameById(id: number | string | null | undefined): string {
-    console.log("id product pasado",id);
     if (id === null || id === undefined) return 'Sin Nombre 1';
     const idNum = Number(id);
     if (isNaN(idNum)) return 'Sin Nombre 2';
@@ -181,61 +181,58 @@ export class ProdrexPage {
     });
   }
 
-  /*ownerId=0*/
-  /*selectUser(u){*/
-    /*console.log("component u pasado",u)*/
-    /*console.log("rexDocument[0]",this.rexDocument)*/
-    /*this.rexService.addUserOwner(this.rexDocument[0],u.id).subscribe({*/
-      /*next: (res) =>{*/
-        /*console.log("res para usar",res)*/
-        /*if(res[0].data.id_user > 0){*/
-          /*this.ownerId=res[0].data.id_user;*/
-          /*this.hasOwner=true;*/
-        /*} */
-      /*}*/
-    /*})*/
-  /*}*/
+  removeFromProdrex(prdct: any) {
+    if (this.removingId !== null || !prdct?.data || prdct.id == null) return;
+    this.removingId = prdct.id;
 
-  removeFromProdrex(prdct:any){
-    this.productService.getProductById(prdct.data.id_product).subscribe({
-      next: (r)=>{
-        r[0].data.qty=Number(r[0].data.qty)+Number(prdct.data.qty);
-        console.log('r[0]',r[0].data)
-        this.productService.patch(r[0].id,r[0].data).subscribe({
-          next: (r)=>{
-            console.log('updated',r)
-            this.prodrexService.removeFromProdrex(prdct.id).subscribe({
-              next: (response)=>{
-                console.log('prodrex deleted',response);
-                this.prodrexService.getAll().subscribe({
-                  next: response=>{
-                    this.prodrexList=response;
-                    console.log("getProdRexList",response)
-                  }
-                })
-                this.rexService.getAll().subscribe({
-                  next: (response) => {
-                    this.rexDocument=response;
-                    console.log("response rex table",response)
-                  }
-                })
-              }
-            });
-          }
-        })
+    this.productService.getProductById(prdct.data.id_product).pipe(
+      take(1),
+      concatMap(products => {
+        const product = Array.isArray(products) ? products[0] : null;
+        if (!product?.data || product.id == null) {
+          throw new Error('Producto no encontrado');
+        }
+        const qty = Number(product.data.qty);
+        const returnedQty = Number(prdct.data.qty);
+        if (!Number.isFinite(qty) || !Number.isFinite(returnedQty)) {
+          throw new Error('Cantidad inválida');
+        }
+        const updatedData = { ...product.data, qty: qty + returnedQty };
+        return this.productService.patch(product.id, updatedData).pipe(take(1));
+      }),
+      concatMap(() => this.prodrexService.removeFromProdrex(prdct.id).pipe(take(1))),
+      finalize(() => this.removingId = null)
+    ).subscribe({
+      next: () => {
+        this.prodrexList = this.prodrexList.filter(item => item.id !== prdct.id);
+        // La lista se actualiza en memoria: no navegar ni recargar la página.
+        // El servidor ya confirmó la eliminación del registro.
+      },
+      error: err => {
+        console.error('Error eliminando prodrex:', err);
+        this.utilService.presentToast('No se pudo completar la eliminación');
       }
-    })
+    });
   }
 
   addToOrder(p){
     console.log('p',p)
   }
 
-  markAsDelivered(){
-    this.rexService.markAsDelivered(this.rexDocument[0].id,'delivered').subscribe({
-      next: (response)=>{
-        console.log('markAsDelivered response',response)
-        this.router.navigate(['/app/tabs/schedule']);
+  markAsDelivered() {
+    const rexId = this.rexDocument?.[0]?.id;
+    if (this.delivering || this.removingId !== null || rexId == null) return;
+    this.delivering = true;
+    this.rexService.markAsDelivered(rexId, 'delivered').pipe(
+      take(1),
+      finalize(() => this.delivering = false)
+    ).subscribe({
+      next: () => this.router.navigate(['/app/tabs/schedule']).catch(err =>
+        console.error('Error navegando a schedule:', err)
+      ),
+      error: err => {
+        console.error('Error marcando entrega:', err);
+        this.utilService.presentToast('No se pudo registrar la entrega');
       }
     });
   }

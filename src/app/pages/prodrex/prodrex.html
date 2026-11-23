@@ -37,7 +37,7 @@
 
 <ion-content>
   <ion-list>
-    <ng-container *ngFor="let p of prodrexList">
+    <ng-container *ngFor="let p of prodrexList; trackBy: trackByProdrexId">
       <ion-item button (click)="addToOrder(p)" lines="none" style="padding-top: 6px; padding-bottom: 6px;">
         <table style="width: 100%; border-collapse: collapse;">
           <tr>
@@ -50,7 +50,7 @@
                 <span style="font-size: small;">{{ p?.data?.qty }}</span>
             </td>
             <td style="width: 15%; text-align: center;">
-              <ion-button color="secondary" (click)="removeFromProdrex(p)" style="height: 28px; min-width: 28px;">
+              <ion-button color="secondary" (click)="$event.stopPropagation(); removeFromProdrex(p)" [disabled]="removingId !== null || delivering" style="height: 28px; min-width: 28px;">
                 <ion-icon name="trash-outline"></ion-icon>
               </ion-button>
             </td>
@@ -87,7 +87,7 @@
   </div>
 
   <div class="button-right" style="padding-right: 12px;" >
-    <ion-button color="primary" (click)="markAsDelivered()">
+    <ion-button color="primary" (click)="markAsDelivered()" [disabled]="delivering || removingId !== null || !rexDocument?.length">
       <ion-icon name="checkbox-outline"></ion-icon>&nbsp; 
     </ion-button>
   </div>
