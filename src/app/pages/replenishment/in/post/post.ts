@@ -759,7 +759,7 @@ export class PostPage {
   }
 
   async pickImageAndUpload(): Promise<void> {
-/*    if (this.uploading) return;*/
+    /*    if (this.uploading) return;*/
     /*this.uploading = true;*/
     try {
       const base64Image = await this.photoService.pickImage();
