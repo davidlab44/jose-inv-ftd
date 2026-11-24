@@ -132,6 +132,20 @@ export class GetallPage implements OnInit {
       next: (res) => {      
         this.stgList=res;
         console.log('stgList :', res);   
+        this.loadIo();
+      }, 
+      error: (err) => {      
+        console.error(new Error('stack_name:').stack, err);
+      } 
+    }); 
+  }     
+
+  ioList: any[] = []; 
+  loadIo(){                
+    this.ioService.getAll().subscribe({ 
+      next: (res) => {      
+        this.ioList=res;
+        console.log('ioList :', res);   
         this.builTaskFullList();
       }, 
       error: (err) => {      
@@ -141,7 +155,25 @@ export class GetallPage implements OnInit {
   }     
 
   builTaskFullList(){
+    // Último movimiento por contenedor (id_cco).
+    const latestIoByCco = new Map<number, any>();
+    this.ioList.forEach((io) => {
+      const ccoId = Number(io?.data?.id_cco);
+      if (!Number.isFinite(ccoId)) return;
+      const previous = latestIoByCco.get(ccoId);
+      if (!previous || Number(io.id) > Number(previous.id)) {
+        latestIoByCco.set(ccoId, io);
+      }
+    });
+
     this.fltrdTList.map((task)=>{
+      const ccoId = Number(this.mntList.find((mnt) => task?.data?.id_mnt === mnt.i)?.data?.id_cco);
+      const io = latestIoByCco.get(ccoId);
+      const entered = io?.data?.in;
+      const exited = io?.data?.out;
+      task.isInside = typeof entered === 'string' && entered.trim() !== ''
+        && !Number.isNaN(Date.parse(entered))
+        && (exited == null || String(exited).trim() === '');
       this.mntList.forEach((mnt)=>{
         if(task.data.id_mnt===mnt.i){
           task.data.mnt=mnt;     
@@ -159,15 +191,19 @@ export class GetallPage implements OnInit {
         }
       }) 
     });
-    console.log('load/build full fltrdTList',this.fltrdTList)
+    console.log('builTaskFullList / fltrdTList',this.fltrdTList);
     this.fltrdTList=this.fltrdTList.sort((a, b) => a?.data?.ats?.data?.stg?.data?.order-b?.data?.ats?.data?.stg?.data?.order);
   }
 
   //Buscador Cco
+  cco:any;
   selectedItem(p:any){
+    this.cco=p;
+    this.hash=p.data.name;
     console.log('selectedItem', p)
     this.filteredCcoList=[];
     this.filterMntList(p.id);
+
   }
 
   filterMntList(id:number) {

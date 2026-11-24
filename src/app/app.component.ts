@@ -55,7 +55,7 @@ export class AppComponent implements OnInit {
        icon: 'build'
      },
      {
-       title: 'Tareas',
+       title: 'Intervenciones',
        url: '/app/tabs/mnt-t-getall',
        icon: 'build'
      },
@@ -203,7 +203,7 @@ export class AppComponent implements OnInit {
      icon: 'today'
    },
    {
-     title: 'Tareas',
+     title: 'Intervenciones',
      url: '/app/tabs/mnt-t-getall',
      icon: 'build'
    },

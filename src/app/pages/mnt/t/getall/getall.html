@@ -30,15 +30,16 @@
   </ion-list>
 </ion-header>  
 
-
 <ion-content>
+
   <ion-list>
     <ion-grid
       *ngFor="let p of fltrdTList"
       class="subtask">
       <ion-row
         [class.approved]="p?.data?.mnt?.data?.dateapv != null"
-        [class.pending]="p?.data?.mnt?.data?.dateapv == null">
+        [class.pending]="p?.data?.mnt?.data?.dateapv == null"
+        [class.inside-workshop]="p?.isInside">
         <ion-col size="1" class="subtask-title">
           {{ p?.i }}
         </ion-col>
@@ -60,12 +61,12 @@
           (click)="goToPatch(p)">
           {{ p?.data?.ats?.data?.name }}
         </ion-col>
-        <ion-col *ngIf="p?.state" 
-          size="2"
-          class="subtask-title"
-          (click)="goToStg(p)">
-          {{ p?.state }}
-        </ion-col>
+        <!--<ion-col *ngIf="p?.state" -->
+          <!--size="2"-->
+          <!--class="subtask-title"-->
+          <!--(click)="goToStg(p)">-->
+          <!--{{ p?.state }}-->
+        <!--</ion-col>-->
         <ion-col   *ngIf="p?.data?.ats?.data?.stg?.data?.order"
           size="1"
           class="subtask-title"

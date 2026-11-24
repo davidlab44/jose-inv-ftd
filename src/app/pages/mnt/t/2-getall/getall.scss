@@ -1,0 +1,43 @@
+
+ion-list {
+  background: transparent;
+  padding: 0;
+}
+
+.subtask {
+  padding: 0;
+  margin-bottom: 3px;
+  background: transparent;
+
+  ion-row {
+    width: 100%;
+    min-height: 36px;
+    border-radius: 4px;
+  }
+
+  // VERDE: dateapv es null
+  ion-row.approved {
+    background: #EBFEE5 !important;
+    //color: #1b5e20 !important;
+    color: #585858 !important;
+  }
+
+  // ROJO: dateapv es diferente de null
+  ion-row.pending {
+    background: #ffe9ec !important;
+    //background: #ffcdd2 !important;
+    //color: #b71c1c !important;
+    color: #585858 !important;
+  }
+
+  .subtask-title {
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    background: transparent;
+    color: inherit;
+  }
+}
+
+
