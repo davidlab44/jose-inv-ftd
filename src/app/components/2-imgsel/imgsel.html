@@ -1,0 +1,17 @@
+<section class="media-panel">
+ <strong>Fotos y videos (opcional)</strong>
+ <div class="actions">
+ <ion-button size="small" fill="outline" [disabled]="busy || disabled" (click)="photoFrom('camera')"><ion-icon slot="start" name="camera-outline"></ion-icon>Foto</ion-button>
+ <ion-button size="small" fill="outline" [disabled]="busy || disabled" (click)="picker.click()"><ion-icon slot="start" name="images-outline"></ion-icon>Archivos</ion-button>
+ <ion-button size="small" fill="outline" [disabled]="busy || disabled" (click)="photoFrom('gallery')">Galería</ion-button>
+ <ion-button size="small" *ngIf="!recording" fill="outline" [disabled]="busy || disabled" (click)="startRecording()">Grabar video</ion-button>
+ <ion-button size="small" *ngIf="recording" color="danger" (click)="stopRecording()">Detener grabación</ion-button>
+ <input #picker type="file" accept="image/*,video/*" multiple hidden (change)="files($event)">
+ </div>
+ <div *ngIf="busy"><ion-progress-bar type="indeterminate"></ion-progress-bar><small>{{recording ? 'Grabando y subiendo video' : 'Procesando archivo multimedia...'}} {{recording ? (bytes / 1048576 | number:'1.1-1') + ' MiB' : ''}}</small></div>
+ <ion-text color="danger" *ngIf="error">{{error}}</ion-text>
+ <div class="media-grid"><div class="media-item" *ngFor="let url of images">
+ <video *ngIf="isVideo(url)" [src]="url" controls preload="metadata"></video><img *ngIf="!isVideo(url)" [src]="url" loading="lazy" alt="Imagen adjunta">
+ <ion-button size="small" fill="clear" color="danger" [disabled]="busy || disabled" (click)="remove(url)"><ion-icon slot="start" name="trash-outline"></ion-icon>Quitar</ion-button>
+ </div></div>
+</section>

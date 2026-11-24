@@ -13,8 +13,8 @@ import { UtilService } from '../../../../services/util.service';
 import { ProductService } from '../../../../services/product.service';
 import { CategoryService } from '../../../../services/category.service';
 import { UmService } from '../../../../services/um.service';
-import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { DateService } from '../../../../services/local/date.service';
 import { RexService } from '../../../../services/rex.service';
 //import { ProdrexService } from '../../../../services/prodrex.service';
@@ -52,7 +52,12 @@ export class AssetSupplyPostPage {
   form!: FormGroup;
   replenishmentList: any[] = [];
   uploadProgress = 0;
-  uploadedUrl: string | null = null;
+  images: string[] = [];
+  selectedUsers: number[] = [];
+  showMedia = false;
+  saving = false;
+  private subs = new Subscription();
+  private productIndex: { product: any; name: string }[] = [];
   uploading = false;
 
   constructor(
@@ -98,7 +103,9 @@ export class AssetSupplyPostPage {
     });
     const ahora = new Date();
     this.todayDate=this.formatFechaLatam(ahora);
-    this.displayLast();
+    this.subs.add(this.searchSubject.pipe(debounceTime(180)).subscribe(value => {
+      if (value === this.hash) this.filteredProductList = this.searchProducts(value);
+    }));
   }
  
   lastAsset:any;
@@ -116,66 +123,57 @@ export class AssetSupplyPostPage {
 
   productListCaos:any[]=[];
   ionViewWillEnter() {
-    this.productService.getCachedOrServer().subscribe({
-      next: (data) => {
-        console.log('[SEARCH][2.1] productListx recibido:', data);
+    this.subs.add(this.productService.getCachedOrServer().subscribe({
+      next: data => {
         this.productListCaos = data || [];
-        this.filteredProductList = [];
-        console.log('[SEARCH][3] productListCaos asignado -> cantidad:', this.productListCaos.length);
+        this.productIndex = this.productListCaos.filter(p => typeof p?.data?.name === 'string')
+          .map(product => ({ product, name: this.normalize(product.data.name) }));
+        this.filteredProductList = this.searchProducts(this.hash);
       },
-      error: (err) => {
-        console.error('[SEARCH][ERROR] error cargando productListCaos:', err);
-      }
-    });
+      error: err => console.error('Error cargando productos', err)
+    }));
   }
-
-  /*prodrexList:any[]=[];*/
-  /*ionViewDidEnter() {*/
-    /*this.prodrexService.getAll().subscribe({*/
-      /*next: response=>{*/
-        /*this.prodrexList=response;*/
-        /*console.log("getProdRexList",response)*/
-      /*}*/
-    /*})*/
-  /*}*/
-
-  searchProducts(hash: string, productList: any[]): any[] {
-    const term = (hash || '').trim().toLowerCase();
-    if (!term) {
-      return [];
+  private normalize(value: string): string {
+    return value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+  searchProducts(hash: string): any[] {
+    const term = this.normalize(hash || '');
+    const results: any[] = [];
+    if (!term) return results;
+    for (const entry of this.productIndex) {
+      if (entry.name.includes(term)) results.push(entry.product);
+      if (results.length === 20) break;
     }
-    const matches = (productList || []).filter((product, index) => {
-      const name = product?.data.name;
-      console.log('elemento lista',productList)
-      console.log('elemento product',product)
-      console.log('elemento name',name)
-      const validName = typeof name === 'string';
-      const match = validName && name.toLowerCase().includes(term);
-      if (match) {
-        console.log(`[SEARCH][7] MATCH index=${index} name=`, name, 'producto=', product);
-      }
-      return match;
-    });
-    const visibleResults = matches.slice(0, 20);
-    return visibleResults;
+    return results;
   }
-
   onSearch(text: string | null | undefined) {
-    const value = text ?? '';
+    const value = text || '';
+    if (value === this.hash) return;
     this.hash = value;
+    this.filteredProductList = [];
     this.searchSubject.next(value);
-    this.filteredProductList = this.searchProducts(value, this.productListCaos);
+  }
+  trackProduct(index: number, p: any) { return p.id; }
+  ngOnDestroy() { this.subs.unsubscribe(); this.searchSubject.complete(); }
+  async selectUsers() {
+    if (this.saving) return;
+    const modal = await this.modalCtrl.create({ component: PostUsersModal,
+      componentProps: { selected: [...this.selectedUsers] } });
+    await modal.present();
+    const result = await modal.onDidDismiss();
+    if (result.role === 'confirm') this.selectedUsers = result.data;
   }
 
   bomList:any[]=[];
   selectProduct(p: any) {
-    console.log('p seleccionado',p)
+    p = { ...p, data: { ...p.data } };
     p.data.qty=1;
     p.data.categName=this.categoryService.getUmNameById(p.data.categ[0],this.categs);
     p.data.umName=this.umService.getUmNameById(p.data.um,this.ums);
     this.bomList.push(p)
-    console.log('bomlist',this.bomList)
-    this.hash = p?.name ?? '';
+
+    this.hash = '';
+    this.searchSubject.next('');
     this.filteredProductList = [];
   }
 
@@ -247,24 +245,54 @@ export class AssetSupplyPostPage {
   }
 
   guardar() {
-    const data: any = this.form.value;
-    data.img = this.uploadedUrl; 
+    if (this.uploading || this.saving) return;
+    this.saving = true;
+    const data: any = { ...this.form.value };
+    data.img = [...this.images];
+    data.usr = [...this.selectedUsers]; 
     data.bom= this.bomList.map(it=>it.i);
     //delete data.category;
     console.log('Project to post =>', data);
     this.pService.post(data).subscribe({
       next: (response) => {
-        console.log("p post response", response);
+        this.saving = false;
         if(response && response.length>0){
           this.bomList=[];
-          this.form.reset();
+          this.form.reset({ name: '', um: 0 });
+          this.images = [];
+          this.selectedUsers = [];
+          this.showMedia = false;
           this.utilService.presentToast('registro creado','success')
           //this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceurl: true });    
         }
-      }
+      },
+      error: () => { this.saving = false; this.utilService.presentToast('No se pudo guardar', 'danger'); },
+      complete: () => { this.saving = false; }
     });
   }
+}
 
-
-
+@Component({ selector: 'post-users-modal', template: `
+<ion-header><ion-toolbar><ion-title>Usuarios</ion-title><ion-buttons slot="end"><ion-button (click)="close()">Cancelar</ion-button></ion-buttons></ion-toolbar></ion-header>
+<ion-content><ion-searchbar (ionInput)="filter($event.detail.value)"></ion-searchbar>
+<ion-spinner *ngIf="loading"></ion-spinner><ion-text color="danger" *ngIf="error">{{error}}</ion-text>
+<ion-list><ion-item *ngFor="let u of visible"><ion-label>{{label(u)}}</ion-label><ion-checkbox slot="end" [checked]="ids.has(+u.id)" (ionChange)="toggle(u.id,$event.detail.checked)"></ion-checkbox></ion-item></ion-list></ion-content>
+<ion-footer><ion-toolbar><ion-button expand="block" (click)="confirm()" [disabled]="loading || !!error">Seleccionar ({{ids.size}})</ion-button></ion-toolbar></ion-footer>` })
+export class PostUsersModal {
+  selected: number[] = [];
+  ids = new Set<number>();
+  users: any[] = []; visible: any[] = []; loading = true; error = '';
+  constructor(private usersService: UserService, private modal: ModalController) {}
+  ngOnInit() {
+    this.ids = new Set(this.selected);
+    this.usersService.getAll().subscribe({ next: (rows: any[]) => {
+      this.users = (rows || []).filter(u => Number.isInteger(Number(u.id)) && Number(u.id) > 0);
+      this.visible = this.users; this.loading = false;
+    }, error: () => { this.loading = false; this.error = 'No se pudieron cargar los usuarios'; } });
+  }
+  label(u: any): string { return String(u.data?.name || u.name || u.data?.email || u.email || ('Usuario #' + u.id)); }
+  filter(value: string) { const q = (value || '').toLowerCase(); this.visible = this.users.filter(u => this.label(u).toLowerCase().includes(q)); }
+  toggle(id: any, checked: boolean) { if (checked) this.ids.add(Number(id)); else this.ids.delete(Number(id)); }
+  close() { this.modal.dismiss(null, 'cancel'); }
+  confirm() { this.modal.dismiss(Array.from(this.ids), 'confirm'); }
 }
