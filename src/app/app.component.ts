@@ -59,6 +59,12 @@ export class AppComponent implements OnInit {
        url: '/app/tabs/mnt-t-getall',
        icon: 'build'
      },
+     {
+       title: 'Actividad',
+       url: '/app/tabs/p-c-post',
+       icon: 'hammer'
+     },
+
    ];
 
    appPages3 = [ //frank
@@ -211,6 +217,11 @@ export class AppComponent implements OnInit {
      title: 'Mantenimientos',
      url: '/app/tabs/mnt-mnt-getall',
      icon: 'build'
+   },  
+   {
+     title: 'Actividad / boilerplate',
+     url: '/app/tabs/p-c-post',
+     icon: 'hammer'
    },
    {
      title: 'Crear mnt manuelmente',

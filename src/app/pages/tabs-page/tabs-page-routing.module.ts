@@ -511,6 +511,16 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'p-c-post',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../p/c/post/post.module').then(m =>m.AssetSupplyPostModule )
+          }
+        ]   
+      },
+
+      {
         path: '',
         redirectTo: '/app/tabs/schedule',
         pathMatch: 'full'

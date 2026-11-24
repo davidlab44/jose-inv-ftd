@@ -2,7 +2,7 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { MenuController } from '@ionic/angular';
 import { ConferenceData } from '../../../../providers/conference-data';
 import { UserData } from '../../../../providers/user-data';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { AlertController,Config,IonList,LoadingController,ModalController,ToastController } from '@ionic/angular';
 import { ActivatedRoute,Router } from '@angular/router';
 import { IoService } from '../../../../services/mnt/io.service';
@@ -12,6 +12,7 @@ import { MntService } from '../../../../services/mnt/mnt.service';
 import { StgService } from '../../../../services/mnt/stg.service';
 import { AtsService } from '../../../../services/ats/ats.service';
 import { DateService } from '../../../../services/local/date.service';
+import { LctnService } from '../../../../services/logistic/lctn.service';
 
 @Component({
   selector:'app-getall',
@@ -43,14 +44,18 @@ export class GetallPage implements OnInit {
     private stgService: StgService,
     private atsService: AtsService,
     private dateService: DateService,
+    private lctnService: LctnService,
   ) {}
 
   ionViewWillEnter() {
     this.loadTasks();
     this.loadCco();
+    if (this.cco) this.getLocation(this.cco.id);
   }
 
-  ionViewWillLeave() {}
+  ionViewWillLeave() {
+    this.locationSub?.unsubscribe();
+  }
 
   ngOnInit() {}
   filteredCcoList:any[] =[];
@@ -74,7 +79,7 @@ export class GetallPage implements OnInit {
       next: (res) => {      
         this.ccoList=res;
         console.log('ccoList :', res);   
-        this.filteredCcoList=this.ccoList;
+        this.filteredCcoList=this.cco ? [] : this.searchCco(this.hash, this.ccoList);
       }, 
       error: (err) => {      
         console.error(new Error('stack_name:').stack, err);
@@ -89,7 +94,7 @@ export class GetallPage implements OnInit {
       next: (res) => {      
         this.tList=res;
         console.log('tList :', res);
-        this.fltrdTList=this.tList;
+        this.fltrdTList=[];
         this.loadMnt(); 
       }, 
       error: (err) => {      
@@ -140,6 +145,7 @@ export class GetallPage implements OnInit {
     }); 
   }     
 
+  insideWorkshopIds = new Set<number>();
   ioList: any[] = []; 
   loadIo(){                
     this.ioService.getAll().subscribe({ 
@@ -166,14 +172,20 @@ export class GetallPage implements OnInit {
       }
     });
 
-    this.fltrdTList.map((task)=>{
-      const ccoId = Number(this.mntList.find((mnt) => task?.data?.id_mnt === mnt.i)?.data?.id_cco);
-      const io = latestIoByCco.get(ccoId);
+    this.insideWorkshopIds = new Set<number>();
+    latestIoByCco.forEach((io, ccoId) => {
       const entered = io?.data?.in;
       const exited = io?.data?.out;
-      task.isInside = typeof entered === 'string' && entered.trim() !== ''
+      if (typeof entered === 'string' && entered.trim() !== ''
         && !Number.isNaN(Date.parse(entered))
-        && (exited == null || String(exited).trim() === '');
+        && (exited == null || String(exited).trim() === '')) {
+        this.insideWorkshopIds.add(ccoId);
+      }
+    });
+
+    this.tList.map((task)=>{
+      const ccoId = Number(this.mntList.find((mnt) => task?.data?.id_mnt === mnt.i)?.data?.id_cco);
+      task.isInside = this.insideWorkshopIds.has(ccoId);
       this.mntList.forEach((mnt)=>{
         if(task.data.id_mnt===mnt.i){
           task.data.mnt=mnt;     
@@ -191,18 +203,19 @@ export class GetallPage implements OnInit {
         }
       }) 
     });
-    console.log('builTaskFullList / fltrdTList',this.fltrdTList);
+    this.fltrdTList = this.cco ? this.tList.filter(it => Number(it?.data?.mnt?.data?.id_cco) === Number(this.cco.id)) : [];
     this.fltrdTList=this.fltrdTList.sort((a, b) => a?.data?.ats?.data?.stg?.data?.order-b?.data?.ats?.data?.stg?.data?.order);
   }
 
   //Buscador Cco
   cco:any;
   selectedItem(p:any){
-    this.cco=p;
-    this.hash=p.data.name;
+    this.cco={ ...p };
+    this.hash = p?.data?.name || '';
     console.log('selectedItem', p)
     this.filteredCcoList=[];
     this.filterMntList(p.id);
+    this.getLocation(p.id);
 
   }
 
@@ -210,10 +223,10 @@ export class GetallPage implements OnInit {
     console.log('f id=',id);
     console.log('f fltrdTList=',this.fltrdTList);
     if (id === undefined || id === null) return;
-    this.fltrdTList = this.fltrdTList.filter(
-      (it) => it?.data?.mnt?.data?.id_cco === id
+    this.fltrdTList = this.tList.filter(
+      (it) => Number(it?.data?.mnt?.data?.id_cco) === Number(id)
     );
-    console.log('f fltrdTList re filtrada FULL=',this.fltrdTList);
+    this.fltrdTList.sort((a, b) => a?.data?.ats?.data?.stg?.data?.order - b?.data?.ats?.data?.stg?.data?.order);
   }
 
   /*filterMntList(p:any){*/
@@ -262,7 +275,49 @@ export class GetallPage implements OnInit {
     /*//this.router.navigate(['/app/tabs/mnt-stg-getall'],   { replaceUrl: true }); */
   /*}*/
 
+  lctn: string = '';
+  locationLoading = false;
+  locationError = false;
+  private locationSub?: Subscription;
+  readonly locationLabels: { [key: string]: string } = {
+    sai: 'San Andrés',
+    tsai: 'En tránsito: Cartagena → San Andrés',
+    ctg: 'Cartagena',
+    inb: 'Pasacaballos / Inbemetal',
+    port: 'Puerto de Cartagena (esperando embarque)'
+  };
+
+  getLocation(id: number): void {
+    this.locationSub?.unsubscribe();
+    this.lctn = '';
+    this.locationLoading = true;
+    this.locationError = false;
+    this.locationSub = this.lctnService.getLctn(id).subscribe({
+      next: res => {
+        this.lctn = res;
+        this.locationLoading = false;
+      },
+      error: err => {
+        this.locationLoading = false;
+        this.locationError = true;
+        console.error('Location:', err);
+      }
+    });
+  }
+
+
+  presentFilter(){
+    this.router.navigate(['/app/tabs/p-c-post'],{ replaceUrl: true }); 
+  }
+
+
+  addUser(){
+    this.router.navigate(['/app/tabs/mnt-ws-ws'],{ replaceUrl: true });     
+  }
+
 
 }
+
+
 
 
