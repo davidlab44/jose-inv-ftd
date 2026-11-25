@@ -50,6 +50,11 @@ export class AppComponent implements OnInit {
        icon: 'layers'
      },
      {
+       title: 'Mantenimiento completo',
+       url: '/app/tabs/sgc-in-post',
+       icon: 'build'
+     },
+     {
        title: 'Taller',
        url: '/app/tabs/mnt-ws-ws',
        icon: 'build'

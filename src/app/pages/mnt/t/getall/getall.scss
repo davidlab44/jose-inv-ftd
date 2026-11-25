@@ -39,3 +39,8 @@ ion-searchbar { --border-radius: 12px; --box-shadow: none; }
   --background-hover: #ffd4d4;
   --background-activated: #ffcaca;
 }
+
+.assignment-cell { justify-content: center; }
+.assignment-button { background: transparent; color: inherit; padding: 4px; font-size: 20px; }
+.assignment-button .assigned-icon { color: #111; }
+.assignment-button:disabled { opacity: .5; }

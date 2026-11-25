@@ -96,74 +96,46 @@ export class PatchPage {
   }
 
 
-mntList: any[] = [];
-loadMnt() {
-  this.mntService.getAll().subscribe({
-    next: (r) => {
-      this.mntList = r;
-      console.log('loadMnt', this.mntList);
-      if (this.mntList?.length > 0) {
-        // 1. Agregar cco a cada item de mntList
-        this.mntList = this.mntList.map(mnt => {
-          const cco = this.ccoList.find(
-            cco => mnt.data?.id_cco === cco.id
-          );
-          return {
-            ...mnt,
-            data: {
-              ...mnt.data,
-              cco: cco ?? null
-            }
-          };
-        });
-        // 2. Agregar mnt (con su cco) a cada task
-        this.mappedList = this.mappedList.map(task => {
-          const mnt = this.mntList.find(
-            mnt => task.data?.id_mnt === mnt.i
-          );
-          return {
-            ...task,
-            data: {
-              ...task.data,
-              mnt: mnt ?? null
-            }
-          };
-        });
-      }
-      console.log('loadMnt mntList', this.mntList);
-      console.log('loadMnt mappedList', this.mappedList);
-    },
-    error: err => console.log('loadMnt error', err)
-  });
-}
-
-
-
-  /*mntList: any[] = [];*/
-  /*loadMnt() {*/
-    /*this.mntService.getAll().subscribe({*/
-      /*next: (r) => {*/
-        /*this.mntList = r;*/
-        /*console.log('loadMnt', this.mntList);*/
-        /*if (this.mntList?.length > 0) {*/
-          /*this.mappedList = this.mappedList.map(task => {*/
-            /*const mnt = this.mntList.find(*/
-              /*mnt => task.data?.id_mnt === mnt.i*/
-            /*);*/
-            /*return {*/
-              /*...task,*/
-              /*data: {*/
-                /*...task.data,*/
-                /*mnt: mnt ?? null*/
-              /*}*/
-            /*};*/
-          /*});*/
-        /*}*/
-        /*console.log('loadMnt mappedList', this.mappedList);*/
-      /*},*/
-      /*error: err => console.log('loadMnt error', err)*/
-    /*});*/
-  /*}*/
+  mntList: any[] = [];
+  loadMnt() {
+    this.mntService.getAll().subscribe({
+      next: (r) => {
+        this.mntList = r;
+        console.log('loadMnt', this.mntList);
+        if (this.mntList?.length > 0) {
+          // 1. Agregar cco a cada item de mntList
+          this.mntList = this.mntList.map(mnt => {
+            const cco = this.ccoList.find(
+              cco => mnt.data?.id_cco === cco.id
+            );
+            return {
+              ...mnt,
+              data: {
+                ...mnt.data,
+                cco: cco ?? null
+              }
+            };
+          });
+          // 2. Agregar mnt (con su cco) a cada task
+          this.mappedList = this.mappedList.map(task => {
+            const mnt = this.mntList.find(
+              mnt => task.data?.id_mnt === mnt.i
+            );
+            return {
+              ...task,
+              data: {
+                ...task.data,
+                mnt: mnt ?? null
+              }
+            };
+          });
+        }
+        console.log('loadMnt mntList', this.mntList);
+        console.log('loadMnt mappedList', this.mappedList);
+      },
+      error: err => console.log('loadMnt error', err)
+    });
+  }
 
   goToTaskEnd() {
     //p.oid = this.dateService.getDate();

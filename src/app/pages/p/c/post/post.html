@@ -4,20 +4,29 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-buttons slot="end">
-      <ion-button (click)="selectUsers()" [disabled]="saving" aria-label="Seleccionar usuarios"><ion-icon slot="icon-only" name="person-outline"></ion-icon><ion-badge *ngIf="selectedUsers.length">{{selectedUsers.length}}</ion-badge></ion-button>
-      <ion-button (click)="showMedia = !showMedia" [disabled]="uploading || saving" aria-label="Imágenes y videos"><ion-icon slot="icon-only" name="images-outline"></ion-icon><ion-badge *ngIf="images.length">{{images.length}}</ion-badge></ion-button>
+      <ion-button (click)="selectUsers()" [disabled]="saving" aria-label="Seleccionar usuarios">
+        <ion-icon slot="icon-only" name="person-outline"></ion-icon>
+        <ion-badge *ngIf="selectedUsers.length">{{selectedUsers.length}}</ion-badge>
+      </ion-button>
+      <ion-button (click)="showMedia = !showMedia" [disabled]="uploading || saving" aria-label="Imágenes y videos">
+        <ion-icon slot="icon-only" name="images-outline">
+        </ion-icon><ion-badge *ngIf="images.length">{{images.length}}</ion-badge>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
-
 </ion-header>
 
 <ion-content class="ion-padding">
 
-  <app-imgsel *ngIf="showMedia" [(images)]="images" (busyChange)="uploading = $event" [disabled]="saving"></app-imgsel>
+  <app-imgsel *ngIf="showMedia" [(images)]="images" (busyChange)="uploading=$event" [disabled]="saving"></app-imgsel>
+  <div>
+    <h2><span>&nbsp;&nbsp;{{rcv?.data?.name}}</span></h2>
+  </div>
+
   <form [formGroup]="form">
     <ion-list>
       <ion-item>
-        <ion-label position="floating">Nombre de la Actividad</ion-label>
+        <ion-label position="floating">Nombre de la Actividad:</ion-label>
         <ion-input formControlName="name"></ion-input>
       </ion-item>
       <ion-item>

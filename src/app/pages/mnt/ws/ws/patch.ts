@@ -9,6 +9,7 @@ interface WsUser {
     name?: string;
     img?: string;
     [key: string]: any;
+    tier?: number;
   };
 }
 
@@ -30,27 +31,6 @@ export class PatchPage implements OnInit {
     this.loadUsers();
   }
 
-  /*loadUsers(): void {*/
-    /*this.loading = true;*/
-    /*this.errorMessage = '';*/
-    /*this.userService.getAll().subscribe({*/
-      /*next: (users: WsUser[]) => {*/
-        /*this.users = Array.isArray(users) ? users : [];*/
-        /*this.loading = false;*/
-        /*console.log('loadUsers',users)*/
-        /*this.users = ...this.users.map((it)=>it.data.role===1)*/
-      /*},*/
-      /*error: (error: any) => {*/
-        /*console.error('[WS] Error cargando usuarios:', error);*/
-        /*this.errorMessage = 'No fue posible cargar los usuarios.';*/
-        /*this.loading = false;*/
-      /*}*/
-    /*});*/
-  /*}*/
-
-
-
-
   loadUsers(): void {
     this.loading = true;
     this.errorMessage = '';
@@ -71,10 +51,6 @@ export class PatchPage implements OnInit {
       }
     });
   }
-
-
-
-
 
   ionViewDidEnter(){
     this.loadTask();
@@ -100,7 +76,6 @@ export class PatchPage implements OnInit {
         custom: 'prueba'
       }
     });
-    //this.router.navigate(['/own', user.id]); // Ruta esperada: own/:wkr
   }
 
   trackById(_index: number, user: WsUser): number {
@@ -111,4 +86,5 @@ export class PatchPage implements OnInit {
     const image = event.target as HTMLImageElement;
     if (image.src !== this.defaultImage) image.src = this.defaultImage;
   }
+
 }

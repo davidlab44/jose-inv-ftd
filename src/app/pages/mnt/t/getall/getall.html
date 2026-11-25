@@ -93,11 +93,13 @@
           (click)="goToStg(p)">
           {{ p?.data?.ats?.data?.stg?.data?.order}}
         </ion-col>
-        <ion-col   *ngIf="p?.data?.ats?.data?.stg?.data?.order"
-          size="1"
-          class="subtask-title"
-          (click)="addUser()">
-          <ion-icon name="person-outline"></ion-icon>
+        <ion-col size="1" class="subtask-title assignment-cell">
+          <button type="button" class="assignment-button" [disabled]="assigning"
+            [attr.aria-label]="hasAssigned(p) ? 'Cambiar usuario asignado' : 'Asignar usuario'"
+            (click)="addUser(p)">
+            <ion-icon [name]="hasAssigned(p) ? 'person' : 'person-outline'"
+              [class.assigned-icon]="hasAssigned(p)"></ion-icon>
+          </button>
         </ion-col>
       </ion-row>
     </ion-grid>

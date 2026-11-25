@@ -1,28 +1,17 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, IonList, LoadingController, ModalController, ToastController, Config } from '@ionic/angular';
+import { AlertController, IonList,LoadingController,ModalController,ToastController,Config } from '@ionic/angular';
 import { ConferenceData } from '../../../../providers/conference-data';
 import { UserData } from '../../../../providers/user-data';
-import { OpportunityService } from '../../../../services/opportunity.service';
-import { PosOrderService } from '../../../../services/pos-order.service';
-import { TableService } from '../../../../services/table.service';
-import { ActivatedRoute } from '@angular/router'
 import { Session } from '../../../../interfaces/session';
-import { SessionService } from '../../../../services/session.service';
 import { UtilService } from '../../../../services/util.service';
 import { ProductService } from '../../../../services/product.service';
 import { CategoryService } from '../../../../services/category.service';
 import { UmService } from '../../../../services/um.service';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DateService } from '../../../../services/local/date.service';
-import { RexService } from '../../../../services/rex.service';
-//import { ProdrexService } from '../../../../services/prodrex.service';
 import { UserService } from '../../../../services/user.service';
-import { ReplenishmentService } from '../../../../services/replenishment/replenishment.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { PhotoService } from '../../../../services/asset/photo.service';
-import { AtsService } from '../../../../services/ats/ats.service';
 import { PService } from '../../../../services/p/p.service';
 
 @Component({
@@ -69,39 +58,26 @@ export class AssetSupplyPostPage {
     public toastCtrl: ToastController,
     public user: UserData,
     public config: Config,
-    private opportunityService: OpportunityService,
-    private posOrderService: PosOrderService,
-    private tableService: TableService,
-    private route: ActivatedRoute,
-    private sessionService:SessionService,
     private utilService:UtilService,
     private productService:ProductService,
     private categoryService:CategoryService,
     private umService:UmService,
-    private dateService: DateService,
-    private rexService: RexService,
-    //private prodrexService: ProdrexService,
-    private userService: UserService,
     private fb: FormBuilder ,
-    private replenishmentService : ReplenishmentService,
-    private photoService: PhotoService,
-    private atsService: AtsService,
-    private ctgService: CategoryService,
     private pService: PService,
   ) {
 
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state?.item) {
-      this.movement = navigation.extras.state.item;
+      this.rcv = navigation.extras.state.item;
       //this.uploadedUrl = this.movement.data.imgin;
       //this.uiDate=this.movement.data.datein;
     } else {
       console.warn('No se recibió item por NavigationExtras.state');
     }
-    console.log("Item recibido:", this.movement);
+    console.log("Item recibido:", this.rcv);
 
   }
-  movement:any;
+  rcv:any;
   hash:string='';
   table:any
   rexDocument:any;

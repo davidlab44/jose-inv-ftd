@@ -20,28 +20,25 @@
   <form [formGroup]="form">    
     <input type="hidden" formControlName="id">
     <ion-list>
-
       <!-- Capturar desde cámara -->  
       <ion-button              
         expand="block"
         (click)="takePhotoAndUpload()"> 
         <ion-icon name="camera-outline" slot="start"></ion-icon>
         Capturar imagen
-        <!--{{ uploading ? 'Procesando OCR...' : 'Capturar imagen' }} -->
       </ion-button>            
       <!-- Seleccionar desde galería -->
       <ion-button
         expand="block"
         color="secondary"      
         (click)="pickImageAndUpload()"> 
-        <ion-icon name="images-outline" slot="start"></ion-icon>                                                                                      
+        <ion-icon name="images-outline" slot="start"></ion-icon> 
         Seleccionar de galería 
       </ion-button> 
-<!--      <ion-spinner             -->
+      <!--<ion-spinner             -->
         <!--*ngIf="uploading"      -->
         <!--name="crescent">       -->
       <!--</ion-spinner>  -->
-
       <!--<ion-button-->
         <!--expand="block"-->
         <!--[disabled]="uploading"-->
@@ -53,7 +50,6 @@
         <!--</ion-spinner>-->
         <!--{{ uploading ? 'Procesando OCR...' : 'Capturar imagen' }}-->
       <!--</ion-button>-->
-
       <!--      <ion-button expand="block" (click)="takePhotoAndUpload()">-->
         <!--📸 Tomar foto-->
       <!--</ion-button>-->
@@ -67,16 +63,15 @@
       <!--<p *ngIf="uploading">-->
         <!--Subiendo: {{ uploadProgress }} %-->
       <!--</p>-->
-      <ion-card *ngIf="rawImage">
+      <ion-card *ngIf="movement?.data?.imgout">
         <ion-card-header>
           <ion-card-title>Imagen subida</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <img [src]="rawImage"/>
-          <!--<p>{{ uploadedUrl }}</p>-->
+          <img [src]="movement?.data?.imgout"/>
+          <p>{{ movement.data.imgout }}</p>
         </ion-card-content>
       </ion-card>
-
 
       <br><br>
       <ion-item class="date-picker-item" button detail="false" (click)="openDatePicker()">
@@ -125,28 +120,6 @@
           <ion-input formControlName="deliveryout"></ion-input>
         </ion-item>
 
-
-        <!--<ion-item>-->
-          <!--<ion-label position="floating">Viaje:</ion-label>-->
-          <!--<ion-input formControlName="tripout"></ion-input>-->
-        <!--</ion-item>-->
-
-        <!--<br><br>-->
-        <!--<ion-item  *ngIf="shipList?.length"  >-->
-          <!--<ion-label>Motonave</ion-label>-->
-          <!--<ion-select-->
-            <!--interface="popover"-->
-            <!--formControlName="shipout"-->
-            <!--(ionChange)="onShipSelect($event)">-->
-            <!--<ion-select-option-->
-              <!--*ngFor="let ship of shipList"-->
-              <!--[value]="ship.id">-->
-              <!--{{ ship.data?.name | uppercase }}-->
-            <!--</ion-select-option>-->
-          <!--</ion-select>-->
-        <!--</ion-item>-->
-        <!--<br>-->
-
         <br>
         <div style="border:solid 1px #d5d5d5;padding:10px">
           <ion-row>
@@ -167,10 +140,6 @@
             </ion-col>
           </ion-row>
         </div>
-        <!--<ion-item>-->
-          <!--<ion-label position="floating">Barco:</ion-label>-->
-          <!--<ion-input formControlName="shipout"></ion-input>-->
-        <!--</ion-item>-->
     </ion-list>
     <br>
     <ion-button expand="block" (click)="patch()">
@@ -198,7 +167,7 @@
       <ion-datetime
         [min]="minDate"
         [max]="maxDate"        
-        class="mobile-datetime"                                                                                                                       
+        class="mobile-datetime" 
         presentation="date-time"
         locale="es-CO"
         [preferWheel]="ios"
