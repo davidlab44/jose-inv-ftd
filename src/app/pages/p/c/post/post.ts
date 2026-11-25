@@ -88,8 +88,20 @@ export class AssetSupplyPostPage {
     private atsService: AtsService,
     private ctgService: CategoryService,
     private pService: PService,
-  ) {}
+  ) {
 
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras?.state?.item) {
+      this.movement = navigation.extras.state.item;
+      //this.uploadedUrl = this.movement.data.imgin;
+      //this.uiDate=this.movement.data.datein;
+    } else {
+      console.warn('No se recibió item por NavigationExtras.state');
+    }
+    console.log("Item recibido:", this.movement);
+
+  }
+  movement:any;
   hash:string='';
   table:any
   rexDocument:any;

@@ -511,6 +511,15 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'p-c-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../p/c/getall/getall.module').then(m =>m.GetallModule)
+          }
+        ]   
+      },
+      {
         path: 'p-c-post',
         children: [
           {

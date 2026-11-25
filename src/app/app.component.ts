@@ -61,7 +61,7 @@ export class AppComponent implements OnInit {
      },
      {
        title: 'Actividad',
-       url: '/app/tabs/p-c-post',
+       url: '/app/tabs/p-c-getall',
        icon: 'hammer'
      },
 
@@ -220,7 +220,7 @@ export class AppComponent implements OnInit {
    },  
    {
      title: 'Actividad / boilerplate',
-     url: '/app/tabs/p-c-post',
+     url: '/app/tabs/p-c-getall',
      icon: 'hammer'
    },
    {
