@@ -251,7 +251,7 @@ export class AssetSupplyPostPage {
           this.selectedUsers = [];
           this.showMedia = false;
           this.utilService.presentToast('registro creado','success')
-          //this.router.navigate(['/app/tabs/asset-supply-readprdct'],   { replaceurl: true });    
+          this.router.navigate(['/app/tabs/p-exc-getAll'],   { replaceUrl: true });    
         }
       },
       error: () => { this.saving = false; this.utilService.presentToast('No se pudo guardar', 'danger'); },

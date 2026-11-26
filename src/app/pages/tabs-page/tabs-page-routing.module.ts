@@ -528,6 +528,43 @@ const routes: Routes = [
           }
         ]   
       },
+      {
+        path: 'p-exc-get',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../p/exc/get/get.module').then(m =>m.GetModule )
+          }
+        ]   
+      },
+
+      {
+        path: 'p-exc-patch',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../p/exc/patch/patch.module').then(m =>m.PatchModule )
+          }
+        ]   
+      },
+      {
+        path: 'p-exc-getall',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../p/exc/end/patch.module').then(m =>m.PatchModule )
+          }
+        ]   
+      },
+      {
+        path: 'p-exc-end',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../p/exc/end/patch.module').then(m =>m.PatchModule )
+          }
+        ]   
+      },
 
       {
         path: '',

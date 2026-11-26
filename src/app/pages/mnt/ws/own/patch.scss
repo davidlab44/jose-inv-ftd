@@ -41,3 +41,6 @@
 .photo-actions ion-button { flex: 1; min-width: 0; margin-inline: 0; }
 .viewer-note { color: #fff; padding: 10px 12px; background: #303030; border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
 :host ::ng-deep ion-modal.photo-note-modal { --width: min(92vw, 420px); --height: 260px; --border-radius: 12px; }
+
+.section-heading { background: var(--ion-color-light); font-weight: 600; margin-top: 12px; border-radius: 5px; }
+.item-name { display: block; width: 100%; text-align: left; background: transparent; color: var(--ion-color-primary); font: inherit; padding: 8px 0; cursor: pointer; overflow-wrap: anywhere; }

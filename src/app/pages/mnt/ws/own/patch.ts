@@ -9,6 +9,7 @@ import { AtsService } from '../../../../services/ats/ats.service';
 import { StgService } from '../../../../services/mnt/stg.service';
 import { MntService } from '../../../../services/mnt/mnt.service';
 import { CcoService } from '../../../../services/cc/cco.service';
+import { PService } from '../../../../services/p/p.service';
 import { Router } from '@angular/router';
 interface PhotoEntry { img: string; date: string; status: string; note: string; pending?: boolean; replacesUrl?: string; saving?: boolean; dirty?: boolean; }
 interface Annotation { type: 'point' | 'circle' | 'arrow'; x1: number; y1: number; x2?: number; y2?: number; }
@@ -19,13 +20,18 @@ export class PatchPage {
   user:any;
   taskList:any[]=[];
   task:any;
+  pList: any[] = [];
+  filteredPList: any[] = [];
+  pLoading = false;
+  pError = false;
   now:any;
 
   constructor(private router: Router, 
               private photoService: PhotoService,
               private actionSheetController: ActionSheetController,
               private alertController: AlertController,
-              private tService: TService, 
+              private tService: TService,
+              private pService: PService, 
               private userService: UserService, 
               private utilService: UtilService, 
               private dateService: DateService, 
@@ -37,7 +43,7 @@ export class PatchPage {
     const navigation = this.router.getCurrentNavigation();
     console.log("Item recibido en patch:", navigation);
     this.user = this.router.getCurrentNavigation()?.extras?.state?.user;
-    this.taskList = this.router.getCurrentNavigation()?.extras?.state?.taskList;
+    this.taskList = this.router.getCurrentNavigation()?.extras?.state?.taskList ?? [];
     console.log('user recibido router',this.user);
     console.log('taskList recibido router',this.taskList);
   }
@@ -48,11 +54,46 @@ export class PatchPage {
 
   filteredTaskList: any[] = [];
   ionViewWillEnter() {
-    this.filteredTaskList = this.taskList.filter(
-      (task) => task?.data?.asgn?.includes(this.user?.id)
-    );
+    this.filteredTaskList = this.taskList.filter(task => this.isAssigned(task));
     console.log('filteredTaskList',this.filteredTaskList)
     this.loadCco();
+    this.loadP();
+  }
+
+  isAssigned(item: any): boolean {
+    return this.user?.id != null && Array.isArray(item?.data?.asgn)
+      && item.data.asgn.includes(this.user.id);
+  }
+
+  loadP() {
+    this.pLoading = true;
+    this.pError = false;
+    this.pService.getAll().subscribe({
+      next: (r: any[]) => {
+        this.pList = Array.isArray(r) ? r : [];
+        this.filteredPList = this.pList.filter(item => this.isAssigned(item));
+        this.pLoading = false;
+      },
+      error: err => {
+        console.log('loadP error', err);
+        this.pLoading = false;
+        this.pError = true;
+      }
+    });
+  }
+
+  goToTaskIni(task: any) {
+    const pageRoute = `/app/tabs/mnt-t-ini`;
+    this.router.navigate([pageRoute], {
+      state: { item: task, custom: 'prueba' }
+    });
+  }
+
+  goToActivity(activity: any) {
+    const pageRoute = `/app/tabs/p-exc-patch`;
+    this.router.navigate([pageRoute], {
+      state: { item: activity, custom: 'prueba' }
+    });
   }
 
   ccoList: any[] = [];

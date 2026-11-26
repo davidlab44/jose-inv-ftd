@@ -7,12 +7,13 @@
 
 <ion-content>
   <ion-grid>
+    <ion-row class="section-heading"><ion-col>Tareas de mantenimiento</ion-col></ion-row>
     <ion-row *ngFor="let task of mappedList" class="ion-align-items-center">
       <ion-col size="2">
         <span>{{task?.data?.mnt?.data?.cco?.data?.name}}</span>
       </ion-col>
       <ion-col size="9">
-        <span>{{task?.data?.ats?.data?.name}}</span>
+        <button type="button" class="item-name" (click)="goToTaskIni(task)">{{task?.data?.ats?.data?.name || task?.data?.name || task.id}}</button>
       </ion-col>
       <ion-col size="1">
         <ion-button fill="clear" size="small" (click)="requestSpv(task)">
@@ -20,5 +21,16 @@
         </ion-button>
       </ion-col>
     </ion-row>
+    <ion-row class="section-heading"><ion-col>Actividades</ion-col></ion-row>
+    <ion-row *ngFor="let activity of filteredPList" class="ion-align-items-center">
+      <ion-col size="2">{{activity.id}}</ion-col>
+      <ion-col size="9">
+        <button type="button" class="item-name" (click)="goToActivity(activity)">{{activity?.data?.name}}</button>
+      </ion-col>
+      <ion-col size="1"></ion-col>
+    </ion-row>
+    <ion-row *ngIf="pLoading"><ion-col><ion-spinner name="dots"></ion-spinner></ion-col></ion-row>
+    <ion-row *ngIf="pError"><ion-col>No se pudieron cargar las actividades. <ion-button size="small" (click)="loadP()">Reintentar</ion-button></ion-col></ion-row>
+    <ion-row *ngIf="!pLoading && !pError && filteredPList.length === 0"><ion-col>Sin actividades asignadas.</ion-col></ion-row>
   </ion-grid>
 </ion-content>

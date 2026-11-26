@@ -1,0 +1,18 @@
+<ion-header><ion-toolbar><ion-title>Actividades asignadas</ion-title><ion-buttons slot="end"><ion-button (click)="load()" [disabled]="loading" aria-label="Actualizar"><ion-icon slot="icon-only" name="refresh-outline"></ion-icon></ion-button></ion-buttons></ion-toolbar></ion-header>
+<ion-content>
+  <div class="status" *ngIf="loading"><ion-spinner name="crescent"></ion-spinner> Cargando actividades...</div>
+  <div class="status error" *ngIf="error">{{ error }} <ion-button size="small" (click)="load()">Reintentar</ion-button></div>
+  <ion-grid *ngIf="!loading && !error" class="activities">
+    <ion-row class="heading"><ion-col size="1">#</ion-col><ion-col size="1">ID</ion-col><ion-col size="9">Nombre</ion-col><ion-col size="1"></ion-col></ion-row>
+    <ng-container *ngFor="let group of [{title: 'Mantenimiento', rows: tRows, offset: 0}, {title: 'Actividades generales', rows: pRows, offset: tRows.length}]">
+      <ion-row class="section"><ion-col size="12">{{ group.title }} ({{ group.rows.length }})</ion-col></ion-row>
+      <ion-row *ngFor="let row of group.rows; let i = index; trackBy: trackById" class="activity">
+        <ion-col size="1">{{ group.offset + i + 1 }}</ion-col>
+        <ion-col size="1">{{ row.item.id }}</ion-col>
+        <ion-col size="9"><button class="task-name" (click)="goToTaskPatch(row.item)">{{ row.name }}<small *ngIf="row.context && row.context !== row.name">{{ row.context }}</small></button></ion-col>
+        <ion-col size="1"><button class="end" (click)="goToTaskEnd(row.item)" aria-label="Finalizar actividad"><ion-icon name="enter-outline"></ion-icon></button></ion-col>
+      </ion-row>
+      <ion-row *ngIf="!group.rows.length"><ion-col size="12" class="empty">Sin actividades asignadas</ion-col></ion-row>
+    </ng-container>
+  </ion-grid>
+</ion-content>

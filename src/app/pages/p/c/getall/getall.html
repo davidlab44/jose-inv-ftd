@@ -4,7 +4,7 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-searchbar
-      placeholder="Buscar"     
+      placeholder="Buscara"     
       [value]="hash"           
       (ionInput)="onSearch($event.detail.value)">
     </ion-searchbar> 
@@ -19,62 +19,42 @@
       </ion-button>            
     </ion-buttons>
   </ion-toolbar>
-  <ion-list class="search-results" *ngIf="filteredCcList.length > 0">
-    <ion-item
-      button
-      detail="false"           
-      *ngFor="let p of filteredCcList"
-      [class.inside-workshop]="insideWorkshopIds.has(+p.id)"
-      (click)="selectedItem(p)">
-      <ion-label>              
-        {{ p.data.name }}
-      </ion-label>
-    </ion-item>
-  </ion-list>
+<!--  <ion-list class="search-results" *ngIf="filteredCcList.length > 0">-->
+    <!--<ion-item-->
+      <!--button-->
+      <!--detail="false"           -->
+      <!--*ngFor="let p of filteredCcList"-->
+      <!--[class.inside-workshop]="insideWorkshopIds.has(+p.id)"-->
+      <!--(click)="selectedItem(p)">-->
+      <!--<ion-label>              -->
+        <!--{{ p.data.name }}-->
+      <!--</ion-label>-->
+    <!--</ion-item>-->
+  <!--</ion-list>-->
 </ion-header>  
 
 <ion-content>
 
-  <!--<section class="location-card" *ngIf="cco" [attr.data-location]="lctn" aria-live="polite">-->
-    <!--<div class="location-icon"><ion-icon name="location-outline"></ion-icon></div>-->
-    <!--<div class="location-info">-->
-      <!--<div class="location-caption">Ubicación logística</div>-->
-      <!--<h2>{{ cco?.data?.name }}</h2>-->
-      <!--<div class="location-value">-->
-        <!--<ion-spinner *ngIf="locationLoading" name="crescent"></ion-spinner>-->
-        <!--<span *ngIf="locationLoading">Consultando ubicación...</span>-->
-        <!--<span *ngIf="locationError">No se pudo consultar la ubicación.</span>-->
-        <!--<span *ngIf="!locationLoading && !locationError">{{ locationLabels[lctn] || 'Ubicación no disponible' }}</span>-->
-      <!--</div>-->
-    <!--</div>-->
-    <!--<span class="location-code" *ngIf="!locationLoading && !locationError && locationLabels[lctn]">{{ lctn | uppercase }}</span>-->
-  <!--</section>-->
-  <!--<div class="tasks-heading" *ngIf="cco">Tareas de mantenimiento <span>{{ fltrdTList.length }}</span></div>-->
-  <ion-list *ngIf="cc">
-    <ion-grid
-      *ngFor="let p of fltrdTList"
-      class="subtask">
-      <ion-row
-        [class.approved]="p?.data?.mnt?.data?.dateapv != null"
-        [class.pending]="p?.data?.mnt?.data?.dateapv == null"
-        [class.inside-workshop]="p?.isInside">
-        <ion-col size="1" class="subtask-title">
-          {{ p?.i }}
+  <h2>hello</h2>
+  <ion-list>
+    <ion-grid *ngFor="let p of fltrdTList" class="subtask">
+      <ion-row>
+        <ion-col size="2" class="subtask-title">
+          {{ p?.id}}
+          <h2>hello</h2>
         </ion-col>
-        <!--<ion-col size="8" class="subtask-title">-->
-          <!--{{ p?.created_at }}-->
-        <!--</ion-col>-->
-        <!--<ion-col size="2" class="subtask-title" *ngIf="p.data.in" >-->
-          <!--{{ p?.data?.in }}-->
-        <!--</ion-col>-->
-        <ion-col size="1"     class="subtask-title"
-          (click)="goToP(p)">
-          {{ p?.data?.created_at }}
+        <ion-col size="3" class="subtask-title" click)="goToPatch(p)">
+          {{ p?.data?.name }}   hola
         </ion-col>
-        <ion-col size="7"
-          class="subtask-title"
-          (click)="goToPatch(p)">
-          {{ p?.data?.name }}
+        <ion-col size="6"  (click)="goToPatch(p)">
+          hola
+          <ion-buttons slot="end">
+            <ion-button>
+              <span>
+                <ion-icon name="enter"></ion-icon>
+              </span>
+            </ion-button>    
+          </ion-buttons>
         </ion-col>
         <!--<ion-col   *ngIf="p?.data?.ats?.data?.stg?.data?.order"-->
           <!--size="2"-->

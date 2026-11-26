@@ -1,0 +1,12 @@
+.activities { max-width: 1100px; margin: auto; padding: 10px; }
+ion-row { align-items: center; }
+ion-col { min-width: 0; overflow-wrap: anywhere; }
+.heading { color: var(--ion-color-medium); font-size: 12px; font-weight: 600; }
+.section { background: var(--ion-color-light); color: var(--ion-color-dark); font-weight: 700; border-radius: 6px; margin-top: 12px; }
+.activity { border-bottom: 1px solid var(--ion-color-light-shade); min-height: 52px; font-size: 13px; }
+.task-name, .end { background: transparent; color: var(--ion-color-primary); cursor: pointer; padding: 8px 0; width: 100%; }
+.task-name { text-align: left; font-size: 14px; font-weight: 600; line-height: 1.4; }
+.task-name small { display: block; color: var(--ion-color-medium); font-weight: 400; }
+.end { font-size: 22px; }
+.status, .empty { padding: 16px; color: var(--ion-color-medium); text-align: center; }
+.error { color: var(--ion-color-danger); }

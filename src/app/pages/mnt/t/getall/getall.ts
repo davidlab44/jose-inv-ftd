@@ -279,18 +279,6 @@ export class GetallPage implements OnInit {
     });
   }
 
-  /*goToPatch(p:any){*/
-    /*const pageRoute = `/app/tabs/mnt-t-stend`;*/
-    /*this.router.navigate([pageRoute], { */
-      /*state: {*/
-        /*item: p,*/
-        /*custom:'prueba',*/
-        /*oid: this.dateService.getDate()*/
-      /*}     */
-    /*}); */
-    /*//this.router.navigate(['/app/tabs/mnt-stg-getall'],   { replaceUrl: true }); */
-  /*}*/
-
   lctn: string = '';
   locationLoading = false;
   locationError = false;
@@ -323,7 +311,7 @@ export class GetallPage implements OnInit {
 
 
   presentFilter(){
-    this.router.navigate(['/app/tabs/p-c-post'],{ replaceUrl: true }); 
+    this.router.navigate(['/app/tabs/p-c-getall'],{ replaceUrl: true }); 
   }
 
 
